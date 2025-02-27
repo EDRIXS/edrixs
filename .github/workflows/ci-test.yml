@@ -120,7 +120,7 @@ jobs:
   publish-docs:
     name: Deploy docs
     runs-on: ${{ matrix.host-os }}
-    needs: lint
+    needs: test
 
     strategy:
       matrix:
