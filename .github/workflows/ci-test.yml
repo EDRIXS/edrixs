@@ -118,13 +118,33 @@ jobs:
           path: docs/build/html/
 
   publish-docs:
-    name: Deploy
-    uses: peaceiris/actions-gh-pages@v4
-    with:
-      github_token: ${{ secrets.GITHUB_TOKEN }}
-      publish_dir: ./public
-      path: docs/build/html/        
+    name: Deploy docs
+    runs-on: ${{ matrix.host-os }}
+    needs: lint
 
+    strategy:
+      matrix:
+        # host-os: ["ubuntu-latest", "macos-13", "macos-14"]
+        host-os: ["ubuntu-latest"]
+        python-version: ["3.12"]
+      fail-fast: false
+
+    defaults:
+      run:
+        shell: bash -l {0}
+
+    steps:
+      - name: Download docs from GitHub artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ env.REPOSITORY_NAME }}-${{ matrix.python-version }}-${{ matrix.host-os }}-docs
+          path: docs/build/html/
+
+      - name: Deploy docs to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/build/html/
 
   # publish-docs:
   #   if: github.repository_owner == 'NSLS-II' && github.ref == 'refs/heads/master'
