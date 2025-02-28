@@ -118,6 +118,7 @@ jobs:
           path: docs/build/html/
 
   publish-docs:
+    if: github.repository_owner == 'EDRIXS' && github.ref == 'refs/heads/master'
     name: Deploy docs
     runs-on: ${{ matrix.host-os }}
     needs: test
