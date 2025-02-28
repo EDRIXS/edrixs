@@ -97,9 +97,9 @@ jobs:
       #     set -vxeuo pipefail
       #     delocate-wheelpython -v ./dist/${{ env.REPOSITORY_NAME }}-*-cp${PYTHON_VERSION_NODOT}*.whl
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.REPOSITORY_NAME }}-wheels
+          name: ${{ env.REPOSITORY_NAME }}-${{ matrix.python-version }}-${{ matrix.host-os }}-wheel
           path: dist/*
 
       - name: Test with pytest
@@ -192,6 +192,12 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write
+    strategy:
+      matrix:
+        # host-os: ["ubuntu-latest", "macos-13", "macos-14"]
+        host-os: ["ubuntu-latest"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+      fail-fast: false
 
     steps:
       - name: Set env vars
@@ -202,9 +208,9 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Download wheels from GitHub artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: ${{ env.REPOSITORY_NAME }}-wheels
+          name: ${{ env.REPOSITORY_NAME }}-${{ matrix.python-version }}-${{ matrix.host-os }}-wheel
           path: dist/
 
       - name: Publish wheels to PyPI
