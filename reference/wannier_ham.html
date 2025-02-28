@@ -1,0 +1,386 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>wannier_ham &mdash; edrixs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Release History" href="../release-history.html" />
+    <link rel="prev" title="utils" href="utils.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            edrixs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">edrixs User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Pedagogical examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">edrixs Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="angular_momentum.html">angular_momentum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="basis_transform.html">basis_transform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coulomb_utensor.html">coulomb_utensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fit_hyb.html">fit_hyb</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fock_basis.html">fock_basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="iostream.html">iostream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manybody_operator.html">manybody_operator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="photon_transition.html">photon_transition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_spectrum.html">plot_spectrum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rixs_utils.html">rixs_utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc.html">soc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers.html">solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">utils</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">wannier_ham</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.wannier_ham.HR"><code class="docutils literal notranslate"><span class="pre">HR</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#edrixs.wannier_ham.HR.copy_hr"><code class="docutils literal notranslate"><span class="pre">HR.copy_hr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edrixs.wannier_ham.HR.from_file"><code class="docutils literal notranslate"><span class="pre">HR.from_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edrixs.wannier_ham.HR.get_hr"><code class="docutils literal notranslate"><span class="pre">HR.get_hr()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edrixs.wannier_ham.HR.get_hr0"><code class="docutils literal notranslate"><span class="pre">HR.get_hr0()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.wannier_ham.KVec"><code class="docutils literal notranslate"><span class="pre">KVec</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#edrixs.wannier_ham.KVec.kvec_from_file"><code class="docutils literal notranslate"><span class="pre">KVec.kvec_from_file()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edrixs.wannier_ham.KVec.set_base"><code class="docutils literal notranslate"><span class="pre">KVec.set_base()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.wannier_ham.SymKVec"><code class="docutils literal notranslate"><span class="pre">SymKVec</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#edrixs.wannier_ham.SymKVec.from_hsymkpt"><code class="docutils literal notranslate"><span class="pre">SymKVec.from_hsymkpt()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edrixs.wannier_ham.SymKVec.from_hsymkpt_uni"><code class="docutils literal notranslate"><span class="pre">SymKVec.from_hsymkpt_uni()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edrixs.wannier_ham.SymKVec.get_klen"><code class="docutils literal notranslate"><span class="pre">SymKVec.get_klen()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.wannier_ham.UniKVec"><code class="docutils literal notranslate"><span class="pre">UniKVec</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#edrixs.wannier_ham.UniKVec.from_grid"><code class="docutils literal notranslate"><span class="pre">UniKVec.from_grid()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">edrixs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">edrixs Reference</a></li>
+      <li class="breadcrumb-item active">wannier_ham</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/reference/wannier_ham.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-edrixs.wannier_ham">
+<span id="wannier-ham"></span><h1>wannier_ham<a class="headerlink" href="#module-edrixs.wannier_ham" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="edrixs.wannier_ham.HR">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">edrixs.wannier_ham.</span></span><span class="sig-name descname"><span class="pre">HR</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nwann</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrpt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">irpt0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rpts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg_rpt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/wannier_ham.html#HR"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.wannier_ham.HR" title="Link to this definition">¶</a></dt>
+<dd><p>Class for post-process of the Wannier90 tight-binding (TB) Hamiltonian in real space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>nwann: int</strong></dt><dd><p>Number of Wannier orbitals.</p>
+</dd>
+<dt><strong>nrpt: int</strong></dt><dd><p>Number of <span class="math notranslate nohighlight">\(r\)</span> points.</p>
+</dd>
+<dt><strong>irpt0: int</strong></dt><dd><p>Index of the point (0,0,0).</p>
+</dd>
+<dt><strong>rpts: float array</strong></dt><dd><p>The coordinates of <span class="math notranslate nohighlight">\(r\)</span> points.</p>
+</dd>
+<dt><strong>deg_rpt: int array</strong></dt><dd><p>Degenerancy of <span class="math notranslate nohighlight">\(r\)</span> points.</p>
+</dd>
+<dt><strong>hr: complex array</strong></dt><dd><p>Hamiltonian <span class="math notranslate nohighlight">\(H(r)\)</span> from Wannier90.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="edrixs.wannier_ham.HR.copy_hr">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">copy_hr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/wannier_ham.html#HR.copy_hr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.wannier_ham.HR.copy_hr" title="Link to this definition">¶</a></dt>
+<dd><p>Copy instance of HR.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>other: HR object</strong></dt><dd><p>A HR object to be copied.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>HR: HR object</dt><dd><p>Return a new HR object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edrixs.wannier_ham.HR.from_file">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'wannier90_hr.dat'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/wannier_ham.html#HR.from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.wannier_ham.HR.from_file" title="Link to this definition">¶</a></dt>
+<dd><p>Generate a TB Hamiltonian from Wannier90 output file “case_hr.dat”.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>fname: str</strong></dt><dd><p>The file that contains the Wannier90 output file: “case_hr.dat”.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>HR: HR object</dt><dd><p>A HR object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edrixs.wannier_ham.HR.get_hr">
+<span class="sig-name descname"><span class="pre">get_hr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ispin</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/wannier_ham.html#HR.get_hr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.wannier_ham.HR.get_hr" title="Link to this definition">¶</a></dt>
+<dd><p>Return the Hamiltonian of <span class="math notranslate nohighlight">\(H(r)\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ispin: logical</strong></dt><dd><p>Whether to include spin degree of freedom or not (default: False)</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>hr: 3d complex array</dt><dd><p>The Hamiltonian <span class="math notranslate nohighlight">\(H(r)\)</span>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edrixs.wannier_ham.HR.get_hr0">
+<span class="sig-name descname"><span class="pre">get_hr0</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ispin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/wannier_ham.html#HR.get_hr0"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.wannier_ham.HR.get_hr0" title="Link to this definition">¶</a></dt>
+<dd><p>Return the on-site term <span class="math notranslate nohighlight">\(H(r=0)\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ispin: logical</strong></dt><dd><p>Whether to include spin degree of freedom or not (default: False).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>hr: 2d complex array</dt><dd><p>The on-site Hamiltonian.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="edrixs.wannier_ham.KVec">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">edrixs.wannier_ham.</span></span><span class="sig-name descname"><span class="pre">KVec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kpt_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'uni'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kbase</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nkpt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kvec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/wannier_ham.html#KVec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.wannier_ham.KVec" title="Link to this definition">¶</a></dt>
+<dd><p>Define <span class="math notranslate nohighlight">\(k\)</span> points in BZ, high symmetry line or uniform grid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>kpt_type: str</strong></dt><dd><p>The type of <span class="math notranslate nohighlight">\(k\)</span> points, ‘uni’ or ‘sym’.</p>
+</dd>
+<dt><strong>kbase: :math:`3 times 3` float array</strong></dt><dd><p>The basis vectors of the primitive reciprocal space.</p>
+</dd>
+<dt><strong>nkpt: int</strong></dt><dd><p>Number of <span class="math notranslate nohighlight">\(k\)</span> points.</p>
+</dd>
+<dt><strong>kvec: float array</strong></dt><dd><p>The <span class="math notranslate nohighlight">\(k\)</span> points.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="edrixs.wannier_ham.KVec.kvec_from_file">
+<span class="sig-name descname"><span class="pre">kvec_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/wannier_ham.html#KVec.kvec_from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.wannier_ham.KVec.kvec_from_file" title="Link to this definition">¶</a></dt>
+<dd><p>Read <span class="math notranslate nohighlight">\(k\)</span> points from file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>fname: str</strong></dt><dd><p>File name.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edrixs.wannier_ham.KVec.set_base">
+<span class="sig-name descname"><span class="pre">set_base</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kbase</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/wannier_ham.html#KVec.set_base"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.wannier_ham.KVec.set_base" title="Link to this definition">¶</a></dt>
+<dd><p>Set the basis of the primitive reciprocal.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>kbase: :math:`3 times 3` float array</strong></dt><dd><p>The basis with respect to the global axis.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="edrixs.wannier_ham.SymKVec">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">edrixs.wannier_ham.</span></span><span class="sig-name descname"><span class="pre">SymKVec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">kbase</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hsymkpt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">klen</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/wannier_ham.html#SymKVec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.wannier_ham.SymKVec" title="Link to this definition">¶</a></dt>
+<dd><p>Class for defining <span class="math notranslate nohighlight">\(k\)</span> points in high symmetry line, derived from <a class="reference internal" href="#edrixs.wannier_ham.KVec" title="edrixs.wannier_ham.KVec"><code class="xref py py-class docutils literal notranslate"><span class="pre">KVec</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>kbase: :math:`3 times 3` float array</strong></dt><dd><p>Basis of the primitive reciprocal lattice.</p>
+</dd>
+<dt><strong>hsymkpt: float array</strong></dt><dd><p>Starting and end <span class="math notranslate nohighlight">\(k\)</span> points along high symmetry lines.</p>
+</dd>
+<dt><strong>klen: float array</strong></dt><dd><p>Length of segments of <span class="math notranslate nohighlight">\(k\)</span> points line.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="edrixs.wannier_ham.SymKVec.from_hsymkpt">
+<span class="sig-name descname"><span class="pre">from_hsymkpt</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nkpt_per_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/wannier_ham.html#SymKVec.from_hsymkpt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.wannier_ham.SymKVec.from_hsymkpt" title="Link to this definition">¶</a></dt>
+<dd><p>Given starting and end <span class="math notranslate nohighlight">\(k\)</span> points of each segment,
+and the number of points per each segment,
+return the high symmetry <span class="math notranslate nohighlight">\(k\)</span> points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>nkpt_per_path: int</strong></dt><dd><p>Number of <span class="math notranslate nohighlight">\(k\)</span> points per each segment.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edrixs.wannier_ham.SymKVec.from_hsymkpt_uni">
+<span class="sig-name descname"><span class="pre">from_hsymkpt_uni</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">step</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/wannier_ham.html#SymKVec.from_hsymkpt_uni"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.wannier_ham.SymKVec.from_hsymkpt_uni" title="Link to this definition">¶</a></dt>
+<dd><p>Given a step, return high symmetry <span class="math notranslate nohighlight">\(k\)</span> points.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>step: float</strong></dt><dd><p>Step size.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edrixs.wannier_ham.SymKVec.get_klen">
+<span class="sig-name descname"><span class="pre">get_klen</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/wannier_ham.html#SymKVec.get_klen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.wannier_ham.SymKVec.get_klen" title="Link to this definition">¶</a></dt>
+<dd><p>Return length of <span class="math notranslate nohighlight">\(k\)</span> points segments.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="edrixs.wannier_ham.UniKVec">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">edrixs.wannier_ham.</span></span><span class="sig-name descname"><span class="pre">UniKVec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">grid</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/wannier_ham.html#UniKVec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.wannier_ham.UniKVec" title="Link to this definition">¶</a></dt>
+<dd><p>Class for defining uniform <span class="math notranslate nohighlight">\(k\)</span> points grid, derived from <a class="reference internal" href="#edrixs.wannier_ham.KVec" title="edrixs.wannier_ham.KVec"><code class="xref py py-class docutils literal notranslate"><span class="pre">KVec</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>grid: 3-elements tuple</strong></dt><dd><p>Three numbers defining a uniform grid, for example: <span class="math notranslate nohighlight">\(11 \times 11 \times 11\)</span>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="edrixs.wannier_ham.UniKVec.from_grid">
+<span class="sig-name descname"><span class="pre">from_grid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/wannier_ham.html#UniKVec.from_grid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.wannier_ham.UniKVec.from_grid" title="Link to this definition">¶</a></dt>
+<dd><p>Return uniform <span class="math notranslate nohighlight">\(k\)</span> points.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="utils.html" class="btn btn-neutral float-left" title="utils" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../release-history.html" class="btn btn-neutral float-right" title="Release History" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Brookhaven National Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

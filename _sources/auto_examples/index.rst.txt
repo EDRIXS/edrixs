@@ -1,0 +1,225 @@
+:orphan:
+
+Pedagogical examples
+====================
+
+Below are some examples illustrating the concepts behind and usage of EDRIXS.
+
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbnails">
+
+.. thumbnail-parent-div-open
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Exact diagonalization">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_example_0_ed_calculator_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_example_0_ed_calculator.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Exact diagonalization</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Crystal fields">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_example_1_crystal_field_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_example_1_crystal_field.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Crystal fields</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="RIXS calculations for an atomic model">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_example_2_single_atom_RIXS_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_example_2_single_atom_RIXS.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">RIXS calculations for an atomic model</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="When defining the bath states, it is useful to use the so-called symmetry adapted linear combinations of orbitals as the basis. These states take into account the symmetry relationships between the different bath atom orbitals and the fact that there are bath orbital combinations that do not interact with the impurity by symmetry. By doing this the problem can be represented with fewer orbitals, which makes the calculation far more efficient. The standard EDRIXS solver that we will use assumes that the bath states are represented by an integer number of bath sites set by nbath, each of which hosts the same number of spin-orbits as the impurity e.g. 10 for a d-electron material.">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_example_3_AIM_XAS_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_example_3_AIM_XAS.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Anderson impurity model for NiO XAS</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="In doing this we will go through the exercise of building and diagonalizing the Hamiltonian in a way that hopefully clarifies how to analyze other properties of the model.">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_example_4_GS_analysis_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_example_4_GS_analysis.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Ground state analysis for NiO</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Charge-transfer energy for NiO">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_example_5_charge_transfer_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_example_5_charge_transfer.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Charge-transfer energy for NiO</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="  .. math::     \begin{equation}     \hat{H} = \sum_{i,j}  \sum_{\sigma} t_{i,j} \hat{f}^{\dagger}_{i,\sigma} \hat{f}_{j, \sigma}     + U \sum_{i} \hat{n}_{i,\uparrow}\hat{n}_{i,\downarrow},     \end{equation}">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_example_6_Hubbard_dimer_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_example_6_Hubbard_dimer.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Hubbard Dimer</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="This case was chosen because the eigenvectors in question are simple enough for us to write them out more-or-less by hand, so this example helps the reader to understand what happens under the hood in more complex cases.">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_example_7_transitions_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_example_7_transitions.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">X-ray transitions</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="The simplest model that captures this physics requires four Ni spin-orbitals, representing the Ni e_g manifold. We will represent the ligand states in the same way as the Anderson impurity model in terms of one effective ligand spin-orbital per Ni spin-orbital. We assume these effective orbitals have been constructed so that each Ni orbital only bonds to one sister orbital. For simplicity, we will treat all Ni and all ligand orbitals as equivalent, even though a more realistic model would account for the different Coulomb and hopping of the d_{3z^2-r^2} and d_{x^2-y^2} orbitals. We therefore simply connect Ni and ligand orbitals via a constant hopping t. We also include the ligand energy parameter e_L.">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_example_8_Hunds_interactions_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_example_8_Hunds_interactions.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Hund's Interactions in charge transfer insulators</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Coulomb interactions">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_example_9_Coulomb_thumb.png
+    :alt:
+
+  :ref:`sphx_glr_auto_examples_example_9_Coulomb.py`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Coulomb interactions</div>
+    </div>
+
+
+.. thumbnail-parent-div-close
+
+.. raw:: html
+
+    </div>
+
+
+.. toctree::
+   :hidden:
+
+   /auto_examples/example_0_ed_calculator
+   /auto_examples/example_1_crystal_field
+   /auto_examples/example_2_single_atom_RIXS
+   /auto_examples/example_3_AIM_XAS
+   /auto_examples/example_4_GS_analysis
+   /auto_examples/example_5_charge_transfer
+   /auto_examples/example_6_Hubbard_dimer
+   /auto_examples/example_7_transitions
+   /auto_examples/example_8_Hunds_interactions
+   /auto_examples/example_9_Coulomb
+
+
+.. only:: html
+
+  .. container:: sphx-glr-footer sphx-glr-footer-gallery
+
+    .. container:: sphx-glr-download sphx-glr-download-python
+
+      :download:`Download all examples in Python source code: auto_examples_python.zip </auto_examples/auto_examples_python.zip>`
+
+    .. container:: sphx-glr-download sphx-glr-download-jupyter
+
+      :download:`Download all examples in Jupyter notebooks: auto_examples_jupyter.zip </auto_examples/auto_examples_jupyter.zip>`
+
+
+.. only:: html
+
+ .. rst-class:: sphx-glr-signature
+
+    `Gallery generated by Sphinx-Gallery <https://sphinx-gallery.github.io>`_

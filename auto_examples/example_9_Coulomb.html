@@ -1,0 +1,691 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Coulomb interactions &mdash; edrixs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="edrixs Reference" href="../reference/index.html" />
+    <link rel="prev" title="Hund’s Interactions in charge transfer insulators" href="example_8_Hunds_interactions.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            edrixs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">edrixs User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Pedagogical examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="example_0_ed_calculator.html">Exact diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_1_crystal_field.html">Crystal fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_2_single_atom_RIXS.html">RIXS calculations for an atomic model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_3_AIM_XAS.html">Anderson impurity model for NiO XAS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_4_GS_analysis.html">Ground state analysis for NiO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_5_charge_transfer.html">Charge-transfer energy for NiO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_6_Hubbard_dimer.html">Hubbard Dimer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_7_transitions.html">X-ray transitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_8_Hunds_interactions.html">Hund’s Interactions in charge transfer insulators</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Coulomb interactions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#create-matrix">Create matrix</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#parameterizing-interactions">Parameterizing interactions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#basis-transform">Basis transform</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#interactions">Interactions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#intra-orbital">1. Intra orbital</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#inter-orbital-coulomb-interactions">2. Inter orbital Coulomb interactions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#inter-orbital-exchange-interactions">3. Inter-orbital exchange interactions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pair-hopping-term">4. Pair hopping term</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#three-orbital">5. Three orbital</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#four-orbital">6. Four orbital</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#effects-of-multi-orbital-terms">Effects of multi-orbital terms</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">edrixs Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">edrixs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Pedagogical examples</a></li>
+      <li class="breadcrumb-item active">Coulomb interactions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/auto_examples/example_9_Coulomb.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-auto-examples-example-9-coulomb-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code.</p>
+</div>
+<section class="sphx-glr-example-title" id="coulomb-interactions">
+<span id="sphx-glr-auto-examples-example-9-coulomb-py"></span><h1>Coulomb interactions<a class="headerlink" href="#coulomb-interactions" title="Link to this heading">¶</a></h1>
+<p>In this example we provide more details on how Coulomb interactions are
+implemented in multiplet calculations and EDRIXS in particular. We aim
+to clarify the form of the matrices, how they are parametrized,
+and how the breaking of spherical symmetry can switch on additional elements
+that one might not anticipate. Our example is based on a <span class="math notranslate nohighlight">\(d\)</span> atomic shell.</p>
+<section id="create-matrix">
+<h2>Create matrix<a class="headerlink" href="#create-matrix" title="Link to this heading">¶</a></h2>
+<p>The Coulomb interaction between two particles can be written as</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{equation}
+\hat{H} = \frac{1}{2}
+\int d\mathbf{r} \int d\mathbf{r}^\prime
+\Sigma_{\sigma, \sigma^\prime}
+|\hat{\psi}^\sigma(\mathbf{r})|^2 \frac{e^2}{R}
+|\hat{\psi}^{\sigma^\prime}(\mathbf{r^\prime})|^2,
+\end{equation}\]</div>
+</div></blockquote>
+<p>where <span class="math notranslate nohighlight">\(\hat{\psi}^\sigma(\mathbf{r})\)</span> is the electron wavefunction, with
+spin <span class="math notranslate nohighlight">\(\sigma\)</span>, and <span class="math notranslate nohighlight">\(R=|r-r^\prime|\)</span> is the electron separation.
+Solving our problem in this form is difficult due to the need to symmeterize
+the wavefunction to follow fermionic statistics.
+Using second quantization, we can use operators to impose the required
+particle exchange statistics and write the equation in terms of
+a tensor <span class="math notranslate nohighlight">\(U\)</span></p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{equation}
+\hat{H} = \sum_{\alpha,\beta,\gamma,\delta,\sigma,\sigma^\prime}
+U_{\alpha\sigma,\beta\sigma^\prime,\gamma\sigma^\prime,\delta\sigma}
+\hat{f}^{\dagger}_{\alpha\sigma}
+\hat{f}^{\dagger}_{\beta\sigma^\prime}
+\hat{f}_{\gamma\sigma^\prime}\hat{f}_{\delta\sigma},
+\end{equation}\]</div>
+</div></blockquote>
+<p>where <span class="math notranslate nohighlight">\(\alpha\)</span>, <span class="math notranslate nohighlight">\(\beta\)</span>, <span class="math notranslate nohighlight">\(\gamma\)</span>, <span class="math notranslate nohighlight">\(\delta\)</span> are
+orbital indices and <span class="math notranslate nohighlight">\(\hat{f}^{\dagger}\)</span>
+(<span class="math notranslate nohighlight">\(\hat{f}\)</span>) are the creation (anihilation) operators.
+For a <span class="math notranslate nohighlight">\(d\)</span>-electron system, we have <span class="math notranslate nohighlight">\(10\)</span> distinct spin-orbitals
+(<span class="math notranslate nohighlight">\(5\)</span> orbitals each with <span class="math notranslate nohighlight">\(2\)</span> spins), which makes matrix the
+<span class="math notranslate nohighlight">\(10\times10\times10\times10\)</span> in total size.
+In EDRIXS the matrix can be created as follows:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+
+<a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">F0</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">F2</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">F4</span></a> <span class="o">=</span> <span class="mf">6.94</span><span class="p">,</span> <span class="mf">14.7</span><span class="p">,</span> <span class="mf">4.41</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">umat_chb</span></a> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_umat_slater</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">F0</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">F2</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">F4</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<p>We stored this under variable <code class="code docutils literal notranslate"><span class="pre">umat_chb</span></code> where “cbh” stands for
+complex harmonic basis, which is the default basis in EDRIXS.</p>
+</section>
+<section id="parameterizing-interactions">
+<h2>Parameterizing interactions<a class="headerlink" href="#parameterizing-interactions" title="Link to this heading">¶</a></h2>
+<p>EDRIXS parameterizes the interactions in <span class="math notranslate nohighlight">\(U\)</span> via Slater integral
+parameters <span class="math notranslate nohighlight">\(F^{k}\)</span>. These relate to integrals of various spherical
+Harmonics as well as Clebsch-Gordon coefficients, Gaunt coefficients,
+and Wigner 3J symbols. Textbooks such as <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> can be used for further
+reference. If you are interested in the details of how
+EDRIXS does this (and you probably aren’t) function <a class="reference internal" href="../reference/coulomb_utensor.html#edrixs.coulomb_utensor.umat_slater" title="edrixs.coulomb_utensor.umat_slater"><code class="xref py py-func docutils literal notranslate"><span class="pre">umat_slater()</span></code></a>,
+constructs the required matrix via Gaunt coeficents from
+<a class="reference internal" href="../reference/coulomb_utensor.html#edrixs.coulomb_utensor.get_gaunt" title="edrixs.coulomb_utensor.get_gaunt"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_gaunt()</span></code></a>. Two alternative parameterizations are common.
+The first are the Racah parameters, which are</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{split}\begin{eqnarray}
+A &amp;=&amp; F^0 - \frac{49}{441} F^4 \\
+B &amp;=&amp; \frac{1}{49}F^2 - \frac{5}{441}F^4 \\
+C &amp;=&amp; \frac{35}{441}F^4.
+\end{eqnarray}\end{split}\]</div>
+</div></blockquote>
+<p>or an alternative form for the Slater integrals</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{split}\begin{eqnarray}
+F_0 &amp;=&amp; F^0  \\
+F_2 &amp;=&amp; \frac{1}{49}F^2 \\
+F_4 &amp;=&amp; \frac{1}{441}F^4,
+\end{eqnarray}\end{split}\]</div>
+</div></blockquote>
+<p>which involves different normalization parameters.</p>
+</section>
+<section id="basis-transform">
+<h2>Basis transform<a class="headerlink" href="#basis-transform" title="Link to this heading">¶</a></h2>
+<p>If we want to use the real harmonic basis, we can use a tensor
+transformation, which imposes the following orbital order
+<span class="math notranslate nohighlight">\(3z^2-r^2, xz, yz, x^2-y^2, xy\)</span>, each of which involves
+<span class="math notranslate nohighlight">\(\uparrow, \downarrow\)</span> spin pairs. Let’s perform this transformation and
+store a list of these orbitals.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">umat</span></a> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">transform_utensor</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">umat_chb</span></a><span class="p">,</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">tmat_c2r</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">orbitals</span></a> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;3z^2-r^2&#39;</span><span class="p">,</span> <span class="s1">&#39;xz&#39;</span><span class="p">,</span> <span class="s1">&#39;yz&#39;</span><span class="p">,</span> <span class="s1">&#39;x^2-y^2&#39;</span><span class="p">,</span> <span class="s1">&#39;xy&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</section>
+<section id="interactions">
+<h2>Interactions<a class="headerlink" href="#interactions" title="Link to this heading">¶</a></h2>
+<p>Tensor <span class="math notranslate nohighlight">\(U\)</span> is a  series of matrix
+elements</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{equation}
+\langle\psi_{\gamma,\delta}^{\bar{\sigma},\bar{\sigma}^\prime}
+|\hat{H}|
+\psi_{\alpha,\beta}^{\sigma,\sigma^\prime}\rangle
+\end{equation}\]</div>
+</div></blockquote>
+<p>the combination of which defines the energetic cost of pairwise
+electron-electron interactions between states <span class="math notranslate nohighlight">\(\alpha,\sigma\)</span>
+and <span class="math notranslate nohighlight">\(\beta,\sigma^\prime\)</span>. In EDRIXS we follow the convention of
+summing over all orbital pairs. Some other texts count each pair of
+indices only once. The matrix elements here will consequently
+be half the magnitude of those in other references.
+We can express the interactions in terms of
+the orbitals involved. It is common to distinguish “direct Coulomb” and
+“exchange” interactions. The former come from electrons in the same orbital
+and the later involve swapping orbital labels for electrons. We will use
+<span class="math notranslate nohighlight">\(U_0\)</span> and <span class="math notranslate nohighlight">\(J\)</span> as a shorthand for distinguishing these.</p>
+<p>Before we describe the different types of interactions, we note that since
+the Coulomb interaction is real, and due to the spin symmmetry properties
+of the process <span class="math notranslate nohighlight">\(U\)</span> always obeys</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{equation}
+U_{\alpha\sigma,\beta\sigma^\prime,\gamma\sigma^\prime,\delta\sigma} =
+U_{\beta\sigma,\alpha\sigma^\prime,\delta\sigma^\prime,\gamma\sigma} =
+U_{\delta\sigma,\gamma\sigma^\prime,\beta\sigma^\prime,\alpha\sigma} =
+U_{\gamma\sigma,\delta\sigma^\prime,\alpha\sigma^\prime,\beta\sigma}.
+\end{equation}\]</div>
+</div></blockquote>
+<section id="intra-orbital">
+<h3>1. Intra orbital<a class="headerlink" href="#intra-orbital" title="Link to this heading">¶</a></h3>
+<p>The direct Coulomb energy cost to double-occupy an orbital comes from terms
+like <span class="math notranslate nohighlight">\(U_{\alpha\sigma,\alpha\bar\sigma,\alpha\bar\sigma,\alpha\sigma}\)</span>.
+In this notation, we use <span class="math notranslate nohighlight">\(\sigma^\prime\)</span> to denote that the matrix
+element is summed over all pairs and <span class="math notranslate nohighlight">\(\bar{\sigma}\)</span> to denote sums
+over all opposite spin pairs. Due to rotational symmetry, all these
+elements are the same and equal to</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{split}\begin{eqnarray}
+U_0 &amp;=&amp; \frac{A}{2} + 2B + \frac{3C}{2}\\
+    &amp;=&amp; \frac{F_0}{2} + 2F_2 + 18F_4
+\end{eqnarray}\end{split}\]</div>
+</div></blockquote>
+<p>Let’s print these to demonstrate where these live in the array</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span>
+    <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">val</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">umat</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="o">*</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">real</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">orbitals</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> </span><span class="se">\t</span><span class="s2"> </span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">val</span></a><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>3z^2-r^2         4.250
+xz               4.250
+yz               4.250
+x^2-y^2          4.250
+xy               4.250
+</pre></div>
+</div>
+</section>
+<section id="inter-orbital-coulomb-interactions">
+<h3>2. Inter orbital Coulomb interactions<a class="headerlink" href="#inter-orbital-coulomb-interactions" title="Link to this heading">¶</a></h3>
+<p>Direct Coulomb repulsion between different orbitals depends on terms like
+<span class="math notranslate nohighlight">\(U_{\alpha\sigma,\beta\sigma^\prime,\beta\sigma^\prime,\alpha\sigma}\)</span>.
+Expresions for these parameters are provided in column <span class="math notranslate nohighlight">\(U\)</span> in
+<a class="reference internal" href="#table-2-orbital"><span class="std std-ref">Table of 2 orbital interactions</span></a>. We can print the values from <code class="code docutils literal notranslate"><span class="pre">umat</span></code>
+like this:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">j</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/itertools.html#itertools.combinations" title="itertools.combinations" class="sphx-glr-backref-module-itertools sphx-glr-backref-type-py-function"><span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span></a><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="mi">2</span><span class="p">):</span>
+    <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">val</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">umat</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">j</span></a><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">j</span></a><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="o">*</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">real</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">orbitals</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> </span><span class="se">\t</span><span class="s2"> </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">orbitals</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">j</span></a><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> </span><span class="se">\t</span><span class="s2"> </span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">val</span></a><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>3z^2-r^2         xz              3.650
+3z^2-r^2         yz              3.650
+3z^2-r^2         x^2-y^2         2.900
+3z^2-r^2         xy              2.900
+xz               yz              3.150
+xz               x^2-y^2         3.150
+xz               xy              3.150
+yz               x^2-y^2         3.150
+yz               xy              3.150
+x^2-y^2          xy              3.900
+</pre></div>
+</div>
+</section>
+<section id="inter-orbital-exchange-interactions">
+<h3>3. Inter-orbital exchange interactions<a class="headerlink" href="#inter-orbital-exchange-interactions" title="Link to this heading">¶</a></h3>
+<p>Exchange terms exist with the form
+<span class="math notranslate nohighlight">\(U_{\alpha\sigma,\beta\sigma^\prime,\alpha\sigma^\prime,\beta\sigma}\)</span>.
+Expresions for these parameters are provided in column <span class="math notranslate nohighlight">\(J\)</span> of
+<a class="reference internal" href="#table-2-orbital"><span class="std std-ref">Table of 2 orbital interactions</span></a>. These come from terms like this in the matrix:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">j</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/itertools.html#itertools.combinations" title="itertools.combinations" class="sphx-glr-backref-module-itertools sphx-glr-backref-type-py-function"><span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span></a><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="mi">2</span><span class="p">):</span>
+    <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">val</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">umat</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">j</span></a><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">j</span></a><span class="o">*</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">real</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">orbitals</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> </span><span class="se">\t</span><span class="s2"> </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">orbitals</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">j</span></a><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> </span><span class="se">\t</span><span class="s2"> </span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">val</span></a><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>3z^2-r^2         xz              0.300
+3z^2-r^2         yz              0.300
+3z^2-r^2         x^2-y^2         0.675
+3z^2-r^2         xy              0.675
+xz               yz              0.550
+xz               x^2-y^2         0.550
+xz               xy              0.550
+yz               x^2-y^2         0.550
+yz               xy              0.550
+x^2-y^2          xy              0.175
+</pre></div>
+</div>
+</section>
+<section id="pair-hopping-term">
+<h3>4. Pair hopping term<a class="headerlink" href="#pair-hopping-term" title="Link to this heading">¶</a></h3>
+<p>Terms that swap pairs of electrons exist as
+<span class="math notranslate nohighlight">\((1-\delta_{\sigma\sigma'})U_{\alpha\sigma,\alpha\bar\sigma,\beta\bar\sigma,\beta\sigma}\)</span>
+and depend on exchange interactions column <span class="math notranslate nohighlight">\(J\)</span> from
+<a class="reference internal" href="#table-2-orbital"><span class="std std-ref">Table of 2 orbital interactions</span></a>
+and here in the matrix.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">j</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/itertools.html#itertools.combinations" title="itertools.combinations" class="sphx-glr-backref-module-itertools sphx-glr-backref-type-py-function"><span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span></a><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">),</span> <span class="mi">2</span><span class="p">):</span>
+    <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">val</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">umat</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">j</span></a><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">j</span></a><span class="o">*</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">real</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">orbitals</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> </span><span class="se">\t</span><span class="s2"> </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">orbitals</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">j</span></a><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> </span><span class="se">\t</span><span class="s2"> </span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">val</span></a><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>3z^2-r^2         xz              0.300
+3z^2-r^2         yz              0.300
+3z^2-r^2         x^2-y^2         0.675
+3z^2-r^2         xy              0.675
+xz               yz              0.550
+xz               x^2-y^2         0.550
+xz               xy              0.550
+yz               x^2-y^2         0.550
+yz               xy              0.550
+x^2-y^2          xy              0.175
+</pre></div>
+</div>
+</section>
+<section id="three-orbital">
+<h3>5. Three orbital<a class="headerlink" href="#three-orbital" title="Link to this heading">¶</a></h3>
+<p>Another set of terms that one might not immediately anticipate involve three
+orbitals like</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{split}\begin{equation}
+U_{\alpha\sigma, \gamma\sigma', \beta\sigma', \gamma\sigma} \\
+U_{\alpha\sigma, \gamma\sigma', \gamma\sigma', \beta\sigma} \\
+(1-\delta_{\sigma\sigma'})
+U_{\alpha\sigma, \beta\sigma', \gamma\sigma', \gamma\sigma}
+\end{equation}\end{split}\]</div>
+</div></blockquote>
+<p>for <span class="math notranslate nohighlight">\(\alpha=3z^2-r^2, \beta=x^2-y^2, \gamma=xz/yz\)</span>.
+These are needed to maintain the rotational symmetry of the interations.
+See <a class="reference internal" href="#table-3-orbital"><span class="std std-ref">Table of 3 orbital interactions</span></a> for the expressions. We can print some of
+these via:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ijkl</span></a> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span>
+
+<span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">j</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">k</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">l</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ijkl</span></a><span class="p">:</span>
+    <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">val</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">umat</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">j</span></a><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">k</span></a><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">l</span></a><span class="o">*</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">real</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">orbitals</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> </span><span class="se">\t</span><span class="s2"> </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">orbitals</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">j</span></a><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> </span><span class="se">\t</span><span class="s2">&quot;</span>
+          <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">orbitals</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">k</span></a><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> </span><span class="se">\t</span><span class="s2"> </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">orbitals</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">l</span></a><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> </span><span class="se">\t</span><span class="s2"> </span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">val</span></a><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>3z^2-r^2         xz             x^2-y^2          xz              0.217
+3z^2-r^2         yz             x^2-y^2          yz              -0.217
+xz               3z^2-r^2       x^2-y^2          xz              -0.433
+xz               xz             x^2-y^2          3z^2-r^2        0.217
+yz               3z^2-r^2       x^2-y^2          yz              0.433
+yz               yz             x^2-y^2          3z^2-r^2        -0.217
+</pre></div>
+</div>
+</section>
+<section id="four-orbital">
+<h3>6. Four orbital<a class="headerlink" href="#four-orbital" title="Link to this heading">¶</a></h3>
+<p>Futher multi-orbital terms include
+<span class="math notranslate nohighlight">\(U_{\alpha\sigma,\beta\sigma^\prime,\gamma\sigma^\prime,\delta\sigma}\)</span>.
+We can find these here in the matrix:</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ijkl</span></a> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span>
+
+<span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">j</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">k</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">l</span></a> <span class="ow">in</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ijkl</span></a><span class="p">:</span>
+    <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">val</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">umat</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">j</span></a><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">k</span></a><span class="o">*</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">l</span></a><span class="o">*</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">real</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">orbitals</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">i</span></a><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> </span><span class="se">\t</span><span class="s2"> </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">orbitals</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">j</span></a><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> </span><span class="se">\t</span><span class="s2"> </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">orbitals</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">k</span></a><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2">&quot;</span>
+          <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2"> </span><span class="si">{</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">orbitals</span></a><span class="p">[</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">l</span></a><span class="p">]</span><span class="si">:</span><span class="s2">&lt;8</span><span class="si">}</span><span class="s2"> </span><span class="se">\t</span><span class="s2"> </span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">val</span></a><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>3z^2-r^2         xz              yz              xy              -0.433
+3z^2-r^2         xz              xy              yz              0.217
+3z^2-r^2         yz              xz              xy              -0.433
+3z^2-r^2         yz              xy              xz              0.217
+3z^2-r^2         xy              xz              yz              0.217
+3z^2-r^2         xy              yz              xz              0.217
+x^2-y^2          xz              xy              yz              -0.375
+x^2-y^2          yz              xy              xz              0.375
+x^2-y^2          xy              xz              yz              -0.375
+x^2-y^2          xy              yz              xz              0.375
+</pre></div>
+</div>
+</section>
+</section>
+<section id="effects-of-multi-orbital-terms">
+<h2>Effects of multi-orbital terms<a class="headerlink" href="#effects-of-multi-orbital-terms" title="Link to this heading">¶</a></h2>
+<p>To test the effects of the multi-orbital terms, let’s plot the eigenenergy
+spectra with and without multi-orbital terms switched on for system with and
+without a cubic crystal field. We will use a <span class="math notranslate nohighlight">\(d\)</span>-shell with two
+electrons.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ten_dqs</span></a> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">12</span><span class="p">]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">diagonalize</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ten_dq</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">umat</span></a><span class="p">):</span>
+    <span class="n">emat</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">cb_op</span><span class="p">(</span><span class="n">edrixs</span><span class="o">.</span><span class="n">cf_cubic_d</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ten_dq</span></a><span class="p">),</span>
+                        <span class="n">edrixs</span><span class="o">.</span><span class="n">tmat_c2r</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="n">ispin</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="p">(</span><span class="n">edrixs</span><span class="o">.</span><span class="n">build_opers</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">umat</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">basis</span></a><span class="p">)</span>
+         <span class="o">+</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">build_opers</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">emat</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">basis</span></a><span class="p">))</span>
+    <span class="n">e</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.eigh.html#scipy.linalg.eigh" title="scipy.linalg.eigh" class="sphx-glr-backref-module-scipy-linalg sphx-glr-backref-type-py-function"><span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span></a><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">e</span> <span class="o">-</span> <span class="n">e</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">basis</span></a> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_fock_bin_by_N</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">umat_no_multiorbital</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.copy.html#numpy.copy" title="numpy.copy" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">copy</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">umat</span></a><span class="p">)</span>
+<a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">B</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">F2</span></a><span class="o">/</span><span class="mi">49</span> <span class="o">-</span> <span class="mi">5</span><span class="o">*</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">F4</span></a><span class="o">/</span><span class="mi">441</span>
+<span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">val</span></a> <span class="ow">in</span> <span class="p">[</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ufunc.html#numpy.ufunc" title="numpy.ufunc" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span></a><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">B</span></a><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ufunc.html#numpy.ufunc" title="numpy.ufunc" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span></a><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">B</span></a><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">B</span></a><span class="o">/</span><span class="mi">2</span><span class="p">]:</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">umat_no_multiorbital</span></a><span class="p">[(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ufunc.html#numpy.ufunc" title="numpy.ufunc" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">np</span><span class="o">.</span><span class="n">abs</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">umat</span></a><span class="p">)</span><span class="o">-</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">val</span></a><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1e-6</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fig</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axs</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html#matplotlib.pyplot.subplots" title="matplotlib.pyplot.subplots" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span></a><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ten_dqs</span></a><span class="p">),</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+
+<span class="k">for</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cind</span></a><span class="p">,</span> <span class="p">(</span><a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="matplotlib.axes.Axes" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ax</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ten_dq</span></a><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axs</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ten_dqs</span></a><span class="p">)):</span>
+    <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.hlines.html#matplotlib.axes.Axes.hlines" title="matplotlib.axes.Axes.hlines" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">hlines</span></a><span class="p">(</span><span class="n">diagonalize</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ten_dq</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">umat</span></a><span class="p">),</span> <span class="n">xmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+              <span class="n">label</span><span class="o">=</span><span class="s1">&#39;on&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;C</span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cind</span></a><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.hlines.html#matplotlib.axes.Axes.hlines" title="matplotlib.axes.Axes.hlines" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">hlines</span></a><span class="p">(</span><span class="n">diagonalize</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ten_dq</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">umat_no_multiorbital</span></a><span class="p">),</span>
+              <span class="n">xmin</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">xmax</span><span class="o">=</span><span class="mf">2.5</span><span class="p">,</span>
+              <span class="n">label</span><span class="o">=</span><span class="s1">&#39;off&#39;</span><span class="p">,</span>
+              <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;C</span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cind</span></a><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_title.html#matplotlib.axes.Axes.set_title" title="matplotlib.axes.Axes.set_title" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span></a><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;$10D_q=</span><span class="si">{</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ten_dq</span></a><span class="si">}</span><span class="s2">$&quot;</span><span class="p">)</span>
+    <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_ylim.html#matplotlib.axes.Axes.set_ylim" title="matplotlib.axes.Axes.set_ylim" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span></a><span class="p">([</span><span class="o">-</span><span class="mf">.5</span><span class="p">,</span> <span class="mi">20</span><span class="p">])</span>
+    <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_xticks.html#matplotlib.axes.Axes.set_xticks" title="matplotlib.axes.Axes.set_xticks" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span></a><span class="p">([])</span>
+    <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.legend.html#matplotlib.axes.Axes.legend" title="matplotlib.axes.Axes.legend" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method"><span class="n">ax</span><span class="o">.</span><span class="n">legend</span></a><span class="p">()</span>
+
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.suptitle.html#matplotlib.figure.Figure.suptitle" title="matplotlib.figure.Figure.suptitle" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-method"><span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span></a><span class="p">(</span><span class="s2">&quot;Eigenvalues with 3&amp;4-orbital effects on/off&quot;</span><span class="p">)</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.subplots_adjust.html#matplotlib.figure.Figure.subplots_adjust" title="matplotlib.figure.Figure.subplots_adjust" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-method"><span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span></a><span class="p">(</span><span class="n">wspace</span><span class="o">=</span><span class="mf">.3</span><span class="p">)</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">axs</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;Eigenvalues (eV)&#39;</span><span class="p">)</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.subplots_adjust.html#matplotlib.figure.Figure.subplots_adjust" title="matplotlib.figure.Figure.subplots_adjust" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-method"><span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span></a><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="mf">.8</span><span class="p">)</span>
+<a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">()</span>
+</pre></div>
+</div>
+<img src="../_images/sphx_glr_example_9_Coulomb_001.png" srcset="../_images/sphx_glr_example_9_Coulomb_001.png" alt="Eigenvalues with 3&4-orbital effects on/off, $10D_q=0$, $10D_q=2$, $10D_q=4$, $10D_q=12$" class = "sphx-glr-single-img"/><p>On the left of the plot Coulomb interactions in spherical symmetry cause
+substantial mxing between <span class="math notranslate nohighlight">\(t_{2g}\)</span> and <span class="math notranslate nohighlight">\(e_{g}\)</span> orbitals in the
+eigenstates and 3 &amp; 4 orbital orbital terms are crucial for obtaining the
+the right eigenenergies. As <span class="math notranslate nohighlight">\(10D_q\)</span> get large, this mixing is switched
+off and the spectra start to become independent of whether the 3 &amp; 4 orbital
+orbital terms are included or not.</p>
+<span id="table-2-orbital"></span><table class="docutils align-default" id="id3">
+<caption><span class="caption-text">Table of 2 orbital interactions</span><a class="headerlink" href="#id3" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head"><p>Orbitals <span class="math notranslate nohighlight">\(\alpha,\beta\)</span></p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(U_0\)</span> Racah</p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(U_0\)</span> Slater</p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(J\)</span> Racah</p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(J\)</span> Slater</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(3z^2-r^2, xz\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(A/2+B+C/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(F_0/2+F_2-12F_4\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(B/2+C/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(F_2/2+15F_4\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(3z^2-r^2, yz\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(A/2+B+C/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(F_0/2+F_2-12F_4\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(B/2+C/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(F_2/2+15F_4\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(3z^2-r^2, x^2-y^2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(A/2-2B+C/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(F_0/2-2F_2+3F_4\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(2B+C/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(2F_2+15F_4/2\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(3z^2-r^2, xy\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(A/2-2B+C/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(F_0/2-2F_2+3F_4\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(2B+C/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(2F_2+15F_4/2\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(xz, yz\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(A/2-B+C/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(F_0/2-F_2-12F_4\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(3B/2+C/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(3F_2/2+10F_4\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(xz, x^2-y^2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(A/2-B+C/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(F_0/2-F_2-12F_4\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(3B/2+C/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(3F_2/2+10F_4\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(xz, xy\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(A/2-B+C/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(F_0/2-F_2-12F_4\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(3B/2+C/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(3F_2/2+10F_4\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(yz, x^2-y^2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(A/2-B+C/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(F_0/2-F_2-12F_4\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(3B/2+C/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(3F_2/2+10F_4\)</span></p></td>
+</tr>
+<tr class="row-even"><td><p><span class="math notranslate nohighlight">\(yz, xy\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(A/2-B+C/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(F_0/2-F_2-12F_4\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(3B/2+C/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(3F_2/2+10F_4\)</span></p></td>
+</tr>
+<tr class="row-odd"><td><p><span class="math notranslate nohighlight">\(x^2-y^2, xy\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(A/2+2B+C/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(F_0+4F_2-34F_4\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(C/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(35F_4/2\)</span></p></td>
+</tr>
+</tbody>
+</table>
+<span id="table-3-orbital"></span><table class="docutils align-default" id="id4">
+<caption><span class="caption-text">Table of 3 orbital interactions</span><a class="headerlink" href="#id4" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head" colspan="2"><p>Orbitals <span class="math notranslate nohighlight">\(\alpha,\beta,\gamma,\delta\)</span></p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(\langle\alpha\beta|\gamma\delta\rangle\)</span> Racah</p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(\langle\alpha\beta|\gamma\delta\rangle\)</span> Slater</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td colspan="2"><p><span class="math notranslate nohighlight">\(3z^2-r^2, xz, x^2-y^2, xz\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\sqrt{3}B/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\sqrt{3}F_2/2-5\sqrt{3}F_4/2\)</span></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p><span class="math notranslate nohighlight">\(3z^2-r^2, yz, x^2-y^2, yz\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(-\sqrt{3}B/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(-\sqrt{3}F_2/2+5\sqrt{3}F_4/2\)</span></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p><span class="math notranslate nohighlight">\(xz, 3z^2-r^2, x^2-y^2, xz\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(-\sqrt{3}B\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(-\sqrt{3}F_2+5\sqrt{3}F_4\)</span></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p><span class="math notranslate nohighlight">\(xz, xz, x^2-y^2, 3z^2-r^2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\sqrt{3}B/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\sqrt{3}F_2/2-5\sqrt{3}F_4/2\)</span></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p><span class="math notranslate nohighlight">\(yz, 3z^2-r^2, x^2-y^2, yz\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\sqrt{3}B\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\sqrt{3}F_2-5\sqrt{3}F_4\)</span></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p><span class="math notranslate nohighlight">\(yz, yz, x^2-y^2, 3z^2-r^2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(-\sqrt{3}B/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(-\sqrt{3}F_2/2+5\sqrt{3}F_4/2\)</span></p></td>
+</tr>
+</tbody>
+</table>
+<span id="table-4-orbital"></span><table class="docutils align-default" id="id5">
+<caption><span class="caption-text">Table of 4 orbital interactions</span><a class="headerlink" href="#id5" title="Link to this table">¶</a></caption>
+<thead>
+<tr class="row-odd"><th class="head" colspan="2"><p>Orbitals <span class="math notranslate nohighlight">\(\alpha,\beta,\gamma,\delta\)</span></p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(\langle\alpha\beta|\gamma\delta\rangle\)</span> Racah</p></th>
+<th class="head"><p><span class="math notranslate nohighlight">\(\langle\alpha\beta|\gamma\delta\rangle\)</span> Slater</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td colspan="2"><p><span class="math notranslate nohighlight">\(3z^2-r^2, xz, yz, xy\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(-\sqrt{3}B\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(-\sqrt{3}F_2+5\sqrt{3}F_4\)</span></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p><span class="math notranslate nohighlight">\(3z^2-r^2, xz, xy, yz\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\sqrt{3}B/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\sqrt{3}F_2/2-5\sqrt{3}F_4/2\)</span></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p><span class="math notranslate nohighlight">\(3z^2-r^2, yz, xz, xy\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(-\sqrt{3}B\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(-\sqrt{3}F_2+5\sqrt{3}F_4\)</span></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p><span class="math notranslate nohighlight">\(3z^2-r^2, yz, xy, xz\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\sqrt{3}B/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\sqrt{3}F_2/2-5\sqrt{3}F_4/2\)</span></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p><span class="math notranslate nohighlight">\(3z^2-r^2, xy, xz, yz\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\sqrt{3}B/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\sqrt{3}F_2/2-5\sqrt{3}F_4/2\)</span></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p><span class="math notranslate nohighlight">\(3z^2-r^2, xy, yz, xz\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\sqrt{3}B/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(\sqrt{3}F_2/2-5\sqrt{3}F_4/2\)</span></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p><span class="math notranslate nohighlight">\(x^2-y^2 , xz, xy, yz\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(-3B/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(-3F_2/2+15F_4/2\)</span></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p><span class="math notranslate nohighlight">\(x^2-y^2 , yz, xy, xz\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(3B/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(3F_2/2-15F_4/2\)</span></p></td>
+</tr>
+<tr class="row-even"><td colspan="2"><p><span class="math notranslate nohighlight">\(x^2-y^2 , xy, xz, yz\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(-3B/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(-3F_2/2+15F_4/2\)</span></p></td>
+</tr>
+<tr class="row-odd"><td colspan="2"><p><span class="math notranslate nohighlight">\(x^2-y^2 , xy, yz, xz\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(3B/2\)</span></p></td>
+<td><p><span class="math notranslate nohighlight">\(3F_2/2-15F_4/2\)</span></p></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Footnotes</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<p>MSugano S, Tanabe Y and Kamimura H. 1970. Multiplets of
+Transition-Metal Ions in Crystals. Academic Press, New York and London.</p>
+</aside>
+</aside>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.352 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-example-9-coulomb-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/687fb58743d637976afd57fbd8a78ef9/example_9_Coulomb.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">example_9_Coulomb.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/5959090930ec84d57a0634c911a64c23/example_9_Coulomb.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">example_9_Coulomb.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-zip docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/6dffa254d364294a4b733a81a90a1732/example_9_Coulomb.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">example_9_Coulomb.zip</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="example_8_Hunds_interactions.html" class="btn btn-neutral float-left" title="Hund’s Interactions in charge transfer insulators" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../reference/index.html" class="btn btn-neutral float-right" title="edrixs Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Brookhaven National Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

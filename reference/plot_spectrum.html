@@ -1,0 +1,253 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>plot_spectrum &mdash; edrixs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="rixs_utils" href="rixs_utils.html" />
+    <link rel="prev" title="photon_transition" href="photon_transition.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            edrixs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">edrixs User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Pedagogical examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">edrixs Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="angular_momentum.html">angular_momentum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="basis_transform.html">basis_transform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coulomb_utensor.html">coulomb_utensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fit_hyb.html">fit_hyb</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fock_basis.html">fock_basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="iostream.html">iostream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manybody_operator.html">manybody_operator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="photon_transition.html">photon_transition</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">plot_spectrum</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.plot_spectrum.get_spectra_from_poles"><code class="docutils literal notranslate"><span class="pre">get_spectra_from_poles()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.plot_spectrum.merge_pole_dicts"><code class="docutils literal notranslate"><span class="pre">merge_pole_dicts()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.plot_spectrum.plot_rixs_map"><code class="docutils literal notranslate"><span class="pre">plot_rixs_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.plot_spectrum.plot_spectrum"><code class="docutils literal notranslate"><span class="pre">plot_spectrum()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="rixs_utils.html">rixs_utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc.html">soc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers.html">solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wannier_ham.html">wannier_ham</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">edrixs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">edrixs Reference</a></li>
+      <li class="breadcrumb-item active">plot_spectrum</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/reference/plot_spectrum.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-edrixs.plot_spectrum">
+<span id="plot-spectrum"></span><h1>plot_spectrum<a class="headerlink" href="#module-edrixs.plot_spectrum" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.plot_spectrum.get_spectra_from_poles">
+<span class="sig-prename descclassname"><span class="pre">edrixs.plot_spectrum.</span></span><span class="sig-name descname"><span class="pre">get_spectra_from_poles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">poles_dict</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/plot_spectrum.html#get_spectra_from_poles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.plot_spectrum.get_spectra_from_poles" title="Link to this definition">¶</a></dt>
+<dd><p>Given the dict of poles, calculate XAS or RIXS spectra using continued fraction formula,</p>
+<div class="math notranslate nohighlight">
+\[I(\omega_{i}) =-\frac{1}{\pi}\text{Im} \left[ \frac{1}{x - \alpha_{0} -
+\frac{\beta_{1}^2}{x-\alpha_{1} - \frac{\beta_{2}^2}{x-\alpha_{2} - ...}} }\right],\]</div>
+<p>where, <span class="math notranslate nohighlight">\(x = \omega_{i}+i\Gamma_{i} + E_{g}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>poles_dict: dict</strong></dt><dd><p>Dict containing information of poles, which are calculated from
+xas_fsolver and rixs_fsolver.
+This dict is constructed by <code class="xref py py-func docutils literal notranslate"><span class="pre">iostream.read_poles_from_file()</span></code>.</p>
+</dd>
+<dt><strong>omega_mesh: 1d float array</strong></dt><dd><p>Energy grid.</p>
+</dd>
+<dt><strong>gamma_mesh: 1d float array</strong></dt><dd><p>Life-time broadening.</p>
+</dd>
+<dt><strong>temperature: float number</strong></dt><dd><p>Temperature (K) for boltzmann distribution.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>spectra: 1d float array</dt><dd><p>The calculated XAS or RIXS spectra.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><code class="xref py py-obj docutils literal notranslate"><span class="pre">iostream.read_poles_from_file</span></code></dt><dd><p>read XAS or RIXS poles files.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.plot_spectrum.merge_pole_dicts">
+<span class="sig-prename descclassname"><span class="pre">edrixs.plot_spectrum.</span></span><span class="sig-name descname"><span class="pre">merge_pole_dicts</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_pole_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/plot_spectrum.html#merge_pole_dicts"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.plot_spectrum.merge_pole_dicts" title="Link to this definition">¶</a></dt>
+<dd><p>Given a list of dict of poles, merge them into one dict of poles</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>list_pole_dict:  list of dict</strong></dt><dd><p>Dict containing information of poles, which are calculated from
+xas_fsolver and rixs_fsolver.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>new_pole_dict: dict of poles</dt><dd><p>New dict of poles.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.plot_spectrum.plot_rixs_map">
+<span class="sig-prename descclassname"><span class="pre">edrixs.plot_spectrum.</span></span><span class="sig-name descname"><span class="pre">plot_rixs_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rixs_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ominc_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eloss_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rixsmap.pdf'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/plot_spectrum.html#plot_rixs_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.plot_spectrum.plot_rixs_map" title="Link to this definition">¶</a></dt>
+<dd><p>Given 2d RIXS data, plot a RIXS map and save it to a pdf file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>rixs_data: 2d float array</strong></dt><dd><p>Calculated RIXS data as a function of incident energy and energy loss.</p>
+</dd>
+<dt><strong>ominc_mesh: 1d float array</strong></dt><dd><p>Incident energy mesh.</p>
+</dd>
+<dt><strong>eloss_mesh: 1d float array</strong></dt><dd><p>Energy loss mesh.</p>
+</dd>
+<dt><strong>fname: string</strong></dt><dd><p>File name to save RIXS map.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.plot_spectrum.plot_spectrum">
+<span class="sig-prename descclassname"><span class="pre">edrixs.plot_spectrum.</span></span><span class="sig-name descname"><span class="pre">plot_spectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_mesh</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'spectrum.dat'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">om_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmt_float</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{:.15f}'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/plot_spectrum.html#plot_spectrum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.plot_spectrum.plot_spectrum" title="Link to this definition">¶</a></dt>
+<dd><p>Reading poles <span class="math notranslate nohighlight">\(\alpha\)</span> and <span class="math notranslate nohighlight">\(\beta\)</span>, and calculate
+the spectrum using continued fraction formula,</p>
+<div class="math notranslate nohighlight">
+\[I(\omega_{i}) =-\frac{1}{\pi}\text{Im} \left[ \frac{1}{x - \alpha_{0} -
+\frac{\beta_{1}^2}{x-\alpha_{1} - \frac{\beta_{2}^2}{x-\alpha_{2} - ...}} }\right],\]</div>
+<p>where, <span class="math notranslate nohighlight">\(x = \omega_{i}+i\Gamma_{i} + E_{g}\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>file_list: list of string</strong></dt><dd><p>Name of poles file.</p>
+</dd>
+<dt><strong>omega_mesh: 1d float array</strong></dt><dd><p>The frequency mesh.</p>
+</dd>
+<dt><strong>gamma_mesh: 1d float array</strong></dt><dd><p>The broadening factor, in general, it is frequency dependent.</p>
+</dd>
+<dt><strong>T: float (default: 1.0K)</strong></dt><dd><p>Temperature (K).</p>
+</dd>
+<dt><strong>fname: str (default: ‘spectrum.dat’)</strong></dt><dd><p>File name to store spectrum.</p>
+</dd>
+<dt><strong>om_shift: float (default: 0.0)</strong></dt><dd><p>Energy shift.</p>
+</dd>
+<dt><strong>fmt_float: str (default: ‘{:.15f}’)</strong></dt><dd><p>Format for printing float numbers.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="photon_transition.html" class="btn btn-neutral float-left" title="photon_transition" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="rixs_utils.html" class="btn btn-neutral float-right" title="rixs_utils" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Brookhaven National Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

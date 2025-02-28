@@ -1,0 +1,178 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>edrixs and docker &mdash; edrixs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Quickstart tutorial" href="quickstart.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            edrixs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">edrixs User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="whatisedrixs.html">What is edrixs?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">edrixs and docker</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#run-edrixs-in-a-docker-container">Run edrixs in a docker container</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#sharing-your-code">Sharing your code</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html">Quickstart tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="basics.html">edrixs basics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pythontips.html">Tips for python and edrixs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="papers.html">EDRIXS papers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Pedagogical examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">edrixs Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">edrixs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">edrixs User Guide</a></li>
+      <li class="breadcrumb-item active">edrixs and docker</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/user/usedocker.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="edrixs-and-docker">
+<span id="edrixsanddocker"></span><h1>edrixs and docker<a class="headerlink" href="#edrixs-and-docker" title="Link to this heading">¶</a></h1>
+<section id="run-edrixs-in-a-docker-container">
+<h2>Run edrixs in a docker container<a class="headerlink" href="#run-edrixs-in-a-docker-container" title="Link to this heading">¶</a></h2>
+<p>To make life easier, we have built a docker image based on Ubuntu Linux (22.04) for edrixs, so you don’t need to struggle with the installation anymore.
+The docker image can be used on any OS as long as the <a class="reference external" href="https://www.docker.com/">docker</a> application is available.
+Follow these steps to use the docker image:</p>
+<ul>
+<li><p>Install the <a class="reference external" href="https://www.docker.com/">docker</a> application on your system.</p></li>
+<li><p>Once Docker is running, create a directory to store data and create a file called <code class="docutils literal notranslate"><span class="pre">docker-compose.yml</span></code> with contents</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">version</span><span class="p">:</span>  <span class="s1">&#39;3&#39;</span>
+<span class="n">services</span><span class="p">:</span>
+  <span class="n">edrixs</span><span class="o">-</span><span class="n">jupyter</span><span class="p">:</span>
+      <span class="n">image</span><span class="p">:</span> <span class="n">edrixs</span><span class="o">/</span><span class="n">edrixs</span>
+      <span class="n">volumes</span><span class="p">:</span>
+        <span class="o">-</span> <span class="o">./</span><span class="p">:</span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">rixs</span>
+      <span class="n">working_dir</span><span class="p">:</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">rixs</span>
+      <span class="n">ports</span><span class="p">:</span>
+        <span class="o">-</span> <span class="mi">8888</span><span class="p">:</span><span class="mi">8888</span>
+      <span class="n">command</span><span class="p">:</span> <span class="s2">&quot;jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root&quot;</span>
+  <span class="n">edrixs</span><span class="o">-</span><span class="n">ipython</span><span class="p">:</span>
+      <span class="n">image</span><span class="p">:</span> <span class="n">edrixs</span><span class="o">/</span><span class="n">edrixs</span>
+      <span class="n">volumes</span><span class="p">:</span>
+        <span class="o">-</span> <span class="o">./</span><span class="p">:</span><span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">rixs</span>
+      <span class="n">working_dir</span><span class="p">:</span> <span class="o">/</span><span class="n">home</span><span class="o">/</span><span class="n">rixs</span>
+</pre></div>
+</div>
+<p>and execute</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">compose</span> <span class="n">up</span>
+</pre></div>
+</div>
+<p>This will return a url, which you can open to connect to the jupyter session.</p>
+</li>
+<li><p>If you would like to access a terminal rather than jupyter run</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">compose</span> <span class="n">run</span> <span class="o">--</span><span class="n">rm</span> <span class="n">edrixs</span><span class="o">-</span><span class="n">ipython</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="sharing-your-code">
+<h2>Sharing your code<a class="headerlink" href="#sharing-your-code" title="Link to this heading">¶</a></h2>
+<p>Using Docker is a nice way to straightforwardly share your code with others. The standard way to specify which docker image is needed to run your code is to include a file named <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code> with the following contents</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">FROM</span> <span class="n">edrixs</span><span class="o">/</span><span class="n">edrixs</span>
+</pre></div>
+</div>
+<p>You might like to checkout the <a class="reference external" href="https://repo2docker.readthedocs.io/en/latest/">jupyter-repo2docker</a> project, which helps automate the process of building and connecting to docker images. The <a class="reference external" href="https://mybinder.org/">mybinder</a> project might also be helpful as this will open a github respository of notebooks in an executable environment, making your code immediately reproducible by anyone, anywhere.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="quickstart.html" class="btn btn-neutral float-right" title="Quickstart tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Brookhaven National Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

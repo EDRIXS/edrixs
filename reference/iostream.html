@@ -1,0 +1,275 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>iostream &mdash; edrixs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="manybody_operator" href="manybody_operator.html" />
+    <link rel="prev" title="fock_basis" href="fock_basis.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            edrixs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">edrixs User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Pedagogical examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">edrixs Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="angular_momentum.html">angular_momentum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="basis_transform.html">basis_transform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coulomb_utensor.html">coulomb_utensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fit_hyb.html">fit_hyb</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fock_basis.html">fock_basis</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">iostream</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.iostream.dump_poles"><code class="docutils literal notranslate"><span class="pre">dump_poles()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.iostream.load_poles"><code class="docutils literal notranslate"><span class="pre">load_poles()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.iostream.read_poles_from_file"><code class="docutils literal notranslate"><span class="pre">read_poles_from_file()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.iostream.write_config"><code class="docutils literal notranslate"><span class="pre">write_config()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.iostream.write_emat"><code class="docutils literal notranslate"><span class="pre">write_emat()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.iostream.write_tensor"><code class="docutils literal notranslate"><span class="pre">write_tensor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.iostream.write_umat"><code class="docutils literal notranslate"><span class="pre">write_umat()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="manybody_operator.html">manybody_operator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="photon_transition.html">photon_transition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_spectrum.html">plot_spectrum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rixs_utils.html">rixs_utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc.html">soc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers.html">solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wannier_ham.html">wannier_ham</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">edrixs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">edrixs Reference</a></li>
+      <li class="breadcrumb-item active">iostream</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/reference/iostream.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-edrixs.iostream">
+<span id="iostream"></span><h1>iostream<a class="headerlink" href="#module-edrixs.iostream" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.iostream.dump_poles">
+<span class="sig-prename descclassname"><span class="pre">edrixs.iostream.</span></span><span class="sig-name descname"><span class="pre">dump_poles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'poles'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/iostream.html#dump_poles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.iostream.dump_poles" title="Link to this definition">¶</a></dt>
+<dd><p>Dump the objects of poles returned from XAS or RIXS calculations to file for later plotting.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>obj: Python object</strong></dt><dd><p>Object of poles, a dict or a list of dicts.</p>
+</dd>
+<dt><strong>file_name: string</strong></dt><dd><p>File name.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.iostream.load_poles">
+<span class="sig-prename descclassname"><span class="pre">edrixs.iostream.</span></span><span class="sig-name descname"><span class="pre">load_poles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'poles'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/iostream.html#load_poles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.iostream.load_poles" title="Link to this definition">¶</a></dt>
+<dd><p>Load the objects of poles from file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>file_name: string</strong></dt><dd></dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>obj: Python objects</dt><dd><p>Poles object.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.iostream.read_poles_from_file">
+<span class="sig-prename descclassname"><span class="pre">edrixs.iostream.</span></span><span class="sig-name descname"><span class="pre">read_poles_from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/iostream.html#read_poles_from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.iostream.read_poles_from_file" title="Link to this definition">¶</a></dt>
+<dd><p>Read informations in files xas_poles.n or rixs_poles.n to a dict.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>file_list: list of strings</strong></dt><dd><p>Names of pole files.</p>
+</dd>
+<dt><strong>pole_dict: dict</strong></dt><dd><p>A dict containing information of poles.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.iostream.write_config">
+<span class="sig-prename descclassname"><span class="pre">edrixs.iostream.</span></span><span class="sig-name descname"><span class="pre">write_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'.'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ed_solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_val_orbs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_core_orbs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nvector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idump</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_gs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linsys_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_ndim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nkryl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eigval_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linsys_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">omega_in</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_in</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/iostream.html#write_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.iostream.write_config" title="Link to this definition">¶</a></dt>
+<dd><p>Write control parameters in config.in file for ed_fsolver.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.iostream.write_emat">
+<span class="sig-prename descclassname"><span class="pre">edrixs.iostream.</span></span><span class="sig-name descname"><span class="pre">write_emat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">emat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmt_int</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{:10d}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmt_float</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{:.15f}'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/iostream.html#write_emat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.iostream.write_emat" title="Link to this definition">¶</a></dt>
+<dd><p>Write the nonzeros of the rank-2 hopping matrices to file.
+The first line is the number of nonzeros, and the following lines are the nonzero elements.
+This file will be read by ed.x, xas.x or rixs.x.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>emat: 2d complex array</strong></dt><dd><p>The array to be written.</p>
+</dd>
+<dt><strong>fname: str</strong></dt><dd><p>File name.</p>
+</dd>
+<dt><strong>tol: float</strong></dt><dd><p>Precision.</p>
+</dd>
+<dt><strong>fmt_int: str (default: ‘{:10d}’)</strong></dt><dd><p>Format for printing integer numbers.</p>
+</dd>
+<dt><strong>fmt_float: str (default: ‘{:.15f}’)</strong></dt><dd><p>Format for printing float numbers.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.iostream.write_tensor">
+<span class="sig-prename descclassname"><span class="pre">edrixs.iostream.</span></span><span class="sig-name descname"><span class="pre">write_tensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tensor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">only_nonzeros</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmt_int</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{:10d}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmt_float</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{:.15f}'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/iostream.html#write_tensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.iostream.write_tensor" title="Link to this definition">¶</a></dt>
+<dd><p>Write <span class="math notranslate nohighlight">\(n\)</span> -dimension numpy array to file, currently, <span class="math notranslate nohighlight">\(n\)</span> can be 1, 2, 3, 4, 5.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>tensor: :math:`n` d float or complex array</strong></dt><dd><p>The array needs to be written.</p>
+</dd>
+<dt><strong>fname: str</strong></dt><dd><p>File name.</p>
+</dd>
+<dt><strong>only_nonzeros: logical (default: False)</strong></dt><dd><p>Only write nonzero elements.</p>
+</dd>
+<dt><strong>tol: float (default: 1E-10)</strong></dt><dd><p>Only write the elements when their absolute value are larger than tol
+and only_nonzeros=True.</p>
+</dd>
+<dt><strong>fmt_int: str (default: ‘{:10d}’)</strong></dt><dd><p>The format for printing integer numbers.</p>
+</dd>
+<dt><strong>fmt_float: str (default: ‘{:.15f}’)</strong></dt><dd><p>The format for printing float numbers.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.iostream.write_umat">
+<span class="sig-prename descclassname"><span class="pre">edrixs.iostream.</span></span><span class="sig-name descname"><span class="pre">write_umat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">umat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-12</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmt_int</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{:10d}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fmt_float</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{:.15f}'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/iostream.html#write_umat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.iostream.write_umat" title="Link to this definition">¶</a></dt>
+<dd><p>Write the nonzeros of the rank-4 Coulomb U tensor to file.
+The first line is the number of nonzeros, and the following lines are the nonzero elements.
+This file will be read by ed.x, xas.x or rixs.x.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>umat: 4d complex array</strong></dt><dd><p>The array to be written.</p>
+</dd>
+<dt><strong>fname: str</strong></dt><dd><p>File name.</p>
+</dd>
+<dt><strong>tol: float (default: 1E-12)</strong></dt><dd><p>Precision.</p>
+</dd>
+<dt><strong>fmt_int: str (default: ‘{:10d}’)</strong></dt><dd><p>Format for printing integer numbers.</p>
+</dd>
+<dt><strong>fmt_float: str (default: ‘{:.15f}’)</strong></dt><dd><p>Format for printing float numbers.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="fock_basis.html" class="btn btn-neutral float-left" title="fock_basis" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="manybody_operator.html" class="btn btn-neutral float-right" title="manybody_operator" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Brookhaven National Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

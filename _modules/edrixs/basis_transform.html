@@ -1,0 +1,646 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>edrixs.basis_transform &mdash; edrixs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            edrixs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">edrixs User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Pedagogical examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">edrixs Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">edrixs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">edrixs.basis_transform</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for edrixs.basis_transform</h1><div class="highlight"><pre>
+<span></span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cb_op&#39;</span><span class="p">,</span> <span class="s1">&#39;cb_op2&#39;</span><span class="p">,</span> <span class="s1">&#39;tmat_c2r&#39;</span><span class="p">,</span> <span class="s1">&#39;tmat_r2c&#39;</span><span class="p">,</span> <span class="s1">&#39;tmat_r2cub_f&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;tmat_cub2r_f&#39;</span><span class="p">,</span> <span class="s1">&#39;tmat_c2j&#39;</span><span class="p">,</span> <span class="s1">&#39;transform_utensor&#39;</span><span class="p">,</span> <span class="s1">&#39;fourier_hr2hk&#39;</span><span class="p">]</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+
+<div class="viewcode-block" id="cb_op">
+<a class="viewcode-back" href="../../reference/basis_transform.html#edrixs.basis_transform.cb_op">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cb_op</span><span class="p">(</span><span class="n">oper_O</span><span class="p">,</span> <span class="n">TL</span><span class="p">,</span> <span class="n">TR</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Change the basis of an operator :math:`\\hat{O}`.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        O^{\\prime} = (T_L)^{\\dagger} O (T_R),</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    oper_O: array-like</span>
+<span class="sd">        At least 2-dimension, the last 2-dimension is the dimension of the</span>
+<span class="sd">        matrix form of operator :math:`\\hat{O}` in basis :math:`A`.</span>
+<span class="sd">        For example:</span>
+
+<span class="sd">        - oper_O.shape = (3, 10, 10), means 3 operators with dimension :math:`10 \\times 10`</span>
+
+<span class="sd">        - oper_O.shape = (2, 3, 10, 10), means :math:`2 \\times 3=6` operators with</span>
+<span class="sd">          dimension :math:`10 \\times 10`</span>
+<span class="sd">    TL: 2d array</span>
+<span class="sd">        The unitary transformation matrix from basis :math:`A` to</span>
+<span class="sd">        basis :math:`B`,  namely,</span>
+
+<span class="sd">        :math:`TL_{ij} = &lt;\\psi^{A}_{i}|\\phi^{B}_{j}&gt;`.</span>
+
+<span class="sd">    TR: 2d array</span>
+<span class="sd">        The unitary transformation matrix from basis :math:`A` to</span>
+<span class="sd">        basis :math:`B`,  namely,</span>
+
+<span class="sd">        :math:`TR_{ij} = &lt;\\psi^{A}_{i}|\\phi^{B}_{j}&gt;`.</span>
+
+<span class="sd">        if TR = None, TR = TL</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    res: same shape as oper_O</span>
+<span class="sd">        The matrices form of operators :math:`\\hat{O}` in new basis.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">oper_O</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">oper_O</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">oper_O</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">if</span> <span class="n">TR</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">TR</span> <span class="o">=</span> <span class="n">TL</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Dimension of oper_O should be at least 2&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">TL</span><span class="p">)),</span> <span class="n">oper_O</span><span class="p">),</span> <span class="n">TR</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">tot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">dim</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">tmp_oper</span> <span class="o">=</span> <span class="n">oper_O</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">tot</span><span class="p">,</span> <span class="n">dim</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">dim</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">tot</span><span class="p">):</span>
+            <span class="n">tmp_oper</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">TL</span><span class="p">)),</span> <span class="n">tmp_oper</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">TR</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">tmp_oper</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+
+<div class="viewcode-block" id="cb_op2">
+<a class="viewcode-back" href="../../reference/basis_transform.html#edrixs.basis_transform.cb_op2">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">cb_op2</span><span class="p">(</span><span class="n">oper_O</span><span class="p">,</span> <span class="n">TL</span><span class="p">,</span> <span class="n">TR</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Change the basis of an operator :math:`\\hat{O}`.</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        O^{\\prime} = (T_L)^{\\dagger} O (T_R),</span>
+
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    oper_O: array-like</span>
+<span class="sd">        At least 2-dimension, the last 2-dimension is the dimension of the</span>
+<span class="sd">        matrix form of operator :math:`\\hat{O}` in basis :math:`A`.</span>
+<span class="sd">        For example:</span>
+
+<span class="sd">        - oper_O.shape = (3, 10, 10), means 3 operatos with dimension :math:`10 \\times 10`</span>
+
+<span class="sd">        - oper_O.shape = (2, 3, 10, 10), means :math:`2 \\times 3=6` operators with</span>
+<span class="sd">          dimension :math:`10 \\times 10`</span>
+<span class="sd">    TL: 2d array</span>
+<span class="sd">        The unitary transformation matrix applied on the left.</span>
+<span class="sd">    TR: 2d array</span>
+<span class="sd">        The unitary transformation matrix applied on the right.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    res: same shape as oper_O</span>
+<span class="sd">        The matrices form of operators :math:`\\hat{O}` in new basis.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">oper_O</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">oper_O</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+    <span class="n">dim</span> <span class="o">=</span> <span class="n">oper_O</span><span class="o">.</span><span class="n">shape</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Dimension of oper_O should be at least 2&quot;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">TL</span><span class="p">)),</span> <span class="n">oper_O</span><span class="p">),</span> <span class="n">TR</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">tot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">prod</span><span class="p">(</span><span class="n">dim</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">tmp_oper</span> <span class="o">=</span> <span class="n">oper_O</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">tot</span><span class="p">,</span> <span class="n">dim</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span> <span class="n">dim</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">tot</span><span class="p">):</span>
+            <span class="n">tmp_oper</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">TL</span><span class="p">)),</span> <span class="n">tmp_oper</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">TR</span><span class="p">)</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">tmp_oper</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+
+<div class="viewcode-block" id="tmat_c2r">
+<a class="viewcode-back" href="../../reference/basis_transform.html#edrixs.basis_transform.tmat_c2r">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">tmat_c2r</span><span class="p">(</span><span class="n">case</span><span class="p">,</span> <span class="n">ispin</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the unitary transformation matrix from the basis of complex</span>
+<span class="sd">    spherical harmonics to real spherical harmonics.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    case: string</span>
+<span class="sd">        Label for different systems.</span>
+
+<span class="sd">        - &#39;p&#39;: for :math:`p`-shell</span>
+<span class="sd">        - &#39;t2g&#39;: for :math:`t_{2g}`-shell</span>
+<span class="sd">        - &#39;d&#39;: for :math:`d`-shell</span>
+<span class="sd">        - &#39;f&#39;: for :math:`f`-shell</span>
+<span class="sd">    ispin: logical</span>
+<span class="sd">        Whether including spin degree of freedom or not (default: False).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    t_c2r: 2d complex array</span>
+<span class="sd">        The transformation matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">sqrt2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+    <span class="n">ci</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">(</span><span class="mf">0.0</span> <span class="o">+</span> <span class="mf">1.0</span><span class="n">j</span><span class="p">)</span>
+    <span class="n">cone</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="mf">0.0</span><span class="n">j</span><span class="p">)</span>
+
+    <span class="c1"># p orbitals: px, py, pz</span>
+    <span class="k">if</span> <span class="n">case</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span>
+        <span class="n">norbs</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">t_c2r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">norbs</span><span class="p">,</span> <span class="n">norbs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+        <span class="c1"># px=1/sqrt(2)( |1,-1&gt; - |1,1&gt; )</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">cone</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">cone</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="c1"># py=i/sqrt(2)( |1,-1&gt; + |1,1&gt; )</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">ci</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">ci</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="c1"># pz=|1,0&gt;</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">cone</span>
+
+    <span class="c1"># t2g orbitals in the t2g subspace, here, we use the so-called</span>
+    <span class="c1"># T-P equivalence, t2g orbitals behave like the effective orbital</span>
+    <span class="c1"># angular momentum leff=1</span>
+    <span class="c1"># dzx ~ py,  dzy ~ px, dxy ~ pz</span>
+    <span class="k">elif</span> <span class="n">case</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;t2g&#39;</span><span class="p">:</span>
+        <span class="n">norbs</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">t_c2r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">norbs</span><span class="p">,</span> <span class="n">norbs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+        <span class="c1"># dzx --&gt; py=i/sqrt(2)( |1,-1&gt; + |1,1&gt; )</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ci</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">ci</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="c1"># dzy --&gt; px=1/sqrt(2)( |1,-1&gt; - |1,1&gt; )</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">cone</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">cone</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="c1"># dxy --&gt; pz=|1,0&gt;</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">cone</span>
+
+    <span class="c1"># d orbitals: dz2, dzx, dzy, dx2-y2, dxy</span>
+    <span class="k">elif</span> <span class="n">case</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;d&#39;</span><span class="p">:</span>
+        <span class="n">norbs</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="n">t_c2r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">norbs</span><span class="p">,</span> <span class="n">norbs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+        <span class="c1"># dz2=|2,0&gt;</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">cone</span>
+        <span class="c1"># dzx=1/sqrt(2)( |2,-1&gt; - |2,1&gt; )</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">cone</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">cone</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="c1"># dzy=i/sqrt(2)( |2,-1&gt; + |2,1&gt; )</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">ci</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">ci</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="c1"># dx2-y2=1/sqrt(2)( |2,-2&gt; + |2,2&gt; )</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">cone</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">cone</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="c1"># dxy=i/sqrt(2)( |2,-2&gt; - |2,2&gt; )</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">ci</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">ci</span> <span class="o">/</span> <span class="n">sqrt2</span>
+
+    <span class="c1"># f orbitals, please NOTE that this real form of the f orbitals is not the</span>
+    <span class="c1"># basis of the representation of the cubic point group, please call the</span>
+    <span class="c1"># function ``tmat_r2cub&quot; to get the transformation matrix from this basis</span>
+    <span class="c1"># to the cubic basis that is the representation of the cubic point group.</span>
+    <span class="k">elif</span> <span class="n">case</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;f&#39;</span><span class="p">:</span>
+        <span class="n">norbs</span> <span class="o">=</span> <span class="mi">7</span>
+        <span class="n">t_c2r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">norbs</span><span class="p">,</span> <span class="n">norbs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+        <span class="c1"># fz3 = |3,0&gt;</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">cone</span>
+        <span class="c1"># fxz2 = 1/sqrt(2)( |3,-1&gt; - |3,1&gt; )</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">cone</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">cone</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="c1"># fyz2 = i/sqrt(2)( |3,-1&gt; + |3,1&gt; )</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">ci</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">ci</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="c1"># fz(x2-y2) = 1/sqrt(2)( |3,-2&gt; + |3,2&gt; )</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">cone</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">cone</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="c1"># fxyz = i/sqrt(2)( |3,-2&gt; - |3,2&gt; )</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">ci</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">ci</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="c1"># fx(x2-3y2) = 1/sqrt(2) ( |3,-3&gt; - |3,3&gt; )</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">cone</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">cone</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="c1"># fy(3x2-y2) = i/sqrt(2) ( |3,-3&gt; + |3,3&gt; )</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">ci</span> <span class="o">/</span> <span class="n">sqrt2</span>
+        <span class="n">t_c2r</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">ci</span> <span class="o">/</span> <span class="n">sqrt2</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;error in tmat_c2r: Do NOT support tmat_c2r for this case: &quot;</span><span class="p">,</span> <span class="n">case</span><span class="p">)</span>
+
+    <span class="c1"># the spin order is: up dn up dn ... up dn</span>
+    <span class="k">if</span> <span class="n">ispin</span><span class="p">:</span>
+        <span class="n">ntot_orbs</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">norbs</span>
+        <span class="n">t_c2r_spin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ntot_orbs</span><span class="p">,</span> <span class="n">ntot_orbs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+        <span class="c1"># spin up</span>
+        <span class="n">t_c2r_spin</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">ntot_orbs</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">ntot_orbs</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">t_c2r</span>
+        <span class="c1"># spin dn</span>
+        <span class="n">t_c2r_spin</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">ntot_orbs</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="n">ntot_orbs</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">t_c2r</span>
+        <span class="k">return</span> <span class="n">t_c2r_spin</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">t_c2r</span></div>
+
+
+
+<div class="viewcode-block" id="tmat_r2c">
+<a class="viewcode-back" href="../../reference/basis_transform.html#edrixs.basis_transform.tmat_r2c">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">tmat_r2c</span><span class="p">(</span><span class="n">case</span><span class="p">,</span> <span class="n">ispin</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the unitary transformation matrix from the basis of real</span>
+<span class="sd">    spherical harmonics to complex spherical harmonics.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    case: string</span>
+<span class="sd">        Label for different systems.</span>
+
+<span class="sd">        - &#39;p&#39;: for :math:`p`-shell</span>
+<span class="sd">        - &#39;t2g&#39;: for :math:`t_{2g}`-shell</span>
+<span class="sd">        - &#39;d&#39;: for :math:`d`-shell</span>
+<span class="sd">        - &#39;f&#39;: for :math:`f`-shell</span>
+<span class="sd">    ispin: logical</span>
+<span class="sd">        Whether including spin degree of freedom or not (default: False).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    t_r2c: 2d complex array</span>
+<span class="sd">        The transformation matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">t_r2c</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">tmat_c2r</span><span class="p">(</span><span class="n">case</span><span class="p">,</span> <span class="n">ispin</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">t_r2c</span></div>
+
+
+
+<div class="viewcode-block" id="tmat_r2cub_f">
+<a class="viewcode-back" href="../../reference/basis_transform.html#edrixs.basis_transform.tmat_r2cub_f">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">tmat_r2cub_f</span><span class="p">(</span><span class="n">ispin</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the transformation matrix from real spherical harmonics to the</span>
+<span class="sd">    cubic spherical harmonics that is the representation of the cubic</span>
+<span class="sd">    point group, only for :math:`f` system.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ispin: logical</span>
+<span class="sd">        Whether including spin degree of freedom or not (default: False).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    t_r2cub: 2d complex array</span>
+<span class="sd">        The transformation matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">a</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">4.0</span> <span class="o">+</span> <span class="mf">0.0</span><span class="n">j</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">6.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">4.0</span> <span class="o">+</span> <span class="mf">0.0</span><span class="n">j</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="mf">0.0</span><span class="n">j</span>
+
+    <span class="n">norbs</span> <span class="o">=</span> <span class="mi">7</span>
+    <span class="n">t_r2cub</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">norbs</span><span class="p">,</span> <span class="n">norbs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+
+    <span class="c1"># T1u</span>
+    <span class="c1"># fx3 = -sqrt(6)/4 fxz2 + sqrt(10)/4 fx(x2-3y2)</span>
+    <span class="n">t_r2cub</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">b</span>
+    <span class="n">t_r2cub</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span>
+    <span class="c1"># fy3 = -sqrt(6)/4 fyz2 - sqrt(10)/4 fy(3x2-y2)</span>
+    <span class="n">t_r2cub</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">b</span>
+    <span class="n">t_r2cub</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">a</span>
+    <span class="c1"># fz3 = fz3</span>
+    <span class="n">t_r2cub</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span>
+
+    <span class="c1"># T2u</span>
+    <span class="c1"># fx(y2-z2) = -sqrt(10)/4 fxz2 - sqrt(6)/4 fx(x2-3y2)</span>
+    <span class="n">t_r2cub</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">a</span>
+    <span class="n">t_r2cub</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">b</span>
+    <span class="c1"># fy(z2-x2) = sqrt(10)/4 fyz2 - sqrt(6)/4 fy(3x2-y2)</span>
+    <span class="n">t_r2cub</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">a</span>
+    <span class="n">t_r2cub</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">b</span>
+    <span class="c1"># fz(x2-y2) = fz(x2-y2)</span>
+    <span class="n">t_r2cub</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span>
+
+    <span class="c1"># A2u</span>
+    <span class="c1"># fxyz = fxyz</span>
+    <span class="n">t_r2cub</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span>
+
+    <span class="k">if</span> <span class="n">ispin</span><span class="p">:</span>
+        <span class="n">ntot_orbs</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">norbs</span>
+        <span class="n">t_r2cub_spin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ntot_orbs</span><span class="p">,</span> <span class="n">ntot_orbs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+        <span class="c1"># spin up</span>
+        <span class="n">t_r2cub_spin</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">ntot_orbs</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">ntot_orbs</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">t_r2cub</span>
+        <span class="c1"># spin dn</span>
+        <span class="n">t_r2cub_spin</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">ntot_orbs</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="n">ntot_orbs</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">t_r2cub</span>
+        <span class="k">return</span> <span class="n">t_r2cub_spin</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">t_r2cub</span></div>
+
+
+
+<div class="viewcode-block" id="tmat_cub2r_f">
+<a class="viewcode-back" href="../../reference/basis_transform.html#edrixs.basis_transform.tmat_cub2r_f">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">tmat_cub2r_f</span><span class="p">(</span><span class="n">ispin</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the transformation matrix from the cubic spherical harmonics to</span>
+<span class="sd">    real spherical harmonics, only for :math:`f` system.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ispin: logical</span>
+<span class="sd">        Whether including spin degree of freedom or not (default: False).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    t_cub2r: 2d complex array</span>
+<span class="sd">        The transformation matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">t_cub2r</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">tmat_r2cub_f</span><span class="p">(</span><span class="n">ispin</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">t_cub2r</span></div>
+
+
+
+<div class="viewcode-block" id="tmat_c2j">
+<a class="viewcode-back" href="../../reference/basis_transform.html#edrixs.basis_transform.tmat_c2j">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">tmat_c2j</span><span class="p">(</span><span class="n">orb_l</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the transformation matrix from the complex spherical harmonics to</span>
+<span class="sd">    the :math:`|j^2,j_z&gt;` basis in which the spin-oribt coupling Hamiltonian</span>
+<span class="sd">    is diagonal. The orbital order is:</span>
+
+<span class="sd">    :math:`|j=l-1/2, -j&gt;, |j=l-1/2, -j+1&gt;, ... |j=l-1/2, +j&gt;,`</span>
+
+<span class="sd">    :math:`|j=l+1/2, -j&gt;, |j=l+1/2, -j+1&gt;, ..., |j=l+1/2, +j&gt;`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    orb_l: int</span>
+<span class="sd">        Quantum number of orbital angular momentum.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    t_c2j: 2d complex array</span>
+<span class="sd">        The transformation matrix.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">orb_l</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">t_c2j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+        <span class="k">return</span> <span class="n">t_c2j</span>
+
+    <span class="k">elif</span> <span class="n">orb_l</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">t_c2j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">4.0</span> <span class="o">/</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">/</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">/</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">4.0</span> <span class="o">/</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">4.0</span> <span class="o">/</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">/</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">/</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">4.0</span> <span class="o">/</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">5.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+        <span class="k">return</span> <span class="n">t_c2j</span>
+
+    <span class="k">elif</span> <span class="n">orb_l</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">t_c2j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">14</span><span class="p">,</span> <span class="mi">14</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">6.0</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">5.0</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">4.0</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">4.0</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">5.0</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">13</span><span class="p">,</span> <span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">6.0</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">6.0</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">5.0</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">4.0</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">4.0</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">8</span><span class="p">,</span> <span class="mi">11</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">5.0</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">11</span><span class="p">,</span> <span class="mi">11</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">12</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">6.0</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">13</span><span class="p">,</span> <span class="mi">12</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">7.0</span><span class="p">)</span>
+        <span class="n">t_c2j</span><span class="p">[</span><span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+
+        <span class="k">return</span> <span class="n">t_c2j</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;error in tmat_c2j: Have NOT implemented for this case: &quot;</span><span class="p">,</span> <span class="n">orb_l</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="transform_utensor">
+<a class="viewcode-back" href="../../reference/basis_transform.html#edrixs.basis_transform.transform_utensor">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">transform_utensor</span><span class="p">(</span><span class="n">umat</span><span class="p">,</span> <span class="n">tmat</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Transform the rank-4 Coulomb interaction tensor from one basis to</span>
+<span class="sd">    another basis.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    umat: 4d array</span>
+<span class="sd">        Coulomb interaction tensor (rank-4).</span>
+<span class="sd">    tmat: 2d array</span>
+<span class="sd">        The transformation matrix.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    umat_new: 4d complex array</span>
+<span class="sd">        The Coulomb interaction tensor in the new basis.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="n">umat</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">umat_new</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+
+    <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">umat</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1E-16</span><span class="p">)</span>
+    <span class="n">nonzero</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="n">jj</span><span class="p">,</span> <span class="n">kk</span><span class="p">,</span> <span class="n">mm</span> <span class="ow">in</span> <span class="n">nonzero</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">tmat</span><span class="p">[</span><span class="n">ii</span><span class="p">,</span> <span class="n">i</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mf">1E-16</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">tmat</span><span class="p">[</span><span class="n">jj</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mf">1E-16</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                            <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">tmat</span><span class="p">[</span><span class="n">kk</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mf">1E-16</span><span class="p">:</span>
+                                <span class="k">continue</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+                                    <span class="n">umat_new</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">m</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">tmat</span><span class="p">[</span><span class="n">ii</span><span class="p">,</span> <span class="n">i</span><span class="p">])</span> <span class="o">*</span>
+                                                             <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">tmat</span><span class="p">[</span><span class="n">jj</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span> <span class="o">*</span>
+                                                             <span class="n">umat</span><span class="p">[</span><span class="n">ii</span><span class="p">,</span> <span class="n">jj</span><span class="p">,</span> <span class="n">kk</span><span class="p">,</span> <span class="n">mm</span><span class="p">]</span> <span class="o">*</span>
+                                                             <span class="n">tmat</span><span class="p">[</span><span class="n">kk</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">*</span>
+                                                             <span class="n">tmat</span><span class="p">[</span><span class="n">mm</span><span class="p">,</span> <span class="n">m</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">umat_new</span></div>
+
+
+
+<div class="viewcode-block" id="fourier_hr2hk">
+<a class="viewcode-back" href="../../reference/basis_transform.html#edrixs.basis_transform.fourier_hr2hk">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fourier_hr2hk</span><span class="p">(</span><span class="n">norbs</span><span class="p">,</span> <span class="n">nkpt</span><span class="p">,</span> <span class="n">kvec</span><span class="p">,</span> <span class="n">nrpt</span><span class="p">,</span> <span class="n">rvec</span><span class="p">,</span> <span class="n">deg_rpt</span><span class="p">,</span> <span class="n">hr</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fourier transform a tight-binding Hamiltonian :math:`H(r)` from</span>
+<span class="sd">    real space to :math:`k` space :math:`H(k)`,</span>
+<span class="sd">    for Wannier90.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    norbs: int</span>
+<span class="sd">        Number of orbitals.</span>
+<span class="sd">    nkpt: int</span>
+<span class="sd">        Number of :math:`k`-points.</span>
+<span class="sd">    kvec: 2d float array</span>
+<span class="sd">        Fractional coordinate for k-points.</span>
+<span class="sd">    nrpt: int</span>
+<span class="sd">        Number of r-points.</span>
+<span class="sd">    rvec: 2d float array</span>
+<span class="sd">        Fractional coordinate for r-points.</span>
+<span class="sd">    deg_rpt: int</span>
+<span class="sd">        The degenerancy for each r-point.</span>
+<span class="sd">    hr: 3d complex array</span>
+<span class="sd">        Hamiltonian in r-space.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    hk: 3d complex array</span>
+<span class="sd">        Hamiltonian in k-space.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">hk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">nkpt</span><span class="p">,</span> <span class="n">norbs</span><span class="p">,</span> <span class="n">norbs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nkpt</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nrpt</span><span class="p">):</span>
+            <span class="n">coef</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">kvec</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:],</span> <span class="n">rvec</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="p">:])</span>
+            <span class="n">ratio</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">coef</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">coef</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">deg_rpt</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+            <span class="n">hk</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">hk</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">ratio</span> <span class="o">*</span> <span class="n">hr</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+    <span class="k">return</span> <span class="n">hk</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Brookhaven National Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

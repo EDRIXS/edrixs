@@ -1,0 +1,872 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>utils &mdash; edrixs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="wannier_ham" href="wannier_ham.html" />
+    <link rel="prev" title="solvers" href="solvers.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            edrixs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">edrixs User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Pedagogical examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">edrixs Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="angular_momentum.html">angular_momentum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="basis_transform.html">basis_transform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coulomb_utensor.html">coulomb_utensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fit_hyb.html">fit_hyb</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fock_basis.html">fock_basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="iostream.html">iostream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manybody_operator.html">manybody_operator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="photon_transition.html">photon_transition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_spectrum.html">plot_spectrum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rixs_utils.html">rixs_utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc.html">soc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers.html">solvers</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.CT_imp_bath"><code class="docutils literal notranslate"><span class="pre">CT_imp_bath()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.CT_imp_bath_core_hole"><code class="docutils literal notranslate"><span class="pre">CT_imp_bath_core_hole()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.F0F2F4F6_to_UdJH"><code class="docutils literal notranslate"><span class="pre">F0F2F4F6_to_UdJH()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.F0F2F4_to_UJ"><code class="docutils literal notranslate"><span class="pre">F0F2F4_to_UJ()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.F0F2F4_to_UdJH"><code class="docutils literal notranslate"><span class="pre">F0F2F4_to_UdJH()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.UJ_to_UdJH"><code class="docutils literal notranslate"><span class="pre">UJ_to_UdJH()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.UdJH_to_F0F2F4"><code class="docutils literal notranslate"><span class="pre">UdJH_to_F0F2F4()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.UdJH_to_F0F2F4F6"><code class="docutils literal notranslate"><span class="pre">UdJH_to_F0F2F4F6()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.UdJH_to_UJ"><code class="docutils literal notranslate"><span class="pre">UdJH_to_UJ()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.beta_to_kelvin"><code class="docutils literal notranslate"><span class="pre">beta_to_kelvin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.boltz_dist"><code class="docutils literal notranslate"><span class="pre">boltz_dist()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.case_to_shell_name"><code class="docutils literal notranslate"><span class="pre">case_to_shell_name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.edge_to_shell_name"><code class="docutils literal notranslate"><span class="pre">edge_to_shell_name()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.get_atom_data"><code class="docutils literal notranslate"><span class="pre">get_atom_data()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.info_atomic_shell"><code class="docutils literal notranslate"><span class="pre">info_atomic_shell()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.kelvin_to_beta"><code class="docutils literal notranslate"><span class="pre">kelvin_to_beta()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.rescale"><code class="docutils literal notranslate"><span class="pre">rescale()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.slater_integrals_name"><code class="docutils literal notranslate"><span class="pre">slater_integrals_name()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="wannier_ham.html">wannier_ham</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">edrixs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">edrixs Reference</a></li>
+      <li class="breadcrumb-item active">utils</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/reference/utils.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="utils">
+<span id="id1"></span><h1>utils<a class="headerlink" href="#utils" title="Link to this heading">¶</a></h1>
+<span class="target" id="module-edrixs.utils"></span><dl class="py function">
+<dt class="sig sig-object py" id="edrixs.utils.CT_imp_bath">
+<span class="sig-prename descclassname"><span class="pre">edrixs.utils.</span></span><span class="sig-name descname"><span class="pre">CT_imp_bath</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">U_dd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Delta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/utils.html#CT_imp_bath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.utils.CT_imp_bath" title="Link to this definition">¶</a></dt>
+<dd><p>Compute energies of the impurity and bath for an
+Anderson impurity or charge-transfer model
+appropriate for a <span class="math notranslate nohighlight">\(d\)</span>-shell transition metal compound.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>U_dd: float</strong></dt><dd><p>Coulomb interaction <span class="math notranslate nohighlight">\(U_{dd}\)</span></p>
+</dd>
+<dt><strong>Delta: float</strong></dt><dd><p>Charge-transfer energy <span class="math notranslate nohighlight">\(\Delta\)</span></p>
+</dd>
+<dt><strong>n</strong><span class="classifier">integer</span></dt><dd><p>Number of electrons in the <span class="math notranslate nohighlight">\(d\)</span>-shell</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>E_d</strong><span class="classifier">float</span></dt><dd><p>Energy of the impurity states <span class="math notranslate nohighlight">\(E_d\)</span></p>
+</dd>
+<dt><strong>E_L</strong><span class="classifier">float</span></dt><dd><p>Energy of the bath states <span class="math notranslate nohighlight">\(E_L\)</span></p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>We credit our approach to Maurits Hakverkort,
+Heidelberg University.
+We define the state with a full set of bath orbitals to be zero
+energy and write the energy levels using the same definitions
+as <a class="reference internal" href="#raa09fd9734d1-1" id="id2">[1]</a> <a class="reference internal" href="#raa09fd9734d1-2" id="id3">[2]</a> <a class="reference internal" href="#raa09fd9734d1-3" id="id4">[3]</a>.</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(d^{n}L^{10}\)</span> has energy <span class="math notranslate nohighlight">\(0\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(d^{n+1}L^9\)</span> has energy <span class="math notranslate nohighlight">\(\Delta\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(d^{n+2}L^8\)</span> has energy <span class="math notranslate nohighlight">\(2\Delta + U_{dd}\)</span></p></li>
+</ul>
+<p>Using this we can write and solve three linear equations to get
+<span class="math notranslate nohighlight">\(E_d\)</span> and <span class="math notranslate nohighlight">\(E_L\)</span> the energies of the impurity and bath.</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+10 E_L + n     E_d + n(n-1) \frac{U_{dd}}{2} &amp;= 0 \\
+ 9 E_L + (n+1) E_d + (n+1)n \frac{U_{dd}}{2} &amp;= \Delta \\
+ 8 E_L + (n+2) E_d + (n+1)(n+2) \frac{U_{dd}}{2}
+ &amp;= 2\Delta + U_{dd}
+\end{aligned}\end{split}\]</div>
+</div></blockquote>
+<p>The solutions are:</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+E_d &amp;=
+\frac{10 \Delta - n (19 +  n) U_{dd}/2}{10 + n}  \\
+E_L &amp;=
+\frac{n ((1+n) U_{dd}/2-\Delta)}{10 + n}
+\end{aligned}.\end{split}\]</div>
+</div></blockquote>
+<p class="rubric">References</p>
+<div role="list" class="citation-list">
+<div class="citation" id="raa09fd9734d1-1" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">1</a><span class="fn-bracket">]</span></span>
+<p>J. Zaanen, G. A. Sawatzky, and J. W. Allen
+<a class="reference external" href="https://doi.org/10.1103/PhysRevLett.55.418">Phys. Rev. Lett. 55, 418 (1985)</a></p>
+</div>
+<div class="citation" id="raa09fd9734d1-2" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">2</a><span class="fn-bracket">]</span></span>
+<p>Maurits Haverkort et al.,
+<a class="reference external" href="https://doi.org/10.1103/PhysRevB.85.165113">Phys. Rev. B 85, 165113 (2012)</a></p>
+</div>
+<div class="citation" id="raa09fd9734d1-3" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">3</a><span class="fn-bracket">]</span></span>
+<p>A. E. Bocquet et al.,
+<a class="reference external" href="https://doi.org/10.1103/PhysRevB.53.1161">Phys. Rev. B 53, 1161 (1996)</a></p>
+</div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.utils.CT_imp_bath_core_hole">
+<span class="sig-prename descclassname"><span class="pre">edrixs.utils.</span></span><span class="sig-name descname"><span class="pre">CT_imp_bath_core_hole</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">U_dd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">U_pd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Delta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/utils.html#CT_imp_bath_core_hole"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.utils.CT_imp_bath_core_hole" title="Link to this definition">¶</a></dt>
+<dd><p>Compute energies of the impurity and bath for an
+Anderson impurity or charge-transfer model
+appropriate for a <span class="math notranslate nohighlight">\(d\)</span>-shell transition metal compound
+with a core hole.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>U_dd: float</strong></dt><dd><p>Coulomb interaction <span class="math notranslate nohighlight">\(U_{dd}\)</span></p>
+</dd>
+<dt><strong>U_pd: float</strong></dt><dd><p>Coulomb interaction <span class="math notranslate nohighlight">\(U_{pd}\)</span></p>
+</dd>
+<dt><strong>Delta: float</strong></dt><dd><p>Charge-transfer energy <span class="math notranslate nohighlight">\(\Delta\)</span></p>
+</dd>
+<dt><strong>n</strong><span class="classifier">integer</span></dt><dd><p>Number of electrons in the <span class="math notranslate nohighlight">\(d\)</span>-shell <span class="math notranslate nohighlight">\(n\)</span></p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>E_dc</strong><span class="classifier">float</span></dt><dd><p>Energy of the impurity states <span class="math notranslate nohighlight">\(E_{dc}\)</span> with
+a core hole</p>
+</dd>
+<dt><strong>E_Lc</strong><span class="classifier">float</span></dt><dd><p>Energy of the bath states <span class="math notranslate nohighlight">\(E_{Lc}\)</span> with a core
+hole</p>
+</dd>
+<dt><strong>E_p</strong><span class="classifier">float</span></dt><dd><p>Energy of the core hole state <span class="math notranslate nohighlight">\(E_\textrm{E_p}\)</span></p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>We credit our approach to Maurits Hakverkort,
+Heidelberg University.
+We define the state with a full set of bath orbitals to be zero
+energy and write the energy levels using the same definitions as
+<a class="reference internal" href="#rdee7c898e8e0-1" id="id8">[1]</a> <a class="reference internal" href="#rdee7c898e8e0-2" id="id9">[2]</a> <a class="reference internal" href="#rdee7c898e8e0-3" id="id10">[3]</a>.</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(2p^5 d^{n}L^{10}\)</span> has energy <span class="math notranslate nohighlight">\(0\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(2p^5 d^{n+1}L^9\)</span> has energy <span class="math notranslate nohighlight">\(\Delta + U_{dd} - U_{pd}\)</span></p></li>
+<li><p><span class="math notranslate nohighlight">\(2p^5 d^{n+2}L^8\)</span> has energy <span class="math notranslate nohighlight">\(2\Delta + 3 U_{dd} - 2 U_{pd}\)</span></p></li>
+</ul>
+<p>Using this we can write and solve linear equations to get
+<span class="math notranslate nohighlight">\(E_{dc}\)</span>, <span class="math notranslate nohighlight">\(E_{Lc}\)</span> and <span class="math notranslate nohighlight">\(E_p\)</span> the energies of the
+impurity and bath with a core hole and the energy of the core hole.</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+    6 E_p + 10 E_{Lc} +  n    E_{dc} + n(n-1) \frac{U_{dd}}{2}
+    + 6 n     U_{pd} &amp;= 0    \\
+    6 E_p +  9 E_{Lc} + (n+1) E_{dc} + (n+1)n \frac{U_{dd}}{2}
+    + 6 (n+1) U_{pd} &amp;= \Delta  \\
+    6 E_p +  8 E_{Lc} + (n+2) E_{d} + (n+1)(n+2) \frac{U_{dd}}{2}
+    + 6 (n+2) U_{pd} &amp;= 2 \Delta+U_{dd} \\
+    5 E_p + 10 E_{Lc} + (n+1) E_{d} + (n+1) n \frac{U_{dd}}{2}
+    + 5 (n+1) U_{pd} &amp;= 0 \\
+    5 E_p +  9 E_{Lc} + (n+2) E_{dc} + (n+2)(n+1) \frac{U_{dd}}{2}
+    + 5 (n+2) U_{pd} &amp;= \Delta+U_{dd}-U_{pd} \\
+    5 E_p +  8 E_{Lc} + (n+3) E_{dc} + (n+3)(n+2) \frac{U_{dd}}{2}
+    + 5 (n+3) U_{pd} &amp;= 2 \Delta+3 U_{dd}-2 U_{pd}
+\end{aligned}\end{split}\]</div>
+</div></blockquote>
+<p>The solutions are:</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\begin{split}\begin{aligned}
+   E_{dc} &amp;= \frac{10 \Delta - n (31+n) \frac{U_{dd}}{2}-90 U_{pd}}{16+n} \\
+   E_{Lc} &amp;= \frac{(1+n) (n \frac{U_{dd}}{2}+6*U_{pd})-(6+n) \Delta}{16+n} \\
+   E_p    &amp;= \frac{10 \Delta + (1+n)(n\frac{U_{dd}}{2}-(10+n)*U_{pd}}{16+n}
+\end{aligned}\end{split}\]</div>
+</div></blockquote>
+<p class="rubric">References</p>
+<div role="list" class="citation-list">
+<div class="citation" id="rdee7c898e8e0-1" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id8">1</a><span class="fn-bracket">]</span></span>
+<p>J. Zaanen, G. A. Sawatzky, and J. W. Allen
+<a class="reference external" href="https://doi.org/10.1103/PhysRevLett.55.418">Phys. Rev. Lett. 55, 418 (1985)</a></p>
+</div>
+<div class="citation" id="rdee7c898e8e0-2" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id9">2</a><span class="fn-bracket">]</span></span>
+<p>Maurits Haverkort et al.,
+<a class="reference external" href="https://doi.org/10.1103/PhysRevB.85.165113">Phys. Rev. B 85, 165113 (2012)</a></p>
+</div>
+<div class="citation" id="rdee7c898e8e0-3" role="doc-biblioentry">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id10">3</a><span class="fn-bracket">]</span></span>
+<p>A. E. Bocquet et al.,
+<a class="reference external" href="https://doi.org/10.1103/PhysRevB.53.1161">Phys. Rev. B 53, 1161 (1996)</a></p>
+</div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.utils.F0F2F4F6_to_UdJH">
+<span class="sig-prename descclassname"><span class="pre">edrixs.utils.</span></span><span class="sig-name descname"><span class="pre">F0F2F4F6_to_UdJH</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">F0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F6</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/utils.html#F0F2F4F6_to_UdJH"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.utils.F0F2F4F6_to_UdJH" title="Link to this definition">¶</a></dt>
+<dd><p>Given <span class="math notranslate nohighlight">\(F_0\)</span>, <span class="math notranslate nohighlight">\(F_2\)</span>, <span class="math notranslate nohighlight">\(F_4\)</span> and <span class="math notranslate nohighlight">\(F_6\)</span>,
+return <span class="math notranslate nohighlight">\(U_d\)</span> and <span class="math notranslate nohighlight">\(J_H\)</span>, for <span class="math notranslate nohighlight">\(f\)</span>-orbitals.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>F0: float</strong></dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F_0\)</span>.</p>
+</dd>
+<dt><strong>F2: float</strong></dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F_2\)</span>.</p>
+</dd>
+<dt><strong>F4: float</strong></dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F_4\)</span>.</p>
+</dd>
+<dt><strong>F6: float</strong></dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F_6\)</span>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>Ud: float</dt><dd><p>Coulomb interaction <span class="math notranslate nohighlight">\(U_d\)</span>.</p>
+</dd>
+<dt>JH: float</dt><dd><p>Hund’s coupling <span class="math notranslate nohighlight">\(J_H\)</span>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.utils.F0F2F4_to_UJ">
+<span class="sig-prename descclassname"><span class="pre">edrixs.utils.</span></span><span class="sig-name descname"><span class="pre">F0F2F4_to_UJ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">F0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/utils.html#F0F2F4_to_UJ"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.utils.F0F2F4_to_UJ" title="Link to this definition">¶</a></dt>
+<dd><p>Given <span class="math notranslate nohighlight">\(F_0\)</span>, <span class="math notranslate nohighlight">\(F_2\)</span> and <span class="math notranslate nohighlight">\(F_4\)</span>, return <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(J\)</span>,
+for <span class="math notranslate nohighlight">\(t2g\)</span>-orbitals.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>F0: float</strong></dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F_0\)</span>.</p>
+</dd>
+<dt><strong>F2: float</strong></dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F_2\)</span>.</p>
+</dd>
+<dt><strong>F4: float</strong></dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F_4\)</span>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>U: float</dt><dd><p>Coulomb interaction <span class="math notranslate nohighlight">\(U\)</span>.</p>
+</dd>
+<dt>J: float</dt><dd><p>Hund’s coupling <span class="math notranslate nohighlight">\(J\)</span>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.utils.F0F2F4_to_UdJH">
+<span class="sig-prename descclassname"><span class="pre">edrixs.utils.</span></span><span class="sig-name descname"><span class="pre">F0F2F4_to_UdJH</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">F0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/utils.html#F0F2F4_to_UdJH"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.utils.F0F2F4_to_UdJH" title="Link to this definition">¶</a></dt>
+<dd><p>Given <span class="math notranslate nohighlight">\(F_0\)</span>, <span class="math notranslate nohighlight">\(F_2\)</span> and <span class="math notranslate nohighlight">\(F_4\)</span>, return <span class="math notranslate nohighlight">\(U_d\)</span> and <span class="math notranslate nohighlight">\(J_H\)</span>,
+for <span class="math notranslate nohighlight">\(d\)</span>-orbitals.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>F0: float</strong></dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F_0\)</span>.</p>
+</dd>
+<dt><strong>F2: float</strong></dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F_2\)</span>.</p>
+</dd>
+<dt><strong>F4: float</strong></dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F_4\)</span>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>Ud: float</dt><dd><p>Coulomb interaction <span class="math notranslate nohighlight">\(U_d\)</span>.</p>
+</dd>
+<dt>JH: float</dt><dd><p>Hund’s coupling <span class="math notranslate nohighlight">\(J_H\)</span>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.utils.UJ_to_UdJH">
+<span class="sig-prename descclassname"><span class="pre">edrixs.utils.</span></span><span class="sig-name descname"><span class="pre">UJ_to_UdJH</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">U</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">J</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/utils.html#UJ_to_UdJH"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.utils.UJ_to_UdJH" title="Link to this definition">¶</a></dt>
+<dd><p>Given Kanamori <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(J\)</span>, return <span class="math notranslate nohighlight">\(U_d\)</span> and <span class="math notranslate nohighlight">\(J_H\)</span>,
+for <span class="math notranslate nohighlight">\(t2g\)</span>-orbitals.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>U: float</strong></dt><dd><p>Coulomb interaction <span class="math notranslate nohighlight">\(U\)</span>.</p>
+</dd>
+<dt><strong>J: float</strong></dt><dd><p>Hund’s coupling <span class="math notranslate nohighlight">\(J\)</span>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>Ud: float</dt><dd><p>Coulomb interaction <span class="math notranslate nohighlight">\(U_d\)</span>.</p>
+</dd>
+<dt>JH: float</dt><dd><p>Hund’s coupling <span class="math notranslate nohighlight">\(J_{H}\)</span>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.utils.UdJH_to_F0F2F4">
+<span class="sig-prename descclassname"><span class="pre">edrixs.utils.</span></span><span class="sig-name descname"><span class="pre">UdJH_to_F0F2F4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Ud</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">JH</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/utils.html#UdJH_to_F0F2F4"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.utils.UdJH_to_F0F2F4" title="Link to this definition">¶</a></dt>
+<dd><p>Given <span class="math notranslate nohighlight">\(U_d\)</span> and <span class="math notranslate nohighlight">\(J_H\)</span>, return <span class="math notranslate nohighlight">\(F_0\)</span>, <span class="math notranslate nohighlight">\(F_2\)</span> and <span class="math notranslate nohighlight">\(F_4\)</span>,
+for <span class="math notranslate nohighlight">\(d\)</span>-orbitals.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>Ud: float</strong></dt><dd><p>Coulomb interaction <span class="math notranslate nohighlight">\(U_d\)</span>.</p>
+</dd>
+<dt><strong>JH: float</strong></dt><dd><p>Hund’s coupling <span class="math notranslate nohighlight">\(J_H\)</span>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>F0: float</dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F_0\)</span>.</p>
+</dd>
+<dt>F2: float</dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F_2\)</span>.</p>
+</dd>
+<dt>F4: float</dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F_4\)</span>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.utils.UdJH_to_F0F2F4F6">
+<span class="sig-prename descclassname"><span class="pre">edrixs.utils.</span></span><span class="sig-name descname"><span class="pre">UdJH_to_F0F2F4F6</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Ud</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">JH</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/utils.html#UdJH_to_F0F2F4F6"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.utils.UdJH_to_F0F2F4F6" title="Link to this definition">¶</a></dt>
+<dd><p>Given <span class="math notranslate nohighlight">\(U_d\)</span> and <span class="math notranslate nohighlight">\(J_H\)</span>, return <span class="math notranslate nohighlight">\(F_0\)</span>, <span class="math notranslate nohighlight">\(F_2\)</span>, <span class="math notranslate nohighlight">\(F_4\)</span> and <span class="math notranslate nohighlight">\(F_6\)</span>,
+for <span class="math notranslate nohighlight">\(f\)</span>-orbitals.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>Ud: float</strong></dt><dd><p>Coulomb interaction <span class="math notranslate nohighlight">\(U_d\)</span>.</p>
+</dd>
+<dt><strong>JH: float</strong></dt><dd><p>Hund’s coupling <span class="math notranslate nohighlight">\(J_H\)</span>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>F0: float</dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F_0\)</span>.</p>
+</dd>
+<dt>F2: float</dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F_2\)</span>.</p>
+</dd>
+<dt>F4: float</dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F_4\)</span>.</p>
+</dd>
+<dt>F6: float</dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F_6\)</span>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.utils.UdJH_to_UJ">
+<span class="sig-prename descclassname"><span class="pre">edrixs.utils.</span></span><span class="sig-name descname"><span class="pre">UdJH_to_UJ</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Ud</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">JH</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/utils.html#UdJH_to_UJ"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.utils.UdJH_to_UJ" title="Link to this definition">¶</a></dt>
+<dd><p>Given <span class="math notranslate nohighlight">\(U_d\)</span> and <span class="math notranslate nohighlight">\(J_H\)</span>, return Kanamori <span class="math notranslate nohighlight">\(U\)</span> and <span class="math notranslate nohighlight">\(J\)</span>,
+for <span class="math notranslate nohighlight">\(t2g\)</span>-orbitals.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>Ud: float</strong></dt><dd><p>Coulomb interaction <span class="math notranslate nohighlight">\(U_d\)</span>.</p>
+</dd>
+<dt><strong>JH: float</strong></dt><dd><p>Hund’s coupling <span class="math notranslate nohighlight">\(J_H\)</span>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>U: float</dt><dd><p>Coulomb interaction <span class="math notranslate nohighlight">\(U\)</span> in Kanamori form.</p>
+</dd>
+<dt>J: float</dt><dd><p>Hund’s coupling <span class="math notranslate nohighlight">\(J\)</span> in Kanamori form.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.utils.beta_to_kelvin">
+<span class="sig-prename descclassname"><span class="pre">edrixs.utils.</span></span><span class="sig-name descname"><span class="pre">beta_to_kelvin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/utils.html#beta_to_kelvin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.utils.beta_to_kelvin" title="Link to this definition">¶</a></dt>
+<dd><p>Convert <span class="math notranslate nohighlight">\(\beta\)</span> to Kelvin.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>beta: float</strong></dt><dd><p>Inversion temperature.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>T: float</dt><dd><p>Temperature (K).</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.utils.boltz_dist">
+<span class="sig-prename descclassname"><span class="pre">edrixs.utils.</span></span><span class="sig-name descname"><span class="pre">boltz_dist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">T</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/utils.html#boltz_dist"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.utils.boltz_dist" title="Link to this definition">¶</a></dt>
+<dd><p>Return Boltzmann distributition.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>gs: 1d float array</strong></dt><dd><p>Energy levels.</p>
+</dd>
+<dt><strong>T: float</strong></dt><dd><p>Temperature in Kelvin.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>res: 1d float array</dt><dd><p>The Boltzmann distributition.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.utils.case_to_shell_name">
+<span class="sig-prename descclassname"><span class="pre">edrixs.utils.</span></span><span class="sig-name descname"><span class="pre">case_to_shell_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">case</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/utils.html#case_to_shell_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.utils.case_to_shell_name" title="Link to this definition">¶</a></dt>
+<dd><p>Return the shell names for different cases.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>case: string</strong></dt><dd><p>A string describing the shells included.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>shell_name: tuple of one or two strings</dt><dd><p>The name of shells.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">edrixs</span><span class="o">.</span><span class="n">case_to_shell_name</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
+<span class="go">(&#39;d&#39;,)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">edrixs</span><span class="o">.</span><span class="n">case_to_shell_name</span><span class="p">(</span><span class="s1">&#39;t2gp32&#39;</span><span class="p">)</span>
+<span class="go">(&#39;t2g&#39;, &#39;p32&#39;)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.utils.edge_to_shell_name">
+<span class="sig-prename descclassname"><span class="pre">edrixs.utils.</span></span><span class="sig-name descname"><span class="pre">edge_to_shell_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">edge_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">with_main_qn</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/utils.html#edge_to_shell_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.utils.edge_to_shell_name" title="Link to this definition">¶</a></dt>
+<dd><p>Given edge name, return shell name.
+If one needs to include both spin-orbit split edges of one shell,
+one can use string, for example, ‘L23’ means both L2 and L3 edges
+are considered in the calculations, and the shell name will be ‘p’.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>edge_name: string</strong></dt><dd><p>Standard edge name.</p>
+</dd>
+<dt><strong>with_main_qn: logical</strong></dt><dd><p>If true, the shell name will include the main quantum number.</p>
+</dd>
+<dt><strong>Returns</strong></dt><dd></dd>
+<dt><strong>——-</strong></dt><dd></dd>
+<dt><strong>shell_name: string</strong></dt><dd><p>Shell name.</p>
+<ul class="simple">
+<li><p>with_main_qn=True, shell_name will include the main quantum number,
+for example, <em>2p</em></p></li>
+<li><p>with_main_qn=False, shell_name will not include the main quantum number,
+for example, <em>p</em></p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.utils.get_atom_data">
+<span class="sig-prename descclassname"><span class="pre">edrixs.utils.</span></span><span class="sig-name descname"><span class="pre">get_atom_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">atom</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_noccu</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trans_to_which</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/utils.html#get_atom_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.utils.get_atom_data" title="Link to this definition">¶</a></dt>
+<dd><p>Return Slater integrals, spin-orbit coupling strength, edge energy and core hole
+life-time broadening for an atom with given type of valence shells, occupancy of
+valence shells and the x-ray resonant edge.</p>
+<p>The Slater integrals and spin-orbit coupling are calculated by Cowan’s code
+(<a class="reference external" href="https://github.com/mretegan/atomic-parameters">https://github.com/mretegan/atomic-parameters</a>) based on Hartree-Fock
+approximation. These numbers are just initial guess and serve as a start point,
+you need to rescale them to reproduce your XAS or RIXS spectra.</p>
+<p>NOTE: F0 is not calculated by Cowan’s code, they are all set to be zero, you need to
+set F0 by yourself.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>atom: string</strong></dt><dd><p>Name of atom, for example, ‘Ni’, ‘Cu’, ‘Ir’, ‘U’.</p>
+</dd>
+<dt><strong>v_name: a string or a tuple of one or two strings</strong></dt><dd><p>Names of one or two valence shells. Set it to a single string if there is only
+one valence shell, or set it to a tuple of two strings if there are two valence
+shells. For example, <em>v_name=’3d’</em>, <em>v_name=(‘3d’, ‘4p’)</em></p>
+</dd>
+<dt><strong>v_noccu: a int or a tuple of one or two ints</strong></dt><dd><p>Occupancy of valence shells before x-ray absorption (without a core hole).
+Set it to a single int if there is only one valence shell, or set it to a
+tuple of two ints if there are two valence shells. The order should be
+consistent with that in v_name.
+For example, <em>v_name=’3d’, v_noccu=8</em>, <em>v_name=(‘3d’, ‘4p’), v_noccu=(8, 0)</em>.</p>
+</dd>
+<dt><strong>edge: a string</strong></dt><dd><p>X-ray resonant edge. If edge is not None, both the information of
+the initial (without a core hole) and intermediate (with a core hole) Hamiltonians
+will be returned, otherwise, only the information of the initial Hamiltonian
+will be returned. It can be,</p>
+<ul class="simple">
+<li><p>K, L1, L2, L3, M1, M2, M3, M4, M5, N1, N2, N3, N4, N5,
+N6, N7, O1, O2, O3, O4, O5, P1, P2, P3</p></li>
+<li><p>L23 (both L2 and L3), M23 (both M2 and M3), M45 (both M4 and M5)
+N23 (both N2 and N3), N45 (both N4 and N5), N67 (both N6 and N7)
+O23 (both O2 and O3), O45 (both O4 and O5), P23 (both P2 and P3)</p></li>
+</ul>
+</dd>
+<dt><strong>trans_to_which: int</strong></dt><dd><p>If there are two valence shells, this variable is used to indicate which
+valence shell the photon transition happens.</p>
+<ul class="simple">
+<li><p>1: to the first valence shell</p></li>
+<li><p>2: to the second valence shell</p></li>
+</ul>
+</dd>
+<dt><strong>label: a string or tuple of strings</strong></dt><dd><p>User-defined symbols to label the names of Slater integrals.</p>
+<ul class="simple">
+<li><p>one element, for the valence shell</p></li>
+<li><p>two elements, 1st (2nd)-element for the 1st (2nd) valence shells or
+1st-element for the 1st valence shell and the 2nd one for the core shell.</p></li>
+<li><p>three elements, the 1st (2nd)-element is for the 1st (2nd) valence shell,
+the 3rd one is for the core shell</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt>res:  dict</dt><dd><p>Atomic data. A dict likes this if edge is None:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">res</span><span class="o">=</span><span class="p">{</span>
+    <span class="s1">&#39;slater_i&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="n">name</span> <span class="n">of</span> <span class="n">slater</span> <span class="n">integrals</span><span class="p">,</span> <span class="n">vaule</span> <span class="n">of</span> <span class="n">slater</span> <span class="n">integrals</span><span class="p">),</span> <span class="p">(),</span> <span class="o">...</span><span class="p">],</span>
+    <span class="s1">&#39;v_soc&#39;</span><span class="p">:</span> <span class="p">[</span><span class="nb">list</span> <span class="n">of</span> <span class="n">SOC</span> <span class="k">for</span> <span class="n">each</span> <span class="n">atomic</span> <span class="n">shell</span> <span class="ow">in</span> <span class="n">v_name</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>otherwise,</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">res</span><span class="o">=</span><span class="p">{</span>
+    <span class="s1">&#39;slater_i&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="n">name</span> <span class="n">of</span> <span class="n">slater</span> <span class="n">integrals</span><span class="p">,</span> <span class="n">value</span> <span class="n">of</span> <span class="n">slater</span> <span class="n">integrals</span><span class="p">),</span> <span class="p">(),</span> <span class="o">...</span><span class="p">],</span>
+    <span class="s1">&#39;slater_n&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="n">name</span> <span class="n">of</span> <span class="n">slater</span> <span class="n">integrals</span><span class="p">,</span> <span class="n">value</span> <span class="n">of</span> <span class="n">slater</span> <span class="n">integrals</span><span class="p">),</span> <span class="p">(),</span> <span class="o">...</span><span class="p">],</span>
+    <span class="s1">&#39;v_soc&#39;</span><span class="p">:</span> <span class="p">[</span><span class="nb">list</span> <span class="n">of</span> <span class="n">SOC</span> <span class="k">for</span> <span class="n">each</span> <span class="n">atomic</span> <span class="n">shell</span> <span class="ow">in</span> <span class="n">v_name</span><span class="p">],</span>
+    <span class="s1">&#39;c_soc&#39;</span><span class="p">:</span> <span class="n">SOC</span> <span class="n">of</span> <span class="n">core</span> <span class="n">shell</span><span class="p">,</span>
+    <span class="s1">&#39;edge_ene&#39;</span><span class="p">:</span> <span class="p">[</span><span class="nb">list</span> <span class="n">of</span> <span class="n">edge</span> <span class="n">energy</span><span class="p">,</span> <span class="mi">2</span> <span class="n">elements</span> <span class="k">if</span> <span class="n">edge</span> <span class="ow">is</span> <span class="nb">any</span> <span class="n">of</span>
+    <span class="s2">&quot;L23, M23, M45, N23, N45, N67, O23, O45, P23&quot;</span><span class="p">,</span> <span class="n">othewise</span> <span class="n">only</span> <span class="mi">1</span> <span class="n">element</span><span class="p">],</span>
+    <span class="s1">&#39;gamma_c&#39;</span><span class="p">:</span> <span class="p">[</span><span class="nb">list</span> <span class="n">of</span> <span class="n">core</span> <span class="n">hole</span> <span class="n">life</span><span class="o">-</span><span class="n">time</span> <span class="n">broadening</span><span class="p">,</span> <span class="mi">2</span> <span class="n">elements</span> <span class="k">if</span> <span class="n">edge</span> <span class="ow">is</span> <span class="nb">any</span> <span class="n">of</span>
+    <span class="s2">&quot;L23, M23, M45, N23, N45, N67, O23, O45, P23&quot;</span><span class="p">,</span> <span class="n">othewise</span> <span class="n">only</span> <span class="mi">1</span> <span class="n">element</span><span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_atom_data</span><span class="p">(</span><span class="s1">&#39;Ni&#39;</span><span class="p">,</span> <span class="n">v_name</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">,</span> <span class="n">v_noccu</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span>
+<span class="go">{&#39;slater_i&#39;: [(&#39;F0_11&#39;, 0.0), (&#39;F2_11&#39;, 13.886), (&#39;F4_11&#39;, 8.67)],</span>
+<span class="go"> &#39;v_soc_i&#39;: [0.112]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">name</span><span class="p">,</span> <span class="n">slater</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;slater_i&#39;</span><span class="p">])]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">name</span>
+<span class="go">[&#39;F0_11&#39;, &#39;F2_11&#39;, &#39;F4_11&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slater</span>
+<span class="go">[0.0, 13.886, 8.67]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slater</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="mf">0.8</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">slater</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slater</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_F0</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="n">slater</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">slater</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slater</span>
+<span class="go">[0.5728507936507936, 11.1088, 6.936]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span><span class="o">=</span><span class="n">edrixs</span><span class="o">.</span><span class="n">get_atom_data</span><span class="p">(</span><span class="s1">&#39;Ni&#39;</span><span class="p">,</span> <span class="n">v_name</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">,</span> <span class="n">v_noccu</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">edge</span><span class="o">=</span><span class="s1">&#39;L3&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span>
+<span class="go">{&#39;slater_i&#39;: [(&#39;F0_dd&#39;, 0.0), (&#39;F2_dd&#39;, 12.234), (&#39;F4_dd&#39;, 7.598)],</span>
+<span class="go"> &#39;v_soc_i&#39;: [0.083],</span>
+<span class="go"> &#39;slater_n&#39;: [(&#39;F0_dd&#39;, 0.0), (&#39;F2_dd&#39;, 12.234), (&#39;F4_dd&#39;, 7.598),</span>
+<span class="go">  (&#39;F0_dp&#39;, 0.0), (&#39;F2_dp&#39;, 7.721), (&#39;G1_dp&#39;, 5.787), (&#39;G3_dp&#39;, 3.291),</span>
+<span class="go">  (&#39;F0_pp&#39;, 0.0), (&#39;F2_pp&#39;, 0.0)],</span>
+<span class="go"> &#39;v_soc_n&#39;: [0.102],</span>
+<span class="go"> &#39;c_soc&#39;: 11.507,</span>
+<span class="go"> &#39;edge_ene&#39;: [852.7],</span>
+<span class="go"> &#39;gamma_c&#39;: [0.275]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">name_i</span><span class="p">,</span> <span class="n">slater_i</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;slater_i&#39;</span><span class="p">])]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">name_n</span><span class="p">,</span> <span class="n">slater_n</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;slater_n&#39;</span><span class="p">])]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">name_i</span>
+<span class="go">[&#39;F0_dd&#39;, &#39;F2_dd&#39;, &#39;F4_dd&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slater_i</span>
+<span class="go">[0.0, 12.234, 7.598]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">name_n</span>
+<span class="go">[&#39;F0_dd&#39;, &#39;F2_dd&#39;, &#39;F4_dd&#39;, &#39;F0_dp&#39;, &#39;F2_dp&#39;, &#39;G1_dp&#39;, &#39;G3_dp&#39;, &#39;F0_pp&#39;, &#39;F2_pp&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slater_n</span>
+<span class="go">[0.0, 12.234, 7.598, 0.0, 7.721, 5.787, 3.291, 0.0, 0.0]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slater_n</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_F0</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="n">slater_n</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">slater_n</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slater_n</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_F0</span><span class="p">(</span><span class="s1">&#39;dp&#39;</span><span class="p">,</span> <span class="n">slater_n</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">slater_n</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slater_n</span>
+<span class="go">[0.6295873015873016, 12.234, 7.598, 0.5268428571428572, 7.721, 5.787, 3.291, 0.0, 0.0]</span>
+</pre></div>
+</div>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span><span class="o">=</span><span class="n">edrixs</span><span class="o">.</span><span class="n">get_atom_data</span><span class="p">(</span><span class="s1">&#39;Ni&#39;</span><span class="p">,</span> <span class="n">v_name</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;3d&#39;</span><span class="p">,</span> <span class="s1">&#39;4p&#39;</span><span class="p">),</span> <span class="n">v_noccu</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">edge</span><span class="o">=</span><span class="s1">&#39;K&#39;</span><span class="p">,</span> <span class="n">trans_to_which</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span>
+<span class="go">{&#39;slater_i&#39;: [(&#39;F0_dd&#39;, 0.0), (&#39;F2_dd&#39;, 12.234), (&#39;F4_dd&#39;, 7.598),</span>
+<span class="go">  (&#39;F0_dp&#39;, 0.0), (&#39;F2_dp&#39;, 0.0), (&#39;G1_dp&#39;, 0.0), (&#39;G3_dp&#39;, 0.0),</span>
+<span class="go">  (&#39;F0_pp&#39;, 0.0), (&#39;F2_pp&#39;, 0.0)],</span>
+<span class="go"> &#39;v_soc_i&#39;: [0.083, 0.0],</span>
+<span class="go"> &#39;slater_n&#39;: [(&#39;F0_dd&#39;, 0.0), (&#39;F2_dd&#39;, 13.851), (&#39;F4_dd&#39;, 8.643),</span>
+<span class="go">  (&#39;F0_dp&#39;, 0.0), (&#39;F2_dp&#39;, 2.299), (&#39;G1_dp&#39;, 0.828), (&#39;G3_dp&#39;, 0.713),</span>
+<span class="go">  (&#39;F0_pp&#39;, 0.0), (&#39;F2_pp&#39;, 0.0),</span>
+<span class="go">  (&#39;F0_ds&#39;, 0.0), (&#39;G2_ds&#39;, 0.079),</span>
+<span class="go">  (&#39;F0_ps&#39;, 0.0), (&#39;G1_ps&#39;, 0.194),</span>
+<span class="go">  (&#39;F0_ss&#39;, 0.0)],</span>
+<span class="go"> &#39;v_soc_n&#39;: [0.113, 0.093],</span>
+<span class="go"> &#39;c_soc&#39;: 0.0,</span>
+<span class="go"> &#39;edge_ene&#39;: [8333.0],</span>
+<span class="go"> &#39;gamma_c&#39;: [0.81]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slat_i</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;slater_i&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slat_n</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;slater_n&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">slat_i</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="go">[&#39;F0_dd&#39;, &#39;F2_dd&#39;, &#39;F4_dd&#39;, &#39;F0_dp&#39;, &#39;F2_dp&#39;, &#39;G1_dp&#39;, &#39;G3_dp&#39;, &#39;F0_pp&#39;, &#39;F2_pp&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">slat_i</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+<span class="go">[0.0, 12.234, 7.598, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">slat_n</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+<span class="go">[&#39;F0_dd&#39;, &#39;F2_dd&#39;, &#39;F4_dd&#39;, &#39;F0_dp&#39;, &#39;F2_dp&#39;, &#39;G1_dp&#39;, &#39;G3_dp&#39;, &#39;F0_pp&#39;, &#39;F2_pp&#39;,</span>
+<span class="go"> &#39;F0_ds&#39;, &#39;G2_ds&#39;, &#39;F0_ps&#39;, &#39;G1_ps&#39;, &#39;F0_ss&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">slat_n</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+<span class="go">[0.0, 13.851, 8.643, 0.0, 2.299, 0.828, 0.713, 0.0, 0.0,</span>
+<span class="go"> 0.0, 0.079, 0.0, 0.194, 0.0]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.utils.info_atomic_shell">
+<span class="sig-prename descclassname"><span class="pre">edrixs.utils.</span></span><span class="sig-name descname"><span class="pre">info_atomic_shell</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/utils.html#info_atomic_shell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.utils.info_atomic_shell" title="Link to this definition">¶</a></dt>
+<dd><p>Return a dict to describe the information of atomic shell.
+The key is a string of the shell’s name, the value is a 2-elments tuple,
+the first value is the orbital angular moment number and
+the second value is the dimension of the Hilbert space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>info: dict</dt><dd><p>The dict describing info of atomic shell.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.utils.kelvin_to_beta">
+<span class="sig-prename descclassname"><span class="pre">edrixs.utils.</span></span><span class="sig-name descname"><span class="pre">kelvin_to_beta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/utils.html#kelvin_to_beta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.utils.kelvin_to_beta" title="Link to this definition">¶</a></dt>
+<dd><p>Convert temperature from Kelvin to <span class="math notranslate nohighlight">\(\beta\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>k: float</strong></dt><dd><p>Temperature in Kelvin.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>beta: float</dt><dd><p>Inversion temperature.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.utils.rescale">
+<span class="sig-prename descclassname"><span class="pre">edrixs.utils.</span></span><span class="sig-name descname"><span class="pre">rescale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">old_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/utils.html#rescale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.utils.rescale" title="Link to this definition">¶</a></dt>
+<dd><p>Rescale a 1d list.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>old_list: 1d list of numerical values</strong></dt><dd><p>Input list.</p>
+</dd>
+<dt><strong>scale: a list of tuples</strong></dt><dd><p>The scaling factors.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>new_list: 1d list</dt><dd><p>The rescaled list.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.utils.slater_integrals_name">
+<span class="sig-prename descclassname"><span class="pre">edrixs.utils.</span></span><span class="sig-name descname"><span class="pre">slater_integrals_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shell_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/utils.html#slater_integrals_name"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.utils.slater_integrals_name" title="Link to this definition">¶</a></dt>
+<dd><p>Given shell names, return the names of required Slater integrals.
+The order of these names in the return list is according to the convention:</p>
+<ul class="simple">
+<li><p>For 1 shell: [FX_11]</p></li>
+<li><p>For 2 shells: [FX_11, FX_12, GX_12, FX_22]</p></li>
+<li><p>For 3 shells: [FX_11, FX_12, GX_12, FX_22, FX_13, GX_13, FX_23, GX_23, FX_33]</p></li>
+</ul>
+<p>where, X=0, 2, 4, 6, or X=1, 3, 5, X shoule be in ascending order.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>shell_name: tuple of strings</strong></dt><dd><p>Name of shells. Its length should be less and equal than 3.</p>
+</dd>
+<dt><strong>label: tuple of strings</strong></dt><dd><p>Label of shells, same shape as shell_name.</p>
+<p>If not provided, label will be set to</p>
+<ul class="simple">
+<li><p>label=(1,) for one shell, or</p></li>
+<li><p>label=(1,2) for two shells, or</p></li>
+<li><p>label=(1,2,3) for three shells</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>res: list of strings</dt><dd><p>Names of Slater integrals.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="solvers.html" class="btn btn-neutral float-left" title="solvers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="wannier_ham.html" class="btn btn-neutral float-right" title="wannier_ham" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Brookhaven National Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

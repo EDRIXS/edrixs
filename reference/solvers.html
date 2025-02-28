@@ -1,0 +1,1250 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>solvers &mdash; edrixs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="utils" href="utils.html" />
+    <link rel="prev" title="soc" href="soc.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            edrixs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">edrixs User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Pedagogical examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">edrixs Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="angular_momentum.html">angular_momentum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="basis_transform.html">basis_transform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coulomb_utensor.html">coulomb_utensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fit_hyb.html">fit_hyb</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fock_basis.html">fock_basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="iostream.html">iostream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manybody_operator.html">manybody_operator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="photon_transition.html">photon_transition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_spectrum.html">plot_spectrum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rixs_utils.html">rixs_utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc.html">soc</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">solvers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.ed_1v1c_fort"><code class="docutils literal notranslate"><span class="pre">ed_1v1c_fort()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.ed_1v1c_py"><code class="docutils literal notranslate"><span class="pre">ed_1v1c_py()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.ed_2v1c_fort"><code class="docutils literal notranslate"><span class="pre">ed_2v1c_fort()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.ed_siam_fort"><code class="docutils literal notranslate"><span class="pre">ed_siam_fort()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.rixs_1v1c_fort"><code class="docutils literal notranslate"><span class="pre">rixs_1v1c_fort()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.rixs_1v1c_py"><code class="docutils literal notranslate"><span class="pre">rixs_1v1c_py()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.rixs_2v1c_fort"><code class="docutils literal notranslate"><span class="pre">rixs_2v1c_fort()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.rixs_siam_fort"><code class="docutils literal notranslate"><span class="pre">rixs_siam_fort()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.xas_1v1c_fort"><code class="docutils literal notranslate"><span class="pre">xas_1v1c_fort()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.xas_1v1c_py"><code class="docutils literal notranslate"><span class="pre">xas_1v1c_py()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.xas_2v1c_fort"><code class="docutils literal notranslate"><span class="pre">xas_2v1c_fort()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.xas_siam_fort"><code class="docutils literal notranslate"><span class="pre">xas_siam_fort()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wannier_ham.html">wannier_ham</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">edrixs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">edrixs Reference</a></li>
+      <li class="breadcrumb-item active">solvers</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/reference/solvers.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-edrixs.solvers">
+<span id="solvers"></span><h1>solvers<a class="headerlink" href="#module-edrixs.solvers" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.solvers.ed_1v1c_fort">
+<span class="sig-prename descclassname"><span class="pre">edrixs.solvers.</span></span><span class="sig-name descname"><span class="pre">ed_1v1c_fort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shell_name</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">shell_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_soc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_soc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_noccu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slater</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext_B</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_which</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'spin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_cfmat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_othermat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_ed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ed_solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nvector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idump</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eigval_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_ndim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/solvers.html#ed_1v1c_fort"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.solvers.ed_1v1c_fort" title="Link to this definition">¶</a></dt>
+<dd><p>Perform ED for the case of one valence shell plus one Core-shell with Fortran ED solver.</p>
+<p>The hopping and Coulomb terms of both the initial and intermediate Hamiltonians will be
+constructed and written to files (hopping_i.in, hopping_n.in, coulomb_i.in and coulomb_n.in).
+Fock basis for the initial Hamiltonian will be written to file (fock_i.in).</p>
+<p>ED will be only performed on the initial Hamiltonian to find a few lowest eigenstates
+do_ed=True. Only input files will be written if do_ed=False.
+Due to large Hilbert space, the ed_fsolver written in Fortran will be called.
+mpi4py and a MPI environment (mpich or openmpi) are required to launch ed_fsolver.</p>
+<p>If do_ed=True, it will output the eigenvalues in file (eigvals.dat) and eigenvectors in files
+(eigvec.n), where n means the n-th eigenvectors. The eigvec.n files will be used later
+as the inputs for XAS and RIXS calculations.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>comm: MPI_comm</strong></dt><dd><p>The MPI communicator from mpi4py.</p>
+</dd>
+<dt><strong>shell_name: tuple of two strings</strong></dt><dd><p>Names of valence and core shells. The 1st (2nd) string in the tuple is for the
+valence (core) shell.</p>
+<ul class="simple">
+<li><p>The 1st strings can only be ‘s’, ‘p’, ‘t2g’, ‘d’, ‘f’</p></li>
+<li><p>The 2nd string can be ‘s’, ‘p’, ‘p12’, ‘p32’, ‘d’, ‘d32’, ‘d52’,
+‘f’, ‘f52’, ‘f72’.</p></li>
+</ul>
+<p>For example: shell_name=(‘d’, ‘p32’) may indicate a <span class="math notranslate nohighlight">\(L_3\)</span> edge transition from
+core <span class="math notranslate nohighlight">\(2p_{3/2}\)</span> shell to valence <span class="math notranslate nohighlight">\(3d\)</span> shell for Ni.</p>
+</dd>
+<dt><strong>shell_level: tuple of two float numbers</strong></dt><dd><p>Energy level of valence (1st element) and core (2nd element) shells.</p>
+<p>They will be set to zero if not provided.</p>
+</dd>
+<dt><strong>v_soc: tuple of two float numbers</strong></dt><dd><p>Spin-orbit coupling strength of the valence shell,
+v1_soc[0] for the initial Hamiltonian, and
+v1_soc[1] for the intermediate Hamiltonian.</p>
+<p>They will be set to zero if not provided.</p>
+</dd>
+<dt><strong>c_soc: float number</strong></dt><dd><p>Spin-orbit coupling strength of core electrons.</p>
+</dd>
+<dt><strong>v_noccu: int number</strong></dt><dd><p>Total number of electrons in valence shells.</p>
+</dd>
+<dt><strong>slater: tuple of two lists</strong></dt><dd><p>Slater integrals for initial (1st list) and intermediate (2nd list) Hamiltonians.
+The order of the elements in each list should be like this:</p>
+<p>[FX_vv, FX_vc, GX_vc, FX_cc],</p>
+<p>where X are integers with ascending order, it can be X=0, 2, 4, 6 or X=1, 3, 5.
+One can ignore all the continuous zeros at the end of the list.</p>
+<p>For example, if the full list is: [F0_dd, F2_dd, F4_dd, 0, F2_dp, 0, 0, 0, 0], one can
+just provide [F0_dd, F2_dd, F4_dd, 0, F2_dp]</p>
+<p>All the Slater integrals will be set to zero if slater==None.</p>
+</dd>
+<dt><strong>ext_B: tuple of three float numbers</strong></dt><dd><p>Vector of external magnetic field with respect to global <span class="math notranslate nohighlight">\(xyz\)</span>-axis applied
+on the valence shell.</p>
+<p>It will be set to zeros if not provided.</p>
+</dd>
+<dt><strong>on_which: string</strong></dt><dd><p>Apply Zeeman exchange field on which sector. Options are ‘spin’, ‘orbital’ or ‘both’.</p>
+</dd>
+<dt><strong>v_cfmat: 2d complex array</strong></dt><dd><p>Crystal field splitting Hamiltonian of the valence shell. The dimension and the orbital
+order should be consistent with the type of the valence shell.</p>
+<p>They will be zeros if not provided.</p>
+</dd>
+<dt><strong>v_othermat: 2d complex array</strong></dt><dd><p>Other possible Hamiltonian of the valence shell. The dimension and the orbital order
+should be consistent with the type of the valence shell.</p>
+<p>They will be zeros if not provided.</p>
+</dd>
+<dt><strong>do_ed: logical</strong></dt><dd><p>If do_end=True, diagonalize the Hamitlonian to find a few lowest eigenstates, return the
+eigenvalues and density matirx, and write the eigenvectors in files eigvec.n, otherwise,
+just write out the input files, do not perform the ED.</p>
+</dd>
+<dt><strong>ed_solver: int</strong></dt><dd><p>Type of ED solver, options can be 0, 1, 2</p>
+<ul class="simple">
+<li><p>0: use Lapack to fully diagonalize Hamiltonian to get all the eigenvalues.</p></li>
+<li><p>1: use standard Lanczos algorithm to find only a few lowest eigenvalues,
+no re-orthogonalization has been applied, so it is not very accurate.</p></li>
+<li><p>2: use parallel version of Arpack library to find a few lowest eigenvalues,
+it is accurate and is the recommeded choice in real calculations of XAS and RIXS.</p></li>
+</ul>
+</dd>
+<dt><strong>neval: int</strong></dt><dd><p>Number of eigenvalues to be found. For ed_solver=2, the value should not be too small,
+neval &gt; 10 is usually a safe value.</p>
+</dd>
+<dt><strong>nvector: int</strong></dt><dd><p>Number of eigenvectors to be found and written into files.</p>
+</dd>
+<dt><strong>ncv: int</strong></dt><dd><p>Used for ed_solver=2, it should be at least ncv &gt; neval + 2. Usually, set it a little
+bit larger than neval, for example, set ncv=200 when neval=100.</p>
+</dd>
+<dt><strong>idump: logical</strong></dt><dd><p>Whether to dump the eigenvectors to files “eigvec.n”, where n means the n-th vectors.</p>
+</dd>
+<dt><strong>maxiter: int</strong></dt><dd><p>Maximum number of iterations in finding all the eigenvalues, used for ed_solver=1, 2.</p>
+</dd>
+<dt><strong>eigval_tol: float</strong></dt><dd><p>The convergence criteria of eigenvalues, used for ed_solver=1, 2.</p>
+</dd>
+<dt><strong>min_ndim: int</strong></dt><dd><p>The minimum dimension of the Hamiltonian when the ed_solver=1, 2 can be used, otherwise,
+ed_solver=1 will be used.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>eval_i: 1d float array, shape=(neval, )</dt><dd><p>The eigenvalues of initial Hamiltonian.</p>
+</dd>
+<dt>denmat: 2d complex array, shape=(nvector, v_norb, v_norb))</dt><dd><p>The density matrix in the eigenstates.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.solvers.ed_1v1c_py">
+<span class="sig-prename descclassname"><span class="pre">edrixs.solvers.</span></span><span class="sig-name descname"><span class="pre">ed_1v1c_py</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shell_name</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">shell_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_soc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_soc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_noccu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slater</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext_B</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_which</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'spin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_cfmat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_othermat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/solvers.html#ed_1v1c_py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.solvers.ed_1v1c_py" title="Link to this definition">¶</a></dt>
+<dd><p>Perform ED for the case of two atomic shells, one valence plus one Core
+shell with pure Python solver.
+For example, for Ni-<span class="math notranslate nohighlight">\(L_3\)</span> edge RIXS, they are 3d valence and 2p core shells.</p>
+<p>It will use scipy.linalag.eigh to exactly diagonalize both the initial and intermediate
+Hamiltonians to get all the eigenvalues and eigenvectors, and the transition operators
+will be built in the many-body eigenvector basis.</p>
+<p>This solver is only suitable for small size of Hamiltonian, typically the dimension
+of both initial and intermediate Hamiltonian are smaller than 10,000.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>shell_name: tuple of two strings</strong></dt><dd><p>Names of valence and core shells. The 1st (2nd) string in the tuple is for the
+valence (core) shell.</p>
+<ul class="simple">
+<li><p>The 1st string can only be ‘s’, ‘p’, ‘t2g’, ‘d’, ‘f’,</p></li>
+<li><p>The 2nd string can be ‘s’, ‘p’, ‘p12’, ‘p32’, ‘d’, ‘d32’, ‘d52’,
+‘f’, ‘f52’, ‘f72’.</p></li>
+</ul>
+<p>For example: shell_name=(‘d’, ‘p32’) indicates a <span class="math notranslate nohighlight">\(L_3\)</span> edge transition from
+core <span class="math notranslate nohighlight">\(p_{3/2}\)</span> shell to valence <span class="math notranslate nohighlight">\(d\)</span> shell.</p>
+</dd>
+<dt><strong>shell_level: tuple of two float numbers</strong></dt><dd><p>Energy level of valence (1st element) and core (2nd element) shells.</p>
+<p>They will be set to zero if not provided.</p>
+</dd>
+<dt><strong>v_soc: tuple of two float numbers</strong></dt><dd><p>Spin-orbit coupling strength of valence electrons, for the initial (1st element)
+and intermediate (2nd element) Hamiltonians.</p>
+<p>They will be set to zero if not provided.</p>
+</dd>
+<dt><strong>c_soc: a float number</strong></dt><dd><p>Spin-orbit coupling strength of core electrons.</p>
+</dd>
+<dt><strong>v_noccu: int number</strong></dt><dd><p>Number of electrons in valence shell.</p>
+</dd>
+<dt><strong>slater: tuple of two lists</strong></dt><dd><p>Slater integrals for initial (1st list) and intermediate (2nd list) Hamiltonians.
+The order of the elements in each list should be like this:</p>
+<p>[FX_vv, FX_vc, GX_vc, FX_cc],</p>
+<p>where X are integers with ascending order, it can be X=0, 2, 4, 6 or X=1, 3, 5.
+One can ignore all the continuous zeros at the end of the list.</p>
+<p>For example, if the full list is: [F0_dd, F2_dd, F4_dd, 0, F2_dp, 0, 0, 0, 0], one can
+just provide [F0_dd, F2_dd, F4_dd, 0, F2_dp]</p>
+<p>All the Slater integrals will be set to zero if slater=None.</p>
+</dd>
+<dt><strong>ext_B: tuple of three float numbers</strong></dt><dd><p>Vector of external magnetic field with respect to global <span class="math notranslate nohighlight">\(xyz\)</span>-axis.</p>
+<p>They will be set to zero if not provided.</p>
+</dd>
+<dt><strong>on_which: string</strong></dt><dd><p>Apply Zeeman exchange field on which sector. Options are ‘spin’, ‘orbital’ or ‘both’.</p>
+</dd>
+<dt><strong>v_cfmat: 2d complex array</strong></dt><dd><p>Crystal field splitting Hamiltonian of valence electrons. The dimension and the orbital
+order should be consistent with the type of valence shell.</p>
+<p>They will be zeros if not provided.</p>
+</dd>
+<dt><strong>v_othermat: 2d complex array</strong></dt><dd><p>Other possible Hamiltonian of valence electrons. The dimension and the orbital order
+should be consistent with the type of valence shell.</p>
+<p>They will be zeros if not provided.</p>
+</dd>
+<dt><strong>loc_axis: 3*3 float array</strong></dt><dd><p>The local axis with respect to which local orbitals are defined.</p>
+<ul class="simple">
+<li><p>x: local_axis[:,0],</p></li>
+<li><p>y: local_axis[:,1],</p></li>
+<li><p>z: local_axis[:,2].</p></li>
+</ul>
+<p>It will be an identity matrix if not provided.</p>
+</dd>
+<dt><strong>verbose: int</strong></dt><dd><p>Level of writting data to files. Hopping matrices, Coulomb tensors, eigvenvalues
+will be written if verbose &gt; 0.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>eval_i:  1d float array</dt><dd><p>The eigenvalues of initial Hamiltonian.</p>
+</dd>
+<dt>eval_n: 1d float array</dt><dd><p>The eigenvalues of intermediate Hamiltonian.</p>
+</dd>
+<dt>trans_op: 3d complex array</dt><dd><p>The matrices of transition operators in the eigenvector basis.
+Their components are defined with respect to the global <span class="math notranslate nohighlight">\(xyz\)</span>-axis.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.solvers.ed_2v1c_fort">
+<span class="sig-prename descclassname"><span class="pre">edrixs.solvers.</span></span><span class="sig-name descname"><span class="pre">ed_2v1c_fort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shell_name</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">shell_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v1_soc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v2_soc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_soc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_tot_noccu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slater</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v1_ext_B</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v2_ext_B</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v1_on_which</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'spin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v2_on_which</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'spin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v1_cfmat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v2_cfmat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v1_othermat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v2_othermat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hopping_v1v2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_ed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ed_solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nvector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idump</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eigval_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_ndim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/solvers.html#ed_2v1c_fort"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.solvers.ed_2v1c_fort" title="Link to this definition">¶</a></dt>
+<dd><p>Perform ED for the case of two valence shell plus one core-shell with Fortran solver.
+For example, for Ni <span class="math notranslate nohighlight">\(K\)</span>-edge RIXS, <span class="math notranslate nohighlight">\(1s\rightarrow 4p\)</span> transition,
+the valence shells involved in RIXS are <span class="math notranslate nohighlight">\(3d\)</span> and <span class="math notranslate nohighlight">\(4p\)</span>.</p>
+<p>The hopping and Coulomb terms of both the initial and intermediate Hamiltonians will be
+constructed and written to files (hopping_i.in, hopping_n.in, coulomb_i.in and coulomb_n.in).
+Fock basis for the initial Hamiltonian will be written to file (fock_i.in).</p>
+<p>ED will be only performed on the initial Hamiltonian to find a few lowest eigenstates
+do_ed=True. Only input files will be written if do_ed=False.
+Due to large Hilbert space, the ed_fsolver written in Fortran will be called.
+mpi4py and a MPI environment (mpich or openmpi) are required to launch ed_fsolver.</p>
+<p>If do_ed=True, it will output the eigenvalues in file (eigvals.dat) and eigenvectors in files
+(eigvec.n), where n means the n-th eigenvectors. The eigvec.n files will be used later
+as the inputs for XAS and RIXS calculations.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>comm: MPI_comm</strong></dt><dd><p>The MPI communicator from mpi4py.</p>
+</dd>
+<dt><strong>shell_name: tuple of three strings</strong></dt><dd><p>Names of valence and core shells. The 1st (2nd) string in the tuple is for the
+1st (2nd) valence shell, and the 3rd one is for the core shell.</p>
+<ul class="simple">
+<li><p>The 1st and 2nd strings can only be ‘s’, ‘p’, ‘t2g’, ‘d’, ‘f’</p></li>
+<li><p>The 3nd string can be ‘s’, ‘p’, ‘p12’, ‘p32’, ‘d’, ‘d32’, ‘d52’,
+‘f’, ‘f52’, ‘f72’.</p></li>
+</ul>
+<p>For example: shell_name=(‘d’, ‘p’, ‘s’) may indicate a <span class="math notranslate nohighlight">\(K\)</span> edge transition from
+core <span class="math notranslate nohighlight">\(1s\)</span> shell to valence <span class="math notranslate nohighlight">\(3d\)</span> and <span class="math notranslate nohighlight">\(4p\)</span> shell for Ni.</p>
+</dd>
+<dt><strong>shell_level: tuple of three float numbers</strong></dt><dd><p>Energy level of valence (1st and 2nd elements) and core (3nd element) shells.</p>
+<p>They will be set to zero if not provided.</p>
+</dd>
+<dt><strong>v1_soc: tuple of two float numbers</strong></dt><dd><p>Spin-orbit coupling strength of the 1st valence shell,
+v1_soc[0] for the initial Hamiltonian, and
+v1_soc[1] for the intermediate Hamiltonian.</p>
+<p>They will be set to zero if not provided.</p>
+</dd>
+<dt><strong>v2_soc: tuple of two float numbers</strong></dt><dd><p>Spin-orbit coupling strength of the 2nd valence shell,
+v2_soc[0] for the initial Hamiltonian, and
+v2_soc[1] for the intermediate Hamiltonian.</p>
+<p>They will be set to zero if not provided.</p>
+</dd>
+<dt><strong>c_soc: float number</strong></dt><dd><p>Spin-orbit coupling strength of core electrons.</p>
+</dd>
+<dt><strong>v_tot_noccu: int number</strong></dt><dd><p>Total number of electrons in valence shells.</p>
+</dd>
+<dt><strong>slater: tuple of two lists</strong></dt><dd><p>Slater integrals for initial (1st list) and intermediate (2nd list) Hamiltonians.
+The order of the elements in each list should be like this:</p>
+<p>[FX_v1v1, FX_v1v2, GX_v1v2, FX_v2v2, FX_v1c, GX_v1c, FX_v2c, GX_v2c],</p>
+<p>where X are integers with ascending order, it can be X=0, 2, 4, 6 or X=1, 3, 5.
+One can ignore all the continuous zeros at the end of the list.</p>
+<p>For example, if the full list is: [F0_dd, F2_dd, F4_dd, 0, F2_dp, 0, 0, 0, 0], one can
+just provide [F0_dd, F2_dd, F4_dd, 0, F2_dp]</p>
+<p>All the Slater integrals will be set to zero if slater==None.</p>
+</dd>
+<dt><strong>v1_ext_B: tuple of three float numbers</strong></dt><dd><p>Vector of external magnetic field with respect to global <span class="math notranslate nohighlight">\(xyz\)</span>-axis applied
+on the 1st valence shell.</p>
+<p>It will be set to zeros if not provided.</p>
+</dd>
+<dt><strong>v2_ext_B: tuple of three float numbers</strong></dt><dd><p>Vector of external magnetic field with respect to global <span class="math notranslate nohighlight">\(xyz\)</span>-axis applied
+on the 2nd valence shell.</p>
+<p>It will be set to zeros if not provided.</p>
+</dd>
+<dt><strong>v1_on_which: string</strong></dt><dd><p>Apply Zeeman exchange field on which sector. Options are ‘spin’, ‘orbital’ or ‘both’.
+For the 1st valence shell.</p>
+</dd>
+<dt><strong>v2_on_which: string</strong></dt><dd><p>Apply Zeeman exchange field on which sector. Options are ‘spin’, ‘orbital’ or ‘both’.
+For the 2nd valence shell.</p>
+</dd>
+<dt><strong>v1_cfmat: 2d complex array</strong></dt><dd><p>Crystal field splitting Hamiltonian of the 1st valence shell. The dimension and the orbital
+order should be consistent with the type of the 1st valence shell.</p>
+<p>They will be zeros if not provided.</p>
+</dd>
+<dt><strong>v2_cfmat: 2d complex array</strong></dt><dd><p>Crystal field splitting Hamiltonian of the 2nd valence shell. The dimension and the orbital
+order should be consistent with the type of the 2nd valence shell.</p>
+<p>They will be zeros if not provided.</p>
+</dd>
+<dt><strong>v1_othermat: 2d complex array</strong></dt><dd><p>Other possible Hamiltonian of the 1st valence shell. The dimension and the orbital order
+should be consistent with the type of the 1st valence shell.</p>
+<p>They will be zeros if not provided.</p>
+</dd>
+<dt><strong>v2_othermat: 2d complex array</strong></dt><dd><p>Other possible Hamiltonian of the 2nd valence shell. The dimension and the orbital order
+should be consistent with the type of the 2nd valence shell.</p>
+<p>They will be zeros if not provided.</p>
+</dd>
+<dt><strong>hopping_v1v2: 2d complex array</strong></dt><dd><p>Hopping between the two valence shells. The 1st-index (2nd-index) is the 1st (2nd)
+valence shell.</p>
+<p>They will be zeros if not provided.</p>
+</dd>
+<dt><strong>do_ed: logical</strong></dt><dd><p>If do_end=True, diagonalize the Hamitlonian to find a few lowest eigenstates, return the
+eigenvalues and density matirx, and write the eigenvectors in files eigvec.n, otherwise,
+just write out the input files, do not perform the ED.</p>
+</dd>
+<dt><strong>ed_solver: int</strong></dt><dd><p>Type of ED solver, options can be 0, 1, 2</p>
+<ul class="simple">
+<li><p>0: use Lapack to fully diagonalize Hamiltonian to get all the eigenvalues.</p></li>
+<li><p>1: use standard Lanczos algorithm to find only a few lowest eigenvalues,
+no re-orthogonalization has been applied, so it is not very accurate.</p></li>
+<li><p>2: use parallel version of Arpack library to find a few lowest eigenvalues,
+it is accurate and is the recommeded choice in real calculations of XAS and RIXS.</p></li>
+</ul>
+</dd>
+<dt><strong>neval: int</strong></dt><dd><p>Number of eigenvalues to be found. For ed_solver=2, the value should not be too small,
+neval &gt; 10 is usually a safe value.</p>
+</dd>
+<dt><strong>nvector: int</strong></dt><dd><p>Number of eigenvectors to be found and written into files.</p>
+</dd>
+<dt><strong>ncv: int</strong></dt><dd><p>Used for ed_solver=2, it should be at least ncv &gt; neval + 2. Usually, set it a little
+bit larger than neval, for example, set ncv=200 when neval=100.</p>
+</dd>
+<dt><strong>idump: logical</strong></dt><dd><p>Whether to dump the eigenvectors to files “eigvec.n”, where n means the n-th vectors.</p>
+</dd>
+<dt><strong>maxiter: int</strong></dt><dd><p>Maximum number of iterations in finding all the eigenvalues, used for ed_solver=1, 2.</p>
+</dd>
+<dt><strong>eigval_tol: float</strong></dt><dd><p>The convergence criteria of eigenvalues, used for ed_solver=1, 2.</p>
+</dd>
+<dt><strong>min_ndim: int</strong></dt><dd><p>The minimum dimension of the Hamiltonian when the ed_solver=1, 2 can be used, otherwise,
+ed_solver=1 will be used.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>eval_i: 1d float array, shape=(neval, )</dt><dd><p>The eigenvalues of initial Hamiltonian.</p>
+</dd>
+<dt>denmat: 2d complex array, shape=(nvector, v1v2_norb, v1v2_norb))</dt><dd><p>The density matrix in the eigenstates.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.solvers.ed_siam_fort">
+<span class="sig-prename descclassname"><span class="pre">edrixs.solvers.</span></span><span class="sig-name descname"><span class="pre">ed_siam_fort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shell_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbath</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">siam_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_noccu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static_core_pot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_soc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trans_c2n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imp_mat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imp_mat_n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bath_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bath_level_n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hyb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hyb_n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hopping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hopping_n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slater</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext_B</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_which</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'spin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_ed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ed_solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nvector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idump</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eigval_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_ndim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/solvers.html#ed_siam_fort"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.solvers.ed_siam_fort" title="Link to this definition">¶</a></dt>
+<dd><p>Find the ground state of the initial Hamiltonian of a Single Impuirty Anderson Model (SIAM),
+and also prepare input files, <em>hopping_i.in</em>, <em>hopping_n.in</em>, <em>coulomb_i.in</em>, <em>coulomb_n.in</em>
+for following XAS and RIXS calculations.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>comm: MPI_Comm</strong></dt><dd><p>MPI Communicator</p>
+</dd>
+<dt><strong>shell_name: tuple of two strings</strong></dt><dd><p>Names of valence and core shells. The 1st (2nd) string in the tuple is for the
+valence (core) shell.</p>
+<ul class="simple">
+<li><p>The 1st string can only be ‘s’, ‘p’, ‘t2g’, ‘d’, ‘f’,</p></li>
+<li><p>The 2nd string can be ‘s’, ‘p’, ‘p12’, ‘p32’, ‘d’, ‘d32’, ‘d52’,
+‘f’, ‘f52’, ‘f72’.</p></li>
+</ul>
+<p>For example: shell_name=(‘d’, ‘p32’) indicates a <span class="math notranslate nohighlight">\(L_3\)</span> edge transition from
+core <span class="math notranslate nohighlight">\(p_{3/2}\)</span> shell to valence <span class="math notranslate nohighlight">\(d\)</span> shell.</p>
+</dd>
+<dt><strong>nbath: int</strong></dt><dd><p>Number of bath sites.</p>
+</dd>
+<dt><strong>siam_type: int</strong></dt><dd><p>Type of SIAM Hamiltonian,</p>
+<ul class="simple">
+<li><p>0: diagonal hybridization function, parameterized by <em>imp_mat</em>, <em>bath_level</em> and <em>hyb</em></p></li>
+<li><p>1: general hybridization function, parameterized by matrix <em>hopping</em></p></li>
+</ul>
+<p>if <em>siam_type=0</em>, only <em>imp_mat</em>, <em>bath_level</em> and <em>hyb</em> are required,
+if <em>siam_type=1</em>, only <em>hopping</em> is required.</p>
+</dd>
+<dt><strong>v_noccu: int</strong></dt><dd><p>Number of total occupancy of impurity and baths orbitals, required when do_ed=1, 2</p>
+</dd>
+<dt><strong>static_core_pot: float</strong></dt><dd><p>Static core hole potential.</p>
+</dd>
+<dt><strong>c_level: float</strong></dt><dd><p>Energy level of core shell.</p>
+</dd>
+<dt><strong>c_soc: float</strong></dt><dd><p>Spin-orbit coupling strength of core electrons.</p>
+</dd>
+<dt><strong>trans_c2n: 2d complex array</strong></dt><dd><p>The transformation matrix from the spherical harmonics basis to the basis on which
+the <cite>imp_mat</cite> and hybridization function (<cite>bath_level</cite>, <cite>hyb</cite>, <cite>hopping</cite>) are defined.</p>
+</dd>
+<dt><strong>imp_mat: 2d complex array</strong></dt><dd><p>Impurity matrix for the impurity site, including CF or SOC, for siam_type=0
+and the initial configurations.</p>
+</dd>
+<dt><strong>imp_mat_n: 2d complex array</strong></dt><dd><p>Impurity matrix for the impurity site, including CF or SOC, for siam_type=0
+and the intermediate configurations. If imp_mat_n=None, imp_mat will be used.</p>
+</dd>
+<dt><strong>bath_level: 2d complex array</strong></dt><dd><p>Energy level of bath sites, 1st (2nd) dimension is for different bath sites (orbitals),
+for siam_type=0 and the initial configurations.</p>
+</dd>
+<dt><strong>bath_level_n: 2d complex array</strong></dt><dd><p>Energy level of bath sites, 1st (2nd) dimension is for different bath sites (orbitals),
+for siam_type=0 and the intermediate configurations. If bath_level_n=None,
+bath_level will be used.</p>
+</dd>
+<dt><strong>hyb: 2d complex array</strong></dt><dd><p>Hybridization strength of bath sites, 1st (2nd) dimension is for different bath
+sites (orbitals), for siam_type=0 and the initial configurations.</p>
+</dd>
+<dt><strong>hyb_n: 2d complex array</strong></dt><dd><p>Hybridization strength of bath sites, 1st (2nd) dimension is for different bath
+sites (orbitals), for siam_type=0 and the intermediate configurations.
+If hyb_n=None, hyb will be used.</p>
+</dd>
+<dt><strong>hopping: 2d complex array</strong></dt><dd><p>General hopping matrix when siam_type=1, including imp_mat and hybridization functions,
+for siam_type=1 and the initial configurations.</p>
+</dd>
+<dt><strong>hopping_n: 2d complex array</strong></dt><dd><p>General hopping matrix when siam_type=1, including imp_mat and hybridization functions,
+for siam_type=1 and the intermediate configurations. If hopping_n=None,
+hopping will be used.</p>
+</dd>
+<dt><strong>slater: tuple of two lists</strong></dt><dd><p>Slater integrals for initial (1st list) and intermediate (2nd list) Hamiltonians.
+The order of the elements in each list should be like this:</p>
+<p>[FX_vv, FX_vc, GX_vc, FX_cc],</p>
+<p>where X are integers with ascending order, it can be X=0, 2, 4, 6 or X=1, 3, 5.
+One can ignore all the continuous zeros at the end of the list.</p>
+<p>For example, if the full list is: [F0_dd, F2_dd, F4_dd, 0, F2_dp, 0, 0, 0, 0], one can
+just provide [F0_dd, F2_dd, F4_dd, 0, F2_dp]</p>
+<p>All the Slater integrals will be set to zero if slater=None.</p>
+</dd>
+<dt><strong>ext_B: tuple of three float numbers</strong></dt><dd><p>Vector of external magnetic field with respect to global <span class="math notranslate nohighlight">\(xyz\)</span>-axis.</p>
+<p>They will be set to zero if not provided.</p>
+</dd>
+<dt><strong>on_which: string</strong></dt><dd><p>Apply Zeeman exchange field on which sector. Options are ‘spin’, ‘orbital’ or ‘both’.</p>
+</dd>
+<dt><strong>do_ed: int</strong></dt><dd><ul class="simple">
+<li><p>0: First, search the ground state in different subspaces of total occupancy
+<span class="math notranslate nohighlight">\(N\)</span> with ed_solver=1, and then do a more accurate ED in the subspace
+<span class="math notranslate nohighlight">\(N\)</span> where the ground state lies to find a few lowest eigenstates, return
+the eigenvalues and density matirx, and write the eigenvectors in files eigvec.n</p></li>
+<li><p>1: Only do ED for given occupancy number <em>v_noccu</em>, return eigenvalues and
+density matrix, write eigenvectors to files eigvec.n</p></li>
+<li><p>2: Do not do ED, only write parameters into files: <em>hopping_i.in</em>, <em>hopping_n.in</em>,
+<em>coulomb_i.in</em>, <em>coulomb_n.in</em> for later XAS or RIXS calculations.</p></li>
+</ul>
+</dd>
+<dt><strong>ed_solver: int</strong></dt><dd><p>Type of ED solver, options can be 0, 1, 2</p>
+<ul class="simple">
+<li><p>0: use Lapack to fully diagonalize Hamiltonian to get all the eigenvalues.</p></li>
+<li><p>1: use standard Lanczos algorithm to find only a few lowest eigenvalues,
+no re-orthogonalization has been applied, so it is not very accurate.</p></li>
+<li><p>2: use parallel version of Arpack library to find a few lowest eigenvalues,
+it is accurate and is the recommeded choice in real calculations of XAS and RIXS.</p></li>
+</ul>
+</dd>
+<dt><strong>neval: int</strong></dt><dd><p>Number of eigenvalues to be found. For ed_solver=2, the value should not be too small,
+neval &gt; 10 is usually a safe value.</p>
+</dd>
+<dt><strong>nvector: int</strong></dt><dd><p>Number of eigenvectors to be found and written into files.</p>
+</dd>
+<dt><strong>ncv: int</strong></dt><dd><p>Used for ed_solver=2, it should be at least ncv &gt; neval + 2. Usually, set it a little
+bit larger than neval, for example, set ncv=200 when neval=100.</p>
+</dd>
+<dt><strong>idump: logical</strong></dt><dd><p>Whether to dump the eigenvectors to files “eigvec.n”, where n means the n-th vectors.</p>
+</dd>
+<dt><strong>maxiter: int</strong></dt><dd><p>Maximum number of iterations in finding all the eigenvalues, used for ed_solver=1, 2.</p>
+</dd>
+<dt><strong>eigval_tol: float</strong></dt><dd><p>The convergence criteria of eigenvalues, used for ed_solver=1, 2.</p>
+</dd>
+<dt><strong>min_ndim: int</strong></dt><dd><p>The minimum dimension of the Hamiltonian when the ed_solver=1, 2 can be used, otherwise,
+ed_solver=1 will be used.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>eval_i: 1d float array</dt><dd><p>Eigenvalues of initial Hamiltonian.</p>
+</dd>
+<dt>denmat: 2d complex array</dt><dd><p>Density matrix.</p>
+</dd>
+<dt>noccu_gs: int</dt><dd><p>Occupancy of the ground state.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.solvers.rixs_1v1c_fort">
+<span class="sig-prename descclassname"><span class="pre">edrixs.solvers.</span></span><span class="sig-name descname"><span class="pre">rixs_1v1c_fort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shell_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ominc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eloss</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_noccu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pol_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_gs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nkryl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linsys_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linsys_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scatter_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/solvers.html#rixs_1v1c_fort"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.solvers.rixs_1v1c_fort" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate RIXS for the case with one valence shell plus one core shell with Fortran solver.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>comm: MPI_comm</strong></dt><dd><p>MPI communicator.</p>
+</dd>
+<dt><strong>shell_name: tuple of two strings</strong></dt><dd><p>Names of valence and core shells. The 1st (2nd) string in the tuple is for the
+valence (core) shell.</p>
+<ul class="simple">
+<li><p>The 1st string can only be ‘s’, ‘p’, ‘t2g’, ‘d’, ‘f’,</p></li>
+<li><p>The 2nd string can be ‘s’, ‘p’, ‘p12’, ‘p32’, ‘d’, ‘d32’, ‘d52’,
+‘f’, ‘f52’, ‘f72’.</p></li>
+</ul>
+<p>For example: shell_name=(‘d’, ‘p32’) may indicate a <span class="math notranslate nohighlight">\(L_3\)</span> edge transition from
+core <span class="math notranslate nohighlight">\(2p_{3/2}\)</span> shell to valence <span class="math notranslate nohighlight">\(3d\)</span> shell for Ni.</p>
+</dd>
+<dt><strong>ominc: 1d float array</strong></dt><dd><p>Incident energy of photon.</p>
+</dd>
+<dt><strong>eloss: 1d float array</strong></dt><dd><p>Energy loss.</p>
+</dd>
+<dt><strong>gamma_c: a float number or a 1d float array with same shape as ominc.</strong></dt><dd><p>The core-hole life-time broadening factor. It can be a constant value
+or incident energy dependent.</p>
+</dd>
+<dt><strong>gamma_f: a float number or a 1d float array with same shape as eloss.</strong></dt><dd><p>The final states life-time broadening factor. It can be a constant value
+or energy loss dependent.</p>
+</dd>
+<dt><strong>v_noccu: int</strong></dt><dd><p>Total occupancy of valence shells.</p>
+</dd>
+<dt><strong>thin: float number</strong></dt><dd><p>The incident angle of photon (in radian).</p>
+</dd>
+<dt><strong>thout: float number</strong></dt><dd><p>The scattered angle of photon (in radian).</p>
+</dd>
+<dt><strong>phi: float number</strong></dt><dd><p>Azimuthal angle (in radian), defined with respect to the
+<span class="math notranslate nohighlight">\(x\)</span>-axis of scattering axis: scatter_axis[:,0].</p>
+</dd>
+<dt><strong>pol_type: list of 4-elements-tuples</strong></dt><dd><p>Type of polarizations. It has the following form:</p>
+<p>(str1, alpha, str2, beta)</p>
+<p>where, str1 (str2) can be ‘linear’, ‘left’, ‘right’, and alpha (beta) is
+the angle (in radians) between the linear polarization vector and the scattering plane.</p>
+<p>It will set pol_type=[(‘linear’, 0, ‘linear’, 0)] if not provided.</p>
+</dd>
+<dt><strong>num_gs: int</strong></dt><dd><p>Number of initial states used in RIXS calculations.</p>
+</dd>
+<dt><strong>nkryl: int</strong></dt><dd><p>Maximum number of poles obtained.</p>
+</dd>
+<dt><strong>linsys_max: int</strong></dt><dd><p>Maximum iterations of solving linear equations.</p>
+</dd>
+<dt><strong>linsys_tol: float</strong></dt><dd><p>Convergence for solving linear equations.</p>
+</dd>
+<dt><strong>temperature: float number</strong></dt><dd><p>Temperature (in K) for boltzmann distribution.</p>
+</dd>
+<dt><strong>loc_axis: 3*3 float array</strong></dt><dd><p>The local axis with respect to which local orbitals are defined.</p>
+<ul class="simple">
+<li><p>x: local_axis[:,0],</p></li>
+<li><p>y: local_axis[:,1],</p></li>
+<li><p>z: local_axis[:,2].</p></li>
+</ul>
+<p>It will be an identity matrix if not provided.</p>
+</dd>
+<dt><strong>scatter_axis: 3*3 float array</strong></dt><dd><p>The local axis defining the scattering geometry. The scattering plane is defined in
+the local <span class="math notranslate nohighlight">\(zx\)</span>-plane.</p>
+<ul class="simple">
+<li><p>local <span class="math notranslate nohighlight">\(x\)</span>-axis: scatter_axis[:,0]</p></li>
+<li><p>local <span class="math notranslate nohighlight">\(y\)</span>-axis: scatter_axis[:,1]</p></li>
+<li><p>local <span class="math notranslate nohighlight">\(z\)</span>-axis: scatter_axis[:,2]</p></li>
+</ul>
+<p>It will be set to an identity matrix if not provided.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>rixs: 3d float array, shape=(len(ominc), len(eloss), len(pol_type))</dt><dd><p>The calculated RIXS spectra. The 1st dimension is for the incident energy,
+the 2nd dimension is for the energy loss and the 3rd dimension is for
+different polarizations.</p>
+</dd>
+<dt>poles: 2d list of dict, shape=(len(ominc), len(pol_type))</dt><dd><p>The calculated RIXS poles. The 1st dimension is for incident energy, and the
+2nd dimension is for different polarizations.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.solvers.rixs_1v1c_py">
+<span class="sig-prename descclassname"><span class="pre">edrixs.solvers.</span></span><span class="sig-name descname"><span class="pre">rixs_1v1c_py</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eval_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trans_op</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ominc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eloss</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pol_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gs_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scatter_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_gs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/solvers.html#rixs_1v1c_py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.solvers.rixs_1v1c_py" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate RIXS for the case of one valence shell plus one core shell with Python solver.</p>
+<p>This solver is only suitable for small size of Hamiltonian, typically the dimension
+of both initial and intermediate Hamiltonian are smaller than 10,000.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>eval_i: 1d float array</strong></dt><dd><p>The eigenvalues of the initial Hamiltonian.</p>
+</dd>
+<dt><strong>eval_n: 1d float array</strong></dt><dd><p>The eigenvalues of the intermediate Hamiltonian.</p>
+</dd>
+<dt><strong>trans_op: 3d complex array</strong></dt><dd><p>The transition operators in the eigenstates basis.</p>
+</dd>
+<dt><strong>ominc: 1d float array</strong></dt><dd><p>Incident energy of photon.</p>
+</dd>
+<dt><strong>eloss: 1d float array</strong></dt><dd><p>Energy loss.</p>
+</dd>
+<dt><strong>gamma_c: a float number or a 1d float array with same shape as ominc.</strong></dt><dd><p>The core-hole life-time broadening factor. It can be a constant value
+or incident energy dependent.</p>
+</dd>
+<dt><strong>gamma_f: a float number or a 1d float array with same shape as eloss.</strong></dt><dd><p>The final states life-time broadening factor. It can be a constant value
+or energy loss dependent.</p>
+</dd>
+<dt><strong>thin: float number</strong></dt><dd><p>The incident angle of photon (in radian).</p>
+</dd>
+<dt><strong>thout: float number</strong></dt><dd><p>The scattered angle of photon (in radian).</p>
+</dd>
+<dt><strong>phi: float number</strong></dt><dd><p>Azimuthal angle (in radian), defined with respect to the
+<span class="math notranslate nohighlight">\(x\)</span>-axis of scattering axis: scatter_axis[:,0].</p>
+</dd>
+<dt><strong>pol_type: list of 4-elements-tuples</strong></dt><dd><p>Type of polarizations. It has the following form:</p>
+<p>(str1, alpha, str2, beta)</p>
+<p>where, str1 (str2) can be ‘linear’, ‘left’, ‘right’, ‘isotropic’ and alpha (beta) is
+the angle (in radians) between the linear polarization vector and the scattering plane.</p>
+<p>If str1 (or str2) is ‘isotropic’ then the polarization vector projects equally
+along each axis and the other variables are ignored.</p>
+<p>It will set pol_type=[(‘linear’, 0, ‘linear’, 0)] if not provided.</p>
+</dd>
+<dt><strong>gs_list: 1d list of ints</strong></dt><dd><p>The indices of initial states which will be used in RIXS calculations.</p>
+<p>It will set gs_list=[0] if not provided.</p>
+</dd>
+<dt><strong>temperature: float number</strong></dt><dd><p>Temperature (in K) for boltzmann distribution.</p>
+</dd>
+<dt><strong>scatter_axis: 3*3 float array</strong></dt><dd><p>The local axis defining the scattering plane. The scattering plane is defined in
+the local <span class="math notranslate nohighlight">\(zx\)</span>-plane.</p>
+<ul class="simple">
+<li><p>local <span class="math notranslate nohighlight">\(x\)</span>-axis: scatter_axis[:,0]</p></li>
+<li><p>local <span class="math notranslate nohighlight">\(y\)</span>-axis: scatter_axis[:,1]</p></li>
+<li><p>local <span class="math notranslate nohighlight">\(z\)</span>-axis: scatter_axis[:,2]</p></li>
+</ul>
+<p>It will be an identity matrix if not provided.</p>
+</dd>
+<dt><strong>skip_gs: bool</strong></dt><dd><p>If True, transitions to the ground state(s) (forming the elastic peak) are omitted from
+the calculation.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>rixs: 3d float array</dt><dd><p>The calculated RIXS spectra. The 1st dimension is for the incident energy,
+the 2nd dimension is for the energy loss and the 3rd dimension is for
+different polarizations.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.solvers.rixs_2v1c_fort">
+<span class="sig-prename descclassname"><span class="pre">edrixs.solvers.</span></span><span class="sig-name descname"><span class="pre">rixs_2v1c_fort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shell_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ominc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eloss</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_tot_noccu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trans_to_which</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pol_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_gs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nkryl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linsys_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linsys_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scatter_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/solvers.html#rixs_2v1c_fort"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.solvers.rixs_2v1c_fort" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate RIXS for the case with 2 valence shells plus 1 core shell.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>comm: MPI_comm</strong></dt><dd><p>MPI communicator.</p>
+</dd>
+<dt><strong>shell_name: tuple of three strings</strong></dt><dd><p>Names of valence and core shells. The 1st (2nd) string in the tuple is for the
+1st (2nd) valence shell, and the 3rd one is for the core shell.</p>
+<ul class="simple">
+<li><p>The 1st and 2nd strings can only be ‘s’, ‘p’, ‘t2g’, ‘d’, ‘f’,</p></li>
+<li><p>The 3nd string can be ‘s’, ‘p’, ‘p12’, ‘p32’, ‘d’, ‘d32’, ‘d52’,
+‘f’, ‘f52’, ‘f72’.</p></li>
+</ul>
+<p>For example: shell_name=(‘d’, ‘p’, ‘s’) may indicate a <span class="math notranslate nohighlight">\(K\)</span> edge transition from
+core <span class="math notranslate nohighlight">\(1s\)</span> shell to valence <span class="math notranslate nohighlight">\(3d\)</span> and <span class="math notranslate nohighlight">\(4p\)</span> shell for Ni.</p>
+</dd>
+<dt><strong>ominc: 1d float array</strong></dt><dd><p>Incident energy of photon.</p>
+</dd>
+<dt><strong>eloss: 1d float array</strong></dt><dd><p>Energy loss.</p>
+</dd>
+<dt><strong>gamma_c: a float number or a 1d float array with same shape as ominc.</strong></dt><dd><p>The core-hole life-time broadening factor. It can be a constant value
+or incident energy dependent.</p>
+</dd>
+<dt><strong>gamma_f: a float number or a 1d float array with same shape as eloss.</strong></dt><dd><p>The final states life-time broadening factor. It can be a constant value
+or energy loss dependent.</p>
+</dd>
+<dt><strong>v_tot_noccu: int</strong></dt><dd><p>Total occupancy of valence shells.</p>
+</dd>
+<dt><strong>trans_to_which: int</strong></dt><dd><p>Photon transition to which valence shell.</p>
+<ul class="simple">
+<li><p>1: to 1st valence shell,</p></li>
+<li><p>2: to 2nd valence shell.</p></li>
+</ul>
+</dd>
+<dt><strong>thin: float number</strong></dt><dd><p>The incident angle of photon (in radian).</p>
+</dd>
+<dt><strong>thout: float number</strong></dt><dd><p>The scattered angle of photon (in radian).</p>
+</dd>
+<dt><strong>phi: float number</strong></dt><dd><p>Azimuthal angle (in radian), defined with respect to the
+<span class="math notranslate nohighlight">\(x\)</span>-axis of scattering axis: scatter_axis[:,0].</p>
+</dd>
+<dt><strong>pol_type: list of 4-elements-tuples</strong></dt><dd><p>Type of polarizations. It has the following form:</p>
+<p>(str1, alpha, str2, beta)</p>
+<p>where, str1 (str2) can be ‘linear’, ‘left’, ‘right’, and alpha (beta) is
+the angle (in radians) between the linear polarization vector and the scattering plane.</p>
+<p>It will set pol_type=[(‘linear’, 0, ‘linear’, 0)] if not provided.</p>
+</dd>
+<dt><strong>num_gs: int</strong></dt><dd><p>Number of initial states used in RIXS calculations.</p>
+</dd>
+<dt><strong>nkryl: int</strong></dt><dd><p>Maximum number of poles obtained.</p>
+</dd>
+<dt><strong>linsys_max: int</strong></dt><dd><p>Maximum iterations of solving linear equations.</p>
+</dd>
+<dt><strong>linsys_tol: float</strong></dt><dd><p>Convergence for solving linear equations.</p>
+</dd>
+<dt><strong>temperature: float number</strong></dt><dd><p>Temperature (in K) for boltzmann distribution.</p>
+</dd>
+<dt><strong>loc_axis: 3*3 float array</strong></dt><dd><p>The local axis with respect to which local orbitals are defined.</p>
+<ul class="simple">
+<li><p>x: local_axis[:,0],</p></li>
+<li><p>y: local_axis[:,1],</p></li>
+<li><p>z: local_axis[:,2].</p></li>
+</ul>
+<p>It will be an identity matrix if not provided.</p>
+</dd>
+<dt><strong>scatter_axis: 3*3 float array</strong></dt><dd><p>The local axis defining the scattering geometry. The scattering plane is defined in
+the local <span class="math notranslate nohighlight">\(zx\)</span>-plane.</p>
+<ul class="simple">
+<li><p>local <span class="math notranslate nohighlight">\(x\)</span>-axis: scatter_axis[:,0]</p></li>
+<li><p>local <span class="math notranslate nohighlight">\(y\)</span>-axis: scatter_axis[:,1]</p></li>
+<li><p>local <span class="math notranslate nohighlight">\(z\)</span>-axis: scatter_axis[:,2]</p></li>
+</ul>
+<p>It will be set to an identity matrix if not provided.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>rixs: 3d float array, shape=(len(ominc), len(eloss), len(pol_type))</dt><dd><p>The calculated RIXS spectra. The 1st dimension is for the incident energy,
+the 2nd dimension is for the energy loss and the 3rd dimension is for
+different polarizations.</p>
+</dd>
+<dt>poles: 2d list of dict, shape=(len(ominc), len(pol_type))</dt><dd><p>The calculated RIXS poles. The 1st dimension is for incident energy, and the
+2nd dimension is for different polarizations.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.solvers.rixs_siam_fort">
+<span class="sig-prename descclassname"><span class="pre">edrixs.solvers.</span></span><span class="sig-name descname"><span class="pre">rixs_siam_fort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shell_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ominc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eloss</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_noccu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pol_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_gs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nkryl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linsys_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linsys_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scatter_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/solvers.html#rixs_siam_fort"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.solvers.rixs_siam_fort" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate RIXS for single impurity Anderson model with Fortran solver.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>comm: MPI_comm</strong></dt><dd><p>MPI communicator.</p>
+</dd>
+<dt><strong>shell_name: tuple of two strings</strong></dt><dd><p>Names of valence and core shells. The 1st (2nd) string in the tuple is for the
+valence (core) shell.</p>
+<ul class="simple">
+<li><p>The 1st string can only be ‘s’, ‘p’, ‘t2g’, ‘d’, ‘f’,</p></li>
+<li><p>The 2nd string can be ‘s’, ‘p’, ‘p12’, ‘p32’, ‘d’, ‘d32’, ‘d52’,
+‘f’, ‘f52’, ‘f72’.</p></li>
+</ul>
+<p>For example: shell_name=(‘d’, ‘p32’) may indicate a <span class="math notranslate nohighlight">\(L_3\)</span> edge transition from
+core <span class="math notranslate nohighlight">\(2p_{3/2}\)</span> shell to valence <span class="math notranslate nohighlight">\(3d\)</span> shell for Ni.</p>
+</dd>
+<dt><strong>nbath: int</strong></dt><dd><p>Number of bath sites.</p>
+</dd>
+<dt><strong>ominc: 1d float array</strong></dt><dd><p>Incident energy of photon.</p>
+</dd>
+<dt><strong>eloss: 1d float array</strong></dt><dd><p>Energy loss.</p>
+</dd>
+<dt><strong>gamma_c: a float number or a 1d float array with same shape as ominc.</strong></dt><dd><p>The core-hole life-time broadening factor. It can be a constant value
+or incident energy dependent.</p>
+</dd>
+<dt><strong>gamma_f: a float number or a 1d float array with same shape as eloss.</strong></dt><dd><p>The final states life-time broadening factor. It can be a constant value
+or energy loss dependent.</p>
+</dd>
+<dt><strong>v_noccu: int</strong></dt><dd><p>Total occupancy of valence shells.</p>
+</dd>
+<dt><strong>thin: float number</strong></dt><dd><p>The incident angle of photon (in radian).</p>
+</dd>
+<dt><strong>thout: float number</strong></dt><dd><p>The scattered angle of photon (in radian).</p>
+</dd>
+<dt><strong>phi: float number</strong></dt><dd><p>Azimuthal angle (in radian), defined with respect to the
+<span class="math notranslate nohighlight">\(x\)</span>-axis of scattering axis: scatter_axis[:,0].</p>
+</dd>
+<dt><strong>pol_type: list of 4-elements-tuples</strong></dt><dd><p>Type of polarizations. It has the following form:</p>
+<p>(str1, alpha, str2, beta)</p>
+<p>where, str1 (str2) can be ‘linear’, ‘left’, ‘right’, and alpha (beta) is
+the angle (in radians) between the linear polarization vector and the scattering plane.</p>
+<p>It will set pol_type=[(‘linear’, 0, ‘linear’, 0)] if not provided.</p>
+</dd>
+<dt><strong>num_gs: int</strong></dt><dd><p>Number of initial states used in RIXS calculations.</p>
+</dd>
+<dt><strong>nkryl: int</strong></dt><dd><p>Maximum number of poles obtained.</p>
+</dd>
+<dt><strong>linsys_max: int</strong></dt><dd><p>Maximum iterations of solving linear equations.</p>
+</dd>
+<dt><strong>linsys_tol: float</strong></dt><dd><p>Convergence for solving linear equations.</p>
+</dd>
+<dt><strong>temperature: float number</strong></dt><dd><p>Temperature (in K) for boltzmann distribution.</p>
+</dd>
+<dt><strong>loc_axis: 3*3 float array</strong></dt><dd><p>The local axis with respect to which local orbitals are defined.</p>
+<ul class="simple">
+<li><p>x: local_axis[:,0],</p></li>
+<li><p>y: local_axis[:,1],</p></li>
+<li><p>z: local_axis[:,2].</p></li>
+</ul>
+<p>It will be an identity matrix if not provided.</p>
+</dd>
+<dt><strong>scatter_axis: 3*3 float array</strong></dt><dd><p>The local axis defining the scattering geometry. The scattering plane is defined in
+the local <span class="math notranslate nohighlight">\(zx\)</span>-plane.</p>
+<ul class="simple">
+<li><p>local <span class="math notranslate nohighlight">\(x\)</span>-axis: scatter_axis[:,0]</p></li>
+<li><p>local <span class="math notranslate nohighlight">\(y\)</span>-axis: scatter_axis[:,1]</p></li>
+<li><p>local <span class="math notranslate nohighlight">\(z\)</span>-axis: scatter_axis[:,2]</p></li>
+</ul>
+<p>It will be set to an identity matrix if not provided.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>rixs: 3d float array, shape=(len(ominc), len(eloss), len(pol_type))</dt><dd><p>The calculated RIXS spectra. The 1st dimension is for the incident energy,
+the 2nd dimension is for the energy loss and the 3rd dimension is for
+different polarizations.</p>
+</dd>
+<dt>poles: 2d list of dict, shape=(len(ominc), len(pol_type))</dt><dd><p>The calculated RIXS poles. The 1st dimension is for incident energy, and the
+2nd dimension is for different polarizations.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.solvers.xas_1v1c_fort">
+<span class="sig-prename descclassname"><span class="pre">edrixs.solvers.</span></span><span class="sig-name descname"><span class="pre">xas_1v1c_fort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shell_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ominc</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_noccu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pol_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_gs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nkryl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scatter_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/solvers.html#xas_1v1c_fort"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.solvers.xas_1v1c_fort" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate XAS for the case with one valence shells plus one core shell with Fortran solver.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>comm: MPI_comm</strong></dt><dd><p>MPI communicator.</p>
+</dd>
+<dt><strong>shell_name: tuple of two strings</strong></dt><dd><p>Names of valence and core shells. The 1st (2nd) string in the tuple is for the
+valence (core) shell.</p>
+<ul class="simple">
+<li><p>The 1st string can only be ‘s’, ‘p’, ‘t2g’, ‘d’, ‘f’,</p></li>
+<li><p>The 2nd string can be ‘s’, ‘p’, ‘p12’, ‘p32’, ‘d’, ‘d32’, ‘d52’,
+‘f’, ‘f52’, ‘f72’.</p></li>
+</ul>
+<p>For example: shell_name=(‘d’, ‘p32’) may indicate a <span class="math notranslate nohighlight">\(L_3\)</span> edge transition from
+core <span class="math notranslate nohighlight">\(2p_{3/2}\)</span> shell to valence <span class="math notranslate nohighlight">\(3d\)</span> shell for Ni.</p>
+</dd>
+<dt><strong>ominc: 1d float array</strong></dt><dd><p>Incident energy of photon.</p>
+</dd>
+<dt><strong>gamma_c: a float number or a 1d float array with the same shape as ominc.</strong></dt><dd><p>The core-hole life-time broadening factor. It can be a constant value
+or incident energy dependent.</p>
+</dd>
+<dt><strong>v_noccu: int</strong></dt><dd><p>Total occupancy of valence shells.</p>
+</dd>
+<dt><strong>thin: float number</strong></dt><dd><p>The incident angle of photon (in radian).</p>
+</dd>
+<dt><strong>phi: float number</strong></dt><dd><p>Azimuthal angle (in radian), defined with respect to the
+<span class="math notranslate nohighlight">\(x\)</span>-axis of the local scattering axis: scatter_axis[:,0].</p>
+</dd>
+<dt><strong>pol_type: list of tuples</strong></dt><dd><p>Type of polarization, options can be:</p>
+<ul class="simple">
+<li><p>(‘linear’, alpha), linear polarization, where alpha is the angle between the
+polarization vector and the scattering plane in radians.</p></li>
+<li><p>(‘left’, 0), left circular polarization.</p></li>
+<li><p>(‘right’, 0), right circular polarization.</p></li>
+<li><p>(‘isotropic’, 0). isotropic polarization.</p></li>
+</ul>
+<p>It will set pol_type=[(‘isotropic’, 0)] if not provided.</p>
+</dd>
+<dt><strong>num_gs: int</strong></dt><dd><p>Number of initial states used in XAS calculations.</p>
+</dd>
+<dt><strong>nkryl: int</strong></dt><dd><p>Maximum number of poles obtained.</p>
+</dd>
+<dt><strong>temperature: float number</strong></dt><dd><p>Temperature (in K) for boltzmann distribution.</p>
+</dd>
+<dt><strong>loc_axis: 3*3 float array</strong></dt><dd><p>The local axis with respect to which local orbitals are defined.</p>
+<ul class="simple">
+<li><p>x: local_axis[:,0],</p></li>
+<li><p>y: local_axis[:,1],</p></li>
+<li><p>z: local_axis[:,2].</p></li>
+</ul>
+<p>It will be an identity matrix if not provided.</p>
+</dd>
+<dt><strong>scatter_axis: 3*3 float array</strong></dt><dd><p>The local axis defining the scattering geometry. The scattering plane is defined in
+the local <span class="math notranslate nohighlight">\(zx\)</span>-plane.</p>
+<ul class="simple">
+<li><p>local <span class="math notranslate nohighlight">\(x\)</span>-axis: scatter_axis[:,0]</p></li>
+<li><p>local <span class="math notranslate nohighlight">\(y\)</span>-axis: scatter_axis[:,1]</p></li>
+<li><p>local <span class="math notranslate nohighlight">\(z\)</span>-axis: scatter_axis[:,2]</p></li>
+</ul>
+<p>It will be set to an identity matrix if not provided.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>xas: 2d array, shape=(len(ominc), len(pol_type))</dt><dd><p>The calculated XAS spectra. The first dimension is for ominc, and the second dimension
+if for different polarizations.</p>
+</dd>
+<dt>poles: list of dict, shape=(len(pol_type), )</dt><dd><p>The calculated XAS poles for different polarizations.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.solvers.xas_1v1c_py">
+<span class="sig-prename descclassname"><span class="pre">edrixs.solvers.</span></span><span class="sig-name descname"><span class="pre">xas_1v1c_py</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eval_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trans_op</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ominc</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pol_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gs_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scatter_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/solvers.html#xas_1v1c_py"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.solvers.xas_1v1c_py" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate XAS for the case of one valence shell plus one core shell with Python solver.</p>
+<p>This solver is only suitable for small size of Hamiltonian, typically the dimension
+of both initial and intermediate Hamiltonian are smaller than 10,000.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>eval_i: 1d float array</strong></dt><dd><p>The eigenvalues of the initial Hamiltonian.</p>
+</dd>
+<dt><strong>eval_n: 1d float array</strong></dt><dd><p>The eigenvalues of the intermediate Hamiltonian.</p>
+</dd>
+<dt><strong>trans_op: 3d complex array</strong></dt><dd><p>The transition operators in the eigenstates basis.</p>
+</dd>
+<dt><strong>ominc: 1d float array</strong></dt><dd><p>Incident energy of photon.</p>
+</dd>
+<dt><strong>gamma_c: a float number or a 1d float array with the same shape as ominc.</strong></dt><dd><p>The core-hole life-time broadening factor. It can be a constant value
+or incident energy dependent.</p>
+</dd>
+<dt><strong>thin: float number</strong></dt><dd><p>The incident angle of photon (in radian).</p>
+</dd>
+<dt><strong>phi: float number</strong></dt><dd><p>Azimuthal angle (in radian), defined with respect to the
+<span class="math notranslate nohighlight">\(x\)</span>-axis of the scattering axis: scatter_axis[:,0].</p>
+</dd>
+<dt><strong>pol_type: list of tuples</strong></dt><dd><p>Type of polarization, options can be:</p>
+<ul class="simple">
+<li><p>(‘linear’, alpha), linear polarization, where alpha is the angle between the
+polarization vector and the scattering plane in radians.</p></li>
+<li><p>(‘left’, 0), left circular polarization.</p></li>
+<li><p>(‘right’, 0), right circular polarization.</p></li>
+<li><p>(‘isotropic’, 0). isotropic polarization.</p></li>
+</ul>
+<p>It will set pol_type=[(‘isotropic’, 0)] if not provided.</p>
+</dd>
+<dt><strong>gs_list: 1d list of ints</strong></dt><dd><p>The indices of initial states which will be used in XAS calculations.</p>
+<p>It will set gs_list=[0] if not provided.</p>
+</dd>
+<dt><strong>temperature: float number</strong></dt><dd><p>Temperature (in K) for boltzmann distribution.</p>
+</dd>
+<dt><strong>scatter_axis: 3*3 float array</strong></dt><dd><p>The local axis defining the scattering plane. The scattering plane is defined in
+the local <span class="math notranslate nohighlight">\(zx\)</span>-plane.</p>
+<p>local <span class="math notranslate nohighlight">\(x\)</span>-axis: scatter_axis[:,0]</p>
+<p>local <span class="math notranslate nohighlight">\(y\)</span>-axis: scatter_axis[:,1]</p>
+<p>local <span class="math notranslate nohighlight">\(z\)</span>-axis: scatter_axis[:,2]</p>
+<p>It will be set to an identity matrix if not provided.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>xas: 2d float array</dt><dd><p>The calculated XAS spectra. The 1st dimension is for the incident energy, and the
+2nd dimension is for different polarizations.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.solvers.xas_2v1c_fort">
+<span class="sig-prename descclassname"><span class="pre">edrixs.solvers.</span></span><span class="sig-name descname"><span class="pre">xas_2v1c_fort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shell_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ominc</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_tot_noccu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trans_to_which</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pol_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_gs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nkryl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scatter_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/solvers.html#xas_2v1c_fort"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.solvers.xas_2v1c_fort" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate XAS for the case with two valence shells plus one core shell with Fortran solver.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>comm: MPI_comm</strong></dt><dd><p>MPI communicator.</p>
+</dd>
+<dt><strong>shell_name: tuple of three strings</strong></dt><dd><p>Names of valence and core shells. The 1st (2nd) string in the tuple is for the
+1st (2nd) valence shell, and the 3rd one is for the core shell.</p>
+<ul class="simple">
+<li><p>The 1st and 2nd strings can only be ‘s’, ‘p’, ‘t2g’, ‘d’, ‘f’,</p></li>
+<li><p>The 3nd string can be ‘s’, ‘p’, ‘p12’, ‘p32’, ‘d’, ‘d32’, ‘d52’,
+‘f’, ‘f52’, ‘f72’.</p></li>
+</ul>
+<p>For example: shell_name=(‘d’, ‘p’, ‘s’) may indicate a <span class="math notranslate nohighlight">\(K\)</span> edge transition from
+core <span class="math notranslate nohighlight">\(1s\)</span> shell to valence <span class="math notranslate nohighlight">\(3d\)</span> and <span class="math notranslate nohighlight">\(4p\)</span> shell for Ni.</p>
+</dd>
+<dt><strong>ominc: 1d float array</strong></dt><dd><p>Incident energy of photon.</p>
+</dd>
+<dt><strong>gamma_c: a float number or a 1d float array with the same shape as ominc.</strong></dt><dd><p>The core-hole life-time broadening factor. It can be a constant value
+or incident energy dependent.</p>
+</dd>
+<dt><strong>v_tot_noccu: int</strong></dt><dd><p>Total occupancy of valence shells.</p>
+</dd>
+<dt><strong>trans_to_which: int</strong></dt><dd><p>Photon transition to which valence shell.</p>
+<ul class="simple">
+<li><p>1: to 1st valence shell,</p></li>
+<li><p>2: to 2nd valence shell.</p></li>
+</ul>
+</dd>
+<dt><strong>thin: float number</strong></dt><dd><p>The incident angle of photon (in radian).</p>
+</dd>
+<dt><strong>phi: float number</strong></dt><dd><p>Azimuthal angle (in radian), defined with respect to the
+<span class="math notranslate nohighlight">\(x\)</span>-axis of the local scattering axis: scatter_axis[:,0].</p>
+</dd>
+<dt><strong>pol_type: list of tuples</strong></dt><dd><p>Type of polarization, options can be:</p>
+<ul class="simple">
+<li><p>(‘linear’, alpha), linear polarization, where alpha is the angle between the
+polarization vector and the scattering plane in radians.</p></li>
+<li><p>(‘left’, 0), left circular polarization.</p></li>
+<li><p>(‘right’, 0), right circular polarization.</p></li>
+<li><p>(‘isotropic’, 0). isotropic polarization.</p></li>
+</ul>
+<p>It will set pol_type=[(‘isotropic’, 0)] if not provided.</p>
+</dd>
+<dt><strong>num_gs: int</strong></dt><dd><p>Number of initial states used in XAS calculations.</p>
+</dd>
+<dt><strong>nkryl: int</strong></dt><dd><p>Maximum number of poles obtained.</p>
+</dd>
+<dt><strong>temperature: float number</strong></dt><dd><p>Temperature (in K) for boltzmann distribution.</p>
+</dd>
+<dt><strong>loc_axis: 3*3 float array</strong></dt><dd><p>The local axis with respect to which local orbitals are defined.</p>
+<ul class="simple">
+<li><p>x: local_axis[:,0],</p></li>
+<li><p>y: local_axis[:,1],</p></li>
+<li><p>z: local_axis[:,2].</p></li>
+</ul>
+<p>It will be an identity matrix if not provided.</p>
+</dd>
+<dt><strong>scatter_axis: 3*3 float array</strong></dt><dd><p>The local axis defining the scattering geometry. The scattering plane is defined in
+the local <span class="math notranslate nohighlight">\(zx\)</span>-plane.</p>
+<ul class="simple">
+<li><p>local <span class="math notranslate nohighlight">\(x\)</span>-axis: scatter_axis[:,0]</p></li>
+<li><p>local <span class="math notranslate nohighlight">\(y\)</span>-axis: scatter_axis[:,1]</p></li>
+<li><p>local <span class="math notranslate nohighlight">\(z\)</span>-axis: scatter_axis[:,2]</p></li>
+</ul>
+<p>It will be set to an identity matrix if not provided.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>xas: 2d array, shape=(len(ominc), len(pol_type))</dt><dd><p>The calculated XAS spectra. The first dimension is for ominc, and the second dimension
+if for different polarizations.</p>
+</dd>
+<dt>poles: list of dict, shape=(len(pol_type), )</dt><dd><p>The calculated XAS poles for different polarizations.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.solvers.xas_siam_fort">
+<span class="sig-prename descclassname"><span class="pre">edrixs.solvers.</span></span><span class="sig-name descname"><span class="pre">xas_siam_fort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shell_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbath</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ominc</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_noccu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pol_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_gs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nkryl</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scatter_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/solvers.html#xas_siam_fort"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.solvers.xas_siam_fort" title="Link to this definition">¶</a></dt>
+<dd><p>Calculate XAS for single impurity Anderson model (SIAM) with Fortran solver.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>comm: MPI_comm</strong></dt><dd><p>MPI communicator.</p>
+</dd>
+<dt><strong>shell_name: tuple of two strings</strong></dt><dd><p>Names of valence and core shells. The 1st (2nd) string in the tuple is for the
+valence (core) shell.</p>
+<ul class="simple">
+<li><p>The 1st string can only be ‘s’, ‘p’, ‘t2g’, ‘d’, ‘f’,</p></li>
+<li><p>The 2nd string can be ‘s’, ‘p’, ‘p12’, ‘p32’, ‘d’, ‘d32’, ‘d52’,
+‘f’, ‘f52’, ‘f72’.</p></li>
+</ul>
+<p>For example: shell_name=(‘d’, ‘p32’) may indicate a <span class="math notranslate nohighlight">\(L_3\)</span> edge transition from
+core <span class="math notranslate nohighlight">\(2p_{3/2}\)</span> shell to valence <span class="math notranslate nohighlight">\(3d\)</span> shell for Ni.</p>
+</dd>
+<dt><strong>nbath: int</strong></dt><dd><p>Number of bath sites.</p>
+</dd>
+<dt><strong>ominc: 1d float array</strong></dt><dd><p>Incident energy of photon.</p>
+</dd>
+<dt><strong>gamma_c: a float number or a 1d float array with the same shape as ominc.</strong></dt><dd><p>The core-hole life-time broadening factor. It can be a constant value
+or incident energy dependent.</p>
+</dd>
+<dt><strong>v_noccu: int</strong></dt><dd><p>Total occupancy of valence shells.</p>
+</dd>
+<dt><strong>thin: float number</strong></dt><dd><p>The incident angle of photon (in radian).</p>
+</dd>
+<dt><strong>phi: float number</strong></dt><dd><p>Azimuthal angle (in radian), defined with respect to the
+<span class="math notranslate nohighlight">\(x\)</span>-axis of the local scattering axis: scatter_axis[:,0].</p>
+</dd>
+<dt><strong>pol_type: list of tuples</strong></dt><dd><p>Type of polarization, options can be:</p>
+<ul class="simple">
+<li><p>(‘linear’, alpha), linear polarization, where alpha is the angle between the
+polarization vector and the scattering plane in radians.</p></li>
+<li><p>(‘left’, 0), left circular polarization.</p></li>
+<li><p>(‘right’, 0), right circular polarization.</p></li>
+<li><p>(‘isotropic’, 0). isotropic polarization.</p></li>
+</ul>
+<p>It will set pol_type=[(‘isotropic’, 0)] if not provided.</p>
+</dd>
+<dt><strong>num_gs: int</strong></dt><dd><p>Number of initial states used in XAS calculations.</p>
+</dd>
+<dt><strong>nkryl: int</strong></dt><dd><p>Maximum number of poles obtained.</p>
+</dd>
+<dt><strong>temperature: float number</strong></dt><dd><p>Temperature (in K) for boltzmann distribution.</p>
+</dd>
+<dt><strong>loc_axis: 3*3 float array</strong></dt><dd><p>The local axis with respect to which local orbitals are defined.</p>
+<ul class="simple">
+<li><p>x: local_axis[:,0],</p></li>
+<li><p>y: local_axis[:,1],</p></li>
+<li><p>z: local_axis[:,2].</p></li>
+</ul>
+<p>It will be an identity matrix if not provided.</p>
+</dd>
+<dt><strong>scatter_axis: 3*3 float array</strong></dt><dd><p>The local axis defining the scattering geometry. The scattering plane is defined in
+the local <span class="math notranslate nohighlight">\(zx\)</span>-plane.</p>
+<ul class="simple">
+<li><p>local <span class="math notranslate nohighlight">\(x\)</span>-axis: scatter_axis[:,0]</p></li>
+<li><p>local <span class="math notranslate nohighlight">\(y\)</span>-axis: scatter_axis[:,1]</p></li>
+<li><p>local <span class="math notranslate nohighlight">\(z\)</span>-axis: scatter_axis[:,2]</p></li>
+</ul>
+<p>It will be set to an identity matrix if not provided.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>xas: 2d array, shape=(len(ominc), len(pol_type))</dt><dd><p>The calculated XAS spectra. The first dimension is for ominc, and the second dimension
+if for different polarizations.</p>
+</dd>
+<dt>poles: list of dict, shape=(len(pol_type), )</dt><dd><p>The calculated XAS poles for different polarizations.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="soc.html" class="btn btn-neutral float-left" title="soc" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="utils.html" class="btn btn-neutral float-right" title="utils" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Brookhaven National Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

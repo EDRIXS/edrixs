@@ -1,0 +1,638 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>edrixs.fock_basis &mdash; edrixs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            edrixs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">edrixs User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Pedagogical examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">edrixs Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">edrixs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">edrixs.fock_basis</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for edrixs.fock_basis</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;combination&#39;</span><span class="p">,</span> <span class="s1">&#39;fock_bin&#39;</span><span class="p">,</span> <span class="s1">&#39;get_fock_bin_by_N&#39;</span><span class="p">,</span> <span class="s1">&#39;get_fock_half_N&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;get_fock_full_N&#39;</span><span class="p">,</span> <span class="s1">&#39;get_fock_basis_by_NLz&#39;</span><span class="p">,</span> <span class="s1">&#39;get_fock_basis_by_NSz&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;get_fock_basis_by_NJz&#39;</span><span class="p">,</span> <span class="s1">&#39;get_fock_basis_by_N_abelian&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;get_fock_basis_by_N_LzSz&#39;</span><span class="p">,</span> <span class="s1">&#39;write_fock_dec_by_N&#39;</span><span class="p">]</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+
+
+<div class="viewcode-block" id="combination">
+<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.combination">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">combination</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the combination :math:`C_{n}^{m}`,</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        C_{n}^{m} = \\frac{n!}{m!(n-m)!}.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n: int</span>
+<span class="sd">       Number n.</span>
+<span class="sd">    m: int</span>
+<span class="sd">        Number m.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    res: int</span>
+<span class="sd">        The calculated result.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import edrixs</span>
+<span class="sd">    &gt;&gt;&gt; edrixs.combination(6, 2)</span>
+<span class="sd">    15</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">m</span> <span class="o">&gt;</span> <span class="n">n</span> <span class="ow">or</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">m</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;wrong number in combination&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="n">m</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">n</span> <span class="o">==</span> <span class="n">m</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="n">largest</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="n">m</span><span class="p">)</span>
+    <span class="n">smallest</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="n">m</span><span class="p">)</span>
+    <span class="n">numer</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">largest</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">numer</span> <span class="o">*=</span> <span class="n">i</span>
+
+    <span class="n">denom</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">smallest</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">denom</span> <span class="o">*=</span> <span class="n">i</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numer</span> <span class="o">/</span> <span class="n">denom</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+
+<div class="viewcode-block" id="fock_bin">
+<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.fock_bin">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">fock_bin</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return all the possible :math:`n`-length binary</span>
+<span class="sd">    where :math:`k` of :math:`n` digitals are set to 1.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n: int</span>
+<span class="sd">        Binary length :math:`n`.</span>
+<span class="sd">    k: int</span>
+<span class="sd">        How many digitals are set to be 1.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    res: list of int-lists</span>
+<span class="sd">        A list of list containing the binary digitals.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import edrixs</span>
+<span class="sd">    &gt;&gt;&gt; edrixs.fock_bin(4, 2)</span>
+<span class="sd">    [[1, 1, 0, 0],</span>
+<span class="sd">     [1, 0, 1, 0],</span>
+<span class="sd">     [1, 0, 0, 1],</span>
+<span class="sd">     [0, 1, 1, 0],</span>
+<span class="sd">     [0, 1, 0, 1],</span>
+<span class="sd">     [0, 0, 1, 1]]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[[</span><span class="mi">0</span><span class="p">]]</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">bits</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)),</span> <span class="n">k</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span>
+        <span class="k">for</span> <span class="n">bit</span> <span class="ow">in</span> <span class="n">bits</span><span class="p">:</span>
+            <span class="n">s</span><span class="p">[</span><span class="n">bit</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+
+<div class="viewcode-block" id="get_fock_bin_by_N">
+<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.get_fock_bin_by_N">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_fock_bin_by_N</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get binary form to represent a Fock state.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    args: ints</span>
+<span class="sd">        args[0]: number of orbitals for 1st-shell,</span>
+
+<span class="sd">        args[1]: number of occupancy for 1st-shell,</span>
+
+<span class="sd">        args[2]: number of orbitals for 2nd-shell,</span>
+
+<span class="sd">        args[3]: number of occupancy for 2nd-shell,</span>
+
+<span class="sd">        ...</span>
+
+<span class="sd">        args[ :math:`2N-2`]: number of orbitals for :math:`N` th-shell,</span>
+
+<span class="sd">        args[ :math:`2N-1`]: number of occupancy for :math:`N` th-shell.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    result: list of int list</span>
+<span class="sd">        The binary form of Fock states.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import edrixs</span>
+<span class="sd">    &gt;&gt;&gt; edrixs.get_fock_bin_by_N(4, 2)</span>
+<span class="sd">    [[1, 1, 0, 0],</span>
+<span class="sd">     [1, 0, 1, 0],</span>
+<span class="sd">     [1, 0, 0, 1],</span>
+<span class="sd">     [0, 1, 1, 0],</span>
+<span class="sd">     [0, 1, 0, 1],</span>
+<span class="sd">     [0, 0, 1, 1]]</span>
+
+<span class="sd">    &gt;&gt;&gt; edrixs.get_fock_bin_by_N(4, 2, 2, 1)</span>
+<span class="sd">    [[1, 1, 0, 0, 1, 0],</span>
+<span class="sd">     [1, 0, 1, 0, 1, 0],</span>
+<span class="sd">     [1, 0, 0, 1, 1, 0],</span>
+<span class="sd">     [0, 1, 1, 0, 1, 0],</span>
+<span class="sd">     [0, 1, 0, 1, 1, 0],</span>
+<span class="sd">     [0, 0, 1, 1, 1, 0],</span>
+<span class="sd">     [1, 1, 0, 0, 0, 1],</span>
+<span class="sd">     [1, 0, 1, 0, 0, 1],</span>
+<span class="sd">     [1, 0, 0, 1, 0, 1],</span>
+<span class="sd">     [0, 1, 1, 0, 0, 1],</span>
+<span class="sd">     [0, 1, 0, 1, 0, 1],</span>
+<span class="sd">     [0, 0, 1, 1, 0, 1]]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">n</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: number of arguments is not even&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">fock_bin</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">res1</span> <span class="o">=</span> <span class="n">fock_bin</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">res2</span> <span class="o">=</span> <span class="n">get_fock_bin_by_N</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
+        <span class="k">for</span> <span class="n">ifock</span> <span class="ow">in</span> <span class="n">res2</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">jfock</span> <span class="ow">in</span> <span class="n">res1</span><span class="p">:</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">jfock</span> <span class="o">+</span> <span class="n">ifock</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_fock_half_N</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">occu</span> <span class="o">=</span> <span class="nb">bin</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;1&#39;</span><span class="p">)</span>
+        <span class="n">res</span><span class="p">[</span><span class="n">occu</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span>
+
+
+<div class="viewcode-block" id="get_fock_full_N">
+<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.get_fock_full_N">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_fock_full_N</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the decimal digitals to represent Fock states.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    norb: int</span>
+<span class="sd">        Number of orbitals.</span>
+<span class="sd">    N: int</span>
+<span class="sd">        Number of occupancy.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    res: list of int</span>
+<span class="sd">        The decimal digitals to represent Fock states.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import edrixs</span>
+<span class="sd">    &gt;&gt;&gt; edrixs.fock_bin(4,2)</span>
+<span class="sd">    [[1, 1, 0, 0],</span>
+<span class="sd">     [1, 0, 1, 0],</span>
+<span class="sd">     [0, 1, 1, 0],</span>
+<span class="sd">     [1, 0, 0, 1],</span>
+<span class="sd">     [0, 1, 0, 1],</span>
+<span class="sd">     [0, 0, 1, 1]]</span>
+
+<span class="sd">    &gt;&gt;&gt; import edrixs</span>
+<span class="sd">    &gt;&gt;&gt; edrixs.get_fock_full_N(4,2)</span>
+<span class="sd">    [3, 5, 6, 9, 10, 12]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">half_N</span> <span class="o">=</span> <span class="n">get_fock_half_N</span><span class="p">(</span><span class="n">norb</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">norb</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">N</span> <span class="o">-</span> <span class="n">m</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="n">norb</span> <span class="o">//</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">res</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">i</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">norb</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">j</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">half_N</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">half_N</span><span class="p">[</span><span class="n">n</span><span class="p">]])</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+
+<div class="viewcode-block" id="get_fock_basis_by_NLz">
+<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.get_fock_basis_by_NLz">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_fock_basis_by_NLz</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">lz_list</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get decimal digitals to represent Fock states, use good quantum number:</span>
+
+<span class="sd">    - orbital angular momentum :math:`L_{z}`</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    norb: int</span>
+<span class="sd">        Number of orbitals.</span>
+<span class="sd">    N: int</span>
+<span class="sd">        Number of total occupancy.</span>
+<span class="sd">    lz_list: list of int</span>
+<span class="sd">        Quantum number :math:`l_{z}` for each orbital.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    res: dict</span>
+<span class="sd">        A dictionary containing the decimal digitals, the key is good</span>
+<span class="sd">        quantum numbers :math:`L_{z}`, the value is a list of int.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import edrixs</span>
+<span class="sd">    &gt;&gt;&gt; edrixs.get_fock_basis_by_NLz(6, 2, [-1, -1, 0, 0, 1, 1])</span>
+<span class="sd">    {</span>
+<span class="sd">     -2: [3],</span>
+<span class="sd">     -1: [5, 6, 9, 10],</span>
+<span class="sd">      0: [12, 17, 18, 33, 34],</span>
+<span class="sd">      1: [20, 36, 24, 40],</span>
+<span class="sd">      2: [48]</span>
+<span class="sd">    }</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="n">get_fock_basis_by_N_abelian</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">lz_list</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+
+<div class="viewcode-block" id="get_fock_basis_by_NSz">
+<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.get_fock_basis_by_NSz">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_fock_basis_by_NSz</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">sz_list</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get decimal digitals to represent Fock states, use good quantum number:</span>
+
+<span class="sd">    - spin angular momentum :math:`S_{z}`</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    norb: int</span>
+<span class="sd">        Number of orbitals.</span>
+<span class="sd">    N: int</span>
+<span class="sd">        Number of total occupancy.</span>
+<span class="sd">    sz_list: list of int</span>
+<span class="sd">        Quantum number :math:`s_{z}` for each orbital.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    res: dict</span>
+<span class="sd">        A dictionary containing the decimal digitals, the key is good quantum</span>
+<span class="sd">        numbers :math:`S_{z}`, the value is a list of int.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import edrixs</span>
+<span class="sd">    &gt;&gt;&gt; edrixs.get_fock_basis_by_NSz(6, 2, [1, -1, 1, -1, 1, -1])</span>
+<span class="sd">    {</span>
+<span class="sd">     -2: [10, 34, 40],</span>
+<span class="sd">     -1: [],</span>
+<span class="sd">      0: [3, 6, 9, 12, 18, 33, 36, 24, 48],</span>
+<span class="sd">      1: [],</span>
+<span class="sd">      2: [5, 17, 20]</span>
+<span class="sd">    }</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="n">get_fock_basis_by_N_abelian</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">sz_list</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+
+<div class="viewcode-block" id="get_fock_basis_by_NJz">
+<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.get_fock_basis_by_NJz">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_fock_basis_by_NJz</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">jz_list</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get decimal digitals to represent Fock states, use good quantum number:</span>
+
+<span class="sd">    - total angular momentum :math:`J_{z}`</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    norb: int</span>
+<span class="sd">        Number of orbitals.</span>
+<span class="sd">    N: int</span>
+<span class="sd">        Number of total occupancy.</span>
+<span class="sd">    jz_list: list of int</span>
+<span class="sd">        Quantum number :math:`j_{z}` for each orbital.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    res: dict</span>
+<span class="sd">        A dictionary containing the decimal digitals, the key is good quantum</span>
+<span class="sd">        numbers :math:`j_{z}`, the value is a list of int.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import edrixs</span>
+<span class="sd">    &gt;&gt;&gt; edrixs.get_fock_basis_by_NJz(6, 2, [-1, 1, -3, -1, 1, 3])</span>
+<span class="sd">    {</span>
+<span class="sd">     -6: [],</span>
+<span class="sd">     -5: [],</span>
+<span class="sd">     -4: [5, 12],</span>
+<span class="sd">     -3: [],</span>
+<span class="sd">     -2: [6, 9, 20],</span>
+<span class="sd">     -1: [],</span>
+<span class="sd">      0: [3, 10, 17, 36, 24],</span>
+<span class="sd">      1: [],</span>
+<span class="sd">      2: [18, 33, 40],</span>
+<span class="sd">      3: [],</span>
+<span class="sd">      4: [34, 48],</span>
+<span class="sd">      5: [],</span>
+<span class="sd">      6: []</span>
+<span class="sd">    }</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="n">get_fock_basis_by_N_abelian</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">jz_list</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+
+<div class="viewcode-block" id="get_fock_basis_by_N_abelian">
+<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.get_fock_basis_by_N_abelian">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_fock_basis_by_N_abelian</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">a_list</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get decimal digitals to represent Fock states, use some Abelian good quantum number.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    norb: int</span>
+<span class="sd">        Number of orbitals.</span>
+<span class="sd">    N: int</span>
+<span class="sd">        Number of total occupancy.</span>
+<span class="sd">    a_list: list of int</span>
+<span class="sd">        Quantum number of the Abelian symmetry for each orbital.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    basis: dict</span>
+<span class="sd">        A dictionary containing the decimal digitals, the key is good quantum numbers,</span>
+<span class="sd">        the value is a list of int.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">get_fock_full_N</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+    <span class="n">min_a</span><span class="p">,</span> <span class="n">max_a</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">a_list</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">a_list</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span>
+    <span class="n">basis</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">min_a</span><span class="p">,</span> <span class="n">max_a</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">basis</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">a_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">bit_length</span><span class="p">())</span> <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&gt;&gt;</span> <span class="n">i</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)])</span>
+        <span class="n">basis</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">basis</span></div>
+
+
+
+<div class="viewcode-block" id="get_fock_basis_by_N_LzSz">
+<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.get_fock_basis_by_N_LzSz">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_fock_basis_by_N_LzSz</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">lz_list</span><span class="p">,</span> <span class="n">sz_list</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get decimal digitals to represent Fock states, use good quantum number:</span>
+
+<span class="sd">    - orbital angular momentum :math:`L_{z}`</span>
+<span class="sd">    - spin angular momentum :math:`S_{z}`</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    norb: int</span>
+<span class="sd">        Number of orbitals.</span>
+<span class="sd">    N: int</span>
+<span class="sd">        Number of total occupancy.</span>
+<span class="sd">    lz_list: list of int</span>
+<span class="sd">        Quantum number :math:`l_{z}` for each orbital.</span>
+<span class="sd">    sz_list: list of int</span>
+<span class="sd">        Quantum number :math:`s_{z}` for each orbital.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    basis: dict</span>
+<span class="sd">        A dictionary containing the decimal digitals, the key is a tuple containing good quantum</span>
+<span class="sd">        numbers ( :math:`l_{z}`, :math:`s_{z}`), the value is a list of int.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import edrixs</span>
+<span class="sd">    &gt;&gt;&gt; edrixs.get_fock_basis_by_N_LzSz(6, 2, [-1, -1, 0, 0, 1, 1], [1, -1, 1, -1, 1, -1])</span>
+<span class="sd">    {</span>
+<span class="sd">     (-2, -2): [],</span>
+<span class="sd">     (-2, -1): [],</span>
+<span class="sd">      (-2, 0): [3],</span>
+<span class="sd">      (-2, 1): [],</span>
+<span class="sd">      (-2, 2): [],</span>
+<span class="sd">     (-1, -2): [10],</span>
+<span class="sd">     (-1, -1): [],</span>
+<span class="sd">      (-1, 0): [6, 9],</span>
+<span class="sd">      (-1, 1): [],</span>
+<span class="sd">      (-1, 2): [5],</span>
+<span class="sd">      (0, -2): [34],</span>
+<span class="sd">      (0, -1): [],</span>
+<span class="sd">       (0, 0): [12, 18, 33],</span>
+<span class="sd">       (0, 1): [],</span>
+<span class="sd">       (0, 2): [17],</span>
+<span class="sd">      (1, -2): [40],</span>
+<span class="sd">      (1, -1): [],</span>
+<span class="sd">       (1, 0): [36, 24],</span>
+<span class="sd">       (1, 1): [],</span>
+<span class="sd">       (1, 2): [20],</span>
+<span class="sd">      (2, -2): [],</span>
+<span class="sd">      (2, -1): [],</span>
+<span class="sd">       (2, 0): [48],</span>
+<span class="sd">       (2, 1): [],</span>
+<span class="sd">       (2, 2): []</span>
+<span class="sd">    }</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">get_fock_full_N</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
+    <span class="n">min_Lz</span><span class="p">,</span> <span class="n">max_Lz</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">lz_list</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">lz_list</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span>
+    <span class="n">min_Sz</span><span class="p">,</span> <span class="n">max_Sz</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">sz_list</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">sz_list</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span>
+    <span class="n">basis</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">min_Lz</span><span class="p">,</span> <span class="n">max_Lz</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">min_Sz</span><span class="p">,</span> <span class="n">max_Sz</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">basis</span><span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+        <span class="n">Lz</span><span class="p">,</span> <span class="n">Sz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([[</span><span class="n">lz_list</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">sz_list</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">bit_length</span><span class="p">())</span>
+                         <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&gt;&gt;</span> <span class="n">i</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">basis</span><span class="p">[(</span><span class="n">Lz</span><span class="p">,</span> <span class="n">Sz</span><span class="p">)]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">basis</span></div>
+
+
+
+<div class="viewcode-block" id="write_fock_dec_by_N">
+<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.write_fock_dec_by_N">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">write_fock_dec_by_N</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">r</span><span class="p">,</span> <span class="n">fname</span><span class="o">=</span><span class="s1">&#39;fock_i.in&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get decimal digitals to represent Fock states, sort them by</span>
+<span class="sd">    ascending order and then write them to file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    N: int</span>
+<span class="sd">       Number of orbitals.</span>
+<span class="sd">    r: int</span>
+<span class="sd">        Number of occuancy.</span>
+<span class="sd">    fname: string</span>
+<span class="sd">        File name.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    ndim: int</span>
+<span class="sd">        The dimension of the Hilbert space</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import edrixs</span>
+<span class="sd">    &gt;&gt;&gt; edrixs.write_fock_dec_by_N(4, 2, &#39;fock_i.in&#39;)</span>
+<span class="sd">    file fock_i.in looks like</span>
+<span class="sd">    15</span>
+<span class="sd">    3</span>
+<span class="sd">    5</span>
+<span class="sd">    6</span>
+<span class="sd">    9</span>
+<span class="sd">    10</span>
+<span class="sd">    12</span>
+<span class="sd">    17</span>
+<span class="sd">    18</span>
+<span class="sd">    20</span>
+<span class="sd">    24</span>
+<span class="sd">    33</span>
+<span class="sd">    34</span>
+<span class="sd">    36</span>
+<span class="sd">    40</span>
+<span class="sd">    48</span>
+
+<span class="sd">    where, the first line is the total numer of Fock states,</span>
+<span class="sd">    and the following lines are the Fock states in decimal form.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="n">get_fock_full_N</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+    <span class="n">res</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">ndim</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">res</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">ndim</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Brookhaven National Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

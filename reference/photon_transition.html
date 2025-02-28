@@ -1,0 +1,499 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>photon_transition &mdash; edrixs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="plot_spectrum" href="plot_spectrum.html" />
+    <link rel="prev" title="manybody_operator" href="manybody_operator.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            edrixs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">edrixs User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Pedagogical examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">edrixs Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="angular_momentum.html">angular_momentum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="basis_transform.html">basis_transform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coulomb_utensor.html">coulomb_utensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fit_hyb.html">fit_hyb</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fock_basis.html">fock_basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="iostream.html">iostream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manybody_operator.html">manybody_operator</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">photon_transition</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.photon_transition.dipole_polvec_rixs"><code class="docutils literal notranslate"><span class="pre">dipole_polvec_rixs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.photon_transition.dipole_polvec_xas"><code class="docutils literal notranslate"><span class="pre">dipole_polvec_xas()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.photon_transition.get_trans_oper"><code class="docutils literal notranslate"><span class="pre">get_trans_oper()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.photon_transition.get_wavevector_rixs"><code class="docutils literal notranslate"><span class="pre">get_wavevector_rixs()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.photon_transition.linear_polvec"><code class="docutils literal notranslate"><span class="pre">linear_polvec()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.photon_transition.quadrupole_polvec"><code class="docutils literal notranslate"><span class="pre">quadrupole_polvec()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.photon_transition.unit_wavevector"><code class="docutils literal notranslate"><span class="pre">unit_wavevector()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.photon_transition.wavevector_with_length"><code class="docutils literal notranslate"><span class="pre">wavevector_with_length()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="plot_spectrum.html">plot_spectrum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rixs_utils.html">rixs_utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc.html">soc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers.html">solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wannier_ham.html">wannier_ham</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">edrixs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">edrixs Reference</a></li>
+      <li class="breadcrumb-item active">photon_transition</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/reference/photon_transition.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-edrixs.photon_transition">
+<span id="photon-transition"></span><h1>photon_transition<a class="headerlink" href="#module-edrixs.photon_transition" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.photon_transition.dipole_polvec_rixs">
+<span class="sig-prename descclassname"><span class="pre">edrixs.photon_transition.</span></span><span class="sig-name descname"><span class="pre">dipole_polvec_rixs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">thin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pol_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/photon_transition.html#dipole_polvec_rixs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.photon_transition.dipole_polvec_rixs" title="Link to this definition">¶</a></dt>
+<dd><p>Return polarization vector of incident and scattered photons, for RIXS calculation.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>thin: float</strong></dt><dd><p>The incident angle  (radian).</p>
+</dd>
+<dt><strong>thout: float</strong></dt><dd><p>The scattered angle (radian).</p>
+</dd>
+<dt><strong>phi: float</strong></dt><dd><p>The azimuthal angle (radian).</p>
+</dd>
+<dt><strong>alpha: float</strong></dt><dd><p>The angle between the polarization vector of the incident photon and
+the scattering plane (radian)</p>
+</dd>
+<dt><strong>beta: float</strong></dt><dd><p>The angle between the polarization vector of the scattered photon and
+the scattering plane (radian)</p>
+</dd>
+<dt><strong>local_axis: 3*3 float array</strong></dt><dd><p>The local axis defining the scattering geometry.</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(x\)</span>-axis: local_axis[:,0]</p></li>
+<li><p><span class="math notranslate nohighlight">\(y\)</span>-axis: local_axis[:,1]</p></li>
+<li><p><span class="math notranslate nohighlight">\(z\)</span>-axis: local_axis[:,2]</p></li>
+</ul>
+<p>It will be an identity matrix if not provided.</p>
+</dd>
+<dt><strong>pol_type: tuple of two strings</strong></dt><dd><p>Specify types of polarization for incident and scattered photons.
+case[0] for incident photon, case[1] for scattered photon. Options can be</p>
+<ul class="simple">
+<li><p>‘linear’: Linear polarization</p></li>
+<li><p>‘left’  : Left-circular polarization.</p></li>
+<li><p>‘right’ : Right-circular polarization.</p></li>
+</ul>
+<p>It will set pol_type=(‘linear’, ‘linear’) if not provided.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>ei_in_global: 3-length complex array</dt><dd><p>The linear polarization vector of the incident photon,
+with respect to the global <span class="math notranslate nohighlight">\(xyz\)</span> -axis.</p>
+</dd>
+<dt>ef_out_global: 3-length complex array</dt><dd><p>The linear polarization vector of the scattered photon
+with respect to the global <span class="math notranslate nohighlight">\(xyz\)</span> -axis.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.photon_transition.dipole_polvec_xas">
+<span class="sig-prename descclassname"><span class="pre">edrixs.photon_transition.</span></span><span class="sig-name descname"><span class="pre">dipole_polvec_xas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">thin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pol_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'linear'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/photon_transition.html#dipole_polvec_xas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.photon_transition.dipole_polvec_xas" title="Link to this definition">¶</a></dt>
+<dd><p>Return the linear polarization vector of incident photons, for XAS calculation.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>thin: float</strong></dt><dd><p>The incident angle  (radian).</p>
+</dd>
+<dt><strong>phi: float</strong></dt><dd><p>The azimuthal angle (radian).</p>
+</dd>
+<dt><strong>alpha: float</strong></dt><dd><p>The angle between the polarization vector of the incident photon and
+the scattering plane (radian)</p>
+</dd>
+<dt><strong>local_axis: 3*3 float array</strong></dt><dd><p>The local axis defining the scattering geometry.</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(x\)</span>-axis: local_axis[:,0]</p></li>
+</ul>
+</div></blockquote>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(y\)</span>-axis: local_axis[:,1]</p></li>
+<li><p><span class="math notranslate nohighlight">\(z\)</span>-axis: local_axis[:,2]</p></li>
+</ul>
+<p>It will be an identity matrix if not provided.</p>
+</dd>
+<dt><strong>pol_type: string</strong></dt><dd><ul class="simple">
+<li><p>‘linear’: Linear polarization.</p></li>
+<li><p>‘left’  : Left-circular polarization.</p></li>
+<li><p>‘right’ : Right-circular polarization.</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>ei_global: 3-length float array</dt><dd><p>The linear polarization vector of the incident photon, with resepct to the
+global <span class="math notranslate nohighlight">\(xyz\)</span> -axis.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.photon_transition.get_trans_oper">
+<span class="sig-prename descclassname"><span class="pre">edrixs.photon_transition.</span></span><span class="sig-name descname"><span class="pre">get_trans_oper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">case</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/photon_transition.html#get_trans_oper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.photon_transition.get_trans_oper" title="Link to this definition">¶</a></dt>
+<dd><p>Get the matrix of transition operators between two atomic shell in the complex
+spherical harmonics basis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>case: string</strong></dt><dd><p>A string indicating the two atomic shells, possible transitions are:</p>
+<ul class="simple">
+<li><p>‘ss’:     <span class="math notranslate nohighlight">\(s \rightarrow s\)</span></p></li>
+<li><p>‘ps’:     <span class="math notranslate nohighlight">\(s \rightarrow p\)</span></p></li>
+<li><p>‘t2gs’:   <span class="math notranslate nohighlight">\(s \rightarrow t2g\)</span></p></li>
+<li><p>‘ds’:     <span class="math notranslate nohighlight">\(s \rightarrow d\)</span></p></li>
+<li><p>‘fs’:     <span class="math notranslate nohighlight">\(s \rightarrow f\)</span></p></li>
+<li><p>‘sp’:     <span class="math notranslate nohighlight">\(p \rightarrow s\)</span></p></li>
+<li><p>‘sp12’:   <span class="math notranslate nohighlight">\(p_{1/2} \rightarrow s\)</span></p></li>
+<li><p>‘sp32’:   <span class="math notranslate nohighlight">\(p_{3/2} \rightarrow s\)</span></p></li>
+<li><p>‘pp’:     <span class="math notranslate nohighlight">\(p \rightarrow p\)</span></p></li>
+<li><p>‘pp12’:   <span class="math notranslate nohighlight">\(p_{1/2} \rightarrow p\)</span></p></li>
+<li><p>‘pp32’:   <span class="math notranslate nohighlight">\(p_{3/2} \rightarrow p\)</span></p></li>
+<li><p>‘t2gp’:   <span class="math notranslate nohighlight">\(p \rightarrow t_{2g}\)</span></p></li>
+<li><p>‘t2gp12’: <span class="math notranslate nohighlight">\(p_{1/2} \rightarrow t_{2g}\)</span></p></li>
+<li><p>‘t2gp32’: <span class="math notranslate nohighlight">\(p_{3/2} \rightarrow t_{2g}\)</span></p></li>
+<li><p>‘dp’:     <span class="math notranslate nohighlight">\(p \rightarrow d\)</span></p></li>
+<li><p>‘dp12’:   <span class="math notranslate nohighlight">\(p_{1/2} \rightarrow d\)</span></p></li>
+<li><p>‘dp32’:   <span class="math notranslate nohighlight">\(p_{3/2} \rightarrow d\)</span></p></li>
+<li><p>‘fp’:     <span class="math notranslate nohighlight">\(p \rightarrow f\)</span></p></li>
+<li><p>‘fp12’:   <span class="math notranslate nohighlight">\(p_{1/2} \rightarrow f\)</span></p></li>
+<li><p>‘fp32’:   <span class="math notranslate nohighlight">\(p_{3/2} \rightarrow f\)</span></p></li>
+<li><p>‘sd’:     <span class="math notranslate nohighlight">\(d \rightarrow s\)</span></p></li>
+<li><p>‘sd32’:   <span class="math notranslate nohighlight">\(d_{3/2} \rightarrow s\)</span></p></li>
+<li><p>‘sd52’:   <span class="math notranslate nohighlight">\(d_{5/2} \rightarrow s\)</span></p></li>
+<li><p>‘pd’:     <span class="math notranslate nohighlight">\(d \rightarrow p\)</span></p></li>
+<li><p>‘pd32’:   <span class="math notranslate nohighlight">\(d_{3/2} \rightarrow p\)</span></p></li>
+<li><p>‘pd52’:   <span class="math notranslate nohighlight">\(d_{5/2} \rightarrow p\)</span></p></li>
+<li><p>‘t2gd’:   <span class="math notranslate nohighlight">\(d \rightarrow t_{2g}\)</span></p></li>
+<li><p>‘t2gd32’: <span class="math notranslate nohighlight">\(d_{3/2} \rightarrow t_{2g}\)</span></p></li>
+<li><p>‘t2gd52’: <span class="math notranslate nohighlight">\(d_{5/2} \rightarrow t_{2g}\)</span></p></li>
+<li><p>‘dd’:     <span class="math notranslate nohighlight">\(d \rightarrow d\)</span></p></li>
+<li><p>‘dd32’:   <span class="math notranslate nohighlight">\(d_{3/2} \rightarrow d\)</span></p></li>
+<li><p>‘dd52’:   <span class="math notranslate nohighlight">\(d_{5/2} \rightarrow d\)</span></p></li>
+<li><p>‘fd’:     <span class="math notranslate nohighlight">\(d \rightarrow f\)</span></p></li>
+<li><p>‘fd32’:   <span class="math notranslate nohighlight">\(d_{3/2} \rightarrow f\)</span></p></li>
+<li><p>‘fd52’:   <span class="math notranslate nohighlight">\(d_{5/2} \rightarrow f\)</span></p></li>
+<li><p>‘sf’:     <span class="math notranslate nohighlight">\(f \rightarrow s\)</span></p></li>
+<li><p>‘sf52’:   <span class="math notranslate nohighlight">\(f_{5/2} \rightarrow s\)</span></p></li>
+<li><p>‘sf72’:   <span class="math notranslate nohighlight">\(f_{7/2} \rightarrow s\)</span></p></li>
+<li><p>‘pf’:     <span class="math notranslate nohighlight">\(f \rightarrow p\)</span></p></li>
+<li><p>‘pf52’:   <span class="math notranslate nohighlight">\(f_{5/2} \rightarrow p\)</span></p></li>
+<li><p>‘pf72’:   <span class="math notranslate nohighlight">\(f_{7/2} \rightarrow p\)</span></p></li>
+<li><p>‘t2gf’:   <span class="math notranslate nohighlight">\(f \rightarrow t_{2g}\)</span></p></li>
+<li><p>‘t2gf52’: <span class="math notranslate nohighlight">\(f_{5/2} \rightarrow t_{2g}\)</span></p></li>
+<li><p>‘t2gf72’: <span class="math notranslate nohighlight">\(f_{7/2} \rightarrow t_{2g}\)</span></p></li>
+<li><p>‘df’:     <span class="math notranslate nohighlight">\(f \rightarrow d\)</span></p></li>
+<li><p>‘df52’:   <span class="math notranslate nohighlight">\(f_{5/2} \rightarrow d\)</span></p></li>
+<li><p>‘df72’:   <span class="math notranslate nohighlight">\(f_{7/2} \rightarrow d\)</span></p></li>
+<li><p>‘ff’:     <span class="math notranslate nohighlight">\(f \rightarrow f\)</span></p></li>
+<li><p>‘ff52’:   <span class="math notranslate nohighlight">\(f_{5/2} \rightarrow f\)</span></p></li>
+<li><p>‘ff72’:   <span class="math notranslate nohighlight">\(f_{7/2} \rightarrow f\)</span></p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>res: 2d complex array</dt><dd><p>The calculated transition matrix.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
+<span class="go">p to d transition</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">trans_dp</span> <span class="o">=</span> <span class="n">get_trans_oper</span><span class="p">(</span><span class="s1">&#39;dp&#39;</span><span class="p">)</span>
+<span class="go">p to t2g transition</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">trans_t2gp</span> <span class="o">=</span> <span class="n">get_trans_oper</span><span class="p">(</span><span class="s1">&#39;t2gp&#39;</span><span class="p">)</span>
+<span class="go">p_{3/2} to d transition</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">trans_dp32</span> <span class="o">=</span> <span class="n">get_trans_oper</span><span class="p">(</span><span class="s1">&#39;dp32&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.photon_transition.get_wavevector_rixs">
+<span class="sig-prename descclassname"><span class="pre">edrixs.photon_transition.</span></span><span class="sig-name descname"><span class="pre">get_wavevector_rixs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">thin</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ein</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eout</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/photon_transition.html#get_wavevector_rixs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.photon_transition.get_wavevector_rixs" title="Link to this definition">¶</a></dt>
+<dd><p>Return the wave vector of incident and scattered photons, for RIXS calculation.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>thin: float</strong></dt><dd><p>The incident angle in radian.</p>
+</dd>
+<dt><strong>thout: float</strong></dt><dd><p>The scattered angle in radian.</p>
+</dd>
+<dt><strong>phi: float</strong></dt><dd><p>The azimuthal angle in radian.</p>
+</dd>
+<dt><strong>ein: float</strong></dt><dd><p>Energy of the incident photon (eV).</p>
+</dd>
+<dt><strong>eout: float</strong></dt><dd><p>Energy of the scattered photon (eV).</p>
+</dd>
+<dt><strong>local_axis: :math:`3 times 3` float array</strong></dt><dd><p>The local <span class="math notranslate nohighlight">\(z\)</span> -axis, the angle thin and thout are defined with respect to this axis.</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(x\)</span>-axis: local_axis[:,0]</p></li>
+<li><p><span class="math notranslate nohighlight">\(y\)</span>-axis: local_axis[:,1]</p></li>
+<li><p><span class="math notranslate nohighlight">\(z\)</span>-axis: local_axis[:,2]</p></li>
+</ul>
+<p>It will be an identity matrix if not provided.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>k_in_global: 3-length float array</dt><dd><p>The wave vector of the incident photon, with respect to the global <span class="math notranslate nohighlight">\(xyz\)</span> -axis.</p>
+</dd>
+<dt>k_out_global: 3-length float array</dt><dd><p>The wave vector of the scattered photon, with respect to the global <span class="math notranslate nohighlight">\(xyz\)</span> -axis.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.photon_transition.linear_polvec">
+<span class="sig-prename descclassname"><span class="pre">edrixs.photon_transition.</span></span><span class="sig-name descname"><span class="pre">linear_polvec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'in'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/photon_transition.html#linear_polvec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.photon_transition.linear_polvec" title="Link to this definition">¶</a></dt>
+<dd><p>Return linear polarization vector.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>theta: float number</strong></dt><dd><p>Incident or scattered angle (in radian) with respect to local_axis.</p>
+</dd>
+<dt><strong>phi: float number</strong></dt><dd><p>Azimuthal angle (in radian) with respect to the <span class="math notranslate nohighlight">\(x\)</span> of local_axis.</p>
+</dd>
+<dt><strong>alpha: float number</strong></dt><dd><p>The angle (in radian) between the polarization vector and the scattering plane.</p>
+</dd>
+<dt><strong>local_axis: 3*3 float array</strong></dt><dd><p>The local axis defining the scattering geometry.</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(x\)</span>-axis: local_axis[:,0]</p></li>
+<li><p><span class="math notranslate nohighlight">\(y\)</span>-axis: local_axis[:,1]</p></li>
+<li><p><span class="math notranslate nohighlight">\(z\)</span>-axis: local_axis[:,2]</p></li>
+</ul>
+<p>It will be an identity matrix if not provided.</p>
+</dd>
+<dt><strong>direction: string</strong></dt><dd><p>The direction of photon wave, options can be</p>
+<ul class="simple">
+<li><p>‘in’: incident photon</p></li>
+<li><p>‘out’: scattered photon</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>polvec: list of 3 float number</dt><dd><p>The polarization vector.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.photon_transition.quadrupole_polvec">
+<span class="sig-prename descclassname"><span class="pre">edrixs.photon_transition.</span></span><span class="sig-name descname"><span class="pre">quadrupole_polvec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">polvec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wavevec</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/photon_transition.html#quadrupole_polvec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.photon_transition.quadrupole_polvec" title="Link to this definition">¶</a></dt>
+<dd><p>Given dipolar polarization vector and wave-vector, return quadrupolar polarization vector.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>polvec: 3 elements of complex array</strong></dt><dd><p>Dipolar polarization vector of photon, <span class="math notranslate nohighlight">\(\epsilon_{x}, \epsilon_{y}, \epsilon_{z}\)</span>,
+NOTE: they can be complex when the polarization is circular.</p>
+</dd>
+<dt><strong>wavevec: 3 elements of float array</strong></dt><dd><p>Wavevector of photon, <span class="math notranslate nohighlight">\(k_{x}, k_{y}, k_{z}\)</span>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>quad_vec: 5 elements of float array</dt><dd><p>Quadrupolar polarization vector.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.photon_transition.unit_wavevector">
+<span class="sig-prename descclassname"><span class="pre">edrixs.photon_transition.</span></span><span class="sig-name descname"><span class="pre">unit_wavevector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'in'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/photon_transition.html#unit_wavevector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.photon_transition.unit_wavevector" title="Link to this definition">¶</a></dt>
+<dd><p>Given incident or scattered angle, and azimuthal angle, return
+unit wavevector with respect to global <span class="math notranslate nohighlight">\(xyz\)</span>-axis.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>theta: float number</strong></dt><dd><p>Incident or scattered angle (in radian), with respect to local_aixs.</p>
+</dd>
+<dt><strong>phi: float number</strong></dt><dd><p>Azimuthal angle (in radian), with respect to the <span class="math notranslate nohighlight">\(x\)</span> of local_axis.</p>
+</dd>
+<dt><strong>local_axis: 3*3 float array</strong></dt><dd><p>The local axis defining the scattering geometry.</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(x\)</span>-axis: local_axis[:,0]</p></li>
+<li><p><span class="math notranslate nohighlight">\(y\)</span>-axis: local_axis[:,1]</p></li>
+<li><p><span class="math notranslate nohighlight">\(z\)</span>-axis: local_axis[:,2]</p></li>
+</ul>
+<p>It will be an identity matrix if not provided.</p>
+</dd>
+<dt><strong>direction: string</strong></dt><dd><p>The direction of photon wave, options can be</p>
+<ul class="simple">
+<li><p>‘in’: incident photon</p></li>
+<li><p>‘out’: scattered photon</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>unit_k: list of 3 float numbers</dt><dd><p>The unit wavevector.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.photon_transition.wavevector_with_length">
+<span class="sig-prename descclassname"><span class="pre">edrixs.photon_transition.</span></span><span class="sig-name descname"><span class="pre">wavevector_with_length</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">theta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">energy</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'in'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/photon_transition.html#wavevector_with_length"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.photon_transition.wavevector_with_length" title="Link to this definition">¶</a></dt>
+<dd><p>Given incident or scattered angle, azimuthal angle, energy of photon, return
+wavevector with respect to global <span class="math notranslate nohighlight">\(xyz\)</span>-axis.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl>
+<dt><strong>theta: float number</strong></dt><dd><p>Incident or scattered angle (in radian), with respect to local_aixs.</p>
+</dd>
+<dt><strong>phi: float number</strong></dt><dd><p>Azimuthal angle (in radian), with respect to the <span class="math notranslate nohighlight">\(x\)</span> of local_axis.</p>
+</dd>
+<dt><strong>energy: float number</strong></dt><dd><p>Energy of photon (in eV).</p>
+</dd>
+<dt><strong>local_axis: 3*3 float array</strong></dt><dd><p>The local axis defining the scattering geometry.</p>
+<ul class="simple">
+<li><p><span class="math notranslate nohighlight">\(x\)</span>-axis: local_axis[:,0]</p></li>
+<li><p><span class="math notranslate nohighlight">\(y\)</span>-axis: local_axis[:,1]</p></li>
+<li><p><span class="math notranslate nohighlight">\(z\)</span>-axis: local_axis[:,2]</p></li>
+</ul>
+<p>It will be an identity matrix if not provided.</p>
+</dd>
+<dt><strong>direction: string</strong></dt><dd><p>The direction of photon wave, options can be</p>
+<ul class="simple">
+<li><p>‘in’: incident photon</p></li>
+<li><p>‘out’: scattered photon</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>k_with_length: list of 3 float numbers</dt><dd><p>The wavevector with length.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="manybody_operator.html" class="btn btn-neutral float-left" title="manybody_operator" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="plot_spectrum.html" class="btn btn-neutral float-right" title="plot_spectrum" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Brookhaven National Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

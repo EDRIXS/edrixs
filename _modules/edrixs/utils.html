@@ -1,0 +1,1093 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>edrixs.utils &mdash; edrixs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            edrixs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">edrixs User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Pedagogical examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">edrixs Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">edrixs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">edrixs.utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for edrixs.utils</h1><div class="highlight"><pre>
+<span></span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;beta_to_kelvin&#39;</span><span class="p">,</span> <span class="s1">&#39;kelvin_to_beta&#39;</span><span class="p">,</span> <span class="s1">&#39;boltz_dist&#39;</span><span class="p">,</span> <span class="s1">&#39;UJ_to_UdJH&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;UdJH_to_UJ&#39;</span><span class="p">,</span> <span class="s1">&#39;UdJH_to_F0F2F4&#39;</span><span class="p">,</span> <span class="s1">&#39;UdJH_to_F0F2F4F6&#39;</span><span class="p">,</span> <span class="s1">&#39;F0F2F4_to_UdJH&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;F0F2F4_to_UJ&#39;</span><span class="p">,</span> <span class="s1">&#39;F0F2F4F6_to_UdJH&#39;</span><span class="p">,</span> <span class="s1">&#39;CT_imp_bath&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;CT_imp_bath_core_hole&#39;</span><span class="p">,</span> <span class="s1">&#39;info_atomic_shell&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;case_to_shell_name&#39;</span><span class="p">,</span> <span class="s1">&#39;edge_to_shell_name&#39;</span><span class="p">,</span> <span class="s1">&#39;slater_integrals_name&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;get_atom_data&#39;</span><span class="p">,</span> <span class="s1">&#39;rescale&#39;</span><span class="p">]</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pkg_resources</span>
+
+
+<div class="viewcode-block" id="beta_to_kelvin">
+<a class="viewcode-back" href="../../reference/utils.html#edrixs.utils.beta_to_kelvin">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">beta_to_kelvin</span><span class="p">(</span><span class="n">beta</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert :math:`\\beta` to Kelvin.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    beta: float</span>
+<span class="sd">        Inversion temperature.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    T: float</span>
+<span class="sd">        Temperature (K).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">kb</span> <span class="o">=</span> <span class="mf">8.6173303E-5</span>
+    <span class="n">ev</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="n">ev</span> <span class="o">/</span> <span class="n">kb</span>
+    <span class="k">return</span> <span class="n">T</span></div>
+
+
+
+<div class="viewcode-block" id="kelvin_to_beta">
+<a class="viewcode-back" href="../../reference/utils.html#edrixs.utils.kelvin_to_beta">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">kelvin_to_beta</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert temperature from Kelvin to :math:`\\beta`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    k: float</span>
+<span class="sd">        Temperature in Kelvin.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    beta: float</span>
+<span class="sd">        Inversion temperature.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">kb</span> <span class="o">=</span> <span class="mf">8.6173303E-5</span>
+    <span class="n">beta</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">kb</span> <span class="o">*</span> <span class="n">k</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">beta</span></div>
+
+
+
+<div class="viewcode-block" id="boltz_dist">
+<a class="viewcode-back" href="../../reference/utils.html#edrixs.utils.boltz_dist">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">boltz_dist</span><span class="p">(</span><span class="n">gs</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return Boltzmann distributition.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gs: 1d float array</span>
+<span class="sd">        Energy levels.</span>
+<span class="sd">    T: float</span>
+<span class="sd">        Temperature in Kelvin.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    res: 1d float array</span>
+<span class="sd">        The Boltzmann distributition.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tmp_gs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">gs</span><span class="p">)</span>
+    <span class="n">beta</span> <span class="o">=</span> <span class="n">kelvin_to_beta</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">beta</span> <span class="o">*</span> <span class="p">(</span><span class="n">tmp_gs</span> <span class="o">-</span> <span class="nb">min</span><span class="p">(</span><span class="n">tmp_gs</span><span class="p">)))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">beta</span> <span class="o">*</span> <span class="p">(</span><span class="n">tmp_gs</span> <span class="o">-</span> <span class="nb">min</span><span class="p">(</span><span class="n">tmp_gs</span><span class="p">))))</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+
+<div class="viewcode-block" id="UJ_to_UdJH">
+<a class="viewcode-back" href="../../reference/utils.html#edrixs.utils.UJ_to_UdJH">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">UJ_to_UdJH</span><span class="p">(</span><span class="n">U</span><span class="p">,</span> <span class="n">J</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given Kanamori :math:`U` and :math:`J`, return :math:`U_d` and :math:`J_H`,</span>
+<span class="sd">    for :math:`t2g`-orbitals.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    U: float</span>
+<span class="sd">        Coulomb interaction :math:`U`.</span>
+<span class="sd">    J: float</span>
+<span class="sd">        Hund&#39;s coupling :math:`J`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Ud: float</span>
+<span class="sd">        Coulomb interaction :math:`U_d`.</span>
+<span class="sd">    JH: float</span>
+<span class="sd">        Hund&#39;s coupling :math:`J_{H}`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">F2</span> <span class="o">=</span> <span class="n">J</span> <span class="o">/</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">49.0</span> <span class="o">+</span> <span class="mi">20</span> <span class="o">*</span> <span class="mf">0.625</span> <span class="o">/</span> <span class="mf">441.0</span><span class="p">)</span>
+    <span class="n">F4</span> <span class="o">=</span> <span class="mf">0.625</span> <span class="o">*</span> <span class="n">F2</span>
+    <span class="n">JH</span> <span class="o">=</span> <span class="p">(</span><span class="n">F2</span> <span class="o">+</span> <span class="n">F4</span><span class="p">)</span> <span class="o">/</span> <span class="mf">14.0</span>
+    <span class="n">Ud</span> <span class="o">=</span> <span class="n">U</span> <span class="o">-</span> <span class="mf">4.0</span> <span class="o">/</span> <span class="mf">49.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">F2</span> <span class="o">+</span> <span class="n">F4</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">Ud</span><span class="p">,</span> <span class="n">JH</span></div>
+
+
+
+<div class="viewcode-block" id="UdJH_to_UJ">
+<a class="viewcode-back" href="../../reference/utils.html#edrixs.utils.UdJH_to_UJ">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">UdJH_to_UJ</span><span class="p">(</span><span class="n">Ud</span><span class="p">,</span> <span class="n">JH</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given :math:`U_d` and :math:`J_H`, return Kanamori :math:`U` and :math:`J`,</span>
+<span class="sd">    for :math:`t2g`-orbitals.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Ud: float</span>
+<span class="sd">        Coulomb interaction :math:`U_d`.</span>
+<span class="sd">    JH: float</span>
+<span class="sd">        Hund&#39;s coupling :math:`J_H`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    U: float</span>
+<span class="sd">        Coulomb interaction :math:`U` in Kanamori form.</span>
+<span class="sd">    J: float</span>
+<span class="sd">        Hund&#39;s coupling :math:`J` in Kanamori form.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">F2</span> <span class="o">=</span> <span class="mf">14.0</span> <span class="o">/</span> <span class="mf">1.625</span> <span class="o">*</span> <span class="n">JH</span>
+    <span class="n">F4</span> <span class="o">=</span> <span class="mf">0.625</span> <span class="o">*</span> <span class="n">F2</span>
+    <span class="n">J</span> <span class="o">=</span> <span class="mf">3.0</span> <span class="o">/</span> <span class="mf">49.0</span> <span class="o">*</span> <span class="n">F2</span> <span class="o">+</span> <span class="mi">20</span> <span class="o">/</span> <span class="mf">441.0</span> <span class="o">*</span> <span class="n">F4</span>
+    <span class="n">U</span> <span class="o">=</span> <span class="n">Ud</span> <span class="o">+</span> <span class="mf">4.0</span> <span class="o">/</span> <span class="mf">49.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">F2</span> <span class="o">+</span> <span class="n">F4</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">U</span><span class="p">,</span> <span class="n">J</span></div>
+
+
+
+<div class="viewcode-block" id="UdJH_to_F0F2F4">
+<a class="viewcode-back" href="../../reference/utils.html#edrixs.utils.UdJH_to_F0F2F4">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">UdJH_to_F0F2F4</span><span class="p">(</span><span class="n">Ud</span><span class="p">,</span> <span class="n">JH</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given :math:`U_d` and :math:`J_H`, return :math:`F_0`, :math:`F_2` and :math:`F_4`,</span>
+<span class="sd">    for :math:`d`-orbitals.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Ud: float</span>
+<span class="sd">        Coulomb interaction :math:`U_d`.</span>
+<span class="sd">    JH: float</span>
+<span class="sd">        Hund&#39;s coupling :math:`J_H`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    F0: float</span>
+<span class="sd">        Slater integral :math:`F_0`.</span>
+<span class="sd">    F2: float</span>
+<span class="sd">        Slater integral :math:`F_2`.</span>
+<span class="sd">    F4: float</span>
+<span class="sd">        Slater integral :math:`F_4`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">F0</span> <span class="o">=</span> <span class="n">Ud</span>
+    <span class="n">F2</span> <span class="o">=</span> <span class="mi">14</span> <span class="o">/</span> <span class="mf">1.625</span> <span class="o">*</span> <span class="n">JH</span>
+    <span class="n">F4</span> <span class="o">=</span> <span class="mf">0.625</span> <span class="o">*</span> <span class="n">F2</span>
+
+    <span class="k">return</span> <span class="n">F0</span><span class="p">,</span> <span class="n">F2</span><span class="p">,</span> <span class="n">F4</span></div>
+
+
+
+<div class="viewcode-block" id="UdJH_to_F0F2F4F6">
+<a class="viewcode-back" href="../../reference/utils.html#edrixs.utils.UdJH_to_F0F2F4F6">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">UdJH_to_F0F2F4F6</span><span class="p">(</span><span class="n">Ud</span><span class="p">,</span> <span class="n">JH</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given :math:`U_d` and :math:`J_H`, return :math:`F_0`, :math:`F_2`, :math:`F_4` and :math:`F_6`,</span>
+<span class="sd">    for :math:`f`-orbitals.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    Ud: float</span>
+<span class="sd">        Coulomb interaction :math:`U_d`.</span>
+<span class="sd">    JH: float</span>
+<span class="sd">        Hund&#39;s coupling :math:`J_H`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    F0: float</span>
+<span class="sd">        Slater integral :math:`F_0`.</span>
+<span class="sd">    F2: float</span>
+<span class="sd">        Slater integral :math:`F_2`.</span>
+<span class="sd">    F4: float</span>
+<span class="sd">        Slater integral :math:`F_4`.</span>
+<span class="sd">    F6: float</span>
+<span class="sd">        Slater integral :math:`F_6`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">F0</span> <span class="o">=</span> <span class="n">Ud</span>
+    <span class="n">F2</span> <span class="o">=</span> <span class="mi">6435</span> <span class="o">/</span> <span class="p">(</span><span class="mf">286.0</span> <span class="o">+</span> <span class="p">(</span><span class="mi">195</span> <span class="o">*</span> <span class="mi">451</span><span class="p">)</span> <span class="o">/</span> <span class="mf">675.0</span> <span class="o">+</span> <span class="p">(</span><span class="mi">250</span> <span class="o">*</span> <span class="mi">1001</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2025.0</span><span class="p">)</span> <span class="o">*</span> <span class="n">JH</span>
+    <span class="n">F4</span> <span class="o">=</span> <span class="mi">451</span> <span class="o">/</span> <span class="mf">675.0</span> <span class="o">*</span> <span class="n">F2</span>
+    <span class="n">F6</span> <span class="o">=</span> <span class="mi">1001</span> <span class="o">/</span> <span class="mf">2025.0</span> <span class="o">*</span> <span class="n">F2</span>
+
+    <span class="k">return</span> <span class="n">F0</span><span class="p">,</span> <span class="n">F2</span><span class="p">,</span> <span class="n">F4</span><span class="p">,</span> <span class="n">F6</span></div>
+
+
+
+<div class="viewcode-block" id="F0F2F4_to_UdJH">
+<a class="viewcode-back" href="../../reference/utils.html#edrixs.utils.F0F2F4_to_UdJH">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">F0F2F4_to_UdJH</span><span class="p">(</span><span class="n">F0</span><span class="p">,</span> <span class="n">F2</span><span class="p">,</span> <span class="n">F4</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given :math:`F_0`, :math:`F_2` and :math:`F_4`, return :math:`U_d` and :math:`J_H`,</span>
+<span class="sd">    for :math:`d`-orbitals.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    F0: float</span>
+<span class="sd">        Slater integral :math:`F_0`.</span>
+<span class="sd">    F2: float</span>
+<span class="sd">        Slater integral :math:`F_2`.</span>
+<span class="sd">    F4: float</span>
+<span class="sd">        Slater integral :math:`F_4`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Ud: float</span>
+<span class="sd">        Coulomb interaction :math:`U_d`.</span>
+<span class="sd">    JH: float</span>
+<span class="sd">        Hund&#39;s coupling :math:`J_H`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">Ud</span> <span class="o">=</span> <span class="n">F0</span>
+    <span class="n">JH</span> <span class="o">=</span> <span class="p">(</span><span class="n">F2</span> <span class="o">+</span> <span class="n">F4</span><span class="p">)</span> <span class="o">/</span> <span class="mf">14.0</span>
+
+    <span class="k">return</span> <span class="n">Ud</span><span class="p">,</span> <span class="n">JH</span></div>
+
+
+
+<div class="viewcode-block" id="F0F2F4_to_UJ">
+<a class="viewcode-back" href="../../reference/utils.html#edrixs.utils.F0F2F4_to_UJ">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">F0F2F4_to_UJ</span><span class="p">(</span><span class="n">F0</span><span class="p">,</span> <span class="n">F2</span><span class="p">,</span> <span class="n">F4</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given :math:`F_0`, :math:`F_2` and :math:`F_4`, return :math:`U` and :math:`J`,</span>
+<span class="sd">    for :math:`t2g`-orbitals.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    F0: float</span>
+<span class="sd">        Slater integral :math:`F_0`.</span>
+<span class="sd">    F2: float</span>
+<span class="sd">        Slater integral :math:`F_2`.</span>
+<span class="sd">    F4: float</span>
+<span class="sd">        Slater integral :math:`F_4`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    U: float</span>
+<span class="sd">        Coulomb interaction :math:`U`.</span>
+<span class="sd">    J: float</span>
+<span class="sd">        Hund&#39;s coupling :math:`J`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">U</span> <span class="o">=</span> <span class="n">F0</span> <span class="o">+</span> <span class="mf">4.0</span> <span class="o">/</span> <span class="mf">49.0</span> <span class="o">*</span> <span class="p">(</span><span class="n">F2</span> <span class="o">+</span> <span class="n">F4</span><span class="p">)</span>
+    <span class="n">J</span> <span class="o">=</span> <span class="mf">3.0</span> <span class="o">/</span> <span class="mf">49.0</span> <span class="o">*</span> <span class="n">F2</span> <span class="o">+</span> <span class="mi">20</span> <span class="o">/</span> <span class="mf">441.0</span> <span class="o">*</span> <span class="n">F4</span>
+
+    <span class="k">return</span> <span class="n">U</span><span class="p">,</span> <span class="n">J</span></div>
+
+
+
+<div class="viewcode-block" id="F0F2F4F6_to_UdJH">
+<a class="viewcode-back" href="../../reference/utils.html#edrixs.utils.F0F2F4F6_to_UdJH">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">F0F2F4F6_to_UdJH</span><span class="p">(</span><span class="n">F0</span><span class="p">,</span> <span class="n">F2</span><span class="p">,</span> <span class="n">F4</span><span class="p">,</span> <span class="n">F6</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given :math:`F_0`, :math:`F_2`, :math:`F_4` and :math:`F_6`,</span>
+<span class="sd">    return :math:`U_d` and :math:`J_H`, for :math:`f`-orbitals.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    F0: float</span>
+<span class="sd">        Slater integral :math:`F_0`.</span>
+<span class="sd">    F2: float</span>
+<span class="sd">        Slater integral :math:`F_2`.</span>
+<span class="sd">    F4: float</span>
+<span class="sd">        Slater integral :math:`F_4`.</span>
+<span class="sd">    F6: float</span>
+<span class="sd">        Slater integral :math:`F_6`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Ud: float</span>
+<span class="sd">        Coulomb interaction :math:`U_d`.</span>
+<span class="sd">    JH: float</span>
+<span class="sd">        Hund&#39;s coupling :math:`J_H`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">Ud</span> <span class="o">=</span> <span class="n">F0</span>
+    <span class="n">JH</span> <span class="o">=</span> <span class="p">(</span><span class="mi">286</span> <span class="o">*</span> <span class="n">F2</span> <span class="o">+</span> <span class="mi">195</span> <span class="o">*</span> <span class="n">F4</span> <span class="o">+</span> <span class="mi">250</span> <span class="o">*</span> <span class="n">F6</span><span class="p">)</span> <span class="o">/</span> <span class="mf">6435.0</span>
+    <span class="k">return</span> <span class="n">Ud</span><span class="p">,</span> <span class="n">JH</span></div>
+
+
+
+<div class="viewcode-block" id="CT_imp_bath">
+<a class="viewcode-back" href="../../reference/utils.html#edrixs.utils.CT_imp_bath">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">CT_imp_bath</span><span class="p">(</span><span class="n">U_dd</span><span class="p">,</span> <span class="n">Delta</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute energies of the impurity and bath for an</span>
+<span class="sd">    Anderson impurity or charge-transfer model</span>
+<span class="sd">    appropriate for a :math:`d`-shell transition metal compound.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    U_dd: float</span>
+<span class="sd">        Coulomb interaction :math:`U_{dd}`</span>
+<span class="sd">    Delta: float</span>
+<span class="sd">        Charge-transfer energy :math:`\\Delta`</span>
+<span class="sd">    n : integer</span>
+<span class="sd">        Number of electrons in the :math:`d`-shell</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    E_d : float</span>
+<span class="sd">        Energy of the impurity states :math:`E_d`</span>
+<span class="sd">    E_L : float</span>
+<span class="sd">        Energy of the bath states :math:`E_L`</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    We credit our approach to Maurits Hakverkort,</span>
+<span class="sd">    Heidelberg University.</span>
+<span class="sd">    We define the state with a full set of bath orbitals to be zero</span>
+<span class="sd">    energy and write the energy levels using the same definitions</span>
+<span class="sd">    as [1]_ [2]_ [3]_.</span>
+
+<span class="sd">    * :math:`d^{n}L^{10}` has energy :math:`0`</span>
+
+<span class="sd">    * :math:`d^{n+1}L^9` has energy :math:`\\Delta`</span>
+
+<span class="sd">    * :math:`d^{n+2}L^8` has energy :math:`2\\Delta + U_{dd}`</span>
+
+<span class="sd">    Using this we can write and solve three linear equations to get</span>
+<span class="sd">    :math:`E_d` and :math:`E_L` the energies of the impurity and bath.</span>
+
+<span class="sd">       .. math::</span>
+<span class="sd">           \\begin{aligned}</span>
+<span class="sd">           10 E_L + n     E_d + n(n-1) \\frac{U_{dd}}{2} &amp;= 0 \\\\</span>
+<span class="sd">            9 E_L + (n+1) E_d + (n+1)n \\frac{U_{dd}}{2} &amp;= \\Delta \\\\</span>
+<span class="sd">            8 E_L + (n+2) E_d + (n+1)(n+2) \\frac{U_{dd}}{2}</span>
+<span class="sd">            &amp;= 2\\Delta + U_{dd}</span>
+<span class="sd">           \\end{aligned}</span>
+
+<span class="sd">    The solutions are:</span>
+
+<span class="sd">       .. math::</span>
+<span class="sd">           \\begin{aligned}</span>
+<span class="sd">           E_d &amp;=</span>
+<span class="sd">           \\frac{10 \\Delta - n (19 +  n) U_{dd}/2}{10 + n}  \\\\</span>
+<span class="sd">           E_L &amp;=</span>
+<span class="sd">           \\frac{n ((1+n) U_{dd}/2-\\Delta)}{10 + n}</span>
+<span class="sd">           \\end{aligned}.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] J. Zaanen, G. A. Sawatzky, and J. W. Allen</span>
+<span class="sd">           `Phys. Rev. Lett. 55, 418 (1985) &lt;https://doi.org/10.1103/PhysRevLett.55.418&gt;`_</span>
+<span class="sd">    .. [2] Maurits Haverkort et al.,</span>
+<span class="sd">           `Phys. Rev. B 85, 165113 (2012) &lt;https://doi.org/10.1103/PhysRevB.85.165113&gt;`_</span>
+<span class="sd">    .. [3] A. E. Bocquet et al.,</span>
+<span class="sd">           `Phys. Rev. B 53, 1161 (1996) &lt;https://doi.org/10.1103/PhysRevB.53.1161&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">E_d</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="o">*</span><span class="n">Delta</span> <span class="o">-</span> <span class="n">n</span><span class="o">*</span><span class="p">(</span><span class="mi">19</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="n">U_dd</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">10</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">E_L</span> <span class="o">=</span> <span class="n">n</span><span class="o">*</span><span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="n">U_dd</span><span class="o">/</span><span class="mi">2</span><span class="o">-</span><span class="n">Delta</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">10</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">E_d</span><span class="p">,</span> <span class="n">E_L</span></div>
+
+
+
+<div class="viewcode-block" id="CT_imp_bath_core_hole">
+<a class="viewcode-back" href="../../reference/utils.html#edrixs.utils.CT_imp_bath_core_hole">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">CT_imp_bath_core_hole</span><span class="p">(</span><span class="n">U_dd</span><span class="p">,</span> <span class="n">U_pd</span><span class="p">,</span> <span class="n">Delta</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute energies of the impurity and bath for an</span>
+<span class="sd">    Anderson impurity or charge-transfer model</span>
+<span class="sd">    appropriate for a :math:`d`-shell transition metal compound</span>
+<span class="sd">    with a core hole.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    U_dd: float</span>
+<span class="sd">        Coulomb interaction :math:`U_{dd}`</span>
+<span class="sd">    U_pd: float</span>
+<span class="sd">        Coulomb interaction :math:`U_{pd}`</span>
+<span class="sd">    Delta: float</span>
+<span class="sd">        Charge-transfer energy :math:`\\Delta`</span>
+<span class="sd">    n : integer</span>
+<span class="sd">        Number of electrons in the :math:`d`-shell :math:`n`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    E_dc : float</span>
+<span class="sd">        Energy of the impurity states :math:`E_{dc}` with</span>
+<span class="sd">        a core hole</span>
+<span class="sd">    E_Lc : float</span>
+<span class="sd">        Energy of the bath states :math:`E_{Lc}` with a core</span>
+<span class="sd">        hole</span>
+<span class="sd">    E_p : float</span>
+<span class="sd">        Energy of the core hole state :math:`E_\\textrm{E_p}`</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    We credit our approach to Maurits Hakverkort,</span>
+<span class="sd">    Heidelberg University.</span>
+<span class="sd">    We define the state with a full set of bath orbitals to be zero</span>
+<span class="sd">    energy and write the energy levels using the same definitions as</span>
+<span class="sd">    [1]_ [2]_ [3]_.</span>
+
+<span class="sd">    * :math:`2p^5 d^{n}L^{10}` has energy :math:`0`</span>
+
+<span class="sd">    * :math:`2p^5 d^{n+1}L^9` has energy :math:`\\Delta + U_{dd} - U_{pd}`</span>
+
+<span class="sd">    * :math:`2p^5 d^{n+2}L^8` has energy :math:`2\\Delta + 3 U_{dd} - 2 U_{pd}`</span>
+
+<span class="sd">    Using this we can write and solve linear equations to get</span>
+<span class="sd">    :math:`E_{dc}`, :math:`E_{Lc}` and :math:`E_p` the energies of the</span>
+<span class="sd">    impurity and bath with a core hole and the energy of the core hole.</span>
+
+<span class="sd">       .. math::</span>
+<span class="sd">           \\begin{aligned}</span>
+<span class="sd">               6 E_p + 10 E_{Lc} +  n    E_{dc} + n(n-1) \\frac{U_{dd}}{2}</span>
+<span class="sd">               + 6 n     U_{pd} &amp;= 0    \\\\</span>
+<span class="sd">               6 E_p +  9 E_{Lc} + (n+1) E_{dc} + (n+1)n \\frac{U_{dd}}{2}</span>
+<span class="sd">               + 6 (n+1) U_{pd} &amp;= \\Delta  \\\\</span>
+<span class="sd">               6 E_p +  8 E_{Lc} + (n+2) E_{d} + (n+1)(n+2) \\frac{U_{dd}}{2}</span>
+<span class="sd">               + 6 (n+2) U_{pd} &amp;= 2 \\Delta+U_{dd} \\\\</span>
+<span class="sd">               5 E_p + 10 E_{Lc} + (n+1) E_{d} + (n+1) n \\frac{U_{dd}}{2}</span>
+<span class="sd">               + 5 (n+1) U_{pd} &amp;= 0 \\\\</span>
+<span class="sd">               5 E_p +  9 E_{Lc} + (n+2) E_{dc} + (n+2)(n+1) \\frac{U_{dd}}{2}</span>
+<span class="sd">               + 5 (n+2) U_{pd} &amp;= \\Delta+U_{dd}-U_{pd} \\\\</span>
+<span class="sd">               5 E_p +  8 E_{Lc} + (n+3) E_{dc} + (n+3)(n+2) \\frac{U_{dd}}{2}</span>
+<span class="sd">               + 5 (n+3) U_{pd} &amp;= 2 \\Delta+3 U_{dd}-2 U_{pd}</span>
+<span class="sd">           \\end{aligned}</span>
+
+<span class="sd">    The solutions are:</span>
+
+<span class="sd">       .. math::</span>
+<span class="sd">           \\begin{aligned}</span>
+<span class="sd">              E_{dc} &amp;= \\frac{10 \\Delta - n (31+n) \\frac{U_{dd}}{2}-90 U_{pd}}{16+n} \\\\</span>
+<span class="sd">              E_{Lc} &amp;= \\frac{(1+n) (n \\frac{U_{dd}}{2}+6*U_{pd})-(6+n) \\Delta}{16+n} \\\\</span>
+<span class="sd">              E_p    &amp;= \\frac{10 \\Delta + (1+n)(n\\frac{U_{dd}}{2}-(10+n)*U_{pd}}{16+n}</span>
+<span class="sd">           \\end{aligned}</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] J. Zaanen, G. A. Sawatzky, and J. W. Allen</span>
+<span class="sd">           `Phys. Rev. Lett. 55, 418 (1985) &lt;https://doi.org/10.1103/PhysRevLett.55.418&gt;`_</span>
+<span class="sd">    .. [2] Maurits Haverkort et al.,</span>
+<span class="sd">           `Phys. Rev. B 85, 165113 (2012) &lt;https://doi.org/10.1103/PhysRevB.85.165113&gt;`_</span>
+<span class="sd">    .. [3] A. E. Bocquet et al.,</span>
+<span class="sd">           `Phys. Rev. B 53, 1161 (1996) &lt;https://doi.org/10.1103/PhysRevB.53.1161&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">E_dc</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="o">*</span><span class="n">Delta</span> <span class="o">-</span> <span class="n">n</span><span class="o">*</span><span class="p">(</span><span class="mi">31</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="n">U_dd</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">90</span><span class="o">*</span><span class="n">U_pd</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">16</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">E_Lc</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="n">U_dd</span><span class="o">/</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">6</span><span class="o">*</span><span class="n">U_pd</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="mi">6</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="n">Delta</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">16</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">E_p</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="o">*</span><span class="n">Delta</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="n">U_dd</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="mi">10</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="n">U_pd</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">16</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">E_dc</span><span class="p">,</span> <span class="n">E_Lc</span><span class="p">,</span> <span class="n">E_p</span></div>
+
+
+
+<div class="viewcode-block" id="info_atomic_shell">
+<a class="viewcode-back" href="../../reference/utils.html#edrixs.utils.info_atomic_shell">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">info_atomic_shell</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a dict to describe the information of atomic shell.</span>
+<span class="sd">    The key is a string of the shell&#39;s name, the value is a 2-elments tuple,</span>
+<span class="sd">    the first value is the orbital angular moment number and</span>
+<span class="sd">    the second value is the dimension of the Hilbert space.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    info: dict</span>
+<span class="sd">        The dict describing info of atomic shell.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">info</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span>   <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="s1">&#39;p&#39;</span><span class="p">:</span>   <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+            <span class="s1">&#39;p12&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="s1">&#39;p32&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+            <span class="s1">&#39;t2g&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+            <span class="s1">&#39;d&#39;</span><span class="p">:</span>   <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+            <span class="s1">&#39;d32&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+            <span class="s1">&#39;d52&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+            <span class="s1">&#39;f&#39;</span><span class="p">:</span>   <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">14</span><span class="p">),</span>
+            <span class="s1">&#39;f52&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+            <span class="s1">&#39;f72&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+            <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">info</span></div>
+
+
+
+<div class="viewcode-block" id="case_to_shell_name">
+<a class="viewcode-back" href="../../reference/utils.html#edrixs.utils.case_to_shell_name">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">case_to_shell_name</span><span class="p">(</span><span class="n">case</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the shell names for different cases.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    case: string</span>
+<span class="sd">        A string describing the shells included.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    shell_name: tuple of one or two strings</span>
+<span class="sd">        The name of shells.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import edrixs</span>
+<span class="sd">    &gt;&gt;&gt; edrixs.case_to_shell_name(&#39;d&#39;)</span>
+<span class="sd">    (&#39;d&#39;,)</span>
+<span class="sd">    &gt;&gt;&gt; edrixs.case_to_shell_name(&#39;t2gp32&#39;)</span>
+<span class="sd">    (&#39;t2g&#39;, &#39;p32&#39;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">shell</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;p12&#39;</span><span class="p">,</span> <span class="s1">&#39;p32&#39;</span><span class="p">,</span> <span class="s1">&#39;t2g&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;d32&#39;</span><span class="p">,</span> <span class="s1">&#39;d52&#39;</span><span class="p">,</span> <span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="s1">&#39;f52&#39;</span><span class="p">,</span> <span class="s1">&#39;f72&#39;</span><span class="p">]</span>
+
+    <span class="n">shell_name</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">str1</span> <span class="ow">in</span> <span class="n">shell</span><span class="p">:</span>
+        <span class="n">shell_name</span><span class="p">[</span><span class="n">str1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">str1</span><span class="p">,)</span>
+
+    <span class="k">for</span> <span class="n">str1</span> <span class="ow">in</span> <span class="n">shell</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">str2</span> <span class="ow">in</span> <span class="n">shell</span><span class="p">:</span>
+            <span class="n">shell_name</span><span class="p">[</span><span class="n">str1</span><span class="o">+</span><span class="n">str2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">str1</span><span class="p">,</span> <span class="n">str2</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">shell_name</span><span class="p">[</span><span class="n">case</span><span class="o">.</span><span class="n">strip</span><span class="p">()]</span></div>
+
+
+
+<div class="viewcode-block" id="edge_to_shell_name">
+<a class="viewcode-back" href="../../reference/utils.html#edrixs.utils.edge_to_shell_name">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">edge_to_shell_name</span><span class="p">(</span><span class="n">edge_name</span><span class="p">,</span> <span class="n">with_main_qn</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given edge name, return shell name.</span>
+<span class="sd">    If one needs to include both spin-orbit split edges of one shell,</span>
+<span class="sd">    one can use string, for example, &#39;L23&#39; means both L2 and L3 edges</span>
+<span class="sd">    are considered in the calculations, and the shell name will be &#39;p&#39;.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    edge_name: string</span>
+<span class="sd">        Standard edge name.</span>
+<span class="sd">    with_main_qn: logical</span>
+<span class="sd">        If true, the shell name will include the main quantum number.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    shell_name: string</span>
+<span class="sd">        Shell name.</span>
+
+<span class="sd">        - with_main_qn=True, shell_name will include the main quantum number,</span>
+<span class="sd">          for example, *2p*</span>
+
+<span class="sd">        - with_main_qn=False, shell_name will not include the main quantum number,</span>
+<span class="sd">          for example, *p*</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">shell_name</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;K&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;1s&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;L1&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;2s&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;L2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;p12&#39;</span><span class="p">,</span> <span class="s1">&#39;2p12&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;L3&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;p32&#39;</span><span class="p">,</span> <span class="s1">&#39;2p32&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;L23&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;2p&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;M1&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;3s&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;M2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;p12&#39;</span><span class="p">,</span> <span class="s1">&#39;3p12&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;M3&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;p32&#39;</span><span class="p">,</span> <span class="s1">&#39;3p32&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;M23&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;3p&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;M4&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;d32&#39;</span><span class="p">,</span> <span class="s1">&#39;3d32&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;M5&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;d52&#39;</span><span class="p">,</span> <span class="s1">&#39;3d52&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;M45&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;3d&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;N1&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;4s&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;N2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;p12&#39;</span><span class="p">,</span> <span class="s1">&#39;4p12&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;N3&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;p32&#39;</span><span class="p">,</span> <span class="s1">&#39;4p32&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;N23&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;4p&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;N4&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;d32&#39;</span><span class="p">,</span> <span class="s1">&#39;4d32&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;N5&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;d52&#39;</span><span class="p">,</span> <span class="s1">&#39;4d52&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;N45&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;4d&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;N6&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;f52&#39;</span><span class="p">,</span> <span class="s1">&#39;4f52&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;N7&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;f72&#39;</span><span class="p">,</span> <span class="s1">&#39;4f72&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;N67&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;f&#39;</span><span class="p">,</span> <span class="s1">&#39;4f&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;O1&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;5s&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;O2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;p12&#39;</span><span class="p">,</span> <span class="s1">&#39;5p12&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;O3&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;p32&#39;</span><span class="p">,</span> <span class="s1">&#39;5p32&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;O23&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;5p&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;O4&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;d32&#39;</span><span class="p">,</span> <span class="s1">&#39;5d32&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;O5&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;d52&#39;</span><span class="p">,</span> <span class="s1">&#39;5d52&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;O45&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;5d&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;P1&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="s1">&#39;6s&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;P2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;p12&#39;</span><span class="p">,</span> <span class="s1">&#39;6p12&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;P3&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;p32&#39;</span><span class="p">,</span> <span class="s1">&#39;6p32&#39;</span><span class="p">),</span>
+        <span class="s1">&#39;P23&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;6p&#39;</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">with_main_qn</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">shell_name</span><span class="p">[</span><span class="n">edge_name</span><span class="o">.</span><span class="n">strip</span><span class="p">()][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">shell_name</span><span class="p">[</span><span class="n">edge_name</span><span class="o">.</span><span class="n">strip</span><span class="p">()][</span><span class="mi">0</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="slater_integrals_name">
+<a class="viewcode-back" href="../../reference/utils.html#edrixs.utils.slater_integrals_name">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">slater_integrals_name</span><span class="p">(</span><span class="n">shell_name</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given shell names, return the names of required Slater integrals.</span>
+<span class="sd">    The order of these names in the return list is according to the convention:</span>
+
+<span class="sd">    - For 1 shell: [FX_11]</span>
+
+<span class="sd">    - For 2 shells: [FX_11, FX_12, GX_12, FX_22]</span>
+
+<span class="sd">    - For 3 shells: [FX_11, FX_12, GX_12, FX_22, FX_13, GX_13, FX_23, GX_23, FX_33]</span>
+
+<span class="sd">    where, X=0, 2, 4, 6, or X=1, 3, 5, X shoule be in ascending order.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    shell_name: tuple of strings</span>
+<span class="sd">        Name of shells. Its length should be less and equal than 3.</span>
+<span class="sd">    label: tuple of strings</span>
+<span class="sd">        Label of shells, same shape as shell_name.</span>
+
+<span class="sd">        If not provided, label will be set to</span>
+
+<span class="sd">        - label=(1,) for one shell, or</span>
+
+<span class="sd">        - label=(1,2) for two shells, or</span>
+
+<span class="sd">        - label=(1,2,3) for three shells</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    res: list of strings</span>
+<span class="sd">        Names of Slater integrals.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="n">info_atomic_shell</span><span class="p">()</span>
+    <span class="c1"># one shell</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shell_name</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">l1</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="n">shell_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">label</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;F&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">x</span> <span class="o">+</span> <span class="n">x</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">l1</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)])</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">shell_name</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">l1</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="n">shell_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">l2</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="n">shell_name</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">label</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">label</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;F&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">x</span> <span class="o">+</span> <span class="n">x</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">l1</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)])</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;F&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">l1</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">l2</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)])</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;G&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">l1</span><span class="o">-</span><span class="n">l2</span><span class="p">),</span> <span class="n">l1</span><span class="o">+</span><span class="n">l2</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)])</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;F&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="n">y</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">l2</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)])</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">shell_name</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">l1</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="n">shell_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">l2</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="n">shell_name</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">l3</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="n">shell_name</span><span class="p">[</span><span class="mi">2</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">label</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">label</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">label</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">,</span> <span class="s1">&#39;3&#39;</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;F&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">x</span> <span class="o">+</span> <span class="n">x</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">l1</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)])</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;F&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">l1</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">l2</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)])</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;G&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">l1</span><span class="o">-</span><span class="n">l2</span><span class="p">),</span> <span class="n">l1</span><span class="o">+</span><span class="n">l2</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)])</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;F&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="n">y</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">l2</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)])</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;F&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">x</span> <span class="o">+</span> <span class="n">z</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">l1</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">l3</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)])</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;G&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">x</span> <span class="o">+</span> <span class="n">z</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">l1</span><span class="o">-</span><span class="n">l3</span><span class="p">),</span> <span class="n">l1</span><span class="o">+</span><span class="n">l3</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)])</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;F&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="n">z</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">l2</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">l3</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)])</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;G&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="n">z</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">l2</span><span class="o">-</span><span class="n">l3</span><span class="p">),</span> <span class="n">l2</span><span class="o">+</span><span class="n">l3</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)])</span>
+        <span class="n">res</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;F&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">z</span> <span class="o">+</span> <span class="n">z</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">l3</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Not implemented for this case: &quot;</span><span class="p">,</span> <span class="n">shell_name</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+
+<div class="viewcode-block" id="get_atom_data">
+<a class="viewcode-back" href="../../reference/utils.html#edrixs.utils.get_atom_data">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_atom_data</span><span class="p">(</span><span class="n">atom</span><span class="p">,</span> <span class="n">v_name</span><span class="p">,</span> <span class="n">v_noccu</span><span class="p">,</span> <span class="n">edge</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">trans_to_which</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return Slater integrals, spin-orbit coupling strength, edge energy and core hole</span>
+<span class="sd">    life-time broadening for an atom with given type of valence shells, occupancy of</span>
+<span class="sd">    valence shells and the x-ray resonant edge.</span>
+
+<span class="sd">    The Slater integrals and spin-orbit coupling are calculated by Cowan&#39;s code</span>
+<span class="sd">    (https://github.com/mretegan/atomic-parameters) based on Hartree-Fock</span>
+<span class="sd">    approximation. These numbers are just initial guess and serve as a start point,</span>
+<span class="sd">    you need to rescale them to reproduce your XAS or RIXS spectra.</span>
+
+<span class="sd">    NOTE: F0 is not calculated by Cowan&#39;s code, they are all set to be zero, you need to</span>
+<span class="sd">    set F0 by yourself.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    atom: string</span>
+<span class="sd">        Name of atom, for example, &#39;Ni&#39;, &#39;Cu&#39;, &#39;Ir&#39;, &#39;U&#39;.</span>
+<span class="sd">    v_name: a string or a tuple of one or two strings</span>
+<span class="sd">        Names of one or two valence shells. Set it to a single string if there is only</span>
+<span class="sd">        one valence shell, or set it to a tuple of two strings if there are two valence</span>
+<span class="sd">        shells. For example, *v_name=&#39;3d&#39;*, *v_name=(&#39;3d&#39;, &#39;4p&#39;)*</span>
+<span class="sd">    v_noccu: a int or a tuple of one or two ints</span>
+<span class="sd">        Occupancy of valence shells before x-ray absorption (without a core hole).</span>
+<span class="sd">        Set it to a single int if there is only one valence shell, or set it to a</span>
+<span class="sd">        tuple of two ints if there are two valence shells. The order should be</span>
+<span class="sd">        consistent with that in v_name.</span>
+<span class="sd">        For example, *v_name=&#39;3d&#39;, v_noccu=8*, *v_name=(&#39;3d&#39;, &#39;4p&#39;), v_noccu=(8, 0)*.</span>
+<span class="sd">    edge: a string</span>
+<span class="sd">        X-ray resonant edge. If edge is not None, both the information of</span>
+<span class="sd">        the initial (without a core hole) and intermediate (with a core hole) Hamiltonians</span>
+<span class="sd">        will be returned, otherwise, only the information of the initial Hamiltonian</span>
+<span class="sd">        will be returned. It can be,</span>
+
+<span class="sd">        - K, L1, L2, L3, M1, M2, M3, M4, M5, N1, N2, N3, N4, N5,</span>
+<span class="sd">          N6, N7, O1, O2, O3, O4, O5, P1, P2, P3</span>
+
+<span class="sd">        - L23 (both L2 and L3), M23 (both M2 and M3), M45 (both M4 and M5)</span>
+<span class="sd">          N23 (both N2 and N3), N45 (both N4 and N5), N67 (both N6 and N7)</span>
+<span class="sd">          O23 (both O2 and O3), O45 (both O4 and O5), P23 (both P2 and P3)</span>
+<span class="sd">    trans_to_which: int</span>
+<span class="sd">        If there are two valence shells, this variable is used to indicate which</span>
+<span class="sd">        valence shell the photon transition happens.</span>
+
+<span class="sd">        - 1: to the first valence shell</span>
+
+<span class="sd">        - 2: to the second valence shell</span>
+<span class="sd">    label: a string or tuple of strings</span>
+<span class="sd">        User-defined symbols to label the names of Slater integrals.</span>
+
+<span class="sd">        - one element, for the valence shell</span>
+
+<span class="sd">        - two elements, 1st (2nd)-element for the 1st (2nd) valence shells or</span>
+<span class="sd">          1st-element for the 1st valence shell and the 2nd one for the core shell.</span>
+
+<span class="sd">        - three elements, the 1st (2nd)-element is for the 1st (2nd) valence shell,</span>
+<span class="sd">          the 3rd one is for the core shell</span>
+
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    res:  dict</span>
+<span class="sd">        Atomic data. A dict likes this if edge is None:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">           res={</span>
+<span class="sd">               &#39;slater_i&#39;: [(name of slater integrals, vaule of slater integrals), (), ...],</span>
+<span class="sd">               &#39;v_soc&#39;: [list of SOC for each atomic shell in v_name],</span>
+<span class="sd">           }</span>
+
+<span class="sd">        otherwise,</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">           res={</span>
+<span class="sd">               &#39;slater_i&#39;: [(name of slater integrals, value of slater integrals), (), ...],</span>
+<span class="sd">               &#39;slater_n&#39;: [(name of slater integrals, value of slater integrals), (), ...],</span>
+<span class="sd">               &#39;v_soc&#39;: [list of SOC for each atomic shell in v_name],</span>
+<span class="sd">               &#39;c_soc&#39;: SOC of core shell,</span>
+<span class="sd">               &#39;edge_ene&#39;: [list of edge energy, 2 elements if edge is any of</span>
+<span class="sd">               &quot;L23, M23, M45, N23, N45, N67, O23, O45, P23&quot;, othewise only 1 element],</span>
+<span class="sd">               &#39;gamma_c&#39;: [list of core hole life-time broadening, 2 elements if edge is any of</span>
+<span class="sd">               &quot;L23, M23, M45, N23, N45, N67, O23, O45, P23&quot;, othewise only 1 element],</span>
+<span class="sd">           }</span>
+
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import edrixs</span>
+<span class="sd">    &gt;&gt;&gt; res = edrixs.get_atom_data(&#39;Ni&#39;, v_name=&#39;3d&#39;, v_noccu=8)</span>
+<span class="sd">    &gt;&gt;&gt; res</span>
+<span class="sd">    {&#39;slater_i&#39;: [(&#39;F0_11&#39;, 0.0), (&#39;F2_11&#39;, 13.886), (&#39;F4_11&#39;, 8.67)],</span>
+<span class="sd">     &#39;v_soc_i&#39;: [0.112]}</span>
+<span class="sd">    &gt;&gt;&gt; name, slater = [list(i) for i in zip(*res[&#39;slater_i&#39;])]</span>
+<span class="sd">    &gt;&gt;&gt; name</span>
+<span class="sd">    [&#39;F0_11&#39;, &#39;F2_11&#39;, &#39;F4_11&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; slater</span>
+<span class="sd">    [0.0, 13.886, 8.67]</span>
+<span class="sd">    &gt;&gt;&gt; slater = [i * 0.8 for i in slater]</span>
+<span class="sd">    &gt;&gt;&gt; slater[0] = edrixs.get_F0(&#39;d&#39;, slater[1], slater[2])</span>
+<span class="sd">    &gt;&gt;&gt; slater</span>
+<span class="sd">    [0.5728507936507936, 11.1088, 6.936]</span>
+
+<span class="sd">    &gt;&gt;&gt; import edrixs</span>
+<span class="sd">    &gt;&gt;&gt; res=edrixs.get_atom_data(&#39;Ni&#39;, v_name=&#39;3d&#39;, v_noccu=8, edge=&#39;L3&#39;, label=(&#39;d&#39;, &#39;p&#39;))</span>
+<span class="sd">    &gt;&gt;&gt; res</span>
+<span class="sd">    {&#39;slater_i&#39;: [(&#39;F0_dd&#39;, 0.0), (&#39;F2_dd&#39;, 12.234), (&#39;F4_dd&#39;, 7.598)],</span>
+<span class="sd">     &#39;v_soc_i&#39;: [0.083],</span>
+<span class="sd">     &#39;slater_n&#39;: [(&#39;F0_dd&#39;, 0.0), (&#39;F2_dd&#39;, 12.234), (&#39;F4_dd&#39;, 7.598),</span>
+<span class="sd">      (&#39;F0_dp&#39;, 0.0), (&#39;F2_dp&#39;, 7.721), (&#39;G1_dp&#39;, 5.787), (&#39;G3_dp&#39;, 3.291),</span>
+<span class="sd">      (&#39;F0_pp&#39;, 0.0), (&#39;F2_pp&#39;, 0.0)],</span>
+<span class="sd">     &#39;v_soc_n&#39;: [0.102],</span>
+<span class="sd">     &#39;c_soc&#39;: 11.507,</span>
+<span class="sd">     &#39;edge_ene&#39;: [852.7],</span>
+<span class="sd">     &#39;gamma_c&#39;: [0.275]}</span>
+<span class="sd">    &gt;&gt;&gt; name_i, slater_i = [list(i) for i in zip(*res[&#39;slater_i&#39;])]</span>
+<span class="sd">    &gt;&gt;&gt; name_n, slater_n = [list(i) for i in zip(*res[&#39;slater_n&#39;])]</span>
+<span class="sd">    &gt;&gt;&gt; name_i</span>
+<span class="sd">    [&#39;F0_dd&#39;, &#39;F2_dd&#39;, &#39;F4_dd&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; slater_i</span>
+<span class="sd">    [0.0, 12.234, 7.598]</span>
+<span class="sd">    &gt;&gt;&gt; name_n</span>
+<span class="sd">    [&#39;F0_dd&#39;, &#39;F2_dd&#39;, &#39;F4_dd&#39;, &#39;F0_dp&#39;, &#39;F2_dp&#39;, &#39;G1_dp&#39;, &#39;G3_dp&#39;, &#39;F0_pp&#39;, &#39;F2_pp&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; slater_n</span>
+<span class="sd">    [0.0, 12.234, 7.598, 0.0, 7.721, 5.787, 3.291, 0.0, 0.0]</span>
+<span class="sd">    &gt;&gt;&gt; slater_n[0] = edrixs.get_F0(&#39;d&#39;, slater_n[1], slater_n[2])</span>
+<span class="sd">    &gt;&gt;&gt; slater_n[3] = edrixs.get_F0(&#39;dp&#39;, slater_n[5], slater_n[6])</span>
+<span class="sd">    &gt;&gt;&gt; slater_n</span>
+<span class="sd">    [0.6295873015873016, 12.234, 7.598, 0.5268428571428572, 7.721, 5.787, 3.291, 0.0, 0.0]</span>
+
+<span class="sd">    &gt;&gt;&gt; import edrixs</span>
+<span class="sd">    &gt;&gt;&gt; import collections</span>
+<span class="sd">    &gt;&gt;&gt; res=edrixs.get_atom_data(&#39;Ni&#39;, v_name=(&#39;3d&#39;, &#39;4p&#39;), v_noccu=(8, 0),</span>
+<span class="sd">    ...     edge=&#39;K&#39;, trans_to_which=2, label=(&#39;d&#39;, &#39;p&#39;, &#39;s&#39;))</span>
+<span class="sd">    &gt;&gt;&gt; res</span>
+<span class="sd">    {&#39;slater_i&#39;: [(&#39;F0_dd&#39;, 0.0), (&#39;F2_dd&#39;, 12.234), (&#39;F4_dd&#39;, 7.598),</span>
+<span class="sd">      (&#39;F0_dp&#39;, 0.0), (&#39;F2_dp&#39;, 0.0), (&#39;G1_dp&#39;, 0.0), (&#39;G3_dp&#39;, 0.0),</span>
+<span class="sd">      (&#39;F0_pp&#39;, 0.0), (&#39;F2_pp&#39;, 0.0)],</span>
+<span class="sd">     &#39;v_soc_i&#39;: [0.083, 0.0],</span>
+<span class="sd">     &#39;slater_n&#39;: [(&#39;F0_dd&#39;, 0.0), (&#39;F2_dd&#39;, 13.851), (&#39;F4_dd&#39;, 8.643),</span>
+<span class="sd">      (&#39;F0_dp&#39;, 0.0), (&#39;F2_dp&#39;, 2.299), (&#39;G1_dp&#39;, 0.828), (&#39;G3_dp&#39;, 0.713),</span>
+<span class="sd">      (&#39;F0_pp&#39;, 0.0), (&#39;F2_pp&#39;, 0.0),</span>
+<span class="sd">      (&#39;F0_ds&#39;, 0.0), (&#39;G2_ds&#39;, 0.079),</span>
+<span class="sd">      (&#39;F0_ps&#39;, 0.0), (&#39;G1_ps&#39;, 0.194),</span>
+<span class="sd">      (&#39;F0_ss&#39;, 0.0)],</span>
+<span class="sd">     &#39;v_soc_n&#39;: [0.113, 0.093],</span>
+<span class="sd">     &#39;c_soc&#39;: 0.0,</span>
+<span class="sd">     &#39;edge_ene&#39;: [8333.0],</span>
+<span class="sd">     &#39;gamma_c&#39;: [0.81]}</span>
+<span class="sd">    &gt;&gt;&gt; slat_i = collections.OrderedDict(res[&#39;slater_i&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; slat_n = collections.OrderedDict(res[&#39;slater_n&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; list(slat_i.keys())</span>
+<span class="sd">    [&#39;F0_dd&#39;, &#39;F2_dd&#39;, &#39;F4_dd&#39;, &#39;F0_dp&#39;, &#39;F2_dp&#39;, &#39;G1_dp&#39;, &#39;G3_dp&#39;, &#39;F0_pp&#39;, &#39;F2_pp&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; list(slat_i.values())</span>
+<span class="sd">    [0.0, 12.234, 7.598, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</span>
+<span class="sd">    &gt;&gt;&gt; list(slat_n.keys())</span>
+<span class="sd">    [&#39;F0_dd&#39;, &#39;F2_dd&#39;, &#39;F4_dd&#39;, &#39;F0_dp&#39;, &#39;F2_dp&#39;, &#39;G1_dp&#39;, &#39;G3_dp&#39;, &#39;F0_pp&#39;, &#39;F2_pp&#39;,</span>
+<span class="sd">     &#39;F0_ds&#39;, &#39;G2_ds&#39;, &#39;F0_ps&#39;, &#39;G1_ps&#39;, &#39;F0_ss&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; list(slat_n.values())</span>
+<span class="sd">    [0.0, 13.851, 8.643, 0.0, 2.299, 0.828, 0.713, 0.0, 0.0,</span>
+<span class="sd">     0.0, 0.079, 0.0, 0.194, 0.0]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">c_norb</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;s&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;f&#39;</span><span class="p">:</span> <span class="mi">14</span><span class="p">}</span>
+    <span class="n">atom</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">avail_atoms</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Ti&#39;</span><span class="p">,</span> <span class="s1">&#39;V&#39;</span><span class="p">,</span> <span class="s1">&#39;Cr&#39;</span><span class="p">,</span> <span class="s1">&#39;Mn&#39;</span><span class="p">,</span> <span class="s1">&#39;Fe&#39;</span><span class="p">,</span> <span class="s1">&#39;Co&#39;</span><span class="p">,</span> <span class="s1">&#39;Ni&#39;</span><span class="p">,</span> <span class="s1">&#39;Cu&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;Re&#39;</span><span class="p">,</span> <span class="s1">&#39;Os&#39;</span><span class="p">,</span> <span class="s1">&#39;Ir&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;Sm&#39;</span><span class="p">,</span>
+                   <span class="s1">&#39;U&#39;</span><span class="p">,</span> <span class="s1">&#39;Pu&#39;</span><span class="p">]</span>
+    <span class="n">avail_shells</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;1s&#39;</span><span class="p">,</span> <span class="s1">&#39;2s&#39;</span><span class="p">,</span> <span class="s1">&#39;2p&#39;</span><span class="p">,</span> <span class="s1">&#39;3s&#39;</span><span class="p">,</span> <span class="s1">&#39;3p&#39;</span><span class="p">,</span> <span class="s1">&#39;3d&#39;</span><span class="p">,</span> <span class="s1">&#39;4s&#39;</span><span class="p">,</span> <span class="s1">&#39;4p&#39;</span><span class="p">,</span> <span class="s1">&#39;4d&#39;</span><span class="p">,</span> <span class="s1">&#39;4f&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;5s&#39;</span><span class="p">,</span> <span class="s1">&#39;5p&#39;</span><span class="p">,</span> <span class="s1">&#39;5d&#39;</span><span class="p">,</span> <span class="s1">&#39;5f&#39;</span><span class="p">,</span> <span class="s1">&#39;6s&#39;</span><span class="p">,</span> <span class="s1">&#39;6p&#39;</span><span class="p">,</span> <span class="s1">&#39;6d&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">atom</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">avail_atoms</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Atom data is Not available for this atom: &quot;</span><span class="p">,</span> <span class="n">atom</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v_name</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="n">v_name</span> <span class="o">=</span> <span class="p">(</span><span class="n">v_name</span><span class="p">,)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v_noccu</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="n">v_noccu</span> <span class="o">=</span> <span class="p">(</span><span class="n">v_noccu</span><span class="p">,)</span>
+
+    <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">label</span> <span class="o">=</span> <span class="p">(</span><span class="n">label</span><span class="p">,)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v_name</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">v_noccu</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;The shape of v_name is not same as noccu&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">ishell</span> <span class="ow">in</span> <span class="n">v_name</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">ishell</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">avail_shells</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Not available for this shell: &quot;</span><span class="p">,</span> <span class="n">ishell</span><span class="p">)</span>
+
+    <span class="n">fname</span> <span class="o">=</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_filename</span><span class="p">(</span><span class="s1">&#39;edrixs&#39;</span><span class="p">,</span> <span class="s1">&#39;atom_data/&#39;</span><span class="o">+</span><span class="n">atom</span><span class="o">+</span><span class="s1">&#39;.json&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">atom_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="n">res</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">shell_name</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">v_name</span><span class="p">:</span>
+        <span class="n">shell_name</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">my_label</span> <span class="o">=</span> <span class="n">label</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">shell_name</span><span class="p">)]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">my_label</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">slater_name</span> <span class="o">=</span> <span class="n">slater_integrals_name</span><span class="p">(</span><span class="n">shell_name</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">my_label</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v_name</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">case</span> <span class="o">=</span> <span class="n">v_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">v_noccu</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">case</span> <span class="o">=</span> <span class="n">v_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">v_noccu</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">v_name</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">v_noccu</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">case</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">atom_dict</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;This configuration is not available in atom_data&quot;</span><span class="p">,</span> <span class="n">case</span><span class="p">)</span>
+
+    <span class="n">nslat</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">slater_name</span><span class="p">)</span>
+    <span class="n">slater_i</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">nslat</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">atom_dict</span><span class="p">[</span><span class="n">case</span><span class="p">][</span><span class="s1">&#39;slater&#39;</span><span class="p">]</span>
+    <span class="n">slater_i</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)]</span> <span class="o">=</span> <span class="n">tmp</span>
+    <span class="n">res</span><span class="p">[</span><span class="s1">&#39;slater_i&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">slater_name</span><span class="p">,</span> <span class="n">slater_i</span><span class="p">))</span>
+    <span class="n">res</span><span class="p">[</span><span class="s1">&#39;v_soc_i&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom_dict</span><span class="p">[</span><span class="n">case</span><span class="p">][</span><span class="s1">&#39;soc&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">edge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">edge</span> <span class="o">=</span> <span class="n">edge</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">edge_name</span> <span class="o">=</span> <span class="n">edge_to_shell_name</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">with_main_qn</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">shell_name</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">v_name</span><span class="p">:</span>
+            <span class="n">shell_name</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">shell_name</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">edge_name</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">2</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">label</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">my_label</span> <span class="o">=</span> <span class="n">label</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">shell_name</span><span class="p">)]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">my_label</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">slater_name</span> <span class="o">=</span> <span class="n">slater_integrals_name</span><span class="p">(</span><span class="n">shell_name</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">my_label</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v_name</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">case</span> <span class="o">=</span> <span class="p">(</span><span class="n">v_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">v_noccu</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span>
+                    <span class="n">edge_name</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">c_norb</span><span class="p">[</span><span class="n">edge_name</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">trans_to_which</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">case</span> <span class="o">=</span> <span class="p">(</span><span class="n">v_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">v_noccu</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span>
+                        <span class="n">v_name</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">v_noccu</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span>
+                        <span class="n">edge_name</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">c_norb</span><span class="p">[</span><span class="n">edge_name</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">case</span> <span class="o">=</span> <span class="p">(</span><span class="n">v_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">v_noccu</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span>
+                        <span class="n">v_name</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">v_noccu</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span>
+                        <span class="n">edge_name</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">c_norb</span><span class="p">[</span><span class="n">edge_name</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">case</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">atom_dict</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;This configuration is currently not available in atom_data&quot;</span><span class="p">,</span> <span class="n">case</span><span class="p">)</span>
+
+        <span class="n">nslat</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">slater_name</span><span class="p">)</span>
+        <span class="n">slater_n</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">nslat</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">atom_dict</span><span class="p">[</span><span class="n">case</span><span class="p">][</span><span class="s1">&#39;slater&#39;</span><span class="p">]</span>
+        <span class="n">slater_n</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">tmp</span><span class="p">)]</span> <span class="o">=</span> <span class="n">tmp</span>
+        <span class="n">res</span><span class="p">[</span><span class="s1">&#39;slater_n&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">slater_name</span><span class="p">,</span> <span class="n">slater_n</span><span class="p">))</span>
+
+        <span class="n">res</span><span class="p">[</span><span class="s1">&#39;v_soc_n&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom_dict</span><span class="p">[</span><span class="n">case</span><span class="p">][</span><span class="s1">&#39;soc&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">res</span><span class="p">[</span><span class="s1">&#39;c_soc&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom_dict</span><span class="p">[</span><span class="n">case</span><span class="p">][</span><span class="s1">&#39;soc&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">res</span><span class="p">[</span><span class="s1">&#39;edge_ene&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">atom_dict</span><span class="p">[</span><span class="n">edge</span><span class="p">][</span><span class="s1">&#39;ene&#39;</span><span class="p">]</span>
+        <span class="n">res</span><span class="p">[</span><span class="s1">&#39;gamma_c&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="o">/</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">atom_dict</span><span class="p">[</span><span class="n">edge</span><span class="p">][</span><span class="s1">&#39;gamma&#39;</span><span class="p">]]</span>
+
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+
+<div class="viewcode-block" id="rescale">
+<a class="viewcode-back" href="../../reference/utils.html#edrixs.utils.rescale">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">rescale</span><span class="p">(</span><span class="n">old_list</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Rescale a 1d list.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    old_list: 1d list of numerical values</span>
+<span class="sd">        Input list.</span>
+<span class="sd">    scale: a list of tuples</span>
+<span class="sd">        The scaling factors.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    new_list: 1d list</span>
+<span class="sd">        The rescaled list.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">new_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">old_list</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">scale</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">pos</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">scale</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">scale</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">new_list</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_list</span><span class="p">[</span><span class="n">pos</span><span class="p">]</span> <span class="o">*</span> <span class="n">val</span>
+    <span class="k">return</span> <span class="n">new_list</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Brookhaven National Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

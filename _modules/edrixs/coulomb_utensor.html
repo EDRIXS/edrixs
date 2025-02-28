@@ -1,0 +1,871 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>edrixs.coulomb_utensor &mdash; edrixs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            edrixs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">edrixs User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Pedagogical examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">edrixs Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">edrixs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">edrixs.coulomb_utensor</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for edrixs.coulomb_utensor</h1><div class="highlight"><pre>
+<span></span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;get_gaunt&#39;</span><span class="p">,</span> <span class="s1">&#39;umat_slater&#39;</span><span class="p">,</span> <span class="s1">&#39;get_umat_kanamori_ge&#39;</span><span class="p">,</span> <span class="s1">&#39;get_F0&#39;</span><span class="p">,</span>
+           <span class="s1">&#39;get_umat_slater&#39;</span><span class="p">,</span> <span class="s1">&#39;get_umat_kanamori&#39;</span><span class="p">,</span> <span class="s1">&#39;get_umat_slater_3shells&#39;</span><span class="p">]</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sympy.physics.wigner</span><span class="w"> </span><span class="kn">import</span> <span class="n">gaunt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.basis_transform</span><span class="w"> </span><span class="kn">import</span> <span class="n">tmat_c2r</span><span class="p">,</span> <span class="n">tmat_r2c</span><span class="p">,</span> <span class="n">tmat_c2j</span><span class="p">,</span> <span class="n">transform_utensor</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">info_atomic_shell</span><span class="p">,</span> <span class="n">case_to_shell_name</span><span class="p">,</span> <span class="n">slater_integrals_name</span>
+
+
+<div class="viewcode-block" id="get_gaunt">
+<a class="viewcode-back" href="../../reference/coulomb_utensor.html#edrixs.coulomb_utensor.get_gaunt">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_gaunt</span><span class="p">(</span><span class="n">l1</span><span class="p">,</span> <span class="n">l2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the Gaunt coefficents :math:`C_{l_1,l_2}(k,m_1,m_2)`</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        C_{l_1,l_2}(k,m_1,m_2)=\\sqrt{\\frac{4\\pi}{2k+1}} \\int</span>
+<span class="sd">        \\mathop{d\\phi} \\mathop{d\\theta} sin(\\theta)</span>
+<span class="sd">        Y_{l_1}^{m_1\\star}(\\theta,\\phi) Y_{k}^{m_1-m_2}(\\theta,\\phi)</span>
+<span class="sd">        Y_{l_2}^{m_2}(\\theta,\\phi)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    l1: int</span>
+<span class="sd">        The first quantum number of angular momentum.</span>
+<span class="sd">    l2: int</span>
+<span class="sd">        The second quantum number of angular momentum.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    res: 3d float array</span>
+<span class="sd">        The calculated Gaunt coefficents.</span>
+
+<span class="sd">        The 1st index (:math:`= 0, 1, ..., l_1+l_2+1`) is the order :math:`k`.</span>
+
+<span class="sd">        The 2nd index (:math:`= 0, 1, ... ,2l_1`) is the magnetic quantum</span>
+<span class="sd">        number :math:`m_1` plus :math:`l_1`</span>
+
+<span class="sd">        The 3nd index (:math:`= 0, 1, ... ,2l_2`) is the magnetic quantum</span>
+<span class="sd">        number :math:`m_2` plus :math:`l_2`</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    It should be noted that :math:`C_{l_1,l_2}(k,m_1,m_2)` is</span>
+<span class="sd">    nonvanishing only when</span>
+
+<span class="sd">    :math:`k + l_1 + l_2 = \\text{even}`,</span>
+
+<span class="sd">    and</span>
+
+<span class="sd">    :math:`|l_1 -  l_2| \\leq k \\leq l_1 + l_2`.</span>
+
+<span class="sd">    Please see Ref. [1]_ p. 10 for more details.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Sugano S, Tanabe Y and Kamimura H. 1970. Multiplets of</span>
+<span class="sd">       Transition-Metal Ions in Crystals. Academic Press, New York and London.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import edrixs</span>
+
+<span class="sd">    Get gaunt coefficients between :math:`p`-shell and :math:`d`-shell</span>
+
+<span class="sd">    &gt;&gt;&gt; g = edrixs.get_gaunt(1, 2)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="kn">import</span> <span class="n">N</span>
+    <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">l1</span> <span class="o">+</span> <span class="n">l2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">l1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">l2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">l1</span> <span class="o">+</span> <span class="n">l2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="n">l1</span> <span class="o">+</span> <span class="n">l2</span> <span class="o">+</span> <span class="n">k</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">l1</span> <span class="o">-</span> <span class="n">l2</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">k</span> <span class="o">&lt;=</span> <span class="n">l1</span> <span class="o">+</span> <span class="n">l2</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="k">for</span> <span class="n">i1</span><span class="p">,</span> <span class="n">m1</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">l1</span><span class="p">,</span> <span class="n">l1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">i2</span><span class="p">,</span> <span class="n">m2</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">l2</span><span class="p">,</span> <span class="n">l2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)):</span>
+                <span class="n">res</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">N</span><span class="p">(</span><span class="n">gaunt</span><span class="p">(</span><span class="n">l1</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">l2</span><span class="p">,</span> <span class="o">-</span><span class="n">m1</span><span class="p">,</span> <span class="n">m1</span> <span class="o">-</span> <span class="n">m2</span><span class="p">,</span> <span class="n">m2</span><span class="p">))</span> <span class="o">*</span>
+                                  <span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">)</span><span class="o">**</span><span class="n">m1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">res</span></div>
+
+
+
+<div class="viewcode-block" id="umat_slater">
+<a class="viewcode-back" href="../../reference/coulomb_utensor.html#edrixs.coulomb_utensor.umat_slater">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">umat_slater</span><span class="p">(</span><span class="n">l_list</span><span class="p">,</span> <span class="n">fk</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the Coulomb interaction tensor which is parameterized by</span>
+<span class="sd">    Slater integrals :math:`F^{k}`:</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        U_{m_{l_i}m_{s_i}, m_{l_j}m_{s_j}, m_{l_t}m_{s_t},</span>
+<span class="sd">        m_{l_u}m_{s_u}}^{i,j,t,u}</span>
+<span class="sd">        =\\frac{1}{2} \\delta_{m_{s_i},m_{s_t}}\\delta_{m_{s_j},m_{s_u}}</span>
+<span class="sd">        \\delta_{m_{l_i}+m_{l_j}, m_{l_t}+m_{l_u}}</span>
+<span class="sd">        \\sum_{k}C_{l_i,l_t}(k,m_{l_i},m_{l_t})C_{l_u,l_j}</span>
+<span class="sd">        (k,m_{l_u},m_{l_j})F^{k}_{i,j,t,u}</span>
+
+<span class="sd">    where :math:`m_s` is the magnetic quantum number for spin</span>
+<span class="sd">    and :math:`m_l` is the magnetic quantum number for orbital.</span>
+<span class="sd">    :math:`F^{k}_{i,j,t,u}` are Slater integrals.</span>
+<span class="sd">    :math:`C_{l_i,l_j}(k,m_{l_i},m_{l_j})` are Gaunt coefficients.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    l_list: list of int</span>
+<span class="sd">        contains the quantum number of orbital angular momentum</span>
+<span class="sd">        :math:`l` for each shell.</span>
+<span class="sd">    fk: dict of float</span>
+<span class="sd">        contains all the possible Slater integrals between the shells</span>
+<span class="sd">        in l_list, the key is a tuple of 5 ints (:math:`k,i,j,t,u`),</span>
+<span class="sd">        where :math:`k` is the order,</span>
+<span class="sd">        :math:`i,j,t,u` are the shell indices begin with 1.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    umat: 4d array of complex</span>
+<span class="sd">        contains the Coulomb interaction tensor.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import edrixs</span>
+
+<span class="sd">    For only one :math:`d`-shell</span>
+
+<span class="sd">    &gt;&gt;&gt; l_list = [2]</span>
+<span class="sd">    &gt;&gt;&gt; fk={}</span>
+<span class="sd">    &gt;&gt;&gt; F0, F2, F4 = 5.0, 4.0 2.0</span>
+<span class="sd">    &gt;&gt;&gt; fk[(0,1,1,1,1)] = F0</span>
+<span class="sd">    &gt;&gt;&gt; fk[(2,1,1,1,1)] = F2</span>
+<span class="sd">    &gt;&gt;&gt; fk[(4,1,1,1,1)] = F4</span>
+<span class="sd">    &gt;&gt;&gt; umat_d = edrixs.umat_slater(l_list, fk)</span>
+
+<span class="sd">    For one :math:`d`-shell and one :math:`p`-shell</span>
+
+<span class="sd">    &gt;&gt;&gt; l_list = [2,1]</span>
+<span class="sd">    &gt;&gt;&gt; fk={}</span>
+<span class="sd">    &gt;&gt;&gt; F0_dd, F2_dd, F4_dd = 5.0, 4.0, 2.0</span>
+<span class="sd">    &gt;&gt;&gt; F0_dp, F2_dp = 4.0, 2.0</span>
+<span class="sd">    &gt;&gt;&gt; G1_dp, G3_dp = 2.0, 1.0</span>
+<span class="sd">    &gt;&gt;&gt; F0_pp, F2_pp = 2.0, 1.0</span>
+
+<span class="sd">    &gt;&gt;&gt; fk[(0,1,1,1,1)] = F0_dd</span>
+<span class="sd">    &gt;&gt;&gt; fk[(2,1,1,1,1)] = F2_dd</span>
+<span class="sd">    &gt;&gt;&gt; fk[(4,1,1,1,1)] = F4_dd</span>
+
+<span class="sd">    &gt;&gt;&gt; fk[(0,1,2,1,2)] = F0_dp</span>
+<span class="sd">    &gt;&gt;&gt; fk[(0,2,1,2,1)] = F0_dp</span>
+<span class="sd">    &gt;&gt;&gt; fk[(2,1,2,1,2)] = F2_dp</span>
+<span class="sd">    &gt;&gt;&gt; fk[(2,2,1,2,1)] = F2_dp</span>
+
+<span class="sd">    &gt;&gt;&gt; fk[(1,1,2,2,1)] = G1_dp</span>
+<span class="sd">    &gt;&gt;&gt; fk[(1,2,1,1,2)] = G1_dp</span>
+<span class="sd">    &gt;&gt;&gt; fk[(3,1,2,2,1)] = G3_dp</span>
+<span class="sd">    &gt;&gt;&gt; fk[(3,2,1,1,2)] = G3_dp</span>
+
+<span class="sd">    &gt;&gt;&gt; fk[(0,2,2,2,2)] = F0_pp</span>
+<span class="sd">    &gt;&gt;&gt; fk[(2,2,2,2,2)] = F2_pp</span>
+
+<span class="sd">    &gt;&gt;&gt; umat_dp = edrixs.umat_slater(l_list, fk)</span>
+
+<span class="sd">    See also</span>
+<span class="sd">    --------</span>
+<span class="sd">    coulomb_utensor.get_umat_slater</span>
+<span class="sd">    coulomb_utensor.get_umat_kanamori</span>
+<span class="sd">    coulomb_utensor.get_umat_kanamori_ge</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">k_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">l_list</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">ck</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">orb_label</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># for each shell</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">l_list</span><span class="p">):</span>
+        <span class="c1"># magnetic quantum number</span>
+        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">l</span><span class="p">,</span> <span class="n">l</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="c1"># spin part, up,dn</span>
+            <span class="k">for</span> <span class="n">spin</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+                <span class="n">orb_label</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">l</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">spin</span><span class="p">))</span>
+
+    <span class="c1"># all the possible gaunt coefficient</span>
+    <span class="k">for</span> <span class="n">l1</span> <span class="ow">in</span> <span class="n">l_list</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">l2</span> <span class="ow">in</span> <span class="n">l_list</span><span class="p">:</span>
+            <span class="n">ck_tmp</span> <span class="o">=</span> <span class="n">get_gaunt</span><span class="p">(</span><span class="n">l1</span><span class="p">,</span> <span class="n">l2</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">m1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">l1</span><span class="p">,</span> <span class="n">l1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">m2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">l2</span><span class="p">,</span> <span class="n">l2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">k_list</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mod</span><span class="p">(</span><span class="n">l1</span> <span class="o">+</span> <span class="n">l2</span> <span class="o">+</span> <span class="n">k</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">l1</span> <span class="o">-</span> <span class="n">l2</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">k</span> <span class="o">&lt;=</span> <span class="n">l1</span> <span class="o">+</span> <span class="n">l2</span><span class="p">):</span>
+                            <span class="n">ck</span><span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">l1</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">l2</span><span class="p">,</span> <span class="n">m2</span><span class="p">)]</span> <span class="o">=</span> <span class="n">ck_tmp</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">m1</span> <span class="o">+</span> <span class="n">l1</span><span class="p">,</span> <span class="n">m2</span> <span class="o">+</span> <span class="n">l2</span><span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">ck</span><span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">l1</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">l2</span><span class="p">,</span> <span class="n">m2</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c1"># build the coulomb interaction tensor</span>
+    <span class="n">norbs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">orb_label</span><span class="p">)</span>
+    <span class="n">umat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">norbs</span><span class="p">,</span> <span class="n">norbs</span><span class="p">,</span> <span class="n">norbs</span><span class="p">,</span> <span class="n">norbs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">orb1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">norbs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">orb2</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">norbs</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">orb3</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">norbs</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">orb4</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">norbs</span><span class="p">):</span>
+                    <span class="n">i1</span><span class="p">,</span> <span class="n">l1</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">sigma1</span> <span class="o">=</span> <span class="n">orb_label</span><span class="p">[</span><span class="n">orb1</span><span class="p">]</span>
+                    <span class="n">i2</span><span class="p">,</span> <span class="n">l2</span><span class="p">,</span> <span class="n">m2</span><span class="p">,</span> <span class="n">sigma2</span> <span class="o">=</span> <span class="n">orb_label</span><span class="p">[</span><span class="n">orb2</span><span class="p">]</span>
+                    <span class="n">i3</span><span class="p">,</span> <span class="n">l3</span><span class="p">,</span> <span class="n">m3</span><span class="p">,</span> <span class="n">sigma3</span> <span class="o">=</span> <span class="n">orb_label</span><span class="p">[</span><span class="n">orb3</span><span class="p">]</span>
+                    <span class="n">i4</span><span class="p">,</span> <span class="n">l4</span><span class="p">,</span> <span class="n">m4</span><span class="p">,</span> <span class="n">sigma4</span> <span class="o">=</span> <span class="n">orb_label</span><span class="p">[</span><span class="n">orb4</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">m1</span> <span class="o">+</span> <span class="n">m2</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">m3</span> <span class="o">+</span> <span class="n">m4</span><span class="p">):</span>
+                        <span class="k">continue</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">sigma1</span> <span class="o">!=</span> <span class="n">sigma3</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">sigma2</span> <span class="o">!=</span> <span class="n">sigma4</span><span class="p">):</span>
+                        <span class="k">continue</span>
+                    <span class="n">res</span> <span class="o">=</span> <span class="mf">0.0</span>
+                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">k_list</span><span class="p">:</span>
+                        <span class="n">tmp_key</span> <span class="o">=</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">i1</span><span class="p">,</span> <span class="n">i2</span><span class="p">,</span> <span class="n">i3</span><span class="p">,</span> <span class="n">i4</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">tmp_key</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">fk</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                            <span class="n">res</span> <span class="o">+=</span> <span class="n">ck</span><span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">l1</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">l3</span><span class="p">,</span> <span class="n">m3</span><span class="p">)]</span> <span class="o">*</span> <span class="n">ck</span><span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="n">l4</span><span class="p">,</span> <span class="n">m4</span><span class="p">,</span> <span class="n">l2</span><span class="p">,</span> <span class="n">m2</span><span class="p">)]</span> <span class="o">*</span> <span class="n">fk</span><span class="p">[</span><span class="n">tmp_key</span><span class="p">]</span>
+                    <span class="n">umat</span><span class="p">[</span><span class="n">orb1</span><span class="p">,</span> <span class="n">orb2</span><span class="p">,</span> <span class="n">orb4</span><span class="p">,</span> <span class="n">orb3</span><span class="p">]</span> <span class="o">=</span> <span class="n">res</span>
+
+    <span class="n">umat</span> <span class="o">=</span> <span class="n">umat</span> <span class="o">/</span> <span class="mf">2.0</span>
+    <span class="k">return</span> <span class="n">umat</span></div>
+
+
+
+<div class="viewcode-block" id="get_umat_kanamori_ge">
+<a class="viewcode-back" href="../../reference/coulomb_utensor.html#edrixs.coulomb_utensor.get_umat_kanamori_ge">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_umat_kanamori_ge</span><span class="p">(</span><span class="n">norbs</span><span class="p">,</span> <span class="n">U1</span><span class="p">,</span> <span class="n">U2</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">Jx</span><span class="p">,</span> <span class="n">Jp</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the Coulomb interaction tensor for a Kanamori-type interaction.</span>
+<span class="sd">    For the general case, it is parameterized by :math:`U_1, U_2, J, J_x, J_p`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    norbs: int</span>
+<span class="sd">        number of orbitals (including spin).</span>
+<span class="sd">    U1: float</span>
+<span class="sd">        Hubbard :math:`U` for electrons residing on the same orbital with opposite spin.</span>
+<span class="sd">    U2: float</span>
+<span class="sd">        Hubbard :math:`U` for electrons residing on different orbitals.</span>
+<span class="sd">    J: float</span>
+<span class="sd">        Hund&#39;s coupling for density-density interaction.</span>
+<span class="sd">    Jx: float</span>
+<span class="sd">        Hund&#39;s coupling for spin flip.</span>
+<span class="sd">    Jp: float</span>
+<span class="sd">        Hund&#39;s coupling for pair-hopping.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    umat: 4d complex array</span>
+<span class="sd">        The calculated Coulomb interaction tensor</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The order of spin index is: up, down, up, down, ..., up, down.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    coulomb_utensor.get_umat_kanamori</span>
+<span class="sd">    coulomb_utensor.get_umat_slater</span>
+<span class="sd">    coulomb_utensor.umat_slater</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">umat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">norbs</span><span class="p">,</span> <span class="n">norbs</span><span class="p">,</span> <span class="n">norbs</span><span class="p">,</span> <span class="n">norbs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">alpha</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">norbs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">beta</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">alpha</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">norbs</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">gamma</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">norbs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">delta</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">gamma</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">norbs</span><span class="p">):</span>
+                    <span class="n">aband</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">//</span> <span class="mi">2</span>
+                    <span class="n">aspin</span> <span class="o">=</span> <span class="n">alpha</span> <span class="o">%</span> <span class="mi">2</span>
+                    <span class="n">bband</span> <span class="o">=</span> <span class="n">beta</span> <span class="o">//</span> <span class="mi">2</span>
+                    <span class="n">bspin</span> <span class="o">=</span> <span class="n">beta</span> <span class="o">%</span> <span class="mi">2</span>
+                    <span class="n">gband</span> <span class="o">=</span> <span class="n">gamma</span> <span class="o">//</span> <span class="mi">2</span>
+                    <span class="n">gspin</span> <span class="o">=</span> <span class="n">gamma</span> <span class="o">%</span> <span class="mi">2</span>
+                    <span class="n">dband</span> <span class="o">=</span> <span class="n">delta</span> <span class="o">//</span> <span class="mi">2</span>
+                    <span class="n">dspin</span> <span class="o">=</span> <span class="n">delta</span> <span class="o">%</span> <span class="mi">2</span>
+
+                    <span class="n">dtmp</span> <span class="o">=</span> <span class="mf">0.0</span>
+                    <span class="k">if</span> <span class="p">((</span><span class="n">alpha</span> <span class="o">==</span> <span class="n">gamma</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">beta</span> <span class="o">==</span> <span class="n">delta</span><span class="p">)):</span>
+                        <span class="k">if</span> <span class="p">((</span><span class="n">aband</span> <span class="o">==</span> <span class="n">bband</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">aspin</span> <span class="o">!=</span> <span class="n">bspin</span><span class="p">)):</span>
+                            <span class="n">dtmp</span> <span class="o">=</span> <span class="n">dtmp</span> <span class="o">+</span> <span class="n">U1</span>
+
+                    <span class="k">if</span> <span class="p">((</span><span class="n">alpha</span> <span class="o">==</span> <span class="n">gamma</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">beta</span> <span class="o">==</span> <span class="n">delta</span><span class="p">)):</span>
+                        <span class="k">if</span> <span class="p">(</span><span class="n">aband</span> <span class="o">!=</span> <span class="n">bband</span><span class="p">):</span>
+                            <span class="n">dtmp</span> <span class="o">=</span> <span class="n">dtmp</span> <span class="o">+</span> <span class="n">U2</span>
+
+                    <span class="k">if</span> <span class="p">((</span><span class="n">alpha</span> <span class="o">==</span> <span class="n">gamma</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">beta</span> <span class="o">==</span> <span class="n">delta</span><span class="p">)):</span>
+                        <span class="k">if</span> <span class="p">((</span><span class="n">aband</span> <span class="o">!=</span> <span class="n">bband</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">aspin</span> <span class="o">==</span> <span class="n">bspin</span><span class="p">)):</span>
+                            <span class="n">dtmp</span> <span class="o">=</span> <span class="n">dtmp</span> <span class="o">-</span> <span class="n">J</span>
+
+                    <span class="k">if</span> <span class="p">((</span><span class="n">aband</span> <span class="o">==</span> <span class="n">gband</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">bband</span> <span class="o">==</span> <span class="n">dband</span><span class="p">)):</span>
+                        <span class="k">if</span> <span class="p">((</span><span class="n">aspin</span> <span class="o">!=</span> <span class="n">gspin</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">bspin</span> <span class="o">!=</span> <span class="n">dspin</span><span class="p">)</span>
+                                <span class="ow">and</span> <span class="p">(</span><span class="n">aspin</span> <span class="o">!=</span> <span class="n">bspin</span><span class="p">)):</span>
+                            <span class="n">dtmp</span> <span class="o">=</span> <span class="n">dtmp</span> <span class="o">-</span> <span class="n">Jx</span>
+
+                    <span class="k">if</span> <span class="p">((</span><span class="n">aband</span> <span class="o">==</span> <span class="n">bband</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">dband</span> <span class="o">==</span> <span class="n">gband</span><span class="p">)</span>
+                            <span class="ow">and</span> <span class="p">(</span><span class="n">aband</span> <span class="o">!=</span> <span class="n">dband</span><span class="p">)):</span>
+                        <span class="k">if</span> <span class="p">((</span><span class="n">aspin</span> <span class="o">!=</span> <span class="n">bspin</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">dspin</span> <span class="o">!=</span> <span class="n">gspin</span><span class="p">)</span>
+                                <span class="ow">and</span> <span class="p">(</span><span class="n">aspin</span> <span class="o">==</span> <span class="n">gspin</span><span class="p">)):</span>
+                            <span class="n">dtmp</span> <span class="o">=</span> <span class="n">dtmp</span> <span class="o">+</span> <span class="n">Jp</span>
+
+                    <span class="n">umat</span><span class="p">[</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtmp</span>
+
+    <span class="k">return</span> <span class="n">umat</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_F0</span><span class="p">(</span><span class="n">case</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="n">case</span> <span class="o">=</span> <span class="n">case</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;s&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mf">0.0</span>
+
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span>
+        <span class="n">F2</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">25.0</span> <span class="o">*</span> <span class="n">F2</span>
+
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;d&#39;</span><span class="p">:</span>
+        <span class="n">F2</span><span class="p">,</span> <span class="n">F4</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">return</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">63.0</span> <span class="o">*</span> <span class="n">F2</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">63.0</span> <span class="o">*</span> <span class="n">F4</span>
+
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;f&#39;</span><span class="p">:</span>
+        <span class="n">F2</span><span class="p">,</span> <span class="n">F4</span><span class="p">,</span> <span class="n">F6</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+        <span class="k">return</span> <span class="mf">4.0</span> <span class="o">/</span> <span class="mf">195.0</span> <span class="o">*</span> <span class="n">F2</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">143.0</span> <span class="o">*</span> <span class="n">F4</span> <span class="o">+</span> <span class="mf">100.0</span> <span class="o">/</span> <span class="mf">5577.0</span> <span class="o">*</span> <span class="n">F6</span>
+
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;ss&#39;</span><span class="p">:</span>
+        <span class="n">G0</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">G0</span>
+
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;sp&#39;</span> <span class="ow">or</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;ps&#39;</span><span class="p">:</span>
+        <span class="n">G1</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="n">G1</span>
+
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;sd&#39;</span> <span class="ow">or</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;ds&#39;</span><span class="p">:</span>
+        <span class="n">G2</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">10.0</span> <span class="o">*</span> <span class="n">G2</span>
+
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;sf&#39;</span> <span class="ow">or</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;fs&#39;</span><span class="p">:</span>
+        <span class="n">G3</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">14.0</span> <span class="o">*</span> <span class="n">G3</span>
+
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;pp&#39;</span><span class="p">:</span>
+        <span class="n">G0</span><span class="p">,</span> <span class="n">G2</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="n">G0</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">15.0</span> <span class="o">*</span> <span class="n">G2</span>
+
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;pd&#39;</span> <span class="ow">or</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;dp&#39;</span><span class="p">:</span>
+        <span class="n">G1</span><span class="p">,</span> <span class="n">G3</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">15.0</span> <span class="o">*</span> <span class="n">G1</span> <span class="o">+</span> <span class="mf">3.0</span> <span class="o">/</span> <span class="mf">70.0</span> <span class="o">*</span> <span class="n">G3</span>
+
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;pf&#39;</span> <span class="ow">or</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;fp&#39;</span><span class="p">:</span>
+        <span class="n">G2</span><span class="p">,</span> <span class="n">G4</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">return</span> <span class="mf">3.0</span> <span class="o">/</span> <span class="mf">70.0</span> <span class="o">*</span> <span class="n">G2</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">63.0</span> <span class="o">*</span> <span class="n">G4</span>
+
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;dd&#39;</span><span class="p">:</span>
+        <span class="n">G0</span><span class="p">,</span> <span class="n">G2</span><span class="p">,</span> <span class="n">G4</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+        <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">10.0</span> <span class="o">*</span> <span class="n">G0</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">35.0</span> <span class="o">*</span> <span class="n">G2</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">35.0</span> <span class="o">*</span> <span class="n">G4</span>
+
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;df&#39;</span> <span class="ow">or</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;fd&#39;</span><span class="p">:</span>
+        <span class="n">G1</span><span class="p">,</span> <span class="n">G3</span><span class="p">,</span> <span class="n">G5</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
+        <span class="k">return</span> <span class="mf">3.0</span> <span class="o">/</span> <span class="mf">70.0</span> <span class="o">*</span> <span class="n">G1</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">105.0</span> <span class="o">*</span> <span class="n">G3</span> <span class="o">+</span> <span class="mf">5.0</span> <span class="o">/</span> <span class="mf">231.0</span> <span class="o">*</span> <span class="n">G5</span>
+
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;ff&#39;</span><span class="p">:</span>
+        <span class="n">G0</span><span class="p">,</span> <span class="n">G2</span><span class="p">,</span> <span class="n">G4</span><span class="p">,</span> <span class="n">G6</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
+        <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">14.0</span> <span class="o">*</span> <span class="n">G0</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">105.0</span> <span class="o">*</span> <span class="n">G2</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">77.0</span> <span class="o">*</span> <span class="n">G4</span> <span class="o">+</span> <span class="mf">50.0</span> <span class="o">/</span> <span class="mf">3003.0</span> <span class="o">*</span> <span class="n">G6</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;error in get_F0():  Unknown case name:&quot;</span><span class="p">,</span> <span class="n">case</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="get_umat_slater">
+<a class="viewcode-back" href="../../reference/coulomb_utensor.html#edrixs.coulomb_utensor.get_umat_slater">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_umat_slater</span><span class="p">(</span><span class="n">case</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convenient adapter function to return the Coulomb interaction tensor for common case.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    case: string</span>
+<span class="sd">        Indicates atomic shells, should be one of</span>
+
+<span class="sd">        For single shell:</span>
+
+<span class="sd">        - &#39;s&#39;:    single :math:`s`-shell (:math:`l=0`)</span>
+<span class="sd">        - &#39;p&#39;:    single :math:`p`-shell (:math:`l=1`)</span>
+<span class="sd">        - &#39;p12&#39;:  single :math:`p_{1/2}`-shell (:math:`l=1`)</span>
+<span class="sd">        - &#39;p32&#39;:  single :math:`p_{3/2}`-shell (:math:`l=1`)</span>
+<span class="sd">        - &#39;t2g&#39;:  single :math:`t_{2g}`-shell (:math:`l_{\\text{eff}}=1`)</span>
+<span class="sd">        - &#39;d&#39;:    single :math:`d`-shell (:math:`l=2`)</span>
+<span class="sd">        - &#39;d32&#39;:  single :math:`d_{3/2}`-shell (:math:`l=2`)</span>
+<span class="sd">        - &#39;d52&#39;:  single :math:`d_{5/2}`-shell (:math:`l=2`)</span>
+<span class="sd">        - &#39;f&#39;:    single :math:`f`-shell (:math:`l=3`)</span>
+<span class="sd">        - &#39;f52&#39;:  single :math:`f_{5/2}`-shell (:math:`l=3`)</span>
+<span class="sd">        - &#39;f72&#39;:  single :math:`f_{7/2}`-shell (:math:`l=3`)</span>
+
+<span class="sd">        For two shells:</span>
+
+<span class="sd">        case = str1 + str2</span>
+
+<span class="sd">        where, str1 and str2 are strings and they can be any of</span>
+
+<span class="sd">        [&#39;s&#39;, &#39;p&#39;, &#39;p12&#39;, &#39;p32&#39;, &#39;t2g&#39;, &#39;d&#39;, &#39;d32&#39;, &#39;d52&#39;, &#39;f&#39;, &#39;f52&#39;, &#39;f72&#39;]</span>
+
+<span class="sd">        For examples,</span>
+
+<span class="sd">        - &#39;dp&#39;:     1st :math:`d`-shell and 2nd :math:`p`-shell</span>
+<span class="sd">        - &#39;dp12&#39;:   1st :math:`d`-shell and 2nd :math:`p_{1/2}`-shell</span>
+<span class="sd">        - &#39;f52p32&#39;: 1st :math:`f_{5/2}`-shell and 2nd :math:`p_{3/2}`-shell</span>
+<span class="sd">        - &#39;t2gp&#39;:   1st :math:`t_{2g}`-shell and 2nd :math:`p`-shell</span>
+
+<span class="sd">    *args: floats</span>
+<span class="sd">        Variable length argument list. Slater integrals.</span>
+<span class="sd">        The order of these integrals shoule be</span>
+
+<span class="sd">        For only one shell case,</span>
+
+<span class="sd">        args = [F0, F2, F4, F6, ....]</span>
+
+<span class="sd">        For two shells case,</span>
+
+<span class="sd">        args = [FX_11, FX_12, GX_12, FX_22]</span>
+
+<span class="sd">        where, 1 (2) means 1st (2nd)-shell, and X=0, 2, 4, ... or X=1, 3, 5 ...,</span>
+<span class="sd">        and X should be in ascending order. The following are possible cases:</span>
+
+<span class="sd">        - &#39;s&#39;:</span>
+
+<span class="sd">        args = [F0]</span>
+
+<span class="sd">        - &#39;p&#39;, &#39;p12&#39;, &#39;p32&#39;:</span>
+
+<span class="sd">        args = [F0, F2]</span>
+
+<span class="sd">        - &#39;d&#39;, &#39;d32&#39;, &#39;d52&#39;, &#39;t2g&#39;:</span>
+
+<span class="sd">        args = [F0, F2, F4]</span>
+
+<span class="sd">        - &#39;f&#39;, &#39;f52&#39;, &#39;f72&#39;:</span>
+
+<span class="sd">        args = [F0, F2, F4, F6]</span>
+
+<span class="sd">        - &#39;ss&#39;:</span>
+
+<span class="sd">        args = [F0_11, F0_12, G0_12, F0_22]</span>
+
+<span class="sd">        - &#39;ps&#39;, &#39;p12s&#39;, &#39;p32s&#39;:</span>
+
+<span class="sd">        args = [F0_11, F2_11, F0_12, G1_12, F0_22]</span>
+
+<span class="sd">        - &#39;ds&#39;, &#39;d32s&#39;, &#39;d52s&#39;, &#39;t2gs&#39;:</span>
+
+<span class="sd">        args = [F0_11, F2_11, F4_11, F0_12, G2_12, F0_22]</span>
+
+<span class="sd">        - &#39;fs&#39;, &#39;f52s&#39;, &#39;f72s&#39;:</span>
+
+<span class="sd">        args = [F0_11, F2_11, F4_11, F6_11, F0_12, G3_12, F0_22]</span>
+
+<span class="sd">        - &#39;sp&#39;, &#39;sp12&#39;, &#39;sp32&#39;:</span>
+
+<span class="sd">        args = [F0_11, F0_12, G1_12, F0_22, F2_22]</span>
+
+<span class="sd">        - &#39;pp&#39;, &#39;pp12&#39;, &#39;pp32&#39;, &#39;p12p&#39;, &#39;p12p12&#39;, &#39;p12p32&#39;, &#39;p32p&#39;, &#39;p32p12&#39;, &#39;p32p32&#39;:</span>
+
+<span class="sd">        args = [F0_11, F2_11, F0_12, F2_12, G0_12, G2_12, F0_22, F2_22]</span>
+
+<span class="sd">        - &#39;dp&#39;, &#39;dp12&#39;, &#39;dp32&#39;, &#39;d32p&#39;, &#39;d32p12&#39;, &#39;d32p32&#39;, &#39;d52p&#39;, &#39;d52p12&#39;, &#39;d52p32&#39;,</span>
+<span class="sd">          &#39;t2gp&#39;, &#39;t2gp12&#39;, t2gp32&#39;:</span>
+
+<span class="sd">        args = [F0_11, F2_11, F4_11, F0_12, F2_12, G1_12, G3_12, F0_22, F2_22]</span>
+
+<span class="sd">        - &#39;fp&#39;, &#39;fp12&#39;, &#39;fp32&#39;, &#39;f52p&#39;, &#39;f52p12&#39;, &#39;f52p32&#39;, &#39;f72p&#39;, &#39;f72p12&#39;, &#39;f72p32&#39;:</span>
+
+<span class="sd">        args = [F0_11, F2_11, F4_11, F6_11, F0_12, F2_12, G2_12, G4_12, F0_22, F2_22]</span>
+
+<span class="sd">        - &#39;sd&#39;, &#39;sd32&#39;, &#39;sd52&#39;:</span>
+
+<span class="sd">        args = [F0_11, F0_12, G2_12, F0_22, F2_22, F4_22]</span>
+
+<span class="sd">        - &#39;pd&#39;, &#39;pd32&#39;, &#39;pd52&#39;, &#39;p12d&#39;, &#39;p12d32&#39;, &#39;p12d52&#39;, &#39;p32d&#39;, &#39;p32d32&#39;, &#39;p32d52&#39;:</span>
+
+<span class="sd">        args = [F0_11, F2_11, F0_12, F2_12, G1_12, G3_12, F0_22, F2_22, F4_22]</span>
+
+<span class="sd">        - &#39;dd&#39;, &#39;dd32&#39;, &#39;dd52&#39;, &#39;d32d&#39;, &#39;d32d32&#39;, &#39;d32d52&#39;, &#39;d52d&#39;, &#39;d52d32&#39;, &#39;d52d52&#39;,</span>
+<span class="sd">          &#39;t2gd&#39;, &#39;t2gd32&#39;, &#39;t2gd52&#39;:</span>
+
+<span class="sd">        args = [F0_11, F2_11, F4_11, F0_12, F2_12, F4_12, G0_12, G2_12, G4_12, F0_22, F2_22, F4_22]</span>
+
+<span class="sd">        - &#39;fd&#39;, &#39;fd32&#39;, &#39;fd52&#39;, &#39;f52d&#39;, &#39;f52d32&#39;, &#39;f52d52&#39;, &#39;f72d&#39;, &#39;f72d32&#39;, &#39;f72d52&#39;:</span>
+
+<span class="sd">        args = [F0_11, F2_11, F4_11, F6_11, F0_12, F2_12, F4_12, G1_12, G3_12, G5_12,</span>
+<span class="sd">        F0_22, F2_22, F4_22]</span>
+
+<span class="sd">        - &#39;sf&#39;, &#39;sf52&#39;, &#39;sf72&#39;:</span>
+
+<span class="sd">        args = [F0_11, F0_12, G3_12, F0_22, F2_22, F4_22, F6_22]</span>
+
+<span class="sd">        - &#39;pf&#39;, &#39;pf52&#39;, &#39;pf72&#39;, &#39;p12f&#39;, &#39;p12f52&#39;, &#39;p12f72&#39;, &#39;p32f&#39;, &#39;p32f52&#39;, &#39;p32f72&#39;:</span>
+
+<span class="sd">        args = [F0_11, F2_11, F0_12, F2_12, G2_12, G4_12, F0_22, F2_22, F4_22, F6_22]</span>
+
+<span class="sd">        - &#39;df&#39;, &#39;df52&#39;, &#39;df72&#39;, &#39;d32f&#39;, &#39;d32f52&#39;, &#39;d32f72&#39;, &#39;d52f&#39;, &#39;d52f52&#39;, &#39;d52f72&#39;,</span>
+<span class="sd">          &#39;t2gf&#39;, &#39;t2gf52&#39;, &#39;t2gf72&#39;:</span>
+
+<span class="sd">        args = [F0_11, F2_11, F4_11, F0_12, F2_12, F4_12, G1_12, G3_12, G5_12,</span>
+<span class="sd">        F0_22, F2_22, F4_22, F6_22]</span>
+
+<span class="sd">        - &#39;ff&#39;, &#39;ff52&#39;, &#39;ff72&#39;, &#39;f52f&#39;, &#39;f52f52&#39;, &#39;f52f72&#39;, &#39;f72f&#39;, &#39;f72f52&#39;, &#39;f72f72&#39;:</span>
+
+<span class="sd">        args = [F0_11, F2_11, F4_11, F6_11, F0_12, F2_12, F4_12, F6_12,</span>
+<span class="sd">        G0_12, G2_12, G4_12, G6_12, F0_22, F2_22, F4_22, F6_22]</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    umat: 4d array of complex</span>
+<span class="sd">        the Coulomb interaction tensor</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; import edrixs</span>
+<span class="sd">    &gt;&gt;&gt; F0_dd, F2_dd, F4_dd = 3.0, 1.0, 0.5</span>
+<span class="sd">    &gt;&gt;&gt; F0_dp, F2_dp, G1_dp, G3_dp = 2.0, 1.0, 0.2, 0.1</span>
+<span class="sd">    &gt;&gt;&gt; F0_pp, F2_pp = 0.0, 0.0</span>
+<span class="sd">    &gt;&gt;&gt; slater = [F0_dd, F2_dd, F4_dd, F0_dp, F2_dp, G1_dp, G3_dp, F0_pp, F2_pp]</span>
+<span class="sd">    &gt;&gt;&gt; umat_d = edrixs.get_umat_slater(&#39;d&#39;, F0_dd, F2_dd, F4_dd)</span>
+<span class="sd">    &gt;&gt;&gt; umat_dp = edrixs.get_umat_slater(&#39;dp&#39;, *slater)</span>
+<span class="sd">    &gt;&gt;&gt; umat_t2gp = edrixs.get_umat_slater(&#39;t2gp&#39;, *slater)</span>
+<span class="sd">    &gt;&gt;&gt; umat_dp32 = edrixs.get_umat_slater(&#39;dp32&#39;, *slater)</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    coulomb_utensor.umat_slater</span>
+<span class="sd">    coulomb_utensor.get_umat_kanamori</span>
+<span class="sd">    coulomb_utensor.get_umat_kanamori_ge</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="n">info_atomic_shell</span><span class="p">()</span>
+    <span class="n">shells</span> <span class="o">=</span> <span class="n">case_to_shell_name</span><span class="p">(</span><span class="n">case</span><span class="p">)</span>
+    <span class="n">nslat</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">slater_integrals_name</span><span class="p">(</span><span class="n">shells</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">nslat</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Number of Slater integrals&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="s2">&quot; is not equal to &quot;</span><span class="p">,</span> <span class="n">nslat</span><span class="p">)</span>
+
+    <span class="n">special_shell</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;t2g&#39;</span><span class="p">,</span> <span class="s1">&#39;p12&#39;</span><span class="p">,</span> <span class="s1">&#39;p32&#39;</span><span class="p">,</span> <span class="s1">&#39;d32&#39;</span><span class="p">,</span> <span class="s1">&#39;d52&#39;</span><span class="p">,</span> <span class="s1">&#39;f52&#39;</span><span class="p">,</span> <span class="s1">&#39;f72&#39;</span><span class="p">]</span>
+    <span class="n">orb_indx</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">special_shell</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span>
+        <span class="n">special_shell</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+        <span class="n">special_shell</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+        <span class="n">special_shell</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+        <span class="n">special_shell</span><span class="p">[</span><span class="mi">4</span><span class="p">]:</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span>
+        <span class="n">special_shell</span><span class="p">[</span><span class="mi">5</span><span class="p">]:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+        <span class="n">special_shell</span><span class="p">[</span><span class="mi">6</span><span class="p">]:</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">]</span>
+    <span class="p">}</span>
+    <span class="c1"># only one shell</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shells</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">orbl</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="n">shells</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">l_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">orbl</span><span class="p">]</span>
+        <span class="n">fk</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">it</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">rank</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">orbl</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="n">fk</span><span class="p">[(</span><span class="n">rank</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">it</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">umat</span> <span class="o">=</span> <span class="n">umat_slater</span><span class="p">(</span><span class="n">l_list</span><span class="p">,</span> <span class="n">fk</span><span class="p">)</span>
+        <span class="c1"># truncate to a sub-shell if necessary</span>
+        <span class="k">if</span> <span class="n">shells</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">special_shell</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">shells</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;t2g&#39;</span><span class="p">:</span>
+                <span class="n">tmat</span> <span class="o">=</span> <span class="n">tmat_c2r</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tmat</span> <span class="o">=</span> <span class="n">tmat_c2j</span><span class="p">(</span><span class="n">orbl</span><span class="p">)</span>
+            <span class="n">umat</span> <span class="o">=</span> <span class="n">transform_utensor</span><span class="p">(</span><span class="n">umat</span><span class="p">,</span> <span class="n">tmat</span><span class="p">)</span>
+            <span class="n">indx</span> <span class="o">=</span> <span class="n">orb_indx</span><span class="p">[</span><span class="n">shells</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="n">umat_tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">indx</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">indx</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">indx</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">indx</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+            <span class="n">umat_tmp</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">umat</span><span class="p">[</span><span class="n">indx</span><span class="p">][:,</span> <span class="n">indx</span><span class="p">][:,</span> <span class="p">:,</span> <span class="n">indx</span><span class="p">][:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">indx</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">shells</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;t2g&#39;</span><span class="p">:</span>
+                <span class="n">umat_tmp</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">transform_utensor</span><span class="p">(</span><span class="n">umat_tmp</span><span class="p">,</span> <span class="n">tmat_r2c</span><span class="p">(</span><span class="s1">&#39;t2g&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+            <span class="n">umat</span> <span class="o">=</span> <span class="n">umat_tmp</span>
+    <span class="c1"># two shells</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">shells</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">name1</span><span class="p">,</span> <span class="n">name2</span> <span class="o">=</span> <span class="n">shells</span>
+        <span class="n">l1</span><span class="p">,</span> <span class="n">l2</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="n">name1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">info</span><span class="p">[</span><span class="n">name2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">n1</span><span class="p">,</span> <span class="n">n2</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">l1</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">l2</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">ntot</span> <span class="o">=</span> <span class="n">n1</span> <span class="o">+</span> <span class="n">n2</span>
+        <span class="n">l_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">l1</span><span class="p">,</span> <span class="n">l2</span><span class="p">]</span>
+        <span class="n">fk</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">it</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">rank</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">l1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="n">fk</span><span class="p">[(</span><span class="n">rank</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">it</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">rank</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">l1</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">l2</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="n">fk</span><span class="p">[(</span><span class="n">rank</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">fk</span><span class="p">[(</span><span class="n">rank</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">it</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">rank</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">l1</span> <span class="o">-</span> <span class="n">l2</span><span class="p">),</span> <span class="n">l1</span> <span class="o">+</span> <span class="n">l2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="n">fk</span><span class="p">[(</span><span class="n">rank</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">fk</span><span class="p">[(</span><span class="n">rank</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">it</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">rank</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">l2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+            <span class="n">fk</span><span class="p">[(</span><span class="n">rank</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)]</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="n">it</span><span class="p">]</span>
+            <span class="n">it</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">umat</span> <span class="o">=</span> <span class="n">umat_slater</span><span class="p">(</span><span class="n">l_list</span><span class="p">,</span> <span class="n">fk</span><span class="p">)</span>
+        <span class="c1"># truncate to a sub-shell if necessary</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">name1</span> <span class="ow">in</span> <span class="n">special_shell</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">name2</span> <span class="ow">in</span> <span class="n">special_shell</span><span class="p">):</span>
+            <span class="n">tmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">ntot</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+            <span class="n">indx1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n1</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">name1</span> <span class="ow">in</span> <span class="n">special_shell</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">name1</span> <span class="o">==</span> <span class="s1">&#39;t2g&#39;</span><span class="p">:</span>
+                    <span class="n">tmat</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">n1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">n1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmat_c2r</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">tmat</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">n1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">n1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmat_c2j</span><span class="p">(</span><span class="n">l1</span><span class="p">)</span>
+                <span class="n">indx1</span> <span class="o">=</span> <span class="n">orb_indx</span><span class="p">[</span><span class="n">name1</span><span class="p">]</span>
+
+            <span class="n">indx2</span> <span class="o">=</span> <span class="p">[</span><span class="n">n1</span> <span class="o">+</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n2</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="n">name2</span> <span class="ow">in</span> <span class="n">special_shell</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">name2</span> <span class="o">==</span> <span class="s1">&#39;t2g&#39;</span><span class="p">:</span>
+                    <span class="n">tmat</span><span class="p">[</span><span class="n">n1</span><span class="p">:</span><span class="n">ntot</span><span class="p">,</span> <span class="n">n1</span><span class="p">:</span><span class="n">ntot</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmat_c2r</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">tmat</span><span class="p">[</span><span class="n">n1</span><span class="p">:</span><span class="n">ntot</span><span class="p">,</span> <span class="n">n1</span><span class="p">:</span><span class="n">ntot</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmat_c2j</span><span class="p">(</span><span class="n">l2</span><span class="p">)</span>
+                <span class="n">indx2</span> <span class="o">=</span> <span class="p">[</span><span class="n">n1</span> <span class="o">+</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">orb_indx</span><span class="p">[</span><span class="n">name2</span><span class="p">]]</span>
+
+            <span class="n">indx</span> <span class="o">=</span> <span class="n">indx1</span> <span class="o">+</span> <span class="n">indx2</span>
+            <span class="n">umat</span> <span class="o">=</span> <span class="n">transform_utensor</span><span class="p">(</span><span class="n">umat</span><span class="p">,</span> <span class="n">tmat</span><span class="p">)</span>
+            <span class="n">umat_tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">indx</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">indx</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">indx</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">indx</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+            <span class="n">umat_tmp</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">umat</span><span class="p">[</span><span class="n">indx</span><span class="p">][:,</span> <span class="n">indx</span><span class="p">][:,</span> <span class="p">:,</span> <span class="n">indx</span><span class="p">][:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">indx</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">name1</span> <span class="o">==</span> <span class="s1">&#39;t2g&#39;</span> <span class="ow">or</span> <span class="n">name2</span> <span class="o">==</span> <span class="s1">&#39;t2g&#39;</span><span class="p">:</span>
+                <span class="n">tmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">indx</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">name1</span> <span class="o">==</span> <span class="s1">&#39;t2g&#39;</span><span class="p">:</span>
+                    <span class="n">tmat</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmat_r2c</span><span class="p">(</span><span class="s1">&#39;t2g&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">name2</span> <span class="o">==</span> <span class="s1">&#39;t2g&#39;</span><span class="p">:</span>
+                    <span class="n">tmat</span><span class="p">[</span><span class="o">-</span><span class="mi">6</span><span class="p">:,</span> <span class="o">-</span><span class="mi">6</span><span class="p">:]</span> <span class="o">=</span> <span class="n">tmat_r2c</span><span class="p">(</span><span class="s1">&#39;t2g&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+                <span class="n">umat_tmp</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">transform_utensor</span><span class="p">(</span><span class="n">umat_tmp</span><span class="p">,</span> <span class="n">tmat</span><span class="p">)</span>
+            <span class="n">umat</span> <span class="o">=</span> <span class="n">umat_tmp</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Not implemented for this case: &quot;</span><span class="p">,</span> <span class="n">shells</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">umat</span></div>
+
+
+
+<div class="viewcode-block" id="get_umat_slater_3shells">
+<a class="viewcode-back" href="../../reference/coulomb_utensor.html#edrixs.coulomb_utensor.get_umat_slater_3shells">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_umat_slater_3shells</span><span class="p">(</span><span class="n">shell_name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given three shells, build the slater type of Coulomb tensors among</span>
+<span class="sd">    the three shells.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    shell_name: tuple of three strings</span>
+<span class="sd">        Shells names.</span>
+<span class="sd">    *args: floats</span>
+<span class="sd">        Slater integrals. The order should be</span>
+
+<span class="sd">        FX_11, FX_12, GX_12, FX_22, FX_13, GX_13, FX_23, GX_23, FX_33</span>
+
+<span class="sd">        where, 1, 2, 3 means 1st, 2nd, 3rd shell, and X=0, 2, 4, ... or X=1, 3, 5 ...,</span>
+<span class="sd">        and X should be in ascending order.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    umat: 4d complex array</span>
+<span class="sd">        Rank-4 Coulomb tensors.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">v1_name</span> <span class="o">=</span> <span class="n">shell_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">v2_name</span> <span class="o">=</span> <span class="n">shell_name</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">v3_name</span> <span class="o">=</span> <span class="n">shell_name</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">info_shell</span> <span class="o">=</span> <span class="n">info_atomic_shell</span><span class="p">()</span>
+
+    <span class="n">v1_orbl</span> <span class="o">=</span> <span class="n">info_shell</span><span class="p">[</span><span class="n">v1_name</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">v2_orbl</span> <span class="o">=</span> <span class="n">info_shell</span><span class="p">[</span><span class="n">v2_name</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">v3_orbl</span> <span class="o">=</span> <span class="n">info_shell</span><span class="p">[</span><span class="n">v3_name</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">v1_norb</span> <span class="o">=</span> <span class="n">info_shell</span><span class="p">[</span><span class="n">v1_name</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">v2_norb</span> <span class="o">=</span> <span class="n">info_shell</span><span class="p">[</span><span class="n">v2_name</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">v3_norb</span> <span class="o">=</span> <span class="n">info_shell</span><span class="p">[</span><span class="n">v3_name</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># total number of orbitals</span>
+    <span class="n">ntot</span> <span class="o">=</span> <span class="n">v1_norb</span> <span class="o">+</span> <span class="n">v2_norb</span> <span class="o">+</span> <span class="n">v3_norb</span>
+    <span class="n">v1v2_norb</span> <span class="o">=</span> <span class="n">v1_norb</span> <span class="o">+</span> <span class="n">v2_norb</span>
+
+    <span class="n">indx</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">it</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">it</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">v1_orbl</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">indx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+    <span class="n">it</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">v1_orbl</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">v2_orbl</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">it</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">v1_orbl</span><span class="o">-</span><span class="n">v2_orbl</span><span class="p">),</span> <span class="n">v1_orbl</span><span class="o">+</span><span class="n">v2_orbl</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">indx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+    <span class="n">it</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">v2_orbl</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">indx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+    <span class="n">it</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">v1_orbl</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">v3_orbl</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">it</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">v1_orbl</span><span class="o">-</span><span class="n">v3_orbl</span><span class="p">),</span> <span class="n">v1_orbl</span><span class="o">+</span><span class="n">v3_orbl</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">indx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+    <span class="n">it</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">v2_orbl</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">v3_orbl</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">it</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">v2_orbl</span><span class="o">-</span><span class="n">v3_orbl</span><span class="p">),</span> <span class="n">v2_orbl</span><span class="o">+</span><span class="n">v3_orbl</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">indx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+    <span class="n">it</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">v3_orbl</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">indx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">it</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Number of Slater integrals&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="s2">&quot; is not equal to &quot;</span><span class="p">,</span> <span class="n">it</span><span class="p">)</span>
+
+    <span class="n">umat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ntot</span><span class="p">,</span> <span class="n">ntot</span><span class="p">,</span> <span class="n">ntot</span><span class="p">,</span> <span class="n">ntot</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+
+    <span class="c1"># v1-v2</span>
+    <span class="n">case</span> <span class="o">=</span> <span class="n">v1_name</span> <span class="o">+</span> <span class="n">v2_name</span>
+    <span class="n">arg_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">indx</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">indx</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span><span class="n">indx</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">indx</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span><span class="n">indx</span><span class="p">[</span><span class="mi">2</span><span class="p">]])</span>
+    <span class="n">umat_tmp</span> <span class="o">=</span> <span class="n">get_umat_slater</span><span class="p">(</span><span class="n">case</span><span class="p">,</span> <span class="o">*</span><span class="n">arg_list</span><span class="p">)</span>
+    <span class="n">umat</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">]</span> <span class="o">=</span> <span class="n">umat_tmp</span>
+
+    <span class="c1"># v1-v3</span>
+    <span class="n">case</span> <span class="o">=</span> <span class="n">v1_name</span> <span class="o">+</span> <span class="n">v3_name</span>
+    <span class="n">arg_list</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="n">indx</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">indx</span><span class="p">[</span><span class="mi">2</span><span class="p">]:</span><span class="n">indx</span><span class="p">[</span><span class="mi">3</span><span class="p">]])</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">indx</span><span class="p">[</span><span class="mi">4</span><span class="p">]:</span><span class="n">indx</span><span class="p">[</span><span class="mi">5</span><span class="p">]])</span>
+    <span class="n">umat_tmp</span> <span class="o">=</span> <span class="n">get_umat_slater</span><span class="p">(</span><span class="n">case</span><span class="p">,</span> <span class="o">*</span><span class="n">arg_list</span><span class="p">)</span>
+    <span class="n">aa</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">v1_norb</span><span class="p">))</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">v1v2_norb</span><span class="p">,</span> <span class="n">ntot</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">v1_norb</span> <span class="o">+</span> <span class="n">v3_norb</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">v1_norb</span> <span class="o">+</span> <span class="n">v3_norb</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">v1_norb</span> <span class="o">+</span> <span class="n">v3_norb</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">v1_norb</span> <span class="o">+</span> <span class="n">v3_norb</span><span class="p">):</span>
+                    <span class="n">umat</span><span class="p">[</span><span class="n">aa</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">aa</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">aa</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">aa</span><span class="p">[</span><span class="n">m</span><span class="p">]]</span> <span class="o">+=</span> <span class="n">umat_tmp</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">m</span><span class="p">]</span>
+
+    <span class="c1"># v2-v3</span>
+    <span class="n">case</span> <span class="o">=</span> <span class="n">v2_name</span> <span class="o">+</span> <span class="n">v3_name</span>
+    <span class="n">arg_list</span> <span class="o">=</span> <span class="p">([</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">indx</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">indx</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span>
+                <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="n">indx</span><span class="p">[</span><span class="mi">3</span><span class="p">]:</span><span class="n">indx</span><span class="p">[</span><span class="mi">4</span><span class="p">]])</span> <span class="o">+</span>
+                <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">indx</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">-</span> <span class="n">indx</span><span class="p">[</span><span class="mi">4</span><span class="p">]))</span>
+    <span class="n">umat_tmp</span> <span class="o">=</span> <span class="n">get_umat_slater</span><span class="p">(</span><span class="n">case</span><span class="p">,</span> <span class="o">*</span><span class="n">arg_list</span><span class="p">)</span>
+    <span class="n">aa</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">v1_norb</span><span class="p">,</span> <span class="n">ntot</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">v2_norb</span> <span class="o">+</span> <span class="n">v3_norb</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">v2_norb</span> <span class="o">+</span> <span class="n">v3_norb</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">v2_norb</span> <span class="o">+</span> <span class="n">v3_norb</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">v2_norb</span> <span class="o">+</span> <span class="n">v3_norb</span><span class="p">):</span>
+                    <span class="n">umat</span><span class="p">[</span><span class="n">aa</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">aa</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">aa</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">aa</span><span class="p">[</span><span class="n">m</span><span class="p">]]</span> <span class="o">+=</span> <span class="n">umat_tmp</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">m</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">umat</span></div>
+
+
+
+<div class="viewcode-block" id="get_umat_kanamori">
+<a class="viewcode-back" href="../../reference/coulomb_utensor.html#edrixs.coulomb_utensor.get_umat_kanamori">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_umat_kanamori</span><span class="p">(</span><span class="n">norbs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">J</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the Coulomb interaction tensor for a Kanamori-type interaction.</span>
+<span class="sd">    For the :math:`t2g`-shell case, it is parameterized by :math:`U, J`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    norbs: int</span>
+<span class="sd">        number of orbitals (including spin).</span>
+<span class="sd">    U: float</span>
+<span class="sd">        Hubbard :math:`U` for electrons residing on the same orbital with opposite spin.</span>
+<span class="sd">    J: float</span>
+<span class="sd">        Hund&#39;s coupling.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    umat: 4d complex array</span>
+<span class="sd">        The calculated Coulomb interaction tensor</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The order of spin index is: up, down, up, down, ..., up, down.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    coulomb_utensor.get_umat_kanamori_ge</span>
+<span class="sd">    coulomb_utensor.get_umat_slater</span>
+<span class="sd">    coulomb_utensor.umat_slater</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">get_umat_kanamori_ge</span><span class="p">(</span><span class="n">norbs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">U</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">J</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">J</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Brookhaven National Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

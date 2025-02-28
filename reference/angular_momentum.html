@@ -1,0 +1,702 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>angular_momentum &mdash; edrixs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="basis_transform" href="basis_transform.html" />
+    <link rel="prev" title="edrixs Reference" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            edrixs
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">edrixs User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Pedagogical examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">edrixs Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">angular_momentum</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.angular_momentum.cf_cubic_d"><code class="docutils literal notranslate"><span class="pre">cf_cubic_d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.angular_momentum.cf_square_planar_d"><code class="docutils literal notranslate"><span class="pre">cf_square_planar_d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.angular_momentum.cf_tetragonal_d"><code class="docutils literal notranslate"><span class="pre">cf_tetragonal_d()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.angular_momentum.cf_trigonal_t2g"><code class="docutils literal notranslate"><span class="pre">cf_trigonal_t2g()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.angular_momentum.dmat_spinor"><code class="docutils literal notranslate"><span class="pre">dmat_spinor()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.angular_momentum.euler_to_rmat"><code class="docutils literal notranslate"><span class="pre">euler_to_rmat()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.angular_momentum.get_ladd"><code class="docutils literal notranslate"><span class="pre">get_ladd()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.angular_momentum.get_lminus"><code class="docutils literal notranslate"><span class="pre">get_lminus()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.angular_momentum.get_lx"><code class="docutils literal notranslate"><span class="pre">get_lx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.angular_momentum.get_ly"><code class="docutils literal notranslate"><span class="pre">get_ly()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.angular_momentum.get_lz"><code class="docutils literal notranslate"><span class="pre">get_lz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.angular_momentum.get_orb_momentum"><code class="docutils literal notranslate"><span class="pre">get_orb_momentum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.angular_momentum.get_pauli"><code class="docutils literal notranslate"><span class="pre">get_pauli()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.angular_momentum.get_spin_momentum"><code class="docutils literal notranslate"><span class="pre">get_spin_momentum()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.angular_momentum.get_sx"><code class="docutils literal notranslate"><span class="pre">get_sx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.angular_momentum.get_sy"><code class="docutils literal notranslate"><span class="pre">get_sy()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.angular_momentum.get_sz"><code class="docutils literal notranslate"><span class="pre">get_sz()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.angular_momentum.get_wigner_dmat"><code class="docutils literal notranslate"><span class="pre">get_wigner_dmat()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.angular_momentum.rmat_to_euler"><code class="docutils literal notranslate"><span class="pre">rmat_to_euler()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.angular_momentum.where_is_angle"><code class="docutils literal notranslate"><span class="pre">where_is_angle()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.angular_momentum.zx_to_rmat"><code class="docutils literal notranslate"><span class="pre">zx_to_rmat()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="basis_transform.html">basis_transform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coulomb_utensor.html">coulomb_utensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fit_hyb.html">fit_hyb</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fock_basis.html">fock_basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="iostream.html">iostream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manybody_operator.html">manybody_operator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="photon_transition.html">photon_transition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_spectrum.html">plot_spectrum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rixs_utils.html">rixs_utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc.html">soc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers.html">solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wannier_ham.html">wannier_ham</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">edrixs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">edrixs Reference</a></li>
+      <li class="breadcrumb-item active">angular_momentum</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/reference/angular_momentum.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-edrixs.angular_momentum">
+<span id="angular-momentum"></span><h1>angular_momentum<a class="headerlink" href="#module-edrixs.angular_momentum" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.angular_momentum.cf_cubic_d">
+<span class="sig-prename descclassname"><span class="pre">edrixs.angular_momentum.</span></span><span class="sig-name descname"><span class="pre">cf_cubic_d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ten_dq</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/angular_momentum.html#cf_cubic_d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.angular_momentum.cf_cubic_d" title="Link to this definition">¶</a></dt>
+<dd><p>Given 10Dq, return cubic crystal field matrix for d orbitals
+in the complex harmonics basis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ten_dq: float scalar</strong></dt><dd><p>The splitting between <span class="math notranslate nohighlight">\(eg\)</span> and <span class="math notranslate nohighlight">\(t2g\)</span> orbitals.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>cf: 2d complex array, shape=(10, 10)</dt><dd><p>The matrix form of crystal field Hamiltonian in complex harmonics basis.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.angular_momentum.cf_square_planar_d">
+<span class="sig-prename descclassname"><span class="pre">edrixs.angular_momentum.</span></span><span class="sig-name descname"><span class="pre">cf_square_planar_d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ten_dq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/angular_momentum.html#cf_square_planar_d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.angular_momentum.cf_square_planar_d" title="Link to this definition">¶</a></dt>
+<dd><p>Given 10Dq, ds, return square planar crystal field matrix for d orbitals
+in the complex harmonics basis. This is the limit of strong tetragonal
+distortion with two axial ligands at infinity. Note that in this case the
+three parameters, ten_dq, ds, and dt, are no longer independent:
+dt = 2/35*ten_dq and the levels depend on only two parameters
+ten_dq and ds.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ten_dq: float scalar</strong></dt><dd><p>Parameter associated with eg-t2g splitting.</p>
+</dd>
+<dt><strong>ds: float scalar</strong></dt><dd><p>Paramter associated with splitting orbitals with
+z-components.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>cf: 2d complex array, shape=(10, 10)</dt><dd><p>The matrix form of crystal field Hamiltonian in complex harmonics basis.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.angular_momentum.cf_tetragonal_d">
+<span class="sig-prename descclassname"><span class="pre">edrixs.angular_momentum.</span></span><span class="sig-name descname"><span class="pre">cf_tetragonal_d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ten_dq</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">d3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/angular_momentum.html#cf_tetragonal_d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.angular_momentum.cf_tetragonal_d" title="Link to this definition">¶</a></dt>
+<dd><p>Given 10Dq, d1, d3, return tetragonal crystal field matrix for d orbitals
+in the complex harmonics basis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ten_dq: float scalar</strong></dt><dd><p>Parameter used to label cubic crystal splitting.</p>
+</dd>
+<dt><strong>d1: float scalar</strong></dt><dd><p>Paramter used to label tetragonal splitting.</p>
+</dd>
+<dt><strong>d3: float scalar</strong></dt><dd><p>Paramter used to label tetragonal splitting.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>cf: 2d complex array, shape=(10, 10)</dt><dd><p>The matrix form of crystal field Hamiltonian in complex harmonics basis.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.angular_momentum.cf_trigonal_t2g">
+<span class="sig-prename descclassname"><span class="pre">edrixs.angular_momentum.</span></span><span class="sig-name descname"><span class="pre">cf_trigonal_t2g</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">delta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/angular_momentum.html#cf_trigonal_t2g"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.angular_momentum.cf_trigonal_t2g" title="Link to this definition">¶</a></dt>
+<dd><p>Given delta, return trigonal crystal field matrix for t2g orbitals
+in the complex harmonics basis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>delta: float scalar</strong></dt><dd><p>Parameter used to label trigonal crystal splitting.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>cf: 2d complex array, shape=(6, 6)</dt><dd><p>The matrix form of crystal field Hamiltonian in complex harmonics basis.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.angular_momentum.dmat_spinor">
+<span class="sig-prename descclassname"><span class="pre">edrixs.angular_momentum.</span></span><span class="sig-name descname"><span class="pre">dmat_spinor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/angular_momentum.html#dmat_spinor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.angular_momentum.dmat_spinor" title="Link to this definition">¶</a></dt>
+<dd><p>Given three Euler angle: <span class="math notranslate nohighlight">\(\alpha, \beta, \gamma\)</span>,
+return the transformation
+matrix for <span class="math notranslate nohighlight">\(\frac{1}{2}\)</span>-spinor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>alpha: float</strong></dt><dd><p>Euler angle <span class="math notranslate nohighlight">\(\alpha\)</span> in radian [0, <span class="math notranslate nohighlight">\(2\pi\)</span>].</p>
+</dd>
+<dt><strong>beta: float</strong></dt><dd><p>Euler angle <span class="math notranslate nohighlight">\(\beta\)</span> in radian [0, <span class="math notranslate nohighlight">\(\pi\)</span>].</p>
+</dd>
+<dt><strong>gamma: float</strong></dt><dd><p>Euler angle <span class="math notranslate nohighlight">\(\gamma\)</span> in radian [0, <span class="math notranslate nohighlight">\(2\pi\)</span>].</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>dmat:  2d complex array</dt><dd><p>The <span class="math notranslate nohighlight">\(2 \times 2\)</span> transformation matrix.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.angular_momentum.euler_to_rmat">
+<span class="sig-prename descclassname"><span class="pre">edrixs.angular_momentum.</span></span><span class="sig-name descname"><span class="pre">euler_to_rmat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/angular_momentum.html#euler_to_rmat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.angular_momentum.euler_to_rmat" title="Link to this definition">¶</a></dt>
+<dd><p>Given Euler angle: <span class="math notranslate nohighlight">\(\alpha, \beta, \gamma\)</span>,
+generate the <span class="math notranslate nohighlight">\(3 \times 3\)</span> rotational matrix <span class="math notranslate nohighlight">\(R\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>alpha: float</strong></dt><dd><p>Euler angle, in radian, [0, <span class="math notranslate nohighlight">\(2\pi\)</span>]</p>
+</dd>
+<dt><strong>beta: float</strong></dt><dd><p>Euler angle, in radian, [0, <span class="math notranslate nohighlight">\(\pi\)</span>]</p>
+</dd>
+<dt><strong>gamma: float</strong></dt><dd><p>Euler angle, in radian, [0, <span class="math notranslate nohighlight">\(2\pi\)</span>]</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>rmat: 2d float array</dt><dd><p>The <span class="math notranslate nohighlight">\(3 \times 3\)</span> rotational matrix.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.angular_momentum.get_ladd">
+<span class="sig-prename descclassname"><span class="pre">edrixs.angular_momentum.</span></span><span class="sig-name descname"><span class="pre">get_ladd</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ll</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ispin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/angular_momentum.html#get_ladd"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.angular_momentum.get_ladd" title="Link to this definition">¶</a></dt>
+<dd><p>Get the matrix form of the raising operator <span class="math notranslate nohighlight">\(l^+\)</span> in the
+complex spherical harmonics basis</p>
+<div class="math notranslate nohighlight">
+\[l^+|ll,m&gt; = \sqrt{(ll-m)(ll+m+1)} |ll,m+1&gt;\]</div>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ll: int</strong></dt><dd><p>Orbital angular momentum number.</p>
+</dd>
+<dt><strong>ispin: logical</strong></dt><dd><p>Whether including spin or not (default: False).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt>ladd: 2d complex array</dt><dd><p>The matrix form of <span class="math notranslate nohighlight">\(l^+\)</span>.</p>
+<p>If ispin=True, the dimension will be <span class="math notranslate nohighlight">\(2(2ll+1) \times 2(2ll+1)\)</span>,</p>
+<p>otherwise, it will be <span class="math notranslate nohighlight">\((2ll+1) \times (2ll+1)\)</span>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.angular_momentum.get_lminus">
+<span class="sig-prename descclassname"><span class="pre">edrixs.angular_momentum.</span></span><span class="sig-name descname"><span class="pre">get_lminus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ll</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ispin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/angular_momentum.html#get_lminus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.angular_momentum.get_lminus" title="Link to this definition">¶</a></dt>
+<dd><p>Get the matrix form of the lowering operator <span class="math notranslate nohighlight">\(l^-\)</span> in the
+complex spherical harmonics basis</p>
+<div class="math notranslate nohighlight">
+\[l^-|ll,m&gt; = \sqrt{(ll+m)(ll-m+1)} |ll,m-1&gt;\]</div>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ll: int</strong></dt><dd><p>Orbital angular momentum number.</p>
+</dd>
+<dt><strong>ispin: logical</strong></dt><dd><p>Whether including spin or not (default: False).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt>lminus: 2d complex array</dt><dd><p>The matrix form of <span class="math notranslate nohighlight">\(l^-\)</span>.</p>
+<p>If ispin=True, the dimension will be <span class="math notranslate nohighlight">\(2(2ll+1) \times 2(2ll+1)\)</span>,</p>
+<p>otherwise, it will be <span class="math notranslate nohighlight">\((2ll+1) \times (2ll+1)\)</span>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.angular_momentum.get_lx">
+<span class="sig-prename descclassname"><span class="pre">edrixs.angular_momentum.</span></span><span class="sig-name descname"><span class="pre">get_lx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ll</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ispin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/angular_momentum.html#get_lx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.angular_momentum.get_lx" title="Link to this definition">¶</a></dt>
+<dd><p>Get the matrix form of the orbital angular momentum
+operator <span class="math notranslate nohighlight">\(l_x\)</span> in the complex spherical harmonics basis,</p>
+<div class="math notranslate nohighlight">
+\[l_x = \frac{1}{2} (l^+ + l^-)\]</div>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ll: int</strong></dt><dd><p>Orbital angular momentum number.</p>
+</dd>
+<dt><strong>ispin: logical</strong></dt><dd><p>Whether including spin or not (default: False).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt>lx: 2d complex array</dt><dd><p>The matrix form of <span class="math notranslate nohighlight">\(l_x\)</span>.</p>
+<p>If ispin=True, the dimension will be <span class="math notranslate nohighlight">\(2(2ll+1) \times 2(2ll+1)\)</span>,</p>
+<p>otherwise, it will be <span class="math notranslate nohighlight">\((2ll+1) \times (2ll+1)\)</span>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.angular_momentum.get_ly">
+<span class="sig-prename descclassname"><span class="pre">edrixs.angular_momentum.</span></span><span class="sig-name descname"><span class="pre">get_ly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ll</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ispin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/angular_momentum.html#get_ly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.angular_momentum.get_ly" title="Link to this definition">¶</a></dt>
+<dd><p>Get the matrix form of the orbital angular momentum
+operator <span class="math notranslate nohighlight">\(l_y\)</span> in the complex spherical harmonics basis,</p>
+<div class="math notranslate nohighlight">
+\[l_y = \frac{-i}{2} (l^+ - l^-)\]</div>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ll: int</strong></dt><dd><p>Orbital angular momentum number.</p>
+</dd>
+<dt><strong>ispin: logical</strong></dt><dd><p>Whether including spin or not (default: False).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt>ly: 2d complex array</dt><dd><p>The matrix form of <span class="math notranslate nohighlight">\(l_y\)</span>.</p>
+<p>If ispin=True, the dimension will be <span class="math notranslate nohighlight">\(2(2ll+1) \times 2(2ll+1)\)</span>,</p>
+<p>otherwise, it will be <span class="math notranslate nohighlight">\((2ll+1) \times (2ll+1)\)</span>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.angular_momentum.get_lz">
+<span class="sig-prename descclassname"><span class="pre">edrixs.angular_momentum.</span></span><span class="sig-name descname"><span class="pre">get_lz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ll</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ispin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/angular_momentum.html#get_lz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.angular_momentum.get_lz" title="Link to this definition">¶</a></dt>
+<dd><p>Get the matrix form of the orbital angular momentum
+operator <span class="math notranslate nohighlight">\(l_z\)</span> in the complex spherical harmonics basis.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ll: int</strong></dt><dd><p>Orbital angular momentum number.</p>
+</dd>
+<dt><strong>ispin: logical</strong></dt><dd><p>Whether including spin or not (default: False).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt>lz: 2d complex array</dt><dd><p>The matrix form of <span class="math notranslate nohighlight">\(l_z\)</span>.</p>
+<p>If ispin=True, the dimension will be <span class="math notranslate nohighlight">\(2(2ll+1) \times 2(2ll+1)\)</span>,</p>
+<p>otherwise, it will be <span class="math notranslate nohighlight">\((2ll+1) \times (2ll+1)\)</span>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.angular_momentum.get_orb_momentum">
+<span class="sig-prename descclassname"><span class="pre">edrixs.angular_momentum.</span></span><span class="sig-name descname"><span class="pre">get_orb_momentum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ll</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ispin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/angular_momentum.html#get_orb_momentum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.angular_momentum.get_orb_momentum" title="Link to this definition">¶</a></dt>
+<dd><p>Get the matrix form of the orbital angular momentum
+operator <span class="math notranslate nohighlight">\(l_x, l_y, l_z\)</span> in the complex spherical harmonics basis.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ll: int</strong></dt><dd><p>Orbital angular momentum number.</p>
+</dd>
+<dt><strong>ispin: logical</strong></dt><dd><p>Whether including spin or not (default: False).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt>res: 3d complex array</dt><dd><p>The matrix form of</p>
+<ul class="simple">
+<li><p>res[0]: <span class="math notranslate nohighlight">\(l_x\)</span></p></li>
+<li><p>res[1]: <span class="math notranslate nohighlight">\(l_y\)</span></p></li>
+<li><p>res[2]: <span class="math notranslate nohighlight">\(l_z\)</span></p></li>
+</ul>
+<p>If ispin=True, the dimension will be <span class="math notranslate nohighlight">\(3 \times 2(2ll+1) \times 2(2ll+1)\)</span>,</p>
+<p>otherwise, it will be <span class="math notranslate nohighlight">\(3 \times (2ll+1) \times (2ll+1)\)</span>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.angular_momentum.get_pauli">
+<span class="sig-prename descclassname"><span class="pre">edrixs.angular_momentum.</span></span><span class="sig-name descname"><span class="pre">get_pauli</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/angular_momentum.html#get_pauli"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.angular_momentum.get_pauli" title="Link to this definition">¶</a></dt>
+<dd><p>Get the Pauli matrix</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>sigma: 3d complex array, shape=(3, 2, 2)</dt><dd><ul class="simple">
+<li><p>sigma[0] is <span class="math notranslate nohighlight">\(\sigma_x\)</span>,</p></li>
+<li><p>sigma[1] is <span class="math notranslate nohighlight">\(\sigma_y\)</span>,</p></li>
+<li><p>sigma[2] is <span class="math notranslate nohighlight">\(\sigma_z\)</span>,</p></li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.angular_momentum.get_spin_momentum">
+<span class="sig-prename descclassname"><span class="pre">edrixs.angular_momentum.</span></span><span class="sig-name descname"><span class="pre">get_spin_momentum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ll</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/angular_momentum.html#get_spin_momentum"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.angular_momentum.get_spin_momentum" title="Link to this definition">¶</a></dt>
+<dd><p>Get the matrix form of the spin angular momentum
+operator <span class="math notranslate nohighlight">\(s_x, s_y, s_z\)</span> in the complex spherical harmonics basis.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ll: int</strong></dt><dd><p>Orbital angular momentum number.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt>res: 3d complex array</dt><dd><p>The matrix form of</p>
+<ul class="simple">
+<li><p>res[0]: <span class="math notranslate nohighlight">\(s_x\)</span></p></li>
+<li><p>res[1]: <span class="math notranslate nohighlight">\(s_y\)</span></p></li>
+<li><p>res[2]: <span class="math notranslate nohighlight">\(s_z\)</span></p></li>
+</ul>
+<p>the dimension is <span class="math notranslate nohighlight">\(3 \times 2(2ll+1) \times 2(2ll+1)\)</span>,</p>
+<p>Orbital order is: |-ll,up&gt;, |-ll,down&gt;, …,
+|+ll, up&gt;, |+ll,down&gt;</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.angular_momentum.get_sx">
+<span class="sig-prename descclassname"><span class="pre">edrixs.angular_momentum.</span></span><span class="sig-name descname"><span class="pre">get_sx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ll</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/angular_momentum.html#get_sx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.angular_momentum.get_sx" title="Link to this definition">¶</a></dt>
+<dd><p>Get the matrix form of spin angular momentum operator <span class="math notranslate nohighlight">\(s_x\)</span> in the
+complex spherical harmonics basis.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ll: int</strong></dt><dd><p>Quantum number of orbital angular momentum.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt>sx: 2d complex array.</dt><dd><p>Matrix form of <span class="math notranslate nohighlight">\(s_x\)</span>, the dimension
+is <span class="math notranslate nohighlight">\(2(2ll+1) \times 2(2ll+1)\)</span>,</p>
+<p>Orbital order is: |-ll,up&gt;, |-ll,down&gt;, …,
+|+ll, up&gt;, |+ll,down&gt;.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.angular_momentum.get_sy">
+<span class="sig-prename descclassname"><span class="pre">edrixs.angular_momentum.</span></span><span class="sig-name descname"><span class="pre">get_sy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ll</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/angular_momentum.html#get_sy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.angular_momentum.get_sy" title="Link to this definition">¶</a></dt>
+<dd><p>Get the matrix form of spin angular momentum operator <span class="math notranslate nohighlight">\(s_y\)</span> in the
+complex spherical harmonics basis.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ll: int</strong></dt><dd><p>Quantum number of orbital angular momentum.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt>sy: 2d complex array.</dt><dd><p>Matrix form of <span class="math notranslate nohighlight">\(s_y\)</span>, the dimension
+is <span class="math notranslate nohighlight">\(2(2ll+1) \times 2(2ll+1)\)</span>, spin order is:</p>
+<p>Orbital order is: |-ll,up&gt;, |-ll,down&gt;, …,
+|+ll, up&gt;, |+ll,down&gt;</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.angular_momentum.get_sz">
+<span class="sig-prename descclassname"><span class="pre">edrixs.angular_momentum.</span></span><span class="sig-name descname"><span class="pre">get_sz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ll</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/angular_momentum.html#get_sz"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.angular_momentum.get_sz" title="Link to this definition">¶</a></dt>
+<dd><p>Get the matrix form of spin angular momentum operator <span class="math notranslate nohighlight">\(s_z\)</span> in the
+complex spherical harmonics basis.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>ll: int</strong></dt><dd><p>Quantum number of orbital angular momentum.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl>
+<dt>sz: 2d complex array.</dt><dd><p>Matrix form of <span class="math notranslate nohighlight">\(s_z\)</span>, the dimension
+is <span class="math notranslate nohighlight">\(2(2ll+1) \times 2(2ll+1)\)</span>.</p>
+<p>Orbital order is: |-ll,up&gt;, |-ll,down&gt;, …,
+|+ll, up&gt;, |+ll,down&gt;</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.angular_momentum.get_wigner_dmat">
+<span class="sig-prename descclassname"><span class="pre">edrixs.angular_momentum.</span></span><span class="sig-name descname"><span class="pre">get_wigner_dmat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">quant_2j</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/angular_momentum.html#get_wigner_dmat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.angular_momentum.get_wigner_dmat" title="Link to this definition">¶</a></dt>
+<dd><p>Given quantum number and Euler angles, return the Wigner-D matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>quant_2j: int</strong></dt><dd><p>Twice of the quantum number j: 2j, for example, quant_2j=1 means j=1/2,
+quant_2j=2 means j=1</p>
+</dd>
+<dt><strong>alpha: float number</strong></dt><dd><p>The first Euler angle <span class="math notranslate nohighlight">\(\alpha\)</span> in radian [0, <span class="math notranslate nohighlight">\(2\pi\)</span>].</p>
+</dd>
+<dt><strong>beta: float number</strong></dt><dd><p>The second Euler angle <span class="math notranslate nohighlight">\(\beta\)</span> in radian [0, <span class="math notranslate nohighlight">\(\pi\)</span>].</p>
+</dd>
+<dt><strong>gamma: float number</strong></dt><dd><p>The third Euler angle <span class="math notranslate nohighlight">\(\gamma\)</span> in radian [0, <span class="math notranslate nohighlight">\(2\pi\)</span>].</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>result: 2d complex array, shape(quant_2j+1, quant_2j+1)</dt><dd><p>The Wigner D-matrix.
+For <span class="math notranslate nohighlight">\(j=1/2\)</span>, the orbital order is: +1/2 (spin up), -1/2 (spin down).
+For <span class="math notranslate nohighlight">\(j&gt;1/2\)</span>, the orbital order is: <span class="math notranslate nohighlight">\(-j, -j+1, ..., +j\)</span></p>
+</dd>
+</dl>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
+<span class="go">spin-1/2 D-matrix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">edrixs</span><span class="o">.</span><span class="n">get_wigner_dmat</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="go">array([[-0.224845-0.491295j, -0.454649-0.708073j],</span>
+<span class="go">       [ 0.454649-0.708073j, -0.224845+0.491295j]])</span>
+<span class="go">j=1 D-matrix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">edrixs</span><span class="o">.</span><span class="n">get_wigner_dmat</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="go">array([[-0.190816-0.220931j,  0.347398+0.541041j, -0.294663-0.643849j],</span>
+<span class="go">       [ 0.636536-0.090736j, -0.416147+0.j      , -0.636536-0.090736j],</span>
+<span class="go">       [-0.294663+0.643849j, -0.347398+0.541041j, -0.190816+0.220931j]])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.angular_momentum.rmat_to_euler">
+<span class="sig-prename descclassname"><span class="pre">edrixs.angular_momentum.</span></span><span class="sig-name descname"><span class="pre">rmat_to_euler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rmat</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/angular_momentum.html#rmat_to_euler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.angular_momentum.rmat_to_euler" title="Link to this definition">¶</a></dt>
+<dd><p>Given the <span class="math notranslate nohighlight">\(3 \times 3\)</span> rotational matrix <span class="math notranslate nohighlight">\(R\)</span>, return the Euler
+angles: <span class="math notranslate nohighlight">\(\alpha, \beta, \gamma\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>rmat:  2d float array</strong></dt><dd><p>The <span class="math notranslate nohighlight">\(3 \times 3\)</span> rotational matrix <span class="math notranslate nohighlight">\(R\)</span>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>alpha: float</dt><dd><p>Euler angle <span class="math notranslate nohighlight">\(\alpha\)</span> in radian, [0, <span class="math notranslate nohighlight">\(2\pi\)</span>].</p>
+</dd>
+<dt>beta: float</dt><dd><p>Euler angle <span class="math notranslate nohighlight">\(\beta\)</span> in radian, [0, <span class="math notranslate nohighlight">\(\pi\)</span>].</p>
+</dd>
+<dt>gamma: float</dt><dd><p>Euler angle <span class="math notranslate nohighlight">\(\gamma\)</span> in radian, [0, <span class="math notranslate nohighlight">\(2\pi\)</span>]</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.angular_momentum.where_is_angle">
+<span class="sig-prename descclassname"><span class="pre">edrixs.angular_momentum.</span></span><span class="sig-name descname"><span class="pre">where_is_angle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sina</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cosa</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/angular_momentum.html#where_is_angle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.angular_momentum.where_is_angle" title="Link to this definition">¶</a></dt>
+<dd><p>Given sine and cosine of an angle <span class="math notranslate nohighlight">\(\alpha\)</span>, return the
+angle <span class="math notranslate nohighlight">\(\alpha\)</span> range from [0, <span class="math notranslate nohighlight">\(2\pi\)</span>].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>sina:  float</strong></dt><dd><p><span class="math notranslate nohighlight">\(\sin(\alpha)\)</span>.</p>
+</dd>
+<dt><strong>cosa:  float</strong></dt><dd><p><span class="math notranslate nohighlight">\(\cos(\alpha)\)</span>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>alpha: float</dt><dd><p>The angle <span class="math notranslate nohighlight">\(\alpha\)</span> in radian [0, <span class="math notranslate nohighlight">\(2\pi\)</span>].</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.angular_momentum.zx_to_rmat">
+<span class="sig-prename descclassname"><span class="pre">edrixs.angular_momentum.</span></span><span class="sig-name descname"><span class="pre">zx_to_rmat</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/angular_momentum.html#zx_to_rmat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.angular_momentum.zx_to_rmat" title="Link to this definition">¶</a></dt>
+<dd><p>Given <span class="math notranslate nohighlight">\(z\)</span> vector and <span class="math notranslate nohighlight">\(x\)</span> vector, calculate <span class="math notranslate nohighlight">\(y\)</span> vector
+which satisfies the right-hand Cartesian coordinate and normalize them to
+unit if needed, and then return the <span class="math notranslate nohighlight">\(3 \times 3\)</span>
+rotational matrix <span class="math notranslate nohighlight">\(R\)</span>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>z: 1d float array</strong></dt><dd><p>The <span class="math notranslate nohighlight">\(z\)</span> vector.</p>
+</dd>
+<dt><strong>x: 1d float array</strong></dt><dd><p>The <span class="math notranslate nohighlight">\(x\)</span> vector.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>rmat: 2d float array</dt><dd><p>The <span class="math notranslate nohighlight">\(3 \times 3\)</span> rotational matrix <span class="math notranslate nohighlight">\(R\)</span>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="edrixs Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="basis_transform.html" class="btn btn-neutral float-right" title="basis_transform" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Brookhaven National Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
