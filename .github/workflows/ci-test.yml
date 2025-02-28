@@ -148,7 +148,6 @@ jobs:
       - name: Deploy docs to gh-pages
         uses: peaceiris/actions-gh-pages@v4
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: docs/build/html/
 
   # publish-docs:
