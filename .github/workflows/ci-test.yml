@@ -134,6 +134,11 @@ jobs:
         shell: bash -l {0}
 
     steps:
+      - name: Set env vars
+        run: |
+          export REPOSITORY_NAME=${GITHUB_REPOSITORY#*/}  # just the repo, as opposed to org/repo
+          echo "REPOSITORY_NAME=${REPOSITORY_NAME}" >> $GITHUB_ENV
+
       - name: Download docs from GitHub artifacts
         uses: actions/download-artifact@v4
         with:
