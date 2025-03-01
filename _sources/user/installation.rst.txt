@@ -11,7 +11,7 @@ Install and use edrixs via Anaconda
 A conda package has been built for Linux. To use edrixs via Anaconda, you need first to install `Anaconda <https://www.anaconda.com/distribution/>`_ in your system.
 We recommend installing edrixs into a separate environment, for example, called ``edrixs_env``, together with any other packages you might want to use like this::
 
-    conda create --name edrixs_env -c conda-forge python=3.10 edrixs matplotlib
+    conda create --name edrixs_env -c conda-forge python=3.13 edrixs matplotlib
 
 We endeavor to keep the conda-forge release up to date, but note that these builds will usually not correspond to the latest version of edrixs, which is available in the `master branch of edrixs <https://github.com/NSLS-II/edrixs>`_.
 
