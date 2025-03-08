@@ -37,7 +37,8 @@ that one might not anticipate. Our example is based on a :math:`d` atomic shell.
 #     U_{\alpha\sigma,\beta\sigma^\prime,\gamma\sigma^\prime,\delta\sigma}
 #     \hat{f}^{\dagger}_{\alpha\sigma}
 #     \hat{f}^{\dagger}_{\beta\sigma^\prime}
-#     \hat{f}_{\gamma\sigma^\prime}\hat{f}_{\delta\sigma},
+#     \hat{f}^{\phantom{\dagger}}_{\delta\sigma}
+#     \hat{f}^{\phantom{\dagger}}_{\gamma\sigma^\prime},
 #     \end{equation}
 #
 # where :math:`\alpha`, :math:`\beta`, :math:`\gamma`, :math:`\delta` are
