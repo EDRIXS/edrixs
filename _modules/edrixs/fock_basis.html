@@ -81,64 +81,13 @@
   <h1>Source code for edrixs.fock_basis</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;combination&#39;</span><span class="p">,</span> <span class="s1">&#39;fock_bin&#39;</span><span class="p">,</span> <span class="s1">&#39;get_fock_bin_by_N&#39;</span><span class="p">,</span> <span class="s1">&#39;get_fock_half_N&#39;</span><span class="p">,</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;fock_bin&#39;</span><span class="p">,</span> <span class="s1">&#39;get_fock_bin_by_N&#39;</span><span class="p">,</span> <span class="s1">&#39;get_fock_half_N&#39;</span><span class="p">,</span>
            <span class="s1">&#39;get_fock_full_N&#39;</span><span class="p">,</span> <span class="s1">&#39;get_fock_basis_by_NLz&#39;</span><span class="p">,</span> <span class="s1">&#39;get_fock_basis_by_NSz&#39;</span><span class="p">,</span>
            <span class="s1">&#39;get_fock_basis_by_NJz&#39;</span><span class="p">,</span> <span class="s1">&#39;get_fock_basis_by_N_abelian&#39;</span><span class="p">,</span>
            <span class="s1">&#39;get_fock_basis_by_N_LzSz&#39;</span><span class="p">,</span> <span class="s1">&#39;write_fock_dec_by_N&#39;</span><span class="p">]</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
-
-
-<div class="viewcode-block" id="combination">
-<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.combination">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">combination</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the combination :math:`C_{n}^{m}`,</span>
-
-<span class="sd">    .. math::</span>
-
-<span class="sd">        C_{n}^{m} = \\frac{n!}{m!(n-m)!}.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    n: int</span>
-<span class="sd">       Number n.</span>
-<span class="sd">    m: int</span>
-<span class="sd">        Number m.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    res: int</span>
-<span class="sd">        The calculated result.</span>
-
-<span class="sd">    Examples</span>
-<span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; import edrixs</span>
-<span class="sd">    &gt;&gt;&gt; edrixs.combination(6, 2)</span>
-<span class="sd">    15</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">if</span> <span class="n">m</span> <span class="o">&gt;</span> <span class="n">n</span> <span class="ow">or</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">m</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;wrong number in combination&quot;</span><span class="p">)</span>
-        <span class="k">return</span>
-    <span class="k">if</span> <span class="n">m</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">n</span> <span class="o">==</span> <span class="n">m</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mi">1</span>
-
-    <span class="n">largest</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="n">m</span><span class="p">)</span>
-    <span class="n">smallest</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">n</span> <span class="o">-</span> <span class="n">m</span><span class="p">)</span>
-    <span class="n">numer</span> <span class="o">=</span> <span class="mf">1.0</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">largest</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="n">numer</span> <span class="o">*=</span> <span class="n">i</span>
-
-    <span class="n">denom</span> <span class="o">=</span> <span class="mf">1.0</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">smallest</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="n">denom</span> <span class="o">*=</span> <span class="n">i</span>
-
-    <span class="n">res</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">numer</span> <span class="o">/</span> <span class="n">denom</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">res</span></div>
-
 
 
 <div class="viewcode-block" id="fock_bin">

@@ -60,7 +60,6 @@
 <li class="toctree-l2"><a class="reference internal" href="coulomb_utensor.html">coulomb_utensor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fit_hyb.html">fit_hyb</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">fock_basis</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#edrixs.fock_basis.combination"><code class="docutils literal notranslate"><span class="pre">combination()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.fock_basis.fock_bin"><code class="docutils literal notranslate"><span class="pre">fock_bin()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.fock_basis.get_fock_basis_by_NJz"><code class="docutils literal notranslate"><span class="pre">get_fock_basis_by_NJz()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.fock_basis.get_fock_basis_by_NLz"><code class="docutils literal notranslate"><span class="pre">get_fock_basis_by_NLz()</span></code></a></li>
@@ -114,36 +113,6 @@
              
   <section id="module-edrixs.fock_basis">
 <span id="fock-basis"></span><h1>fock_basis<a class="headerlink" href="#module-edrixs.fock_basis" title="Link to this heading"></a></h1>
-<dl class="py function">
-<dt class="sig sig-object py" id="edrixs.fock_basis.combination">
-<span class="sig-prename descclassname"><span class="pre">edrixs.fock_basis.</span></span><span class="sig-name descname"><span class="pre">combination</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/fock_basis.html#combination"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.fock_basis.combination" title="Link to this definition"></a></dt>
-<dd><p>Calculate the combination <span class="math notranslate nohighlight">\(C_{n}^{m}\)</span>,</p>
-<div class="math notranslate nohighlight">
-\[C_{n}^{m} = \frac{n!}{m!(n-m)!}.\]</div>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><dl class="simple">
-<dt><strong>n: int</strong></dt><dd><p>Number n.</p>
-</dd>
-<dt><strong>m: int</strong></dt><dd><p>Number m.</p>
-</dd>
-</dl>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><dl class="simple">
-<dt>res: int</dt><dd><p>The calculated result.</p>
-</dd>
-</dl>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">edrixs</span><span class="o">.</span><span class="n">combination</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-<span class="go">15</span>
-</pre></div>
-</div>
-</dd></dl>
-
 <dl class="py function">
 <dt class="sig sig-object py" id="edrixs.fock_basis.fock_bin">
 <span class="sig-prename descclassname"><span class="pre">edrixs.fock_basis.</span></span><span class="sig-name descname"><span class="pre">fock_bin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/fock_basis.html#fock_bin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.fock_basis.fock_bin" title="Link to this definition"></a></dt>
