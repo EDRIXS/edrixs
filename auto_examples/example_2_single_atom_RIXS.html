@@ -17,6 +17,8 @@
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=5929fcd5"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -108,7 +110,7 @@
 to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="rixs-calculations-for-an-atomic-model">
-<span id="sphx-glr-auto-examples-example-2-single-atom-rixs-py"></span><h1>RIXS calculations for an atomic model<a class="headerlink" href="#rixs-calculations-for-an-atomic-model" title="Link to this heading">¶</a></h1>
+<span id="sphx-glr-auto-examples-example-2-single-atom-rixs-py"></span><h1>RIXS calculations for an atomic model<a class="headerlink" href="#rixs-calculations-for-an-atomic-model" title="Link to this heading"></a></h1>
 <p>Here we show how to compute RIXS for a single site atomic model with crystal
 field and electron-electron interactions. We take the case of
 Sr<sub>2</sub>YIrO<sub>6</sub>
@@ -124,7 +126,7 @@ by executing functions with ?? in IPython.</p>
 </pre></div>
 </div>
 <section id="specify-active-core-and-valence-orbitals">
-<h2>Specify active core and valence orbitals<a class="headerlink" href="#specify-active-core-and-valence-orbitals" title="Link to this heading">¶</a></h2>
+<h2>Specify active core and valence orbitals<a class="headerlink" href="#specify-active-core-and-valence-orbitals" title="Link to this heading"></a></h2>
 <p>Sr<sub>2</sub>YIrO<sub>6</sub> has a <span class="math notranslate nohighlight">\(5d^4\)</span> electronic configuration and
 we want to calculate the <span class="math notranslate nohighlight">\(L_3\)</span> edge spectrum i.e. resonating with a
 <span class="math notranslate nohighlight">\(2p_{3/2}\)</span> core hole. We will start by including only the
@@ -135,7 +137,7 @@ we want to calculate the <span class="math notranslate nohighlight">\(L_3\)</spa
 </div>
 </section>
 <section id="slater-parameters">
-<h2>Slater parameters<a class="headerlink" href="#slater-parameters" title="Link to this heading">¶</a></h2>
+<h2>Slater parameters<a class="headerlink" href="#slater-parameters" title="Link to this heading"></a></h2>
 <p>Here we want to use Hund’s interaction
 <span class="math notranslate nohighlight">\(J_H\)</span> and spin orbit coupling <span class="math notranslate nohighlight">\(\lambda\)</span> as adjustable parameters
 to match experiment. We will take
@@ -165,7 +167,7 @@ required by EDRIXS.</p>
 </div>
 </section>
 <section id="diagonalization">
-<h2>Diagonalization<a class="headerlink" href="#diagonalization" title="Link to this heading">¶</a></h2>
+<h2>Diagonalization<a class="headerlink" href="#diagonalization" title="Link to this heading"></a></h2>
 <p>We obtain the ground and intermediate state eigenenergies and the transition
 operators via matrix diagonalization. Note that the calculation does not know
 the core hole energy, so we need to adjust the energy that the resonance will
@@ -207,7 +209,7 @@ edrixs &gt;&gt;&gt; ED Done !
 </div>
 </section>
 <section id="compute-xas">
-<h2>Compute XAS<a class="headerlink" href="#compute-xas" title="Link to this heading">¶</a></h2>
+<h2>Compute XAS<a class="headerlink" href="#compute-xas" title="Link to this heading"></a></h2>
 <p>To calculate XAS we need to correctly specify the orientation of the x-rays
 with respect to the sample. By default, the <span class="math notranslate nohighlight">\(x, y, z\)</span> coordinates
 of the sample’s crystal field, will be aligned with our lab frame, passing
@@ -252,7 +254,7 @@ edrixs &gt;&gt;&gt; XAS Done !
 </div>
 </section>
 <section id="compute-rixs">
-<h2>Compute RIXS<a class="headerlink" href="#compute-rixs" title="Link to this heading">¶</a></h2>
+<h2>Compute RIXS<a class="headerlink" href="#compute-rixs" title="Link to this heading"></a></h2>
 <p>Calculating RIXS is overall similar to XAS, but with a few additional
 considerations. The spectral width in the energy loss axis of RIXS it
 not set by the core hole lifetime, but by either the final state lifetime
@@ -287,7 +289,7 @@ edrixs &gt;&gt;&gt; RIXS Done !
 <code class="code docutils literal notranslate"><span class="pre">(len(ominc_xas),</span> <span class="pre">len(pol_type))</span></code></p>
 </section>
 <section id="plot-xas-and-rixs">
-<h2>Plot XAS and RIXS<a class="headerlink" href="#plot-xas-and-rixs" title="Link to this heading">¶</a></h2>
+<h2>Plot XAS and RIXS<a class="headerlink" href="#plot-xas-and-rixs" title="Link to this heading"></a></h2>
 <p>Let’s plot everything. We will use a function so we can reuse the code later.
 Note that the rixs array <code class="code docutils literal notranslate"><span class="pre">rixs</span></code> has shape
 <code class="code docutils literal notranslate"><span class="pre">(len(ominc_xas),</span> <span class="pre">len(ominc_xas),</span> <span class="pre">len(pol_type))</span></code>. We will use some numpy
@@ -328,7 +330,7 @@ tricks to sum over the two different emitted polarizations.</p>
 </div>
 <img src="../_images/sphx_glr_example_2_single_atom_RIXS_001.png" srcset="../_images/sphx_glr_example_2_single_atom_RIXS_001.png" alt="XAS, RIXS at resonance, RIXS map" class = "sphx-glr-single-img"/></section>
 <section id="full-d-shell-calculation">
-<h2>Full d shell calculation<a class="headerlink" href="#full-d-shell-calculation" title="Link to this heading">¶</a></h2>
+<h2>Full d shell calculation<a class="headerlink" href="#full-d-shell-calculation" title="Link to this heading"></a></h2>
 <p>Some researchers have questioned the appropriateness of only including the
 <span class="math notranslate nohighlight">\(t_{2g}\)</span> subshell for iridates <a class="footnote-reference brackets" href="#id4" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a>. Let’s test this. We specify that
 the full <span class="math notranslate nohighlight">\(d\)</span> shell should be used and apply cubic crystal field matrix
@@ -409,7 +411,7 @@ of Sr<sub>2</sub>YIrO<sub>6</sub> is dependent on the model.</p>
 <a class="reference external" href="https://doi.org/10.1103/PhysRevB.97.085150">Phys. Rev. B 97, 085150 (2018)</a>.</p>
 </aside>
 </aside>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.735 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 3.743 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-example-2-single-atom-rixs-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/ec5be3ffa2b20d2aa5db9e4571690517/example_2_single_atom_RIXS.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">example_2_single_atom_RIXS.ipynb</span></code></a></p>

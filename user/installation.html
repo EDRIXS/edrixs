@@ -17,6 +17,8 @@
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=5929fcd5"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -100,10 +102,10 @@
            <div itemprop="articleBody">
              
   <section id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading">¶</a></h1>
+<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
 <p>For Linux users we suggest <a class="reference internal" href="#anacondainstall"><span class="std std-ref">installing with anaconda</span></a>. For Windows and macOS machines, we suggest using the <a class="reference internal" href="usedocker.html#edrixsanddocker"><span class="std std-ref">docker instructions</span></a>, which are relatively straightforward.  If desired, you can also compile the code from the source for Linux.</p>
 <section id="install-and-use-edrixs-via-anaconda">
-<span id="anacondainstall"></span><h2>Install and use edrixs via Anaconda<a class="headerlink" href="#install-and-use-edrixs-via-anaconda" title="Link to this heading">¶</a></h2>
+<span id="anacondainstall"></span><h2>Install and use edrixs via Anaconda<a class="headerlink" href="#install-and-use-edrixs-via-anaconda" title="Link to this heading"></a></h2>
 <p>A conda package has been built for Linux. To use edrixs via Anaconda, you need first to install <a class="reference external" href="https://www.anaconda.com/distribution/">Anaconda</a> in your system.
 We recommend installing edrixs into a separate environment, for example, called <code class="docutils literal notranslate"><span class="pre">edrixs_env</span></code>, together with any other packages you might want to use like this:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">--</span><span class="n">name</span> <span class="n">edrixs_env</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="n">python</span><span class="o">=</span><span class="mf">3.13</span> <span class="n">edrixs</span> <span class="n">matplotlib</span>
@@ -120,7 +122,7 @@ condacolab.install()
 <p>from within a notebook cell.</p>
 </section>
 <section id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading">¶</a></h2>
+<h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
 <p>Several tools and libraries are required to build and install edrixs,</p>
 <blockquote>
 <div><ul class="simple">
@@ -136,12 +138,12 @@ condacolab.install()
 </div></blockquote>
 </section>
 <section id="build-from-source">
-<h2>Build from source<a class="headerlink" href="#build-from-source" title="Link to this heading">¶</a></h2>
+<h2>Build from source<a class="headerlink" href="#build-from-source" title="Link to this heading"></a></h2>
 <p>We will show how to build edrixs from source on Ubuntu Linux 20.04 and macOS Mojave (OSX 10.14) as examples.
 We will use gcc, gfortran, openmpi and OpenBLAS in these examples.
 Building edrixs on other versions of Linux or macOS, or with Intel’s ifort+MKL will be similar.</p>
 <section id="ubuntu-linux-20-04">
-<h3>Ubuntu Linux 20.04<a class="headerlink" href="#ubuntu-linux-20-04" title="Link to this heading">¶</a></h3>
+<h3>Ubuntu Linux 20.04<a class="headerlink" href="#ubuntu-linux-20-04" title="Link to this heading"></a></h3>
 <p>Install compilers and tools:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">update</span>
 <span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">build</span><span class="o">-</span><span class="n">essential</span> <span class="n">gfortran</span> <span class="n">gcc</span>
@@ -276,10 +278,10 @@ However, they can also be compiled from source easily. In the following, we will
 <p>if no errors, the installation is successful.</p>
 </section>
 <section id="macos-mojave-osx-10-14">
-<h3>macOS Mojave (OSX 10.14)<a class="headerlink" href="#macos-mojave-osx-10-14" title="Link to this heading">¶</a></h3>
+<h3>macOS Mojave (OSX 10.14)<a class="headerlink" href="#macos-mojave-osx-10-14" title="Link to this heading"></a></h3>
 <p>Install newest Xcode through App store.</p>
 <section id="use-macports">
-<h4>Use MacPorts<a class="headerlink" href="#use-macports" title="Link to this heading">¶</a></h4>
+<h4>Use MacPorts<a class="headerlink" href="#use-macports" title="Link to this heading"></a></h4>
 <p>Download and install <a class="reference external" href="https://www.macports.org/install.php/">MacPorts</a>.
 Update MacPorts by:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">port</span> <span class="o">-</span><span class="n">v</span> <span class="n">selfupdate</span>
@@ -356,7 +358,7 @@ export PATH=/opt/local/Library/Frameworks/Python.framework/Versions/3.7/bin:$PAT
 <p>All done, enjoy!</p>
 </section>
 <section id="use-homebrew">
-<h4>Use Homebrew<a class="headerlink" href="#use-homebrew" title="Link to this heading">¶</a></h4>
+<h4>Use Homebrew<a class="headerlink" href="#use-homebrew" title="Link to this heading"></a></h4>
 <p>Install Homebrew:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">ruby</span> <span class="o">-</span><span class="n">e</span> <span class="s2">&quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)&quot;</span>
 </pre></div>

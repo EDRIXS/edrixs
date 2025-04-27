@@ -17,6 +17,8 @@
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=5929fcd5"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -105,7 +107,7 @@
 to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="hubbard-dimer">
-<span id="sphx-glr-auto-examples-example-6-hubbard-dimer-py"></span><h1>Hubbard Dimer<a class="headerlink" href="#hubbard-dimer" title="Link to this heading">¶</a></h1>
+<span id="sphx-glr-auto-examples-example-6-hubbard-dimer-py"></span><h1>Hubbard Dimer<a class="headerlink" href="#hubbard-dimer" title="Link to this heading"></a></h1>
 <p>This exercise will demonstrate how to handle hopping and multi-site problems within
 edrixs using the example of a Hubbard dimer. We want to solve the equation</p>
 <blockquote>
@@ -133,7 +135,7 @@ particle basis.</p>
 \end{equation}\]</div>
 </div></blockquote>
 <section id="initialize-matrices">
-<h2>Initialize matrices<a class="headerlink" href="#initialize-matrices" title="Link to this heading">¶</a></h2>
+<h2>Initialize matrices<a class="headerlink" href="#initialize-matrices" title="Link to this heading"></a></h2>
 <p>We start by noting that each of the two sites is like an <span class="math notranslate nohighlight">\(l=0\)</span>
 <span class="math notranslate nohighlight">\(s\)</span>-orbital with two spin-orbitals each. We will include
 two electron occupation and build the Fock basis.</p>
@@ -153,7 +155,7 @@ two electron occupation and build the Fock basis.</p>
 </div>
 </section>
 <section id="create-function-to-populate-and-diagonalize-matrices">
-<h2>Create function to populate and diagonalize matrices<a class="headerlink" href="#create-function-to-populate-and-diagonalize-matrices" title="Link to this heading">¶</a></h2>
+<h2>Create function to populate and diagonalize matrices<a class="headerlink" href="#create-function-to-populate-and-diagonalize-matrices" title="Link to this heading"></a></h2>
 <p>The Coulomb and hopping matrices <code class="code docutils literal notranslate"><span class="pre">umat</span></code> and <code class="code docutils literal notranslate"><span class="pre">emat</span></code> will be
 represented by <span class="math notranslate nohighlight">\(4\times4\times4\times4\)</span> and <span class="math notranslate nohighlight">\(4\times4\)</span> matrices,
 respectively. Note that we needed to specify
@@ -188,7 +190,7 @@ the same spin.</p>
 </div>
 </section>
 <section id="the-large-u-limit">
-<h2>The large <span class="math notranslate nohighlight">\(U\)</span> limit<a class="headerlink" href="#the-large-u-limit" title="Link to this heading">¶</a></h2>
+<h2>The large <span class="math notranslate nohighlight">\(U\)</span> limit<a class="headerlink" href="#the-large-u-limit" title="Link to this heading"></a></h2>
 <p>Let us see what happens with <span class="math notranslate nohighlight">\(U \gg t\)</span>.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">e</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">v</span></a> <span class="o">=</span> <span class="n">diagonalize</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Energies are&quot;</span><span class="p">)</span>
@@ -242,7 +244,7 @@ and <span class="math notranslate nohighlight">\(S=1\)</span> triplet, which are
 magnetic exchange term.</p>
 </section>
 <section id="u-dependence">
-<h2><span class="math notranslate nohighlight">\(U\)</span> dependence<a class="headerlink" href="#u-dependence" title="Link to this heading">¶</a></h2>
+<h2><span class="math notranslate nohighlight">\(U\)</span> dependence<a class="headerlink" href="#u-dependence" title="Link to this heading"></a></h2>
 <p>Let us plot the changes in  energy with <span class="math notranslate nohighlight">\(U\)</span>.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.figure.html#matplotlib.pyplot.figure" title="matplotlib.pyplot.figure" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">figure</span></a><span class="p">()</span>
 
@@ -314,7 +316,7 @@ research on quantum materials <a class="footnote-reference brackets" href="#id3"
 </ol>
 </aside>
 </aside>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.092 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.096 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-example-6-hubbard-dimer-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/ceccd240871166cf69609184775c524d/example_6_Hubbard_dimer.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">example_6_Hubbard_dimer.ipynb</span></code></a></p>

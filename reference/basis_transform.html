@@ -17,6 +17,8 @@
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=5929fcd5"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -110,10 +112,10 @@
            <div itemprop="articleBody">
              
   <section id="module-edrixs.basis_transform">
-<span id="basis-transform"></span><h1>basis_transform<a class="headerlink" href="#module-edrixs.basis_transform" title="Link to this heading">¶</a></h1>
+<span id="basis-transform"></span><h1>basis_transform<a class="headerlink" href="#module-edrixs.basis_transform" title="Link to this heading"></a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="edrixs.basis_transform.cb_op">
-<span class="sig-prename descclassname"><span class="pre">edrixs.basis_transform.</span></span><span class="sig-name descname"><span class="pre">cb_op</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oper_O</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TR</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/basis_transform.html#cb_op"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.basis_transform.cb_op" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">edrixs.basis_transform.</span></span><span class="sig-name descname"><span class="pre">cb_op</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oper_O</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TR</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/basis_transform.html#cb_op"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.basis_transform.cb_op" title="Link to this definition"></a></dt>
 <dd><p>Change the basis of an operator <span class="math notranslate nohighlight">\(\hat{O}\)</span>.</p>
 <div class="math notranslate nohighlight">
 \[O^{\prime} = (T_L)^{\dagger} O (T_R),\]</div>
@@ -151,7 +153,7 @@ basis <span class="math notranslate nohighlight">\(B\)</span>,  namely,</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="edrixs.basis_transform.cb_op2">
-<span class="sig-prename descclassname"><span class="pre">edrixs.basis_transform.</span></span><span class="sig-name descname"><span class="pre">cb_op2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oper_O</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TR</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/basis_transform.html#cb_op2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.basis_transform.cb_op2" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">edrixs.basis_transform.</span></span><span class="sig-name descname"><span class="pre">cb_op2</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">oper_O</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TL</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">TR</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/basis_transform.html#cb_op2"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.basis_transform.cb_op2" title="Link to this definition"></a></dt>
 <dd><p>Change the basis of an operator <span class="math notranslate nohighlight">\(\hat{O}\)</span>.</p>
 <div class="math notranslate nohighlight">
 \[O^{\prime} = (T_L)^{\dagger} O (T_R),\]</div>
@@ -184,7 +186,7 @@ dimension <span class="math notranslate nohighlight">\(10 \times 10\)</span></p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="edrixs.basis_transform.fourier_hr2hk">
-<span class="sig-prename descclassname"><span class="pre">edrixs.basis_transform.</span></span><span class="sig-name descname"><span class="pre">fourier_hr2hk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">norbs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nkpt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kvec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrpt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rvec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg_rpt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/basis_transform.html#fourier_hr2hk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.basis_transform.fourier_hr2hk" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">edrixs.basis_transform.</span></span><span class="sig-name descname"><span class="pre">fourier_hr2hk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">norbs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nkpt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">kvec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrpt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rvec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deg_rpt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hr</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/basis_transform.html#fourier_hr2hk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.basis_transform.fourier_hr2hk" title="Link to this definition"></a></dt>
 <dd><p>Fourier transform a tight-binding Hamiltonian <span class="math notranslate nohighlight">\(H(r)\)</span> from
 real space to <span class="math notranslate nohighlight">\(k\)</span> space <span class="math notranslate nohighlight">\(H(k)\)</span>,
 for Wannier90.</p>
@@ -218,7 +220,7 @@ for Wannier90.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="edrixs.basis_transform.tmat_c2j">
-<span class="sig-prename descclassname"><span class="pre">edrixs.basis_transform.</span></span><span class="sig-name descname"><span class="pre">tmat_c2j</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">orb_l</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/basis_transform.html#tmat_c2j"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.basis_transform.tmat_c2j" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">edrixs.basis_transform.</span></span><span class="sig-name descname"><span class="pre">tmat_c2j</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">orb_l</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/basis_transform.html#tmat_c2j"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.basis_transform.tmat_c2j" title="Link to this definition"></a></dt>
 <dd><p>Get the transformation matrix from the complex spherical harmonics to
 the <span class="math notranslate nohighlight">\(|j^2,j_z&gt;\)</span> basis in which the spin-oribt coupling Hamiltonian
 is diagonal. The orbital order is:</p>
@@ -242,7 +244,7 @@ is diagonal. The orbital order is:</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="edrixs.basis_transform.tmat_c2r">
-<span class="sig-prename descclassname"><span class="pre">edrixs.basis_transform.</span></span><span class="sig-name descname"><span class="pre">tmat_c2r</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">case</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ispin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/basis_transform.html#tmat_c2r"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.basis_transform.tmat_c2r" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">edrixs.basis_transform.</span></span><span class="sig-name descname"><span class="pre">tmat_c2r</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">case</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ispin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/basis_transform.html#tmat_c2r"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.basis_transform.tmat_c2r" title="Link to this definition"></a></dt>
 <dd><p>Get the unitary transformation matrix from the basis of complex
 spherical harmonics to real spherical harmonics.</p>
 <dl class="field-list simple">
@@ -271,7 +273,7 @@ spherical harmonics to real spherical harmonics.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="edrixs.basis_transform.tmat_cub2r_f">
-<span class="sig-prename descclassname"><span class="pre">edrixs.basis_transform.</span></span><span class="sig-name descname"><span class="pre">tmat_cub2r_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ispin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/basis_transform.html#tmat_cub2r_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.basis_transform.tmat_cub2r_f" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">edrixs.basis_transform.</span></span><span class="sig-name descname"><span class="pre">tmat_cub2r_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ispin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/basis_transform.html#tmat_cub2r_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.basis_transform.tmat_cub2r_f" title="Link to this definition"></a></dt>
 <dd><p>Get the transformation matrix from the cubic spherical harmonics to
 real spherical harmonics, only for <span class="math notranslate nohighlight">\(f\)</span> system.</p>
 <dl class="field-list simple">
@@ -292,7 +294,7 @@ real spherical harmonics, only for <span class="math notranslate nohighlight">\(
 
 <dl class="py function">
 <dt class="sig sig-object py" id="edrixs.basis_transform.tmat_r2c">
-<span class="sig-prename descclassname"><span class="pre">edrixs.basis_transform.</span></span><span class="sig-name descname"><span class="pre">tmat_r2c</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">case</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ispin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/basis_transform.html#tmat_r2c"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.basis_transform.tmat_r2c" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">edrixs.basis_transform.</span></span><span class="sig-name descname"><span class="pre">tmat_r2c</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">case</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ispin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/basis_transform.html#tmat_r2c"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.basis_transform.tmat_r2c" title="Link to this definition"></a></dt>
 <dd><p>Get the unitary transformation matrix from the basis of real
 spherical harmonics to complex spherical harmonics.</p>
 <dl class="field-list simple">
@@ -321,7 +323,7 @@ spherical harmonics to complex spherical harmonics.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="edrixs.basis_transform.tmat_r2cub_f">
-<span class="sig-prename descclassname"><span class="pre">edrixs.basis_transform.</span></span><span class="sig-name descname"><span class="pre">tmat_r2cub_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ispin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/basis_transform.html#tmat_r2cub_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.basis_transform.tmat_r2cub_f" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">edrixs.basis_transform.</span></span><span class="sig-name descname"><span class="pre">tmat_r2cub_f</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ispin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/basis_transform.html#tmat_r2cub_f"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.basis_transform.tmat_r2cub_f" title="Link to this definition"></a></dt>
 <dd><p>Get the transformation matrix from real spherical harmonics to the
 cubic spherical harmonics that is the representation of the cubic
 point group, only for <span class="math notranslate nohighlight">\(f\)</span> system.</p>
@@ -343,7 +345,7 @@ point group, only for <span class="math notranslate nohighlight">\(f\)</span> sy
 
 <dl class="py function">
 <dt class="sig sig-object py" id="edrixs.basis_transform.transform_utensor">
-<span class="sig-prename descclassname"><span class="pre">edrixs.basis_transform.</span></span><span class="sig-name descname"><span class="pre">transform_utensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">umat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmat</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/basis_transform.html#transform_utensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.basis_transform.transform_utensor" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">edrixs.basis_transform.</span></span><span class="sig-name descname"><span class="pre">transform_utensor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">umat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tmat</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/basis_transform.html#transform_utensor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.basis_transform.transform_utensor" title="Link to this definition"></a></dt>
 <dd><p>Transform the rank-4 Coulomb interaction tensor from one basis to
 another basis.</p>
 <dl class="field-list simple">

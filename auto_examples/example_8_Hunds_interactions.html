@@ -17,6 +17,8 @@
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=5929fcd5"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -107,7 +109,7 @@
 to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="hund-s-interactions-in-charge-transfer-insulators">
-<span id="sphx-glr-auto-examples-example-8-hunds-interactions-py"></span><h1>Hund’s Interactions in charge transfer insulators<a class="headerlink" href="#hund-s-interactions-in-charge-transfer-insulators" title="Link to this heading">¶</a></h1>
+<span id="sphx-glr-auto-examples-example-8-hunds-interactions-py"></span><h1>Hund’s Interactions in charge transfer insulators<a class="headerlink" href="#hund-s-interactions-in-charge-transfer-insulators" title="Link to this heading"></a></h1>
 <p>In this exercise we will solve a toy model relevant to cubic <span class="math notranslate nohighlight">\(d^8\)</span> charge transfer insulators
 such as NiO or NiPS<sub>3</sub>. We are interested in better understanding the interplay between the
 Hund’s interactions and the charge transfer energy in terms of the energy of the triplet-singlet
@@ -132,7 +134,7 @@ parameterize the interactions via Coulomb repulsion parameter <span class="math 
 <p>It’s also easiest to consider this problem in hole langauge, which means our eight spin-orbitals
 are populated by two fermions.</p>
 <section id="setup">
-<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading">¶</a></h2>
+<h2>Setup<a class="headerlink" href="#setup" title="Link to this heading"></a></h2>
 <p>We start by loading the necessary modules, and defining the total number of
 orbitals and electrons.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
@@ -146,7 +148,7 @@ orbitals and electrons.</p>
 </div>
 </section>
 <section id="diagonalization">
-<h2>Diagonalization<a class="headerlink" href="#diagonalization" title="Link to this heading">¶</a></h2>
+<h2>Diagonalization<a class="headerlink" href="#diagonalization" title="Link to this heading"></a></h2>
 <p>Let’s write a function to diagonalize our model in a similar way to
 the <a class="reference internal" href="example_6_Hubbard_dimer.html#sphx-glr-auto-examples-example-6-hubbard-dimer-py"><span class="std std-ref">Hubbard Dimer</span></a> example.
 Within this function, we also create operators to count the number of
@@ -201,7 +203,7 @@ small effective spin interaction along <span class="math notranslate nohighlight
 </div>
 </section>
 <section id="the-atomic-limit">
-<h2>The atomic limit<a class="headerlink" href="#the-atomic-limit" title="Link to this heading">¶</a></h2>
+<h2>The atomic limit<a class="headerlink" href="#the-atomic-limit" title="Link to this heading"></a></h2>
 <p>For simplicity, let’s start in the atomic limit with <span class="math notranslate nohighlight">\(e_L \gg t \gg U\)</span>
 where all holes are on nickel. In this case, there are six ways to distribute
 two holes on the four Ni spin-orbitals. Let’s examine the expectation values
@@ -243,7 +245,7 @@ The state at <span class="math notranslate nohighlight">\(3 J_H\)</span> also ha
 <span class="math notranslate nohighlight">\(|\uparrow\downarrow&gt;+|\downarrow\uparrow&gt;\)</span> configuration.</p>
 </section>
 <section id="where-are-the-holes-for-large-hopping">
-<h2>Where are the holes for large hopping<a class="headerlink" href="#where-are-the-holes-for-large-hopping" title="Link to this heading">¶</a></h2>
+<h2>Where are the holes for large hopping<a class="headerlink" href="#where-are-the-holes-for-large-hopping" title="Link to this heading"></a></h2>
 <p>As discussed at the start, we are interested to see interplay between Hund’s
 and charge-transfer physics, which will obviously depend strongly on whether
 the holes are on Ni or the ligand. Let’s see what happens as <span class="math notranslate nohighlight">\(e_L\)</span> is
@@ -282,7 +284,7 @@ Ni. In the limit of large <span class="math notranslate nohighlight">\(e_L\)</sp
 exciton.</p>
 </section>
 <section id="connecton-between-atomic-and-charge-transfer-limits">
-<h2>Connecton between atomic and charge transfer limits<a class="headerlink" href="#connecton-between-atomic-and-charge-transfer-limits" title="Link to this heading">¶</a></h2>
+<h2>Connecton between atomic and charge transfer limits<a class="headerlink" href="#connecton-between-atomic-and-charge-transfer-limits" title="Link to this heading"></a></h2>
 <p>We now examine the quantum numbers during cross over between the two limits
 with <span class="math notranslate nohighlight">\(e_L\)</span>. Let’s first look at the how <span class="math notranslate nohighlight">\(&lt;S^2&gt;\)</span> changes for the
 ground state and exciton and then examine how the exciton energy changes.</p>
@@ -338,7 +340,7 @@ strong mixing with the <span class="math notranslate nohighlight">\(d^8\)</span>
 dominates the energy of the exciton.</p>
 </section>
 <section id="charge-transfer-excitons">
-<h2>Charge transfer excitons<a class="headerlink" href="#charge-transfer-excitons" title="Link to this heading">¶</a></h2>
+<h2>Charge transfer excitons<a class="headerlink" href="#charge-transfer-excitons" title="Link to this heading"></a></h2>
 <p>Another limiting case of the model is where <span class="math notranslate nohighlight">\(t\)</span> is smaller than the
 Coulomb interactions. This, however, tends to produce
 ground state and exciton configurations that correspond to those of distinct
@@ -412,7 +414,7 @@ in the ground state and exciton.</p>
 </ol>
 </aside>
 </aside>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.181 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 1.163 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-example-8-hunds-interactions-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/66f2a6da335f3f194c2adc5e82be4b27/example_8_Hunds_interactions.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">example_8_Hunds_interactions.ipynb</span></code></a></p>

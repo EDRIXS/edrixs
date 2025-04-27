@@ -17,6 +17,8 @@
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=5929fcd5"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -105,7 +107,7 @@
 to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="charge-transfer-energy-for-nio">
-<span id="sphx-glr-auto-examples-example-5-charge-transfer-py"></span><h1>Charge-transfer energy for NiO<a class="headerlink" href="#charge-transfer-energy-for-nio" title="Link to this heading">¶</a></h1>
+<span id="sphx-glr-auto-examples-example-5-charge-transfer-py"></span><h1>Charge-transfer energy for NiO<a class="headerlink" href="#charge-transfer-energy-for-nio" title="Link to this heading"></a></h1>
 <p>This example follows the <a class="reference internal" href="example_3_AIM_XAS.html#sphx-glr-auto-examples-example-3-aim-xas-py"><span class="std std-ref">Anderson impurity model for NiO XAS</span></a>
 example and considers the same model. This time we outline how to determine
 the charge transfer energy in the sense defined by Zaanen, Sawatzky, and Allen
@@ -123,7 +125,7 @@ calculate it, as we will do here.</p>
 </pre></div>
 </div>
 <section id="determine-eigenvectors-and-occupations">
-<h2>Determine eigenvectors and occupations<a class="headerlink" href="#determine-eigenvectors-and-occupations" title="Link to this heading">¶</a></h2>
+<h2>Determine eigenvectors and occupations<a class="headerlink" href="#determine-eigenvectors-and-occupations" title="Link to this heading"></a></h2>
 <p>The first step repeats what was done in
 <a class="reference internal" href="example_4_GS_analysis.html#sphx-glr-auto-examples-example-4-gs-analysis-py"><span class="std std-ref">Ground state analysis for NiO</span></a> but it does not apply
 the hybridization between the impurity and both states.</p>
@@ -165,7 +167,7 @@ the hybridization between the impurity and both states.</p>
 </div>
 </section>
 <section id="energy-to-lowest-energy-ligand-orbital">
-<h2>Energy to lowest energy ligand orbital<a class="headerlink" href="#energy-to-lowest-energy-ligand-orbital" title="Link to this heading">¶</a></h2>
+<h2>Energy to lowest energy ligand orbital<a class="headerlink" href="#energy-to-lowest-energy-ligand-orbital" title="Link to this heading"></a></h2>
 <p>Let’s vizualize <span class="math notranslate nohighlight">\(\alpha\)</span> and <span class="math notranslate nohighlight">\(\beta\)</span>.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure" class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">fig</span></a><span class="p">,</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="matplotlib.axes.Axes" class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ax</span></a> <span class="o">=</span> <a href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html#matplotlib.pyplot.subplots" title="matplotlib.pyplot.subplots" class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function"><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span></a><span class="p">()</span>
 
@@ -194,7 +196,7 @@ because we have turned off the hybridization. The energy required to</p>
 precision.</p>
 </section>
 <section id="diagonalizing-by-blocks">
-<h2>Diagonalizing by blocks<a class="headerlink" href="#diagonalizing-by-blocks" title="Link to this heading">¶</a></h2>
+<h2>Diagonalizing by blocks<a class="headerlink" href="#diagonalizing-by-blocks" title="Link to this heading"></a></h2>
 <p>When working on a problem with a large basis, one can take advantage of the
 lack of hybridization and separately diagonalize the impurity and bath
 states</p>
@@ -222,7 +224,7 @@ states</p>
 <p>which yields the same result.</p>
 </section>
 <section id="energy-splitting-in-ligand-states">
-<h2>Energy splitting in ligand states<a class="headerlink" href="#energy-splitting-in-ligand-states" title="Link to this heading">¶</a></h2>
+<h2>Energy splitting in ligand states<a class="headerlink" href="#energy-splitting-in-ligand-states" title="Link to this heading"></a></h2>
 <p>The last thing to consider is that our definition of the charge transfer
 energy refers to the atomic limit with all hopping terms switched off, whereas
 the ligand states in the model are already split by the oxygen-oxygen hopping
@@ -246,7 +248,7 @@ needs to account for this.</p>
 <a class="reference external" href="https://doi.org/10.1103/PhysRevLett.55.418">Phys. Rev. Lett. 55, 418 (1985)</a>.</p>
 </aside>
 </aside>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.434 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.443 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-example-5-charge-transfer-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/ea938601a5ea0e41baae4e0ea4cfc9b2/example_5_charge_transfer.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">example_5_charge_transfer.ipynb</span></code></a></p>

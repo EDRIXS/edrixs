@@ -17,6 +17,8 @@
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=5929fcd5"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -105,7 +107,7 @@
 to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="anderson-impurity-model-for-nio-xas">
-<span id="sphx-glr-auto-examples-example-3-aim-xas-py"></span><h1>Anderson impurity model for NiO XAS<a class="headerlink" href="#anderson-impurity-model-for-nio-xas" title="Link to this heading">¶</a></h1>
+<span id="sphx-glr-auto-examples-example-3-aim-xas-py"></span><h1>Anderson impurity model for NiO XAS<a class="headerlink" href="#anderson-impurity-model-for-nio-xas" title="Link to this heading"></a></h1>
 <p>Here we calculate the <span class="math notranslate nohighlight">\(L\)</span>-edge XAS spectrum of an Anderson impurity model,
 which is sometimes also called a charge-transfer multiplet model. This model
 considers a set of correlated orbitals, often called the impurity or metal
@@ -145,7 +147,7 @@ references should, of course, be cited.</p>
 </pre></div>
 </div>
 <section id="number-of-electrons">
-<h2>Number of electrons<a class="headerlink" href="#number-of-electrons" title="Link to this heading">¶</a></h2>
+<h2>Number of electrons<a class="headerlink" href="#number-of-electrons" title="Link to this heading"></a></h2>
 <p>When formulating problems of this type, one usually thinks of a nominal
 valence for the impurity atom in this case <code class="code docutils literal notranslate"><span class="pre">nd</span> <span class="pre">=</span> <span class="pre">8</span></code> and assume that the
 bath is full. The solver that we will
@@ -163,7 +165,7 @@ during our calculation, but the total number of valance electrons
 </div>
 </section>
 <section id="coulomb-interactions">
-<h2>Coulomb interactions<a class="headerlink" href="#coulomb-interactions" title="Link to this heading">¶</a></h2>
+<h2>Coulomb interactions<a class="headerlink" href="#coulomb-interactions" title="Link to this heading"></a></h2>
 <p>The atomic Coulomb interactions are usually initialized based on Hartree-Fock
 calculations from, for example,
 <a class="reference external" href="https://www.tcd.ie/Physics/people/Cormac.McGuinness/Cowan/">Cowan’s code</a>.
@@ -194,7 +196,7 @@ obtained by comparing theory and experiment <a class="footnote-reference bracket
 </div>
 </section>
 <section id="energy-of-the-bath-states">
-<h2>Energy of the bath states<a class="headerlink" href="#energy-of-the-bath-states" title="Link to this heading">¶</a></h2>
+<h2>Energy of the bath states<a class="headerlink" href="#energy-of-the-bath-states" title="Link to this heading"></a></h2>
 <p>In the notation used in EDRIXS, <span class="math notranslate nohighlight">\(\Delta\)</span> sets the energy difference
 between the bath and impurity states. <span class="math notranslate nohighlight">\(\Delta\)</span> is defined in the atomic
 limit without crystal field (i.e. in terms of the centers of the impurity and
@@ -240,7 +242,7 @@ are initialized using the atomic values.</p>
 </div>
 </section>
 <section id="build-matrices-describing-interactions">
-<h2>Build matrices describing interactions<a class="headerlink" href="#build-matrices-describing-interactions" title="Link to this heading">¶</a></h2>
+<h2>Build matrices describing interactions<a class="headerlink" href="#build-matrices-describing-interactions" title="Link to this heading"></a></h2>
 <p>edrixs uses complex spherical harmonics as its default basis set. If we want to
 use another basis set, we need to pass a matrix to the solver, which transforms
 from complex spherical harmonics into the basis we use.
@@ -496,7 +498,7 @@ edrixs &gt;&gt;&gt; Isotropic, component:  2
 <a class="reference external" href="https://doi.org/10.1143/JPSJ.63.2788">J. Phys. Soc. Jpn. 63, 2788-2807(1994)</a>.</p>
 </aside>
 </aside>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.504 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.519 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-example-3-aim-xas-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/37c91286a883108afd6bd1f2ad87920c/example_3_AIM_XAS.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">example_3_AIM_XAS.ipynb</span></code></a></p>

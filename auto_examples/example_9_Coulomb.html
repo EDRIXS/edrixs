@@ -17,6 +17,8 @@
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
 
   
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=5929fcd5"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
@@ -114,14 +116,14 @@
 to download the full example code.</p>
 </div>
 <section class="sphx-glr-example-title" id="coulomb-interactions">
-<span id="sphx-glr-auto-examples-example-9-coulomb-py"></span><h1>Coulomb interactions<a class="headerlink" href="#coulomb-interactions" title="Link to this heading">¶</a></h1>
+<span id="sphx-glr-auto-examples-example-9-coulomb-py"></span><h1>Coulomb interactions<a class="headerlink" href="#coulomb-interactions" title="Link to this heading"></a></h1>
 <p>In this example we provide more details on how Coulomb interactions are
 implemented in multiplet calculations and EDRIXS in particular. We aim
 to clarify the form of the matrices, how they are parametrized,
 and how the breaking of spherical symmetry can switch on additional elements
 that one might not anticipate. Our example is based on a <span class="math notranslate nohighlight">\(d\)</span> atomic shell.</p>
 <section id="create-matrix">
-<h2>Create matrix<a class="headerlink" href="#create-matrix" title="Link to this heading">¶</a></h2>
+<h2>Create matrix<a class="headerlink" href="#create-matrix" title="Link to this heading"></a></h2>
 <p>The Coulomb interaction between two particles can be written as</p>
 <blockquote>
 <div><div class="math notranslate nohighlight">
@@ -171,7 +173,7 @@ In EDRIXS the matrix can be created as follows:</p>
 complex harmonic basis, which is the default basis in EDRIXS.</p>
 </section>
 <section id="parameterizing-interactions">
-<h2>Parameterizing interactions<a class="headerlink" href="#parameterizing-interactions" title="Link to this heading">¶</a></h2>
+<h2>Parameterizing interactions<a class="headerlink" href="#parameterizing-interactions" title="Link to this heading"></a></h2>
 <p>EDRIXS parameterizes the interactions in <span class="math notranslate nohighlight">\(U\)</span> via Slater integral
 parameters <span class="math notranslate nohighlight">\(F^{k}\)</span>. These relate to integrals of various spherical
 Harmonics as well as Clebsch-Gordon coefficients, Gaunt coefficients,
@@ -201,7 +203,7 @@ F_4 &amp;=&amp; \frac{1}{441}F^4,
 <p>which involves different normalization parameters.</p>
 </section>
 <section id="basis-transform">
-<h2>Basis transform<a class="headerlink" href="#basis-transform" title="Link to this heading">¶</a></h2>
+<h2>Basis transform<a class="headerlink" href="#basis-transform" title="Link to this heading"></a></h2>
 <p>If we want to use the real harmonic basis, we can use a tensor
 transformation, which imposes the following orbital order
 <span class="math notranslate nohighlight">\(3z^2-r^2, xz, yz, x^2-y^2, xy\)</span>, each of which involves
@@ -213,7 +215,7 @@ store a list of these orbitals.</p>
 </div>
 </section>
 <section id="interactions">
-<h2>Interactions<a class="headerlink" href="#interactions" title="Link to this heading">¶</a></h2>
+<h2>Interactions<a class="headerlink" href="#interactions" title="Link to this heading"></a></h2>
 <p>Tensor <span class="math notranslate nohighlight">\(U\)</span> is a  series of matrix
 elements</p>
 <blockquote>
@@ -248,7 +250,7 @@ U_{\gamma\sigma,\delta\sigma^\prime,\alpha\sigma^\prime,\beta\sigma}.
 \end{equation}\]</div>
 </div></blockquote>
 <section id="intra-orbital">
-<h3>1. Intra orbital<a class="headerlink" href="#intra-orbital" title="Link to this heading">¶</a></h3>
+<h3>1. Intra orbital<a class="headerlink" href="#intra-orbital" title="Link to this heading"></a></h3>
 <p>The direct Coulomb energy cost to double-occupy an orbital comes from terms
 like <span class="math notranslate nohighlight">\(U_{\alpha\sigma,\alpha\bar\sigma,\alpha\bar\sigma,\alpha\sigma}\)</span>.
 In this notation, we use <span class="math notranslate nohighlight">\(\sigma^\prime\)</span> to denote that the matrix
@@ -277,7 +279,7 @@ xy               4.250
 </div>
 </section>
 <section id="inter-orbital-coulomb-interactions">
-<h3>2. Inter orbital Coulomb interactions<a class="headerlink" href="#inter-orbital-coulomb-interactions" title="Link to this heading">¶</a></h3>
+<h3>2. Inter orbital Coulomb interactions<a class="headerlink" href="#inter-orbital-coulomb-interactions" title="Link to this heading"></a></h3>
 <p>Direct Coulomb repulsion between different orbitals depends on terms like
 <span class="math notranslate nohighlight">\(U_{\alpha\sigma,\beta\sigma^\prime,\beta\sigma^\prime,\alpha\sigma}\)</span>.
 Expresions for these parameters are provided in column <span class="math notranslate nohighlight">\(U\)</span> in
@@ -302,7 +304,7 @@ x^2-y^2          xy              3.900
 </div>
 </section>
 <section id="inter-orbital-exchange-interactions">
-<h3>3. Inter-orbital exchange interactions<a class="headerlink" href="#inter-orbital-exchange-interactions" title="Link to this heading">¶</a></h3>
+<h3>3. Inter-orbital exchange interactions<a class="headerlink" href="#inter-orbital-exchange-interactions" title="Link to this heading"></a></h3>
 <p>Exchange terms exist with the form
 <span class="math notranslate nohighlight">\(U_{\alpha\sigma,\beta\sigma^\prime,\alpha\sigma^\prime,\beta\sigma}\)</span>.
 Expresions for these parameters are provided in column <span class="math notranslate nohighlight">\(J\)</span> of
@@ -326,7 +328,7 @@ x^2-y^2          xy              0.175
 </div>
 </section>
 <section id="pair-hopping-term">
-<h3>4. Pair hopping term<a class="headerlink" href="#pair-hopping-term" title="Link to this heading">¶</a></h3>
+<h3>4. Pair hopping term<a class="headerlink" href="#pair-hopping-term" title="Link to this heading"></a></h3>
 <p>Terms that swap pairs of electrons exist as
 <span class="math notranslate nohighlight">\((1-\delta_{\sigma\sigma'})U_{\alpha\sigma,\alpha\bar\sigma,\beta\bar\sigma,\beta\sigma}\)</span>
 and depend on exchange interactions column <span class="math notranslate nohighlight">\(J\)</span> from
@@ -351,7 +353,7 @@ x^2-y^2          xy              0.175
 </div>
 </section>
 <section id="three-orbital">
-<h3>5. Three orbital<a class="headerlink" href="#three-orbital" title="Link to this heading">¶</a></h3>
+<h3>5. Three orbital<a class="headerlink" href="#three-orbital" title="Link to this heading"></a></h3>
 <p>Another set of terms that one might not immediately anticipate involve three
 orbitals like</p>
 <blockquote>
@@ -390,7 +392,7 @@ yz               yz             x^2-y^2          3z^2-r^2        -0.217
 </div>
 </section>
 <section id="four-orbital">
-<h3>6. Four orbital<a class="headerlink" href="#four-orbital" title="Link to this heading">¶</a></h3>
+<h3>6. Four orbital<a class="headerlink" href="#four-orbital" title="Link to this heading"></a></h3>
 <p>Futher multi-orbital terms include
 <span class="math notranslate nohighlight">\(U_{\alpha\sigma,\beta\sigma^\prime,\gamma\sigma^\prime,\delta\sigma}\)</span>.
 We can find these here in the matrix:</p>
@@ -426,7 +428,7 @@ x^2-y^2          xy              yz              xz              0.375
 </section>
 </section>
 <section id="effects-of-multi-orbital-terms">
-<h2>Effects of multi-orbital terms<a class="headerlink" href="#effects-of-multi-orbital-terms" title="Link to this heading">¶</a></h2>
+<h2>Effects of multi-orbital terms<a class="headerlink" href="#effects-of-multi-orbital-terms" title="Link to this heading"></a></h2>
 <p>To test the effects of the multi-orbital terms, let’s plot the eigenenergy
 spectra with and without multi-orbital terms switched on for system with and
 without a cubic crystal field. We will use a <span class="math notranslate nohighlight">\(d\)</span>-shell with two
@@ -475,7 +477,7 @@ the right eigenenergies. As <span class="math notranslate nohighlight">\(10D_q\)
 off and the spectra start to become independent of whether the 3 &amp; 4 orbital
 orbital terms are included or not.</p>
 <span id="table-2-orbital"></span><table class="docutils align-default" id="id3">
-<caption><span class="caption-text">Table of 2 orbital interactions</span><a class="headerlink" href="#id3" title="Link to this table">¶</a></caption>
+<caption><span class="caption-text">Table of 2 orbital interactions</span><a class="headerlink" href="#id3" title="Link to this table"></a></caption>
 <thead>
 <tr class="row-odd"><th class="head"><p>Orbitals <span class="math notranslate nohighlight">\(\alpha,\beta\)</span></p></th>
 <th class="head"><p><span class="math notranslate nohighlight">\(U_0\)</span> Racah</p></th>
@@ -548,7 +550,7 @@ orbital terms are included or not.</p>
 </tbody>
 </table>
 <span id="table-3-orbital"></span><table class="docutils align-default" id="id4">
-<caption><span class="caption-text">Table of 3 orbital interactions</span><a class="headerlink" href="#id4" title="Link to this table">¶</a></caption>
+<caption><span class="caption-text">Table of 3 orbital interactions</span><a class="headerlink" href="#id4" title="Link to this table"></a></caption>
 <thead>
 <tr class="row-odd"><th class="head" colspan="2"><p>Orbitals <span class="math notranslate nohighlight">\(\alpha,\beta,\gamma,\delta\)</span></p></th>
 <th class="head"><p><span class="math notranslate nohighlight">\(\langle\alpha\beta|\gamma\delta\rangle\)</span> Racah</p></th>
@@ -583,7 +585,7 @@ orbital terms are included or not.</p>
 </tbody>
 </table>
 <span id="table-4-orbital"></span><table class="docutils align-default" id="id5">
-<caption><span class="caption-text">Table of 4 orbital interactions</span><a class="headerlink" href="#id5" title="Link to this table">¶</a></caption>
+<caption><span class="caption-text">Table of 4 orbital interactions</span><a class="headerlink" href="#id5" title="Link to this table"></a></caption>
 <thead>
 <tr class="row-odd"><th class="head" colspan="2"><p>Orbitals <span class="math notranslate nohighlight">\(\alpha,\beta,\gamma,\delta\)</span></p></th>
 <th class="head"><p><span class="math notranslate nohighlight">\(\langle\alpha\beta|\gamma\delta\rangle\)</span> Racah</p></th>
@@ -641,7 +643,7 @@ orbital terms are included or not.</p>
 Transition-Metal Ions in Crystals. Academic Press, New York and London.</p>
 </aside>
 </aside>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.345 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.352 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-example-9-coulomb-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/687fb58743d637976afd57fbd8a78ef9/example_9_Coulomb.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">example_9_Coulomb.ipynb</span></code></a></p>
