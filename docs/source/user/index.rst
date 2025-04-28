@@ -14,6 +14,7 @@ edrixs User Guide
    installation
    usedocker
    quickstart
+   expectationvalues
    basics
    pythontips
    examples
