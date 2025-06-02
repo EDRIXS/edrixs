@@ -194,16 +194,14 @@ of the :math:`S^2` and :math:`S_z` operators.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 126-132
+.. GENERATED FROM PYTHON SOURCE LINES 126-130
 
 The ground state is a high-spin triplet. The fourth and fifth
 states (the first excited state) are low-spin singlet excitons at
 :math:`2 J_H`. These have one hole on each orbital in the antisymmetric
 combination of :math:`|\uparrow\downarrow>-|\downarrow\uparrow>`.
-The state at :math:`3 J_H` also has one hole on each orbital in the symmetric
-:math:`|\uparrow\downarrow>+|\downarrow\uparrow>` configuration.
 
-.. GENERATED FROM PYTHON SOURCE LINES 134-140
+.. GENERATED FROM PYTHON SOURCE LINES 132-138
 
 Where are the holes for large hopping
 ------------------------------------------------------------------------------
@@ -212,7 +210,7 @@ and charge-transfer physics, which will obviously depend strongly on whether
 the holes are on Ni or the ligand. Let's see what happens as :math:`e_L` is
 reduced while observing the location of the ground state and exciton holes.
 
-.. GENERATED FROM PYTHON SOURCE LINES 140-164
+.. GENERATED FROM PYTHON SOURCE LINES 138-162
 
 .. code-block:: Python
 
@@ -252,7 +250,7 @@ reduced while observing the location of the ground state and exciton holes.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 165-171
+.. GENERATED FROM PYTHON SOURCE LINES 163-169
 
 For large :math:`e_L`, we see that both holes are on nickel as expected. In
 the opposite limit of :math:`|e_L| \ll t` and :math:`U \ll t` the holes are
@@ -261,7 +259,7 @@ Ni. In the limit of large :math:`e_L`, all holes move onto Ni. Since
 :math:`t` is large, this applies equally to both the ground state and the
 exciton.
 
-.. GENERATED FROM PYTHON SOURCE LINES 174-179
+.. GENERATED FROM PYTHON SOURCE LINES 172-177
 
 Connecton between atomic and charge transfer limits
 ------------------------------------------------------------------------------
@@ -269,7 +267,7 @@ We now examine the quantum numbers during cross over between the two limits
 with :math:`e_L`. Let's first look at the how :math:`<S^2>` changes for the
 ground state and exciton and then examine how the exciton energy changes.
 
-.. GENERATED FROM PYTHON SOURCE LINES 179-216
+.. GENERATED FROM PYTHON SOURCE LINES 177-214
 
 .. code-block:: Python
 
@@ -322,7 +320,7 @@ ground state and exciton and then examine how the exciton energy changes.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 217-229
+.. GENERATED FROM PYTHON SOURCE LINES 215-227
 
 In the left panel, we see that the two limits are adiabatically connected
 as they preseve the same quantum numbers. This is because there is always
@@ -337,7 +335,7 @@ electronic configuration, whenever :math:`t` is appreciable there is a
 strong mixing with the :math:`d^8` component is always present, which
 dominates the energy of the exciton.
 
-.. GENERATED FROM PYTHON SOURCE LINES 231-237
+.. GENERATED FROM PYTHON SOURCE LINES 229-235
 
 Charge transfer excitons
 ------------------------------------------------------------------------------
@@ -346,7 +344,7 @@ Coulomb interactions. This, however, tends to produce
 ground state and exciton configurations that correspond to those of distinct
 atomic models. Let's look at the :math:`e_L` dependence in this case.
 
-.. GENERATED FROM PYTHON SOURCE LINES 237-265
+.. GENERATED FROM PYTHON SOURCE LINES 235-263
 
 .. code-block:: Python
 
@@ -390,14 +388,14 @@ atomic models. Let's look at the :math:`e_L` dependence in this case.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 266-270
+.. GENERATED FROM PYTHON SOURCE LINES 264-268
 
 Around :math:`e_L = 7` the plot shows that the excition is primairly a
 :math:`d^2 \rightarrow d^1` transition or a
 :math:`d^8 \rightarrow d^{9}\underline{L}` transition in electron language.
 Let's examine the energy and quantum numbers.
 
-.. GENERATED FROM PYTHON SOURCE LINES 270-281
+.. GENERATED FROM PYTHON SOURCE LINES 268-279
 
 .. code-block:: Python
 
@@ -435,12 +433,12 @@ Let's examine the energy and quantum numbers.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 282-284
+.. GENERATED FROM PYTHON SOURCE LINES 280-282
 
 We once again see the same quantum numbers, despite the differences in mixing
 in the ground state and exciton.
 
-.. GENERATED FROM PYTHON SOURCE LINES 287-290
+.. GENERATED FROM PYTHON SOURCE LINES 285-288
 
 .. rubric:: Footnotes
 
@@ -449,7 +447,7 @@ in the ground state and exciton.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.151 seconds)
+   **Total running time of the script:** (0 minutes 1.153 seconds)
 
 
 .. _sphx_glr_download_auto_examples_example_8_Hunds_interactions.py:

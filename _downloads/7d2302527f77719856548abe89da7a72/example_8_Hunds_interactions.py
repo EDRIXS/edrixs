@@ -127,8 +127,6 @@ for i in range(3, 6):
 # states (the first excited state) are low-spin singlet excitons at
 # :math:`2 J_H`. These have one hole on each orbital in the antisymmetric
 # combination of :math:`|\uparrow\downarrow>-|\downarrow\uparrow>`.
-# The state at :math:`3 J_H` also has one hole on each orbital in the symmetric
-# :math:`|\uparrow\downarrow>+|\downarrow\uparrow>` configuration.
 
 ################################################################################
 # Where are the holes for large hopping
