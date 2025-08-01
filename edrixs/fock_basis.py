@@ -1,60 +1,12 @@
 #!/usr/bin/env python
 
-__all__ = ['combination', 'fock_bin', 'get_fock_bin_by_N', 'get_fock_half_N',
+__all__ = ['fock_bin', 'get_fock_bin_by_N', 'get_fock_half_N',
            'get_fock_full_N', 'get_fock_basis_by_NLz', 'get_fock_basis_by_NSz',
            'get_fock_basis_by_NJz', 'get_fock_basis_by_N_abelian',
            'get_fock_basis_by_N_LzSz', 'write_fock_dec_by_N']
 
 import numpy as np
 import itertools
-
-
-def combination(n, m):
-    """
-    Calculate the combination :math:`C_{n}^{m}`,
-
-    .. math::
-
-        C_{n}^{m} = \\frac{n!}{m!(n-m)!}.
-
-    Parameters
-    ----------
-    n: int
-       Number n.
-    m: int
-        Number m.
-
-    Returns
-    -------
-    res: int
-        The calculated result.
-
-    Examples
-    --------
-    >>> import edrixs
-    >>> edrixs.combination(6, 2)
-    15
-
-    """
-
-    if m > n or n < 0 or m < 0:
-        print("wrong number in combination")
-        return
-    if m == 0 or n == m:
-        return 1
-
-    largest = max(m, n - m)
-    smallest = min(m, n - m)
-    numer = 1.0
-    for i in range(largest + 1, n + 1):
-        numer *= i
-
-    denom = 1.0
-    for i in range(1, smallest + 1):
-        denom *= i
-
-    res = int(numer / denom)
-    return res
 
 
 def fock_bin(n, k):

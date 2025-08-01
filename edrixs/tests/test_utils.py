@@ -92,3 +92,14 @@ def test_CT_imp_bath_core_hole():
     assert E_dc_val == E_dc_cal
     assert E_Lc_val == E_Lc_cal
     assert E_p_val == E_p_cal
+
+
+def test_get_atom_data():
+    res = edrixs.get_atom_data('Ni', v_name='3d', v_noccu=8)
+    slater_i = res['slater_i']
+    assert slater_i[0][0] == 'F0_11'
+    assert slater_i[0][1] == 0.0
+    assert slater_i[1][0] == 'F2_11'
+    assert slater_i[1][1] == 12.234
+    assert slater_i[2][0] == 'F4_11'
+    assert slater_i[2][1] == 7.598
