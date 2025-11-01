@@ -39,9 +39,9 @@ Several tools and libraries are required to build and install edrixs,
 
 Build from source
 =================
-We will show how to build edrixs from source on Ubuntu Linux 20.04 and macOS Mojave (OSX 10.14) as examples.
+We will show how to build edrixs from source on Ubuntu Linux 20.04.
 We will use gcc, gfortran, openmpi and OpenBLAS in these examples.
-Building edrixs on other versions of Linux or macOS, or with Intel's ifort+MKL will be similar.
+Building edrixs on other versions of Linux or with Intel's ifort+MKL will be similar.
 
 Ubuntu Linux 20.04
 ------------------
