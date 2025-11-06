@@ -59,7 +59,6 @@
 <li class="toctree-l3"><a class="reference internal" href="#requirements">Requirements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#build-from-source">Build from source</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#ubuntu-linux-20-04">Ubuntu Linux 20.04</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#macos-mojave-osx-10-14">macOS Mojave (OSX 10.14)</a></li>
 </ul>
 </li>
 </ul>
@@ -140,9 +139,9 @@ condacolab.install()
 </section>
 <section id="build-from-source">
 <h2>Build from source<a class="headerlink" href="#build-from-source" title="Link to this heading"></a></h2>
-<p>We will show how to build edrixs from source on Ubuntu Linux 20.04 and macOS Mojave (OSX 10.14) as examples.
+<p>We will show how to build edrixs from source on Ubuntu Linux 20.04.
 We will use gcc, gfortran, openmpi and OpenBLAS in these examples.
-Building edrixs on other versions of Linux or macOS, or with Intel’s ifort+MKL will be similar.</p>
+Building edrixs on other versions of Linux or with Intel’s ifort+MKL will be similar.</p>
 <section id="ubuntu-linux-20-04">
 <h3>Ubuntu Linux 20.04<a class="headerlink" href="#ubuntu-linux-20-04" title="Link to this heading"></a></h3>
 <p>Install compilers and tools:</p>
@@ -277,187 +276,12 @@ However, they can also be compiled from source easily. In the following, we will
 </pre></div>
 </div>
 <p>if no errors, the installation is successful.</p>
-</section>
-<section id="macos-mojave-osx-10-14">
-<h3>macOS Mojave (OSX 10.14)<a class="headerlink" href="#macos-mojave-osx-10-14" title="Link to this heading"></a></h3>
-<p>Install newest Xcode through App store.</p>
-<section id="use-macports">
-<h4>Use MacPorts<a class="headerlink" href="#use-macports" title="Link to this heading"></a></h4>
-<p>Download and install <a class="reference external" href="https://www.macports.org/install.php/">MacPorts</a>.
-Update MacPorts by:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">port</span> <span class="o">-</span><span class="n">v</span> <span class="n">selfupdate</span>
-</pre></div>
-</div>
-<p>Install gcc8, arpack, openblas and openmpi:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">port</span> <span class="o">-</span><span class="n">v</span> <span class="n">install</span> <span class="n">gcc8</span>
-<span class="n">sudo</span> <span class="n">port</span> <span class="n">select</span> <span class="n">gcc</span> <span class="n">mp</span><span class="o">-</span><span class="n">gcc8</span>
-<span class="n">sudo</span> <span class="n">port</span> <span class="o">-</span><span class="n">v</span> <span class="n">install</span> <span class="n">openmpi</span><span class="o">-</span><span class="n">default</span> <span class="o">+</span><span class="n">gcc8</span>
-<span class="n">sudo</span> <span class="n">port</span> <span class="o">-</span><span class="n">v</span> <span class="n">install</span> <span class="n">openblas</span> <span class="o">+</span><span class="n">gcc8</span>
-<span class="n">sudo</span> <span class="n">port</span> <span class="o">-</span><span class="n">v</span> <span class="n">install</span> <span class="n">arpack</span> <span class="o">+</span><span class="n">openblas</span> <span class="o">+</span><span class="n">openmpi</span>
-<span class="n">sudo</span> <span class="n">port</span> <span class="n">select</span> <span class="o">--</span><span class="nb">set</span> <span class="n">mpi</span> <span class="n">openmpi</span><span class="o">-</span><span class="n">mp</span><span class="o">-</span><span class="n">fortran</span>
-</pre></div>
-</div>
-<p>Install Python, pip, numpy, scipy, sympy, matplotlib:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">port</span> <span class="o">-</span><span class="n">v</span> <span class="n">install</span> <span class="n">python37</span> <span class="n">py37</span><span class="o">-</span><span class="n">pip</span>
-<span class="n">sudo</span> <span class="n">port</span> <span class="o">-</span><span class="n">v</span> <span class="n">install</span> <span class="n">py37</span><span class="o">-</span><span class="n">numpy</span> <span class="o">+</span><span class="n">gcc8</span> <span class="o">+</span><span class="n">openblas</span>
-<span class="n">sudo</span> <span class="n">port</span> <span class="o">-</span><span class="n">v</span> <span class="n">install</span> <span class="n">py37</span><span class="o">-</span><span class="n">scipy</span> <span class="o">+</span><span class="n">gcc8</span> <span class="o">+</span><span class="n">openblas</span>
-<span class="n">sudo</span> <span class="n">port</span> <span class="o">-</span><span class="n">v</span> <span class="n">install</span> <span class="n">py37</span><span class="o">-</span><span class="n">sympy</span>
-<span class="n">sudo</span> <span class="n">port</span> <span class="o">-</span><span class="n">v</span> <span class="n">install</span> <span class="n">py37</span><span class="o">-</span><span class="n">matplotlib</span>
-</pre></div>
-</div>
-<p><strong>Notes:</strong></p>
-<ul class="simple">
-<li><p>DO NOT use pip to install numpy because it will use <code class="docutils literal notranslate"><span class="pre">clang</span></code> as default compiler, which has a strange bug when using <code class="docutils literal notranslate"><span class="pre">f2py</span></code> with <code class="docutils literal notranslate"><span class="pre">mpif90</span></code> compiler. If you cannot solve this issue by <code class="docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">port</span> <span class="pre">install</span> <span class="pre">py37-numpy</span> <span class="pre">+gcc8</span></code>, you can compile numpy from its source with <code class="docutils literal notranslate"><span class="pre">gcc</span></code> compiler. Always use gcc to compile numpy if you want to build it from source.</p></li>
-<li><p>You can also try <code class="docutils literal notranslate"><span class="pre">gcc9</span></code> if it is already available, but be sure to change all <code class="docutils literal notranslate"><span class="pre">gcc8</span></code> to <code class="docutils literal notranslate"><span class="pre">gcc9</span></code> in the above commands.</p></li>
-</ul>
-<p>We will assume <code class="docutils literal notranslate"><span class="pre">python</span></code> pointing to <code class="docutils literal notranslate"><span class="pre">python3.7</span></code> and <code class="docutils literal notranslate"><span class="pre">pip</span></code> pointing to <code class="docutils literal notranslate"><span class="pre">pip3.7</span></code> from now on. If this is not the case, you can make links explicitly.
-Check we are using the expected python and pip:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">which</span> <span class="n">python</span>
-<span class="n">python</span> <span class="o">--</span><span class="n">version</span>
-<span class="n">which</span> <span class="n">pip</span>
-<span class="n">pip</span> <span class="o">--</span><span class="n">version</span>
-</pre></div>
-</div>
-<p>Add the following two lines into <code class="docutils literal notranslate"><span class="pre">~/.bash_profile</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>export PATH=&quot;/opt/local/bin:/opt/local/sbin:$PATH&quot;
-export PATH=/opt/local/Library/Frameworks/Python.framework/Versions/3.7/bin:$PATH
-</pre></div>
-</div>
-<p>Close current terminal and open a new one.</p>
-<p>Install mpi4py:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">MPICC</span><span class="o">=/</span><span class="n">opt</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">mpicc</span>
-<span class="n">sudo</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">cache</span><span class="o">-</span><span class="nb">dir</span> <span class="n">mpi4py</span>
-</pre></div>
-</div>
-<p>Please be sure to check whether the MPI paths of mpi4py are correct by:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="nn">mpi4py</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">mpi4py</span><span class="o">.</span><span class="n">get_config</span><span class="p">()</span>
-<span class="p">{</span><span class="s1">&#39;mpicc&#39;</span><span class="p">:</span> <span class="s1">&#39;/opt/local/bin/mpicc&#39;</span><span class="p">}</span>
-</pre></div>
-</div>
-<p>Now, we are ready to build edrixs:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">NSLS</span><span class="o">-</span><span class="n">II</span><span class="o">/</span><span class="n">edrixs</span><span class="o">.</span><span class="n">git</span>
-<span class="n">cd</span> <span class="n">edrixs</span>
-<span class="n">make</span> <span class="o">-</span><span class="n">C</span> <span class="n">src</span> <span class="n">F90</span><span class="o">=</span><span class="n">mpif90</span> <span class="n">LIBS</span><span class="o">=</span><span class="s2">&quot;-L/opt/local/lib -lopenblas -lparpack -larpack&quot;</span>
-<span class="n">make</span> <span class="o">-</span><span class="n">C</span> <span class="n">src</span> <span class="n">install</span>
-<span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">config_fc</span> <span class="o">--</span><span class="n">f77exec</span><span class="o">=</span><span class="n">mpif90</span> <span class="o">--</span><span class="n">f90exec</span><span class="o">=</span><span class="n">mpif90</span> <span class="n">build_ext</span> <span class="o">--</span><span class="n">libraries</span><span class="o">=</span><span class="n">openblas</span><span class="p">,</span><span class="n">parpack</span><span class="p">,</span><span class="n">arpack</span> <span class="o">--</span><span class="n">library</span><span class="o">-</span><span class="n">dirs</span><span class="o">=/</span><span class="n">opt</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">lib</span>
-<span class="n">sudo</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">.</span>
-</pre></div>
-</div>
-<p>You can add <code class="docutils literal notranslate"><span class="pre">edrixs/bin</span></code> to the environment variable <code class="docutils literal notranslate"><span class="pre">PATH</span></code> in ~/.bash_profile.</p>
-<p>Go to <code class="docutils literal notranslate"><span class="pre">examples</span></code> directory to run some examples:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">examples</span><span class="o">/</span><span class="n">more</span><span class="o">/</span><span class="n">ED</span><span class="o">/</span><span class="mi">14</span><span class="n">orb</span>
-<span class="o">./</span><span class="n">get_inputs</span><span class="o">.</span><span class="n">py</span>
-<span class="n">mpirun</span> <span class="o">-</span><span class="n">np</span> <span class="mi">2</span> <span class="o">../../../../</span><span class="n">src</span><span class="o">/</span><span class="n">ed</span><span class="o">.</span><span class="n">x</span>
-<span class="n">mpirun</span> <span class="o">-</span><span class="n">np</span> <span class="mi">2</span> <span class="o">./</span><span class="n">run_fedsolver</span><span class="o">.</span><span class="n">py</span>
-<span class="n">cd</span> <span class="o">../../</span><span class="n">RIXS</span><span class="o">/</span><span class="n">LaNiO3_thin</span>
-<span class="n">mpirun</span> <span class="o">-</span><span class="n">np</span> <span class="mi">2</span> <span class="o">./</span><span class="n">run_rixs_fsolver</span><span class="o">.</span><span class="n">py</span>
-</pre></div>
-</div>
-<p>if no errors, the installation is successful.</p>
-<p>All done, enjoy!</p>
-</section>
-<section id="use-homebrew">
-<h4>Use Homebrew<a class="headerlink" href="#use-homebrew" title="Link to this heading"></a></h4>
-<p>Install Homebrew:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">ruby</span> <span class="o">-</span><span class="n">e</span> <span class="s2">&quot;$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)&quot;</span>
-</pre></div>
-</div>
-<p>Add following line to <code class="docutils literal notranslate"><span class="pre">~/.bash_profile</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">PATH</span><span class="o">=</span><span class="s2">&quot;/usr/local/bin:$PATH&quot;</span>
-</pre></div>
-</div>
-<p>Install gcc9:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">brew</span> <span class="n">install</span> <span class="n">gcc</span><span class="o">@</span><span class="mi">9</span>
-</pre></div>
-</div>
-<p>Install openblas and arpack:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">brew</span> <span class="n">install</span> <span class="n">openblas</span>
-<span class="n">brew</span> <span class="n">install</span> <span class="n">arpack</span>
-</pre></div>
-</div>
-<p>openmpi has been automatically installed when installing arpack.</p>
-<p>Install python3.7:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">brew</span> <span class="n">install</span> <span class="n">python</span>
-</pre></div>
-</div>
-<p>We will assume <code class="docutils literal notranslate"><span class="pre">python</span></code> pointing to <code class="docutils literal notranslate"><span class="pre">python3.7</span></code> and <code class="docutils literal notranslate"><span class="pre">pip</span></code> pointing to <code class="docutils literal notranslate"><span class="pre">pip3.7</span></code> from now on. If this is not the case, you can make link explicitly.
-Check we are using the expected python and pip:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">which</span> <span class="n">python</span>
-<span class="n">python</span> <span class="o">--</span><span class="n">version</span>
-<span class="n">which</span> <span class="n">pip</span>
-<span class="n">pip</span> <span class="o">--</span><span class="n">version</span>
-</pre></div>
-</div>
-<p>Make links if gcc, g++ and gfortran are not pointing to gcc-9, g++-9, gfortran-9, for example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">ln</span> <span class="o">-</span><span class="n">s</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">Cellar</span><span class="o">/</span><span class="n">gcc</span><span class="o">/</span><span class="mf">9.1.0</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">gcc</span><span class="o">-</span><span class="mi">9</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">gcc</span>
-<span class="n">ln</span> <span class="o">-</span><span class="n">s</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">Cellar</span><span class="o">/</span><span class="n">gcc</span><span class="o">/</span><span class="mf">9.1.0</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">g</span><span class="o">++-</span><span class="mi">9</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">g</span><span class="o">++</span>
-<span class="n">ln</span> <span class="o">-</span><span class="n">s</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">Cellar</span><span class="o">/</span><span class="n">gcc</span><span class="o">/</span><span class="mf">9.1.0</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">gfortran</span><span class="o">-</span><span class="mi">9</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">gfortran</span>
-</pre></div>
-</div>
-<p>DO NOT install numpy through <code class="docutils literal notranslate"><span class="pre">pip</span></code> because it uses <code class="docutils literal notranslate"><span class="pre">clang</span></code> as default compiler, which will cause problems.
-We will build numpy from source with gcc:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wget</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">numpy</span><span class="o">/</span><span class="n">numpy</span><span class="o">/</span><span class="n">archive</span><span class="o">/</span><span class="n">v1</span><span class="mf">.16.3</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
-<span class="n">tar</span> <span class="n">xzf</span> <span class="n">v1</span><span class="mf">.16.3</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
-<span class="n">cd</span> <span class="n">numpy</span><span class="o">-</span><span class="mf">1.16.3</span>
-<span class="n">export</span> <span class="n">CC</span><span class="o">=</span><span class="n">gcc</span> <span class="n">CXX</span><span class="o">=</span><span class="n">g</span><span class="o">++</span>
-<span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="o">.</span>
-</pre></div>
-</div>
-<p>You might need to do  <code class="docutils literal notranslate"><span class="pre">brew</span> <span class="pre">install</span> <span class="pre">wget</span></code> if it is not already installed.
-If you have BLIS or MKL installed, you will need to tell numpy to compile with
-openblas. Create a file in the numpy directory called site.cfg and put the
-following text in it:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">openblas</span><span class="p">]</span>
-<span class="n">libraries</span> <span class="o">=</span> <span class="n">openblas</span>
-<span class="n">library_dirs</span> <span class="o">=</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">Cellar</span><span class="o">/</span><span class="n">openblas</span><span class="o">/</span><span class="mf">0.3.9</span><span class="o">/</span><span class="n">lib</span>
-<span class="n">include_dirs</span> <span class="o">=</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">Cellar</span><span class="o">/</span><span class="n">openblas</span><span class="o">/</span><span class="mf">0.3.9</span><span class="o">/</span><span class="n">include</span>
-<span class="n">runtime_library_dirs</span> <span class="o">=</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">Cellar</span><span class="o">/</span><span class="n">openblas</span><span class="o">/</span><span class="mf">0.3.9</span><span class="o">/</span><span class="n">lib</span>
-</pre></div>
-</div>
-<p>Now we are ready to install scipy, sympy, matplotlib:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="n">scipy</span> <span class="n">sympy</span> <span class="n">matplotlib</span>
-<span class="n">export</span> <span class="n">MPICC</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">mpicc</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">cache</span><span class="o">-</span><span class="nb">dir</span> <span class="n">mpi4py</span>
-</pre></div>
-</div>
-<p>Please be sure to check whether the MPI paths of mpi4py are correct by:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="nn">mpi4py</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">mpi4py</span><span class="o">.</span><span class="n">get_config</span><span class="p">()</span>
-<span class="p">{</span><span class="s1">&#39;mpicc&#39;</span><span class="p">:</span> <span class="s1">&#39;/usr/local/bin/mpicc&#39;</span><span class="p">}</span>
-</pre></div>
-</div>
-<p>Now, we are ready to build edrixs:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">NSLS</span><span class="o">-</span><span class="n">II</span><span class="o">/</span><span class="n">edrixs</span><span class="o">.</span><span class="n">git</span>
-<span class="n">cd</span> <span class="n">edrixs</span>
-<span class="n">make</span> <span class="o">-</span><span class="n">C</span> <span class="n">src</span> <span class="n">F90</span><span class="o">=</span><span class="n">mpif90</span> <span class="n">LIBS</span><span class="o">=</span><span class="s2">&quot;-L/usr/local/opt/openblas/lib -lopenblas -L/usr/local/lib -lparpack -larpack&quot;</span>
-<span class="n">make</span> <span class="o">-</span><span class="n">C</span> <span class="n">src</span> <span class="n">install</span>
-<span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">config_fc</span> <span class="o">--</span><span class="n">f77exec</span><span class="o">=</span><span class="n">mpif90</span> <span class="o">--</span><span class="n">f90exec</span><span class="o">=</span><span class="n">mpif90</span> <span class="n">build_ext</span> <span class="o">--</span><span class="n">libraries</span><span class="o">=</span><span class="n">openblas</span><span class="p">,</span><span class="n">parpack</span><span class="p">,</span><span class="n">arpack</span> <span class="o">--</span><span class="n">library</span><span class="o">-</span><span class="n">dirs</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">lib</span><span class="p">:</span><span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">openblas</span><span class="o">/</span><span class="n">lib</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="o">.</span>
-</pre></div>
-</div>
-<p>You can add <code class="docutils literal notranslate"><span class="pre">edrixs/bin</span></code> to the environment variable <code class="docutils literal notranslate"><span class="pre">PATH</span></code> in <code class="docutils literal notranslate"><span class="pre">~/.bash_profile</span></code>.</p>
-<p>Go to <code class="docutils literal notranslate"><span class="pre">examples</span></code> directory to run some examples:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">examples</span><span class="o">/</span><span class="n">more</span><span class="o">/</span><span class="n">ED</span><span class="o">/</span><span class="mi">14</span><span class="n">orb</span>
-<span class="o">./</span><span class="n">get_inputs</span><span class="o">.</span><span class="n">py</span>
-<span class="n">mpirun</span> <span class="o">-</span><span class="n">np</span> <span class="mi">2</span> <span class="o">../../../../</span><span class="n">src</span><span class="o">/</span><span class="n">ed</span><span class="o">.</span><span class="n">x</span>
-<span class="n">mpirun</span> <span class="o">-</span><span class="n">np</span> <span class="mi">2</span> <span class="o">./</span><span class="n">run_fedsolver</span><span class="o">.</span><span class="n">py</span>
-<span class="n">cd</span> <span class="o">../../</span><span class="n">RIXS</span><span class="o">/</span><span class="n">LaNiO3_thin</span>
-<span class="n">mpirun</span> <span class="o">-</span><span class="n">np</span> <span class="mi">2</span> <span class="o">./</span><span class="n">run_rixs_fsolver</span><span class="o">.</span><span class="n">py</span>
-</pre></div>
-</div>
-<p>if no errors, the installation is successful.</p>
-<p>All done, enjoy!</p>
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="id1" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
 <p>To change your default pip you need to add a line to your <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code> on linux or to your <code class="docutils literal notranslate"><span class="pre">~/.bash_profile</span></code> on macOS. This should be <code class="docutils literal notranslate"><span class="pre">alias</span> <span class="pre">pip='/usr/bin/pip3'</span></code> where the path is determined by calling <code class="docutils literal notranslate"><span class="pre">which</span> <span class="pre">pip3</span></code> from your terminal.</p>
 </aside>
 </aside>
-</section>
 </section>
 </section>
 </section>
