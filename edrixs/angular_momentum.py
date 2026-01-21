@@ -1,10 +1,11 @@
 __all__ = ['get_ladd', 'get_lminus', 'get_lx', 'get_ly', 'get_lz', 'get_orb_momentum',
            'get_pauli', 'get_sx', 'get_sy', 'get_sz', 'get_spin_momentum', 'euler_to_rmat',
            'rmat_to_euler', 'where_is_angle', 'dmat_spinor', 'zx_to_rmat', 'get_wigner_dmat',
-           'cf_cubic_d', 'cf_tetragonal_d', 'cf_square_planar_d', 'cf_trigonal_t2g']
+           'cf_cubic_d', 'cf_tetragonal_d', 'cf_square_planar_d', 'cf_trigonal_t2g',
+           'cf_trigonal_d']
 
 import numpy as np
-from .basis_transform import cb_op, tmat_r2c
+from .basis_transform import cb_op, tmat_r2c, tmat_trig2r
 
 
 def get_ladd(ll, ispin=False):
@@ -692,14 +693,63 @@ def cf_trigonal_t2g(delta):
     return cf
 
 
+def cf_trigonal_d(case, Delta1, Delta2):
+    """
+    Given Delta1 and Delta2, return trigonal crystal field matrix for d orbitals
+    in the complex harmonics basis. See PHYSICAL REVIEW B 105, 245153 (2022) for the
+    definition of the orbitals.
+
+    Parameters
+    ----------
+    case: string
+        Label for different systems.
+
+        - '111': :math:`z` axis along diagonal of coordinate system
+        - '100': :math:`z` axis vertical
+
+    Delta1: float scalar
+        The :math:`e^\\sigma_g` orbitals are Delta1 above the :math:`a^_{1g}`
+    Delta1: float scalar
+        The :math:`e^\\pi_g` orbitals are Delta2 below the :math:`a^_{1g}`
+
+    Returns
+    -------
+    cf: 2d complex array
+        The matrix form of crystal field Hamiltonian in complex harmonics basis.
+    """
+
+    cf_trig = np.zeros((5, 5), dtype=complex)
+    cf_trig[0, 0] = 0  # a1g
+    cf_trig[1, 1] = -Delta2  # epi_g
+    cf_trig[2, 2] = -Delta2  # epi_g
+    cf_trig[3, 3] = Delta1  # esigma_g
+    cf_trig[4, 4] = Delta1  # esigma_g
+
+    cf_trig_spin = np.zeros((10, 10), dtype=complex)
+    cf_trig_spin[::2, ::2] = cf_trig
+    cf_trig_spin[1::2, 1::2] = cf_trig
+
+    if case == '111':
+        cf_real = cb_op(cf_trig_spin, tmat_trig2r('111', ispin=True))
+        cf = cb_op(cf_real, tmat_r2c('d', ispin=True))
+        return cf
+    elif case == '100':
+        cf_real = cb_op(cf_trig_spin, tmat_trig2r('100', ispin=True))
+        cf = cb_op(cf_real, tmat_r2c('d', ispin=True))
+        return cf
+    else:
+        raise Exception(f"case {case} not implemented."
+                        "It should be either '111' or '110'")
+
+
 def cf_square_planar_d(ten_dq, ds):
     """
     Given 10Dq, ds, return square planar crystal field matrix for d orbitals
     in the complex harmonics basis. This is the limit of strong tetragonal
     distortion with two axial ligands at infinity. Note that in this case the
-    three parameters, ten_dq, ds, and dt, are no longer independent:
+    three parameters, ten_dq, ds, and dt, are no longer independent:
     dt = 2/35*ten_dq and the levels depend on only two parameters
-    ten_dq and ds.
+    ten_dq and ds.
 
     Parameters
     ----------
