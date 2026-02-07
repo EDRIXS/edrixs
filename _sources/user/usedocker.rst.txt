@@ -15,7 +15,6 @@ Follow these steps to use the docker image:
 
 * Once Docker is running, create a directory to store data and create a file called ``docker-compose.yml`` with contents ::
 
-    version:  '3'
     services:
       edrixs-jupyter:
           image: edrixs/edrixs
