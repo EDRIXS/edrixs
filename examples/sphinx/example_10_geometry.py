@@ -2,7 +2,11 @@
 """
 Geometry
 =====================================
-Here, we explain in more detail how geometry works in EDRIXS. From a physics point of view, the only requirement is that the coordinate system describing the crystal field and hopping is the same as the one describing the X-ray absorption and emission operators. For this discussion, it is useful to illustrate the standard RIXS geometry.
+Here, we explain in more detail how geometry works in EDRIXS. From a physics
+point of view, the only requirement is that the coordinate system describing
+the crystal field and hopping is the same as the one describing the X-ray
+absorption and emission operators. For this discussion, it is useful to
+illustrate the standard RIXS geometry.
 
 .. image:: /_static/geometry.png
    :alt: Default RIXS coordinate system.
@@ -11,29 +15,30 @@ Here, we explain in more detail how geometry works in EDRIXS. From a physics poi
 """
 
 ################################################################################
-# RIXS function 
+# RIXS function
 # ------------------------------------------------------------------------------
 # We begin by preparing a basic function to compute RIXS for an atomic model.
 # As inputs, we include:
-# 
+#
 # * :code:`v_cfmat`: the matrix defining the crystal field.
 # * :code:`thin`: incident x-ray angle
 # * :code:`thout`: emitted x-ray angle
 # * :code:`loc_axis`: the matrix specifying how the crystal field is defined
 #   or equivalently the orientation of the sample
 # * :code:`scatter_axis`: the matrix specifying how the x-ray geometry is set up
-# 
+#
 import edrixs
 import numpy as np
 import matplotlib.pyplot as plt
 import contextlib
 import io
 
+
 def make_rixs(v_cfmat, thin, thout, loc_axis=None, scatter_axis=None):
     v_noccu = 8
     gs_list = [0, 1, 2]
     ominc = np.array([853])
-    gamma_f = 0.1    
+    gamma_f = 0.1
     pol_type = [('linear', 0, 'linear', 0), ('linear', 0, 'linear', np.pi/2)]
     info = edrixs.utils.get_atom_data('Ni', '3d', v_noccu, edge='L3')
     slater = [[s[1] for s in info['slater_i']],
@@ -41,8 +46,8 @@ def make_rixs(v_cfmat, thin, thout, loc_axis=None, scatter_axis=None):
     off = 871
     with contextlib.redirect_stdout(io.StringIO()):
         out = edrixs.ed_1v1c_py(('d', 'p32'), shell_level=(0, -off),
-                                    v_cfmat=v_cfmat, loc_axis=loc_axis,
-                                    c_soc=info['c_soc'], v_noccu=v_noccu, slater=slater)
+                                v_cfmat=v_cfmat, loc_axis=loc_axis,
+                                c_soc=info['c_soc'], v_noccu=v_noccu, slater=slater)
     eval_i, eval_n, trans_op = out
 
     eloss = np.arange(-1, 5, 0.01)
@@ -56,11 +61,12 @@ def make_rixs(v_cfmat, thin, thout, loc_axis=None, scatter_axis=None):
     rixs = rixs_all.sum(axis=(0, 2))
     return eloss, rixs
 
+
 ################################################################################
 # Crystal field in a non-standard example of geometry
 # ------------------------------------------------------------------------------
 # Let us assume we are measuring a :math:`d`-electron material with a tetragonal
-# crystal field using :math:`L`-edge RIXS. The standard EDRIXS function for a 
+# crystal field using :math:`L`-edge RIXS. The standard EDRIXS function for a
 # tetragonal crystal field will use :math:`z` as the four-fold symmetry axis.
 v_cfmat = edrixs.cf_tetragonal_d(2.09, 0.15, 0.08)
 ################################################################################
@@ -68,7 +74,7 @@ v_cfmat = edrixs.cf_tetragonal_d(2.09, 0.15, 0.08)
 # field :math:`z`-axis, rather the :math:`z`-axis is parallel to the sample surface
 # within the scattering plane and that the sample surface normal is
 # :math:`x`-axis. We have also defined our incoming and outgoing x-ray angles
-# :code:`thin` and :code:`thout` with respect to the sample surface. 
+# :code:`thin` and :code:`thout` with respect to the sample surface.
 thin = np.deg2rad(30)
 thout = np.deg2rad(120)
 ################################################################################
@@ -78,7 +84,7 @@ thout = np.deg2rad(120)
 # Re-define angles
 # ^^^^^^^^^^^^^^^^
 # A simple approach to the problem is to alter the angles so they are correct
-# with respect to the orientation of the crystal field matrix. 
+# with respect to the orientation of the crystal field matrix.
 angle_offset = -np.deg2rad(90)
 eloss, rixs0 = make_rixs(v_cfmat, thin+angle_offset, thout+angle_offset)
 
@@ -90,7 +96,9 @@ eloss, rixs0 = make_rixs(v_cfmat, thin+angle_offset, thout+angle_offset)
 # up the crystal field. It will then apply this transform when it diagonalizes
 # the Hamiltonian and obtains the eigenvectors. Each column of the matrix
 # writes the axes used for the crystal field in the :math:`x`,
-# :math:`y`, :math:`z` frame used for the absorption operators. We include a consistency check between this matrix and what is expected from the :code:`angle_offset` variable.
+# :math:`y`, :math:`z` frame used for the absorption operators. We include a
+# consistency check between this matrix and what is expected from the
+# :code:`angle_offset` variable.
 loc_axis = np.array([[0, 0, -1],
                      [0, 1, 0],
                      [1, 0, 0]])
@@ -121,7 +129,7 @@ eloss, rixs2 = make_rixs(v_cfmat, thin, thout, scatter_axis=scatter_axis)
 # around the :math:`y`-axis.
 alpha, beta, gamma = 0, angle_offset, 0
 D = edrixs.get_wigner_dmat(4, alpha, beta, gamma)
-U = np.kron(D, np.eye(2)) # expand to account for spin
+U = np.kron(D, np.eye(2))  # expand to account for spin
 v_cfmat_rotated = U.conj().T @ v_cfmat @ U
 eloss, rixs3 = make_rixs(v_cfmat_rotated, thin, thout)
 
