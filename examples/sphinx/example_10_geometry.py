@@ -63,15 +63,16 @@ def make_rixs(v_cfmat, thin, thout, loc_axis=None, scatter_axis=None):
 
 
 ################################################################################
-# Crystal field in a non-standard example of geometry
+# Crystal field in a non-standard geometry
 # ------------------------------------------------------------------------------
-# Let us assume we are measuring a :math:`d`-electron material with a tetragonal
+# For an example, let's consider a :math:`d`-electron material with a tetragonal
 # crystal field using :math:`L`-edge RIXS. The standard EDRIXS function for a
 # tetragonal crystal field will use :math:`z` as the four-fold symmetry axis.
 v_cfmat = edrixs.cf_tetragonal_d(2.09, 0.15, 0.08)
 ################################################################################
-# Let us assume that the sample surface is, in fact, not parallel to the crystal
-# field :math:`z`-axis, rather the :math:`z`-axis is parallel to the sample surface
+# How can we deal with a case where the sample surface is, in fact, not parallel
+# to the crystal field :math:`z`-axis, 
+# rather the :math:`z`-axis is parallel to the sample surface
 # within the scattering plane and that the sample surface normal is
 # :math:`x`-axis. We have also defined our incoming and outgoing x-ray angles
 # :code:`thin` and :code:`thout` with respect to the sample surface.
