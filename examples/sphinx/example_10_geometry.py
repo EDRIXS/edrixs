@@ -85,8 +85,8 @@ thout = np.deg2rad(120)
 # ^^^^^^^^^^^^^^^^
 # A simple approach to the problem is to alter the angles so they are correct
 # with respect to the orientation of the crystal field matrix.
-angle_offset = -np.deg2rad(90)
-eloss, rixs0 = make_rixs(v_cfmat, thin+angle_offset, thout+angle_offset)
+angle_offset = np.deg2rad(90)
+eloss, rixs0 = make_rixs(v_cfmat, thin-angle_offset, thout+angle_offset)
 
 
 ################################################################################
@@ -99,9 +99,9 @@ eloss, rixs0 = make_rixs(v_cfmat, thin+angle_offset, thout+angle_offset)
 # :math:`y`, :math:`z` frame used for the absorption operators. We include a
 # consistency check between this matrix and what is expected from the
 # :code:`angle_offset` variable.
-loc_axis = np.array([[0, 0, -1],
-                     [0, 1, 0],
-                     [1, 0, 0]])
+loc_axis = np.array([[ 0, 0, 1],
+                     [ 0, 1, 0],
+                     [-1, 0, 0]])
 np.testing.assert_allclose(
     loc_axis,
     edrixs.euler_to_rmat(0, angle_offset, 0),
