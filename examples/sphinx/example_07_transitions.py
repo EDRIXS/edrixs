@@ -55,7 +55,7 @@ def get_eigenvector(orbital_index, spin_index):
 
 ################################################################################
 # Let's examine the :math:`d_{x^2-y^2}` orbital first. Recall from the
-# :ref:`sphx_glr_auto_examples_example_1_crystal_field.py`
+# :ref:`sphx_glr_auto_examples_example_01_crystal_field.py`
 # example that edrixs uses the standard orbital order of
 # :math:`d_{3z^2-r^2}, d_{xz}, d_{yz}, d_{x^2-y^2}, d_{xy}`. So we want
 # :code:`orbital_index = 3` element. Using this, we can build spin-up and -down
