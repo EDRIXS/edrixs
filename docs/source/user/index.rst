@@ -18,3 +18,4 @@ edrixs User Guide
    pythontips
    examples
    papers
+   developing
