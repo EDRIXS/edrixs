@@ -71,9 +71,9 @@ def make_rixs(v_cfmat, thin, thout, loc_axis=None, scatter_axis=None):
 v_cfmat = edrixs.cf_tetragonal_d(2.09, 0.15, 0.08)
 ################################################################################
 # How can we deal with a case where the sample surface is, in fact, not parallel
-# to the crystal field :math:`z`-axis,
-# rather the :math:`z`-axis is parallel to the sample surface
-# within the scattering plane and that the sample surface normal is
+# to the crystal field :math:`z`-axis?
+# Instead the :math:`z`-axis is parallel to the sample surface
+# within the scattering plane and the sample surface normal is the
 # :math:`x`-axis. We have also defined our incoming and outgoing x-ray angles
 # :code:`thin` and :code:`thout` with respect to the sample surface.
 thin = np.deg2rad(30)
