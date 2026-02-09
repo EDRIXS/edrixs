@@ -1,0 +1,500 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crystal fields &mdash; edrixs  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=d2d258e8" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="RIXS calculations for an atomic model" href="example_02_single_atom_RIXS.html" />
+    <link rel="prev" title="Exact diagonalization" href="example_00_ed_calculator.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            edrixs
+              <img src="../_static/EDRIXS_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">edrixs User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Pedagogical examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="example_00_ed_calculator.html">Exact diagonalization</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Crystal fields</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#crystal-field-matrices">Crystal field matrices</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#crystal-field-on-an-atom">Crystal field on an atom</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="example_02_single_atom_RIXS.html">RIXS calculations for an atomic model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_03_AIM_XAS.html">Anderson impurity model for NiO XAS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_04_GS_analysis.html">Ground state analysis for NiO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_05_charge_transfer.html">Charge-transfer energy for NiO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_06_Hubbard_dimer.html">Hubbard Dimer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_07_transitions.html">X-ray transitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_08_Hunds_interactions.html">Hund’s Interactions in charge transfer insulators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_09_Coulomb.html">Coulomb interactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_10_geometry.html">Geometry</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">edrixs Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">edrixs</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Pedagogical examples</a></li>
+      <li class="breadcrumb-item active">Crystal fields</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/auto_examples/example_01_crystal_field.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-auto-examples-example-01-crystal-field-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code.</p>
+</div>
+<section class="sphx-glr-example-title" id="crystal-fields">
+<span id="sphx-glr-auto-examples-example-01-crystal-field-py"></span><h1>Crystal fields<a class="headerlink" href="#crystal-fields" title="Link to this heading"></a></h1>
+<p>This example explains how to implement crystal fields in edrixs.</p>
+<p>We need to import these modules.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scipy</span>
+
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.set_printoptions.html#numpy.set_printoptions" title="numpy.set_printoptions" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">set_printoptions</span></a><span class="p">(</span><span class="n">precision</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">suppress</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="crystal-field-matrices">
+<h2>Crystal field matrices<a class="headerlink" href="#crystal-field-matrices" title="Link to this heading"></a></h2>
+<p>Let us start by considering the common case of a <span class="math notranslate nohighlight">\(d\)</span> atomic shell in a
+cubic crystal field. This is controlled by parameter <span class="math notranslate nohighlight">\(10D_q\)</span> and is
+described in terms of a matrix which we will assign to <code class="code docutils literal notranslate"><span class="pre">cfmat</span></code>. edrixs
+can make this matrix via.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ten_dq</span></a> <span class="o">=</span> <span class="mi">10</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cfmat</span></a> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">angular_momentum</span><span class="o">.</span><span class="n">cf_cubic_d</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ten_dq</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note this matrix is in a complex harmonic basis <span class="math notranslate nohighlight">\(Y^m_l\)</span> where <span class="math notranslate nohighlight">\(m\)</span>
+goes from <span class="math notranslate nohighlight">\(-l,-l+1,...,l-1, l\)</span>. There is an up spin and a down
+spin for each <span class="math notranslate nohighlight">\(Y^m_l\)</span>. This matrix is not diagonal in the complex
+harmonic basis, but it would be diagonal in the real harmonic basis
+<span class="math notranslate nohighlight">\(d_{3z^2-r^2}, d_{xz}, d_{yz}, d_{x^2-y^2}, d_{xy}\)</span>.
+Let us diagonalize this matrix as a check and print out the energies
+and their degeneracies.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">e</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">v</span></a> <span class="o">=</span> <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.eigh.html#scipy.linalg.eigh" title="scipy.linalg.eigh" class="sphx-glr-backref-module-scipy-linalg sphx-glr-backref-type-py-function"><span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cfmat</span></a><span class="p">)</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">e</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">e</span></a><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">decimals</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">unique_e</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.unique.html#numpy.unique" title="numpy.unique" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">unique</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">e</span></a><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">degeneracies</span></a> <span class="o">=</span> <span class="p">[</span><span class="nb">sum</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">evalue</span></a> <span class="o">==</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">e</span></a><span class="p">)</span> <span class="k">for</span> <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">evalue</span></a> <span class="ow">in</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">unique_e</span></a><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;E  </span><span class="se">\t</span><span class="s2">Degeneracy&quot;</span><span class="p">)</span>
+<span class="k">for</span> <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">evalue</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.int64" title="numpy.int64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">degenvalue</span></a> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">unique_e</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">degeneracies</span></a><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:.1f}</span><span class="se">\t</span><span class="si">{:.0f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">evalue</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.int64" title="numpy.int64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">degenvalue</span></a><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> distinct energies&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">unique_e</span></a><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>E       Degeneracy
+-4.0    6
+6.0     4
+2 distinct energies
+</pre></div>
+</div>
+<p>This makes sense! We see two different energies split by <span class="math notranslate nohighlight">\(10D_q=10\)</span>. Let
+us look at the six columns corresponding to the lower energy eigenvalues.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">v</span></a><span class="p">[:,</span> <span class="p">:</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">real</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[[ 0.    0.    0.    0.    0.71  0.  ]
+ [ 0.    0.    0.    0.    0.    0.71]
+ [ 0.    0.   -1.    0.    0.    0.  ]
+ [ 0.    0.    0.   -1.    0.    0.  ]
+ [ 0.    0.    0.    0.    0.    0.  ]
+ [ 0.    0.    0.    0.    0.    0.  ]
+ [ 1.    0.    0.    0.    0.    0.  ]
+ [ 0.    1.    0.    0.    0.    0.  ]
+ [ 0.    0.    0.    0.   -0.71  0.  ]
+ [ 0.    0.    0.    0.    0.   -0.71]]
+</pre></div>
+</div>
+<p>These are the set of so-called <span class="math notranslate nohighlight">\(t_{2g}\)</span> orbitals, composed of
+<span class="math notranslate nohighlight">\(Y^2_2, Y^{-2}_2, Y^{1}_2, Y^{-1}_2\)</span>. The rest of the eigenvectors
+(the last four) are</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">v</span></a><span class="p">[:,</span> <span class="mi">6</span><span class="p">:]</span><span class="o">.</span><span class="n">real</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[[-0.71  0.    0.    0.  ]
+ [ 0.   -0.71  0.    0.  ]
+ [ 0.    0.    0.    0.  ]
+ [ 0.    0.    0.    0.  ]
+ [ 0.    0.    0.    1.  ]
+ [ 0.    0.    1.    0.  ]
+ [ 0.    0.    0.    0.  ]
+ [ 0.    0.    0.    0.  ]
+ [-0.71  0.    0.    0.  ]
+ [ 0.   -0.71  0.    0.  ]]
+</pre></div>
+</div>
+<p>These are the set of so-called <span class="math notranslate nohighlight">\(e_{g}\)</span> orbitals, composed of
+<span class="math notranslate nohighlight">\(Y^2_2, Y^{-2}_2, Y^{0}_2\)</span>. We can use edrixs to prove that
+<code class="code docutils literal notranslate"><span class="pre">cfmat</span></code> would be diagonal in the real
+harmonic basis. An operator <span class="math notranslate nohighlight">\(\hat{O}\)</span> can be transformed into an
+operator in another basis <span class="math notranslate nohighlight">\(\hat{O}^{\prime}\)</span> using a unitary
+transformation matrix <span class="math notranslate nohighlight">\(T\)</span> as</p>
+<blockquote>
+<div><div class="math notranslate nohighlight">
+\[\hat{O}^{\prime} = (T)^{\dagger} \hat{O} (T).\]</div>
+</div></blockquote>
+<p>This is computed as follows</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cfmat_rhb</span></a> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">cb_op</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cfmat</span></a><span class="p">,</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">tmat_c2r</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="n">ispin</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cfmat_rhb</span><span class="o">.</span><span class="n">real</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>[[ 6.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  6.  0.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0. -4.  0.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0. -4.  0.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0. -4.  0.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0. -4.  0.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  6.  0.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  6.  0.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0. -4.  0.]
+ [ 0.  0.  0.  0.  0.  0.  0.  0.  0. -4.]]
+</pre></div>
+</div>
+<p>where <code class="code docutils literal notranslate"><span class="pre">edrixs.tmat_c2r('d',</span> <span class="pre">ispin=True)</span></code> is the transformation matrix.
+We needed to tell edrixs that we are working with a <span class="math notranslate nohighlight">\(d\)</span>-shell and that it
+should include spin. We could also have transformed <code class="code docutils literal notranslate"><span class="pre">v</span></code> to see how these
+eignevectors are  composed of the real harmonic basis. We will see an example
+of this later.</p>
+</section>
+<section id="crystal-field-on-an-atom">
+<h2>Crystal field on an atom<a class="headerlink" href="#crystal-field-on-an-atom" title="Link to this heading"></a></h2>
+<p>To simulate the solid state, we need to combine the crystal field with Coulomb
+interactions. Let us choose an atomic model for Ni.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">l</span></a> <span class="o">=</span> <span class="mi">2</span>
+<a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">norb</span></a> <span class="o">=</span> <span class="mi">10</span>
+<a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">noccu</span></a> <span class="o">=</span> <span class="mi">8</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">basis</span></a> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_fock_bin_by_N</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">norb</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">noccu</span></a><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">slater</span></a> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_atom_data</span><span class="p">(</span><span class="s1">&#39;Ni&#39;</span><span class="p">,</span> <span class="s1">&#39;3d&#39;</span><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">noccu</span></a><span class="p">,</span> <span class="n">edge</span><span class="o">=</span><span class="s1">&#39;L3&#39;</span><span class="p">)[</span><span class="s1">&#39;slater_i&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Let us implement a tetragonal crystal field, for which we need to pass
+<code class="code docutils literal notranslate"><span class="pre">d1</span></code> the splitting of <span class="math notranslate nohighlight">\(d_{yz}/d_{zx}\)</span> and <span class="math notranslate nohighlight">\(d_{xy}\)</span> and
+<code class="code docutils literal notranslate"><span class="pre">d3</span></code> the splitting of <span class="math notranslate nohighlight">\(d_{3z^2-r^2}\)</span> and <span class="math notranslate nohighlight">\(d_{x^2-y^2}\)</span>.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ten_dq</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">d1</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">d3</span></a> <span class="o">=</span> <span class="mf">2.5</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">,</span> <span class="mf">.2</span>
+</pre></div>
+</div>
+<p>To determine the eigenvalues and eigenvectors we need to transform both our
+Coulomb matrix and our crystal field matrix into the same basis. See the
+example on exact diagonalization if needed. In this case, we put this
+procedure into a function, with the option to scale the Coulomb interactions.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">diagonlize</span><span class="p">(</span><span class="n">scaleU</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">umat</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_umat_slater</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span>
+                                  <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">slater</span></a><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">scaleU</span><span class="p">,</span>
+                                  <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">slater</span></a><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">scaleU</span><span class="p">,</span>
+                                  <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">slater</span></a><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">scaleU</span><span class="p">)</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cfmat</span></a> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">angular_momentum</span><span class="o">.</span><span class="n">cf_tetragonal_d</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ten_dq</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">ten_dq</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">d1</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">d1</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">d3</span></a><span class="o">=</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">d3</span></a><span class="p">)</span>
+    <span class="n">H</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">build_opers</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">cfmat</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">basis</span></a><span class="p">)</span> <span class="o">+</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">build_opers</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">umat</span><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">basis</span></a><span class="p">)</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">e</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">v</span></a> <span class="o">=</span> <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.eigh.html#scipy.linalg.eigh" title="scipy.linalg.eigh" class="sphx-glr-backref-module-scipy-linalg sphx-glr-backref-type-py-function"><span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span></a><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">e</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">e</span></a> <span class="o">-</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.min.html#numpy.min" title="numpy.min" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">min</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">e</span></a><span class="p">)</span>  <span class="c1"># define ground state as zero energy</span>
+    <span class="k">return</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">e</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">v</span></a>
+</pre></div>
+</div>
+<p>Let us look what happens when we run the function with the Coulomb
+interactions switched off and check the degeneracy of the output. Look at this
+python
+<a class="reference external" href="https://realpython.com/python-formatted-output/">string formatting tutorial</a>
+if the code is confusing.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">e</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">v</span></a> <span class="o">=</span> <span class="n">diagonlize</span><span class="p">(</span><span class="n">scaleU</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">e</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">e</span></a><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">decimals</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">unique_e</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.unique.html#numpy.unique" title="numpy.unique" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">unique</span></a><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">e</span></a><span class="p">)</span>
+<a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">degeneracies</span></a> <span class="o">=</span> <span class="p">[</span><span class="nb">sum</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">evalue</span></a> <span class="o">==</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">e</span></a><span class="p">)</span> <span class="k">for</span> <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">evalue</span></a> <span class="ow">in</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">unique_e</span></a><span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;E  </span><span class="se">\t</span><span class="s2">Degeneracy&quot;</span><span class="p">)</span>
+<span class="k">for</span> <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">evalue</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.int64" title="numpy.int64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">degenvalue</span></a> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">unique_e</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">degeneracies</span></a><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{:.1f}</span><span class="se">\t</span><span class="si">{:.0f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">evalue</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.int64" title="numpy.int64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">degenvalue</span></a><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> distinct energies&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">unique_e</span></a><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>E       Degeneracy
+0.0     1
+0.2     4
+0.4     1
+2.5     4
+2.7     4
+3.4     8
+3.6     8
+5.0     1
+5.9     8
+6.8     6
+10 distinct energies
+</pre></div>
+</div>
+<p>We see 10 distinct energies, which is the number of ways one can arrange
+two holes among 4 energy levels – which makes sense as the tetragonal field
+involves four levels <span class="math notranslate nohighlight">\(zx/zy, xy, 3z^2-r^2, x^2-y^2\)</span>. To see what is going
+on in more detail, we can also calculate the expectation
+values of the occupancy number of the orbitals
+<span class="math notranslate nohighlight">\(3z^2-r^2, zx, zy, x^2-y^2, xy\)</span>.
+To create the operator, first write the matrix in the real harmonics basis
+<span class="math notranslate nohighlight">\(|3z^2-r^2,\uparrow&gt;\)</span>, <span class="math notranslate nohighlight">\(|3z^2-r^2,\downarrow&gt;\)</span>,
+<span class="math notranslate nohighlight">\(|zx,\uparrow&gt;\)</span>, <span class="math notranslate nohighlight">\(|zx,\downarrow&gt;\)</span>, etc.
+In this basis, they take a simple form: only the diagonal terms have element
+1. We therefore make a 3D empty array and assign the diagonal as 1. Check
+out the
+<a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.indexing.html">numpy indexing notes</a>
+if needed.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nd_real_harmoic_basis</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.zeros.html#numpy.zeros" title="numpy.zeros" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">zeros</span></a><span class="p">((</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">norb</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">norb</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">norb</span></a><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">indx</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.arange.html#numpy.arange" title="numpy.arange" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">arange</span></a><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">norb</span></a><span class="p">)</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nd_real_harmoic_basis</span></a><span class="p">[</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">indx</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">indx</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">indx</span></a><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<p>Recalling the necessity to put everything in the same basis, we transform
+into the complex harmonic basis and then transform into our Fock basis</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nd_complex_harmoic_basis</span></a> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">cb_op</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nd_real_harmoic_basis</span></a><span class="p">,</span>
+                                        <span class="n">edrixs</span><span class="o">.</span><span class="n">tmat_r2c</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nd_op</span></a> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">build_opers</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nd_complex_harmoic_basis</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/stdtypes.html#list" title="builtins.list" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">basis</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<p>We apply the operator and print out as follows. Check the
+<a class="reference external" href="https://numpy.org/doc/1.18/reference/generated/numpy.reshape.html">numpy docs</a>
+if the details of how the spin pairs have been added up is not immediately
+transparent.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nd_expt</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span><span class="n">edrixs</span><span class="o">.</span><span class="n">cb_op</span><span class="p">(</span><span class="n">nd_vec</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">v</span></a><span class="p">)</span><span class="o">.</span><span class="n">diagonal</span><span class="p">()</span><span class="o">.</span><span class="n">real</span> <span class="k">for</span> <span class="n">nd_vec</span> <span class="ow">in</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nd_op</span></a><span class="p">])</span>
+
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">message</span></a> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:&gt;3s}</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="si">{:&gt;6s}</span><span class="s2">&quot;</span><span class="o">*</span><span class="mi">5</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">message</span></a><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="s2">&quot;E 3z2-r2 zx zy x2-y2 xy&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)))</span>
+
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">message</span></a> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:&gt;3.1f}</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="si">{:&gt;6.1f}</span><span class="s2">&quot;</span><span class="o">*</span><span class="mi">5</span>
+<span class="k">for</span> <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">evalue</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">row</span></a> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">e</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nd_expt</span><span class="o">.</span><span class="n">T</span></a><span class="p">):</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spin_pairs</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">row</span></a><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">message</span></a><span class="o">.</span><span class="n">format</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">evalue</span></a><span class="p">,</span> <span class="o">*</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spin_pairs</span></a><span class="p">))</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  E     3z2-r2      zx      zy   x2-y2      xy
+0.0        2.0     2.0     2.0     0.0     2.0
+0.2        1.0     2.0     2.0     1.0     2.0
+0.2        1.0     2.0     2.0     1.0     2.0
+0.2        1.0     2.0     2.0     1.0     2.0
+0.2        1.0     2.0     2.0     1.0     2.0
+0.4        0.0     2.0     2.0     2.0     2.0
+2.5        2.0     2.0     2.0     1.0     1.0
+2.5        2.0     2.0     2.0     1.0     1.0
+2.5        2.0     2.0     2.0     1.0     1.0
+2.5        2.0     2.0     2.0     1.0     1.0
+2.7        1.0     2.0     2.0     2.0     1.0
+2.7        1.0     2.0     2.0     2.0     1.0
+2.7        1.0     2.0     2.0     2.0     1.0
+2.7        1.0     2.0     2.0     2.0     1.0
+3.4        2.0     1.5     1.5     1.0     2.0
+3.4        2.0     1.5     1.5     1.0     2.0
+3.4        2.0     1.5     1.5     1.0     2.0
+3.4        2.0     1.5     1.5     1.0     2.0
+3.4        2.0     1.5     1.5     1.0     2.0
+3.4        2.0     1.5     1.5     1.0     2.0
+3.4        2.0     1.5     1.5     1.0     2.0
+3.4        2.0     1.5     1.5     1.0     2.0
+3.6        1.0     1.6     1.4     2.0     2.0
+3.6        1.0     1.5     1.5     2.0     2.0
+3.6        1.0     1.5     1.5     2.0     2.0
+3.6        1.0     1.6     1.4     2.0     2.0
+3.6        1.0     1.3     1.7     2.0     2.0
+3.6        1.0     1.5     1.5     2.0     2.0
+3.6        1.0     1.4     1.6     2.0     2.0
+3.6        1.0     1.6     1.4     2.0     2.0
+5.0        2.0     2.0     2.0     2.0     0.0
+5.9        2.0     1.5     1.5     2.0     1.0
+5.9        2.0     1.5     1.5     2.0     1.0
+5.9        2.0     1.5     1.5     2.0     1.0
+5.9        2.0     1.5     1.5     2.0     1.0
+5.9        2.0     1.5     1.5     2.0     1.0
+5.9        2.0     1.5     1.5     2.0     1.0
+5.9        2.0     1.5     1.5     2.0     1.0
+5.9        2.0     1.5     1.5     2.0     1.0
+6.8        2.0     0.4     1.6     2.0     2.0
+6.8        2.0     1.3     0.7     2.0     2.0
+6.8        2.0     1.0     1.0     2.0     2.0
+6.8        2.0     1.0     1.0     2.0     2.0
+6.8        2.0     1.0     1.0     2.0     2.0
+6.8        2.0     1.2     0.8     2.0     2.0
+</pre></div>
+</div>
+<p>The lowest energy state involves putting both holes in the <span class="math notranslate nohighlight">\(x^2-y^2\)</span>
+orbital, which makes sense.  Now, let us redo the proceedure including Coulomb
+repulsion, which imposes an energy cost to putting multiple electrons in the
+same orbital.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">e</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">v</span></a> <span class="o">=</span> <span class="n">diagonlize</span><span class="p">(</span><span class="n">scaleU</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nd_expt</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">([</span><span class="n">edrixs</span><span class="o">.</span><span class="n">cb_op</span><span class="p">(</span><span class="n">nd_vec</span><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">v</span></a><span class="p">)</span><span class="o">.</span><span class="n">diagonal</span><span class="p">()</span><span class="o">.</span><span class="n">real</span> <span class="k">for</span> <span class="n">nd_vec</span> <span class="ow">in</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nd_op</span></a><span class="p">])</span>
+
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">message</span></a> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:&gt;3s}</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="si">{:&gt;6s}</span><span class="s2">&quot;</span><span class="o">*</span><span class="mi">5</span>
+<span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">message</span></a><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="s2">&quot;E 3z2-r2 zx zy x2-y2 xy&quot;</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)))</span>
+
+<a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">message</span></a> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{:&gt;3.1f}</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="si">{:&gt;6.1f}</span><span class="s2">&quot;</span><span class="o">*</span><span class="mi">5</span>
+<span class="k">for</span> <a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">evalue</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">row</span></a> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">e</span></a><span class="p">,</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nd_expt</span><span class="o">.</span><span class="n">T</span></a><span class="p">):</span>
+    <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spin_pairs</span></a> <span class="o">=</span> <a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">row</span></a><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">message</span></a><span class="o">.</span><span class="n">format</span><span class="p">(</span><a href="https://numpy.org/doc/stable/reference/arrays.scalars.html#numpy.float64" title="numpy.float64" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-attribute"><span class="n">evalue</span></a><span class="p">,</span> <span class="o">*</span><a href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray" class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">spin_pairs</span></a><span class="p">))</span>
+</pre></div>
+</div>
+<div class="sphx-glr-script-out highlight-none notranslate"><div class="highlight"><pre><span></span>  E     3z2-r2      zx      zy   x2-y2      xy
+0.0        1.0     2.0     2.0     1.0     2.0
+0.0        1.0     2.0     2.0     1.0     2.0
+0.0        1.0     2.0     2.0     1.0     2.0
+2.4        1.2     2.0     2.0     0.8     2.0
+2.5        1.0     2.0     2.0     1.0     2.0
+2.5        1.0     2.0     2.0     2.0     1.0
+2.5        1.0     2.0     2.0     2.0     1.0
+2.5        1.0     2.0     2.0     2.0     1.0
+3.2        1.8     1.2     1.8     1.2     2.0
+3.2        1.8     1.7     1.3     1.2     2.0
+3.2        1.8     1.5     1.5     1.2     2.0
+3.2        1.8     1.7     1.3     1.2     2.0
+3.2        1.8     1.4     1.6     1.2     2.0
+3.2        1.8     1.5     1.5     1.2     2.0
+4.0        2.0     1.9     1.9     1.1     1.1
+4.0        2.0     1.9     1.9     1.1     1.1
+4.0        2.0     1.9     1.9     1.1     1.1
+4.3        0.9     2.0     2.0     1.2     1.9
+4.7        1.4     1.4     1.6     1.9     1.7
+4.7        1.4     1.5     1.5     1.9     1.7
+4.7        1.4     1.6     1.4     1.9     1.7
+4.7        1.4     1.4     1.6     1.9     1.7
+4.7        1.4     1.4     1.6     1.9     1.7
+4.7        1.4     1.6     1.4     1.9     1.7
+4.9        1.0     2.0     2.0     2.0     1.0
+5.5        2.0     2.0     2.0     1.0     1.0
+5.6        1.8     1.6     1.4     1.2     2.0
+5.6        1.8     1.4     1.6     1.2     2.0
+6.5        1.2     1.6     1.4     1.8     2.0
+6.5        1.2     1.4     1.6     1.8     2.0
+6.8        1.8     1.4     1.6     1.9     1.3
+6.8        1.8     1.5     1.5     1.9     1.3
+6.8        1.8     1.5     1.5     1.9     1.3
+6.8        1.8     1.6     1.4     1.9     1.3
+6.8        1.8     1.4     1.6     1.9     1.3
+6.8        1.8     1.6     1.4     1.9     1.3
+7.4        2.0     1.1     1.1     1.9     1.9
+7.4        2.0     1.1     1.1     1.9     1.9
+7.4        2.0     1.1     1.1     1.9     1.9
+8.0        2.0     1.8     1.8     2.0     0.4
+8.5        2.0     1.5     1.5     2.0     1.0
+8.5        2.0     1.5     1.5     2.0     1.0
+9.3        2.0     1.0     1.0     2.0     2.0
+9.4        2.0     1.0     1.0     2.0     2.0
+12.8       1.9     1.2     1.2     1.9     1.7
+</pre></div>
+</div>
+<p>Now the lowest energy state involves splitting the holes between the two
+highest energy <span class="math notranslate nohighlight">\(x^2-y^2\)</span> and <span class="math notranslate nohighlight">\(3z^2-r^2\)</span> orbitals. i.e. we have
+gone from low-spin to high spin. Working out the balance between these two
+states is often one of the first things one wants to determine upon the
+discovery of an interesting new material <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+<p class="rubric">Footnotes</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id2" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id1">1</a><span class="fn-bracket">]</span></span>
+<ol class="upperalpha simple" start="13">
+<li><p>Rossi et al., <a class="reference external" href="https://arxiv.org/abs/2011.00595">arXiv:2011.00595  (2021)</a>.</p></li>
+</ol>
+</aside>
+</aside>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.131 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-example-01-crystal-field-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/b7332bf086a59638a80f0b4668705359/example_01_crystal_field.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">example_01_crystal_field.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/9b58f9c5c21ba2fed56cb7c940ad42d8/example_01_crystal_field.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">example_01_crystal_field.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-zip docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/09cd825e3b49e9bab0c31dfee514a321/example_01_crystal_field.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">example_01_crystal_field.zip</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="example_00_ed_calculator.html" class="btn btn-neutral float-left" title="Exact diagonalization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="example_02_single_atom_RIXS.html" class="btn btn-neutral float-right" title="RIXS calculations for an atomic model" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Brookhaven National Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

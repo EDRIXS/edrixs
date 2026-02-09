@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:07.227** total execution time for 10 files **from auto_examples**:
+**00:09.003** total execution time for 11 files **from auto_examples**:
 
 .. container::
 
@@ -32,33 +32,36 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_auto_examples_example_2_single_atom_RIXS.py` (``example_2_single_atom_RIXS.py``)
-     - 00:03.660
+   * - :ref:`sphx_glr_auto_examples_example_02_single_atom_RIXS.py` (``example_02_single_atom_RIXS.py``)
+     - 00:03.632
      - 0.0
-   * - :ref:`sphx_glr_auto_examples_example_8_Hunds_interactions.py` (``example_8_Hunds_interactions.py``)
-     - 00:01.135
+   * - :ref:`sphx_glr_auto_examples_example_10_geometry.py` (``example_10_geometry.py``)
+     - 00:01.736
      - 0.0
-   * - :ref:`sphx_glr_auto_examples_example_3_AIM_XAS.py` (``example_3_AIM_XAS.py``)
+   * - :ref:`sphx_glr_auto_examples_example_08_Hunds_interactions.py` (``example_08_Hunds_interactions.py``)
+     - 00:01.154
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_example_07_transitions.py` (``example_07_transitions.py``)
+     - 00:00.516
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_example_03_AIM_XAS.py` (``example_03_AIM_XAS.py``)
      - 00:00.505
      - 0.0
-   * - :ref:`sphx_glr_auto_examples_example_7_transitions.py` (``example_7_transitions.py``)
-     - 00:00.459
+   * - :ref:`sphx_glr_auto_examples_example_05_charge_transfer.py` (``example_05_charge_transfer.py``)
+     - 00:00.429
      - 0.0
-   * - :ref:`sphx_glr_auto_examples_example_5_charge_transfer.py` (``example_5_charge_transfer.py``)
-     - 00:00.421
+   * - :ref:`sphx_glr_auto_examples_example_04_GS_analysis.py` (``example_04_GS_analysis.py``)
+     - 00:00.369
      - 0.0
-   * - :ref:`sphx_glr_auto_examples_example_4_GS_analysis.py` (``example_4_GS_analysis.py``)
-     - 00:00.372
+   * - :ref:`sphx_glr_auto_examples_example_09_Coulomb.py` (``example_09_Coulomb.py``)
+     - 00:00.320
      - 0.0
-   * - :ref:`sphx_glr_auto_examples_example_9_Coulomb.py` (``example_9_Coulomb.py``)
-     - 00:00.345
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_example_1_crystal_field.py` (``example_1_crystal_field.py``)
+   * - :ref:`sphx_glr_auto_examples_example_01_crystal_field.py` (``example_01_crystal_field.py``)
      - 00:00.131
      - 0.0
-   * - :ref:`sphx_glr_auto_examples_example_0_ed_calculator.py` (``example_0_ed_calculator.py``)
+   * - :ref:`sphx_glr_auto_examples_example_00_ed_calculator.py` (``example_00_ed_calculator.py``)
      - 00:00.118
      - 0.0
-   * - :ref:`sphx_glr_auto_examples_example_6_Hubbard_dimer.py` (``example_6_Hubbard_dimer.py``)
-     - 00:00.079
+   * - :ref:`sphx_glr_auto_examples_example_06_Hubbard_dimer.py` (``example_06_Hubbard_dimer.py``)
+     - 00:00.093
      - 0.0

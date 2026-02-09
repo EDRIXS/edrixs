@@ -19,10 +19,10 @@ Below are some examples illustrating the concepts behind and usage of EDRIXS.
 
 .. only:: html
 
-  .. image:: /auto_examples/images/thumb/sphx_glr_example_0_ed_calculator_thumb.png
+  .. image:: /auto_examples/images/thumb/sphx_glr_example_00_ed_calculator_thumb.png
     :alt:
 
-  :doc:`/auto_examples/example_0_ed_calculator`
+  :doc:`/auto_examples/example_00_ed_calculator`
 
 .. raw:: html
 
@@ -36,10 +36,10 @@ Below are some examples illustrating the concepts behind and usage of EDRIXS.
 
 .. only:: html
 
-  .. image:: /auto_examples/images/thumb/sphx_glr_example_1_crystal_field_thumb.png
+  .. image:: /auto_examples/images/thumb/sphx_glr_example_01_crystal_field_thumb.png
     :alt:
 
-  :doc:`/auto_examples/example_1_crystal_field`
+  :doc:`/auto_examples/example_01_crystal_field`
 
 .. raw:: html
 
@@ -53,10 +53,10 @@ Below are some examples illustrating the concepts behind and usage of EDRIXS.
 
 .. only:: html
 
-  .. image:: /auto_examples/images/thumb/sphx_glr_example_2_single_atom_RIXS_thumb.png
+  .. image:: /auto_examples/images/thumb/sphx_glr_example_02_single_atom_RIXS_thumb.png
     :alt:
 
-  :doc:`/auto_examples/example_2_single_atom_RIXS`
+  :doc:`/auto_examples/example_02_single_atom_RIXS`
 
 .. raw:: html
 
@@ -70,10 +70,10 @@ Below are some examples illustrating the concepts behind and usage of EDRIXS.
 
 .. only:: html
 
-  .. image:: /auto_examples/images/thumb/sphx_glr_example_3_AIM_XAS_thumb.png
+  .. image:: /auto_examples/images/thumb/sphx_glr_example_03_AIM_XAS_thumb.png
     :alt:
 
-  :doc:`/auto_examples/example_3_AIM_XAS`
+  :doc:`/auto_examples/example_03_AIM_XAS`
 
 .. raw:: html
 
@@ -87,10 +87,10 @@ Below are some examples illustrating the concepts behind and usage of EDRIXS.
 
 .. only:: html
 
-  .. image:: /auto_examples/images/thumb/sphx_glr_example_4_GS_analysis_thumb.png
+  .. image:: /auto_examples/images/thumb/sphx_glr_example_04_GS_analysis_thumb.png
     :alt:
 
-  :doc:`/auto_examples/example_4_GS_analysis`
+  :doc:`/auto_examples/example_04_GS_analysis`
 
 .. raw:: html
 
@@ -104,10 +104,10 @@ Below are some examples illustrating the concepts behind and usage of EDRIXS.
 
 .. only:: html
 
-  .. image:: /auto_examples/images/thumb/sphx_glr_example_5_charge_transfer_thumb.png
+  .. image:: /auto_examples/images/thumb/sphx_glr_example_05_charge_transfer_thumb.png
     :alt:
 
-  :doc:`/auto_examples/example_5_charge_transfer`
+  :doc:`/auto_examples/example_05_charge_transfer`
 
 .. raw:: html
 
@@ -121,10 +121,10 @@ Below are some examples illustrating the concepts behind and usage of EDRIXS.
 
 .. only:: html
 
-  .. image:: /auto_examples/images/thumb/sphx_glr_example_6_Hubbard_dimer_thumb.png
+  .. image:: /auto_examples/images/thumb/sphx_glr_example_06_Hubbard_dimer_thumb.png
     :alt:
 
-  :doc:`/auto_examples/example_6_Hubbard_dimer`
+  :doc:`/auto_examples/example_06_Hubbard_dimer`
 
 .. raw:: html
 
@@ -138,10 +138,10 @@ Below are some examples illustrating the concepts behind and usage of EDRIXS.
 
 .. only:: html
 
-  .. image:: /auto_examples/images/thumb/sphx_glr_example_7_transitions_thumb.png
+  .. image:: /auto_examples/images/thumb/sphx_glr_example_07_transitions_thumb.png
     :alt:
 
-  :doc:`/auto_examples/example_7_transitions`
+  :doc:`/auto_examples/example_07_transitions`
 
 .. raw:: html
 
@@ -155,10 +155,10 @@ Below are some examples illustrating the concepts behind and usage of EDRIXS.
 
 .. only:: html
 
-  .. image:: /auto_examples/images/thumb/sphx_glr_example_8_Hunds_interactions_thumb.png
+  .. image:: /auto_examples/images/thumb/sphx_glr_example_08_Hunds_interactions_thumb.png
     :alt:
 
-  :doc:`/auto_examples/example_8_Hunds_interactions`
+  :doc:`/auto_examples/example_08_Hunds_interactions`
 
 .. raw:: html
 
@@ -172,14 +172,31 @@ Below are some examples illustrating the concepts behind and usage of EDRIXS.
 
 .. only:: html
 
-  .. image:: /auto_examples/images/thumb/sphx_glr_example_9_Coulomb_thumb.png
+  .. image:: /auto_examples/images/thumb/sphx_glr_example_09_Coulomb_thumb.png
     :alt:
 
-  :doc:`/auto_examples/example_9_Coulomb`
+  :doc:`/auto_examples/example_09_Coulomb`
 
 .. raw:: html
 
       <div class="sphx-glr-thumbnail-title">Coulomb interactions</div>
+    </div>
+
+
+.. raw:: html
+
+    <div class="sphx-glr-thumbcontainer" tooltip="Geometry">
+
+.. only:: html
+
+  .. image:: /auto_examples/images/thumb/sphx_glr_example_10_geometry_thumb.png
+    :alt:
+
+  :doc:`/auto_examples/example_10_geometry`
+
+.. raw:: html
+
+      <div class="sphx-glr-thumbnail-title">Geometry</div>
     </div>
 
 
@@ -193,16 +210,17 @@ Below are some examples illustrating the concepts behind and usage of EDRIXS.
 .. toctree::
    :hidden:
 
-   /auto_examples/example_0_ed_calculator
-   /auto_examples/example_1_crystal_field
-   /auto_examples/example_2_single_atom_RIXS
-   /auto_examples/example_3_AIM_XAS
-   /auto_examples/example_4_GS_analysis
-   /auto_examples/example_5_charge_transfer
-   /auto_examples/example_6_Hubbard_dimer
-   /auto_examples/example_7_transitions
-   /auto_examples/example_8_Hunds_interactions
-   /auto_examples/example_9_Coulomb
+   /auto_examples/example_00_ed_calculator
+   /auto_examples/example_01_crystal_field
+   /auto_examples/example_02_single_atom_RIXS
+   /auto_examples/example_03_AIM_XAS
+   /auto_examples/example_04_GS_analysis
+   /auto_examples/example_05_charge_transfer
+   /auto_examples/example_06_Hubbard_dimer
+   /auto_examples/example_07_transitions
+   /auto_examples/example_08_Hunds_interactions
+   /auto_examples/example_09_Coulomb
+   /auto_examples/example_10_geometry
 
 
 .. only:: html
