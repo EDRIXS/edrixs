@@ -63,17 +63,16 @@ def make_rixs(v_cfmat, thin, thout, loc_axis=None, scatter_axis=None):
 
 
 ################################################################################
-# Crystal field in a non-standard geometry
+# Crystal field in a non-standard example of geometry
 # ------------------------------------------------------------------------------
-# For an example, let's consider a :math:`d`-electron material with a tetragonal
+# Let us assume we are measuring a :math:`d`-electron material with a tetragonal
 # crystal field using :math:`L`-edge RIXS. The standard EDRIXS function for a
 # tetragonal crystal field will use :math:`z` as the four-fold symmetry axis.
 v_cfmat = edrixs.cf_tetragonal_d(2.09, 0.15, 0.08)
 ################################################################################
-# How can we deal with a case where the sample surface is, in fact, not parallel
-# to the crystal field :math:`z`-axis?
-# Instead the :math:`z`-axis is parallel to the sample surface
-# within the scattering plane and the sample surface normal is the
+# Let us assume that the sample surface is, in fact, not parallel to the crystal
+# field :math:`z`-axis, rather the :math:`z`-axis is parallel to the sample surface
+# within the scattering plane and that the sample surface normal is
 # :math:`x`-axis. We have also defined our incoming and outgoing x-ray angles
 # :code:`thin` and :code:`thout` with respect to the sample surface.
 thin = np.deg2rad(30)
@@ -100,9 +99,9 @@ eloss, rixs0 = make_rixs(v_cfmat, thin-angle_offset, thout+angle_offset)
 # :math:`y`, :math:`z` frame used for the absorption operators. We include a
 # consistency check between this matrix and what is expected from the
 # :code:`angle_offset` variable.
-loc_axis = np.array([[0,  0, 1],
-                     [0,  1, 0],
-                     [-1, 0, 0]])
+loc_axis = np.array([[0, 0, -1],
+                     [0, 1, 0],
+                     [1, 0, 0]])
 np.testing.assert_allclose(
     loc_axis,
     edrixs.euler_to_rmat(0, angle_offset, 0),
@@ -146,6 +145,8 @@ fig, ax = plt.subplots()
 ax.plot(eloss, rixs0, label='Re-define angles')
 ax.plot(eloss, rixs1, label='Set crystal field axes')
 ax.plot(eloss, rixs2, label='Set geometry axes')
-ax.plot(eloss, rixs3, label='Redefine crystal field')
+ax.plot(eloss, rixs3, label='Re-define crystal field')
+ax.set_xlabel('Energy loss (eV)')
+ax.set_ylabel('RIXS intensity')
 ax.legend()
 plt.show()
