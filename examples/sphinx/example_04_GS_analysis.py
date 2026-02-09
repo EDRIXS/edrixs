@@ -2,7 +2,7 @@
 """
 Ground state analysis for NiO
 ================================================================================
-This example follows the :ref:`sphx_glr_auto_examples_example_3_AIM_XAS.py`
+This example follows the :ref:`sphx_glr_auto_examples_example_03_AIM_XAS.py`
 example and considers the same model. This time we show how to analyze
 the wavevectors in terms of a
 :math:`\\alpha |d^8L^{10}> + \\beta |d^9L^9> \\gamma |d^{10}L^8>`
@@ -16,9 +16,9 @@ import edrixs
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy
-import example_3_AIM_XAS
+import example_03_AIM_XAS
 import importlib
-_ = importlib.reload(example_3_AIM_XAS)
+_ = importlib.reload(example_03_AIM_XAS)
 
 ################################################################################
 # Hamiltonian
@@ -42,11 +42,11 @@ _ = importlib.reload(example_3_AIM_XAS)
 # Import parameters
 # ------------------------------------------------------------------------------
 # Let's get the parammeters we need from the
-# :ref:`sphx_glr_auto_examples_example_3_AIM_XAS.py` example. We need to
+# :ref:`sphx_glr_auto_examples_example_03_AIM_XAS.py` example. We need to
 # consider :code:`ntot=20` spin-orbitals
 # for this problem.
 
-from example_3_AIM_XAS import (F0_dd, F2_dd, F4_dd,
+from example_03_AIM_XAS import (F0_dd, F2_dd, F4_dd,
                                nd, norb_d, norb_bath, v_noccu,
                                imp_mat, bath_level,
                                hyb, ext_B, trans_c2n)
@@ -116,7 +116,7 @@ emat_chb[0:norb_d, 0:norb_d] += zeeman
 # ------------------------------------------------------------------------------
 # We create the fock basis and build the Hamiltonian using the full set of
 # :math:`20` spin orbitals,  specifying that they are occuplied by :math:`18`
-# electrons. See the :ref:`sphx_glr_auto_examples_example_0_ed_calculator.py`
+# electrons. See the :ref:`sphx_glr_auto_examples_example_00_ed_calculator.py`
 # example for more details if needed. We also set the ground state to zero
 # energy.
 basis = np.array(edrixs.get_fock_bin_by_N(ntot, v_noccu))

@@ -151,7 +151,7 @@ trans_c2n = edrixs.tmat_c2r('d',True)
 # `list comprehension <https://realpython.com/list-comprehension-python/>`_
 # and
 # `numpy indexing <https://numpy.org/doc/stable/reference/arrays.indexing.html>`_
-# are used here. See :ref:`sphx_glr_auto_examples_example_1_crystal_field.py`
+# are used here. See :ref:`sphx_glr_auto_examples_example_01_crystal_field.py`
 # for more details if needed.
 ten_dq = 0.56
 CF = np.zeros((norb_d, norb_d), dtype=complex)

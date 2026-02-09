@@ -47,7 +47,7 @@ noccu = 2
 # Diagonalization
 # ------------------------------------------------------------------------------
 # Let's write a function to diagonalize our model in a similar way to
-# the :ref:`sphx_glr_auto_examples_example_6_Hubbard_dimer.py` example.
+# the :ref:`sphx_glr_auto_examples_example_06_Hubbard_dimer.py` example.
 # Within this function, we also create operators to count the number of
 # :math:`d` holes and operators to calculate expectation values for
 # :math:`S^2` and :math:`S_z`. For the latter to make sense, we also include a

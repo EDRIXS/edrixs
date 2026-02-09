@@ -2,7 +2,7 @@
 """
 Charge-transfer energy for NiO
 ================================================================================
-This example follows the :ref:`sphx_glr_auto_examples_example_3_AIM_XAS.py`
+This example follows the :ref:`sphx_glr_auto_examples_example_03_AIM_XAS.py`
 example and considers the same model. This time we outline how to determine
 the charge transfer energy in the sense defined by Zaanen, Sawatzky, and Allen
 [1]_. That is, a :math:`d^{n_d} \\rightarrow d^{n_d + 1} \\underline{L}` transition
@@ -14,18 +14,18 @@ import edrixs
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy
-import example_3_AIM_XAS
+import example_03_AIM_XAS
 import importlib
-_ = importlib.reload(example_3_AIM_XAS)
+_ = importlib.reload(example_03_AIM_XAS)
 
 ################################################################################
 # Determine eigenvectors and occupations
 # ------------------------------------------------------------------------------
 # The first step repeats what was done in
-# :ref:`sphx_glr_auto_examples_example_4_GS_analysis.py` but it does not apply
+# :ref:`sphx_glr_auto_examples_example_04_GS_analysis.py` but it does not apply
 # the hybridization between the impurity and both states.
 
-from example_3_AIM_XAS import (F0_dd, F2_dd, F4_dd,
+from example_03_AIM_XAS import (F0_dd, F2_dd, F4_dd,
                                nd, norb_d, norb_bath, v_noccu,
                                imp_mat, bath_level,
                                hyb, ext_B, trans_c2n)
