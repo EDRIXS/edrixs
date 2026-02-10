@@ -94,9 +94,9 @@ eloss, rixs0 = make_rixs(v_cfmat, thin-angle_offset, thout+angle_offset)
 # Set crystal field axes
 # ^^^^^^^^^^^^^^^^^^^^^^
 # The :code:`loc_axis` variable allows you to tell EDRIXS the axes used to set
-# up the crystal field. It will then apply this transform when it diagonalizes
-# the Hamiltonian and obtains the eigenvectors. Each column of the matrix
-# writes the axes used for the crystal field in the :math:`x`,
+# up the crystal field. It will then transform the axes used to compute the
+# x-ray absorption and emission operators. The columns of :code:`loc_axis`
+# should denote the axes used for the crystal field in the :math:`x`,
 # :math:`y`, :math:`z` frame used for the absorption operators. We include a
 # consistency check between this matrix and what is expected from the
 # :code:`angle_offset` variable.
@@ -146,6 +146,8 @@ fig, ax = plt.subplots()
 ax.plot(eloss, rixs0, label='Re-define angles')
 ax.plot(eloss, rixs1, label='Set crystal field axes')
 ax.plot(eloss, rixs2, label='Set geometry axes')
-ax.plot(eloss, rixs3, label='Redefine crystal field')
+ax.plot(eloss, rixs3, label='Re-define crystal field')
+ax.set_xlabel('Energy loss (eV)')
+ax.set_ylabel('RIXS intensity')
 ax.legend()
 plt.show()
