@@ -114,9 +114,9 @@ eloss, rixs1 = make_rixs(v_cfmat, thin, thout, loc_axis=loc_axis)
 # Set geometry axes
 # ^^^^^^^^^^^^^^^^^
 # The :code:`scatter_axis` variable makes EDRIXS rotate the absorption and
-# emission operations. The columns of this matrix should express the
-# :math:`x`, :math:`y`, :math:`z` of the scattering plane using the coordinates
-# used to define the crystal field.
+# emission operations. The columns of this matrix should express the local
+# scattering axes in the same global :math:`x`, :math:`y`, :math:`z`
+# coordinates used for the transition operators.
 scatter_axis = loc_axis
 eloss, rixs2 = make_rixs(v_cfmat, thin, thout, scatter_axis=scatter_axis)
 

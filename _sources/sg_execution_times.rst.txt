@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:09.018** total execution time for 11 files **from all galleries**:
+**00:08.998** total execution time for 11 files **from all galleries**:
 
 .. container::
 
@@ -33,35 +33,35 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_example_02_single_atom_RIXS.py` (``../../examples/sphinx/example_02_single_atom_RIXS.py``)
-     - 00:03.649
+     - 00:03.628
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_10_geometry.py` (``../../examples/sphinx/example_10_geometry.py``)
-     - 00:01.738
+     - 00:01.725
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_08_Hunds_interactions.py` (``../../examples/sphinx/example_08_Hunds_interactions.py``)
-     - 00:01.135
+     - 00:01.116
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_07_transitions.py` (``../../examples/sphinx/example_07_transitions.py``)
-     - 00:00.514
+     - 00:00.509
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_03_AIM_XAS.py` (``../../examples/sphinx/example_03_AIM_XAS.py``)
-     - 00:00.506
+     - 00:00.507
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_05_charge_transfer.py` (``../../examples/sphinx/example_05_charge_transfer.py``)
-     - 00:00.429
+     - 00:00.440
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_04_GS_analysis.py` (``../../examples/sphinx/example_04_GS_analysis.py``)
-     - 00:00.375
+     - 00:00.410
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_09_Coulomb.py` (``../../examples/sphinx/example_09_Coulomb.py``)
-     - 00:00.324
+     - 00:00.343
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_01_crystal_field.py` (``../../examples/sphinx/example_01_crystal_field.py``)
      - 00:00.131
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_00_ed_calculator.py` (``../../examples/sphinx/example_00_ed_calculator.py``)
-     - 00:00.122
+     - 00:00.096
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_06_Hubbard_dimer.py` (``../../examples/sphinx/example_06_Hubbard_dimer.py``)
-     - 00:00.095
+     - 00:00.093
      - 0.0
