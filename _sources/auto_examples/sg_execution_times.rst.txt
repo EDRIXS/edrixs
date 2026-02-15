@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:09.130** total execution time for 11 files **from auto_examples**:
+**00:09.111** total execution time for 11 files **from auto_examples**:
 
 .. container::
 
@@ -33,35 +33,35 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_example_02_single_atom_RIXS.py` (``example_02_single_atom_RIXS.py``)
-     - 00:03.610
+     - 00:03.667
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_10_geometry.py` (``example_10_geometry.py``)
-     - 00:01.770
+     - 00:01.752
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_08_Hunds_interactions.py` (``example_08_Hunds_interactions.py``)
-     - 00:01.173
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_example_07_transitions.py` (``example_07_transitions.py``)
-     - 00:00.527
+     - 00:01.164
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_03_AIM_XAS.py` (``example_03_AIM_XAS.py``)
-     - 00:00.524
+     - 00:00.532
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_example_07_transitions.py` (``example_07_transitions.py``)
+     - 00:00.522
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_05_charge_transfer.py` (``example_05_charge_transfer.py``)
-     - 00:00.427
+     - 00:00.423
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_04_GS_analysis.py` (``example_04_GS_analysis.py``)
-     - 00:00.377
+     - 00:00.369
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_09_Coulomb.py` (``example_09_Coulomb.py``)
-     - 00:00.354
+     - 00:00.349
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_01_crystal_field.py` (``example_01_crystal_field.py``)
-     - 00:00.140
+     - 00:00.138
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_00_ed_calculator.py` (``example_00_ed_calculator.py``)
-     - 00:00.129
+     - 00:00.098
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_06_Hubbard_dimer.py` (``example_06_Hubbard_dimer.py``)
-     - 00:00.099
+     - 00:00.097
      - 0.0

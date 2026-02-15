@@ -216,22 +216,24 @@ coordinates used for the transition operators.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-131
+.. GENERATED FROM PYTHON SOURCE LINES 125-132
 
 Redefine crystal field
 ^^^^^^^^^^^^^^^^^^^^^^
 Although a little more complicated, it can be helpful to redefine the crystal
 field in some cases. This can be done using a Wigner d-matrix in terms of
-angular rotations around the axes. In this case, we need to rotate 90 degrees
+angular rotations around the axes. The spin also needs to be rotated by a
+spinor matrix. In this case, we need to rotate 90 degrees
 around the :math:`y`-axis.
 
-.. GENERATED FROM PYTHON SOURCE LINES 131-137
+.. GENERATED FROM PYTHON SOURCE LINES 132-139
 
 .. code-block:: Python
 
     alpha, beta, gamma = 0, angle_offset, 0
     D = edrixs.get_wigner_dmat(4, alpha, beta, gamma)
-    U = np.kron(D, np.eye(2))  # expand to account for spin
+    spinor = edrixs.dmat_spinor(alpha, beta, gamma)
+    U = np.kron(D, spinor)  # expand to account for spin
     v_cfmat_rotated = U.conj().T @ v_cfmat @ U
     eloss, rixs3 = make_rixs(v_cfmat_rotated, thin, thout)
 
@@ -242,13 +244,13 @@ around the :math:`y`-axis.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 138-141
+.. GENERATED FROM PYTHON SOURCE LINES 140-143
 
 Check consistency
 ------------------------------------------------------------------------------
 Let's show that all these methods are consistent.
 
-.. GENERATED FROM PYTHON SOURCE LINES 141-154
+.. GENERATED FROM PYTHON SOURCE LINES 143-156
 
 .. code-block:: Python
 
@@ -280,7 +282,7 @@ Let's show that all these methods are consistent.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.770 seconds)
+   **Total running time of the script:** (0 minutes 1.752 seconds)
 
 
 .. _sphx_glr_download_auto_examples_example_10_geometry.py:
