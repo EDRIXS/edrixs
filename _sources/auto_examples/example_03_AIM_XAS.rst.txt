@@ -719,7 +719,7 @@ Let's plot the data and save it just in case
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.507 seconds)
+   **Total running time of the script:** (0 minutes 0.524 seconds)
 
 
 .. _sphx_glr_download_auto_examples_example_03_AIM_XAS.py:
