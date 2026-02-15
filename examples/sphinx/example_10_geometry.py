@@ -126,11 +126,13 @@ eloss, rixs2 = make_rixs(v_cfmat, thin, thout, scatter_axis=scatter_axis)
 # ^^^^^^^^^^^^^^^^^^^^^^
 # Although a little more complicated, it can be helpful to redefine the crystal
 # field in some cases. This can be done using a Wigner d-matrix in terms of
-# angular rotations around the axes. In this case, we need to rotate 90 degrees
+# angular rotations around the axes. The spin also needs to be rotated by a
+# spinor matrix. In this case, we need to rotate 90 degrees
 # around the :math:`y`-axis.
 alpha, beta, gamma = 0, angle_offset, 0
 D = edrixs.get_wigner_dmat(4, alpha, beta, gamma)
-U = np.kron(D, np.eye(2))  # expand to account for spin
+spinor = edrixs.dmat_spinor(alpha, beta, gamma)
+U = np.kron(D, spinor)  # expand to account for spin
 v_cfmat_rotated = U.conj().T @ v_cfmat @ U
 eloss, rixs3 = make_rixs(v_cfmat_rotated, thin, thout)
 
