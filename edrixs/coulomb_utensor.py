@@ -80,7 +80,14 @@ def get_gaunt(l1, l2):
 
 def umat_slater(l_list, fk):
     """
-    Calculate the Coulomb interaction tensor which is parameterized by
+    Calculate the Coulomb interaction tensor
+    
+    .. math::
+
+        \\bra{i j}U_{m_{l_i}m_{s_i}, m_{l_j}m_{s_j}, m_{l_t}m_{s_t},
+        m_{l_u}m_{s_u}}^{i,j,t,u}\\ket{t u}
+
+    which is parameterized by
     Slater integrals :math:`F^{k}`:
 
     .. math::

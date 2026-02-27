@@ -37,12 +37,16 @@ that one might not anticipate. Our example is based on a :math:`d` atomic shell.
 #     U_{\alpha\sigma,\beta\sigma^\prime,\gamma\sigma^\prime,\delta\sigma}
 #     \hat{f}^{\dagger}_{\alpha\sigma}
 #     \hat{f}^{\dagger}_{\beta\sigma^\prime}
-#     \hat{f}_{\gamma\sigma^\prime}\hat{f}_{\delta\sigma},
+#     \hat{f}_{\delta\sigma^\prime}\hat{f}_{\gamma\sigma},
 #     \end{equation}
 #
 # where :math:`\alpha`, :math:`\beta`, :math:`\gamma`, :math:`\delta` are
 # orbital indices and :math:`\hat{f}^{\dagger}`
 # (:math:`\hat{f}`) are the creation (anihilation) operators.
+# Notice that the order of :math:`\gamma` and :math:`\delta`
+# for the :math:`\hat{f}` operators is inverted, because
+# these operators are associated with a ket state :math:`\ket{\delta \gamma}`,
+# which acts from left-to-right.
 # For a :math:`d`-electron system, we have :math:`10` distinct spin-orbitals
 # (:math:`5` orbitals each with :math:`2` spins), which makes matrix the
 # :math:`10\times10\times10\times10` in total size.

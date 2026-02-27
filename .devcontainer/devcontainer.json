@@ -1,0 +1,10 @@
+{
+  "name": "edrixs-dev",
+  "dockerComposeFile": "../../docker-compose.yml",
+  "service": "edrixs-jupyter",
+  "workspaceFolder": "/home/rixs/edrixs",
+  "shutdownAction": "stopCompose",
+  "forwardPorts": [8888],
+  "overrideCommand": false
+}
+
