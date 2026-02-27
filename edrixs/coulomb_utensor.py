@@ -111,7 +111,7 @@ def umat_slater(l_list, fk):
     :math:`C_{l_i,l_j}(k,m_{l_i},m_{l_j})` are Gaunt coefficients.
     Note that the :math:`u`, :math:`t` orbital order in the matrix
     is chosen to account for the
-    :math:| t u\\rangle` ket which acts from left-to-right.
+    :math:`| t u \\rangle` ket which acts from left-to-right.
 
     Parameters
     ----------
