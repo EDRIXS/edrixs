@@ -45,7 +45,7 @@ that one might not anticipate. Our example is based on a :math:`d` atomic shell.
 # (:math:`\hat{f}`) are the creation (anihilation) operators.
 # Notice that the order of :math:`\gamma` and :math:`\delta`
 # for the :math:`\hat{f}` operators is inverted, because
-# these operators are associated with a ket state :math:`\ket{\delta \gamma}`,
+# these operators are associated with a ket state :math:`\ket{\gamma \delta}`,
 # which acts from left-to-right.
 # For a :math:`d`-electron system, we have :math:`10` distinct spin-orbitals
 # (:math:`5` orbitals each with :math:`2` spins), which makes matrix the
