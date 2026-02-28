@@ -80,18 +80,18 @@ def get_gaunt(l1, l2):
 
 def umat_slater(l_list, fk):
     """
-    Calculate the Coulomb interaction tensor
+    Calculate the Coulomb interaction tensor defined via
 
     .. math::
 
-        \\langle i j | U_{m_{l_i}m_{s_i}, m_{l_j}m_{s_j}, m_{l_t}m_{s_t},
-        m_{l_u}m_{s_u}}^{i,j,t,u} |t u \\rangle
-        = U_{m_{l_i}m_{s_i}, m_{l_j}m_{s_j}, m_{l_t}m_{s_t},
+        \\hat{U} = \\sum_{i j t u} \\sum_{m_l​,m_s}
+         U_{m_{l_i}m_{s_i}, m_{l_j}m_{s_j}, m_{l_t}m_{s_t},
         m_{l_u}m_{s_u}}^{i,j,t,u}
         \\hat{f}^{\\dagger}_{i}
         \\hat{f}^{\\dagger}_{j}
         \\hat{f}_{u}
-        \\hat{f}_{t}
+        \\hat{f}_{t} ,
+
 
     which is parameterized by
     Slater integrals :math:`F^{k}`:
@@ -109,9 +109,11 @@ def umat_slater(l_list, fk):
     and :math:`m_l` is the magnetic quantum number for orbital.
     :math:`F^{k}_{i,j,t,u}` are Slater integrals.
     :math:`C_{l_i,l_j}(k,m_{l_i},m_{l_j})` are Gaunt coefficients.
-    Note that the :math:`u`, :math:`t` orbital order in the matrix
-    is chosen to account for the
-    :math:`| t u \\rangle` ket which acts from left-to-right.
+    Note that the matrix is indexed with respect to the second
+    quantization convention, so double occupancy involves
+    matrix elements :code:`umat[i, j, j, i]`.
+
+    .. math::
 
     Parameters
     ----------
