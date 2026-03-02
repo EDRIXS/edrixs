@@ -7,7 +7,7 @@ __all__ = ['beta_to_kelvin', 'kelvin_to_beta', 'boltz_dist', 'UJ_to_UdJH',
 
 import numpy as np
 import json
-from importlib import resources
+from importlib.resources import files
 
 
 def beta_to_kelvin(beta):
@@ -835,10 +835,7 @@ def get_atom_data(atom, v_name, v_noccu, edge=None, trans_to_which=1, label=None
         if ishell not in avail_shells:
             raise Exception("Not available for this shell: ", ishell)
 
-    data_pkg = 'edrixs.atom_data'
-    fname = f'{atom}.json'
-    with resources.open_text(data_pkg, fname) as f:
-        atom_dict = json.load(f)
+    atom_dict = json.loads(files('edrixs.atom_data').joinpath(f'{atom}.json').read_text())
 
     res = {}
     shell_name = []
