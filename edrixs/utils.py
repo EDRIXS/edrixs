@@ -314,7 +314,7 @@ def CT_imp_bath(U_dd, Delta, n):
     * :math:`d^{n+1}L^9` has energy :math:`\\Delta`
 
     * :math:`d^{n+2}L^8` has energy :math:`2\\Delta + U_{dd}`
- 
+
     Using this we can write and solve three linear equations to get
     :math:`E_d` and :math:`E_L` the energies of the impurity and bath.
 
