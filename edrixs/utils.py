@@ -380,7 +380,7 @@ def CT_imp_bath_core_hole(U_dd, U_pd, Delta, n):
         Energy of the bath states :math:`E_{Lc}` with a core
         hole
     E_p : float
-        Energy of the core hole state :math:`E_\\textrm{E_p}`
+        Energy of the core hole state :math:`E_p`
 
     Notes
     -----
