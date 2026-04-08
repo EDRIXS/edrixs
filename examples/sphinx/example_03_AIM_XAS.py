@@ -107,7 +107,7 @@ slater = ([F0_dd, F2_dd, F4_dd],  # initial
 # :math:`E_d`, bath energy :math:`E_L`, impurity energy with a core hole
 # :math:`E_{dc}`, bath energy with a core hole :math:`E_{Lc}` and the
 # core hole energy :math:`E_p`. The initial ground state calculation is
-# done in electron language leaving out the core shell. 
+# done in electron language leaving out the core shell.
 Delta = 4.7
 E_d, E_L = edrixs.CT_imp_bath(U_dd, Delta, nd)
 ################################################################################
