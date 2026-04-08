@@ -282,7 +282,7 @@ def CT_imp_bath(U_dd, Delta, n):
     Anderson impurity or charge-transfer model
     appropriate for a :math:`d`-shell transition metal compound.
     Core hole potential effects are omitted from this calculation
-    because one technically performs the ground state
+    because one typically performs the ground state
     diagonalization step leaving out these states.
 
     Parameters
