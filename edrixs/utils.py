@@ -281,6 +281,9 @@ def CT_imp_bath(U_dd, Delta, n):
     Compute energies of the impurity and bath for an
     Anderson impurity or charge-transfer model
     appropriate for a :math:`d`-shell transition metal compound.
+    Core hole potential effects are omitted from this calculation
+    because one technically performs the ground state
+    diagonalization step leaving out these states.
 
     Parameters
     ----------
@@ -311,7 +314,7 @@ def CT_imp_bath(U_dd, Delta, n):
     * :math:`d^{n+1}L^9` has energy :math:`\\Delta`
 
     * :math:`d^{n+2}L^8` has energy :math:`2\\Delta + U_{dd}`
-
+ 
     Using this we can write and solve three linear equations to get
     :math:`E_d` and :math:`E_L` the energies of the impurity and bath.
 
@@ -352,7 +355,10 @@ def CT_imp_bath_core_hole(U_dd, U_pd, Delta, n):
     Compute energies of the impurity and bath for an
     Anderson impurity or charge-transfer model
     appropriate for a :math:`d`-shell transition metal compound
-    with a core hole.
+    with a core hole. Take note that this involves a
+    re-definition of :math:`\\Delta` compared to the
+    :code:`CT_imp_bath` function, which leaves out
+    core hole effects.
 
     Parameters
     ----------
