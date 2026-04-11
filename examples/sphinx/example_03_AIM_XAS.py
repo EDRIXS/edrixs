@@ -93,7 +93,7 @@ slater = ([F0_dd, F2_dd, F4_dd],  # initial
 ################################################################################
 # Energy of the bath states
 # ------------------------------------------------------------------------------
-# In the notation used in EDRIXS, :math:`\Delta` sets the energy difference
+# In the notation used here, :math:`\Delta` sets the energy difference
 # between the bath and impurity states. :math:`\Delta` is defined in the atomic
 # limit without crystal field (i.e. in terms of the centers of the impurity and
 # bath states before hybridization is considered) as the energy for a
@@ -106,11 +106,14 @@ slater = ([F0_dd, F2_dd, F4_dd],  # initial
 # for details. We can call these functions to get the impurity energy
 # :math:`E_d`, bath energy :math:`E_L`, impurity energy with a core hole
 # :math:`E_{dc}`, bath energy with a core hole :math:`E_{Lc}` and the
-# core hole energy :math:`E_p`. The
-# :code:`if __name__ == '__main__'` code specifies that this command
-# should only be executed if the file is explicitly run.
+# core hole energy :math:`E_p`. The initial ground state calculation is
+# done in electron language leaving out the core shell.
 Delta = 4.7
 E_d, E_L = edrixs.CT_imp_bath(U_dd, Delta, nd)
+################################################################################
+# In the intermediate state, we include the core shell and the core hole
+# potential. For this reason, the energies will shift differently to account
+# for this.
 E_dc, E_Lc, E_p = edrixs.CT_imp_bath_core_hole(U_dd, U_dp, Delta, nd)
 message = ("E_d = {:.3f} eV\n"
            "E_L = {:.3f} eV\n"
