@@ -128,7 +128,10 @@
 <span class="sig-prename descclassname"><span class="pre">edrixs.utils.</span></span><span class="sig-name descname"><span class="pre">CT_imp_bath</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">U_dd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Delta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/utils.html#CT_imp_bath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.utils.CT_imp_bath" title="Link to this definition"></a></dt>
 <dd><p>Compute energies of the impurity and bath for an
 Anderson impurity or charge-transfer model
-appropriate for a <span class="math notranslate nohighlight">\(d\)</span>-shell transition metal compound.</p>
+appropriate for a <span class="math notranslate nohighlight">\(d\)</span>-shell transition metal compound.
+Core hole potential effects are omitted from this calculation
+because one typically performs the ground state
+diagonalization step leaving out these states.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
@@ -207,7 +210,10 @@ E_L &amp;=
 <dd><p>Compute energies of the impurity and bath for an
 Anderson impurity or charge-transfer model
 appropriate for a <span class="math notranslate nohighlight">\(d\)</span>-shell transition metal compound
-with a core hole.</p>
+with a core hole. Take note that this involves a
+re-definition of <span class="math notranslate nohighlight">\(\Delta\)</span> compared to the
+<code class="code docutils literal notranslate"><span class="pre">CT_imp_bath</span></code> function, which leaves out
+core hole effects.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
@@ -229,7 +235,7 @@ a core hole</p>
 <dt><strong>E_Lc</strong><span class="classifier">float</span></dt><dd><p>Energy of the bath states <span class="math notranslate nohighlight">\(E_{Lc}\)</span> with a core
 hole</p>
 </dd>
-<dt><strong>E_p</strong><span class="classifier">float</span></dt><dd><p>Energy of the core hole state <span class="math notranslate nohighlight">\(E_\textrm{E_p}\)</span></p>
+<dt><strong>E_p</strong><span class="classifier">float</span></dt><dd><p>Energy of the core hole state <span class="math notranslate nohighlight">\(E_p\)</span></p>
 </dd>
 </dl>
 </dd>

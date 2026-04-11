@@ -395,6 +395,9 @@
 <span class="sd">    Compute energies of the impurity and bath for an</span>
 <span class="sd">    Anderson impurity or charge-transfer model</span>
 <span class="sd">    appropriate for a :math:`d`-shell transition metal compound.</span>
+<span class="sd">    Core hole potential effects are omitted from this calculation</span>
+<span class="sd">    because one typically performs the ground state</span>
+<span class="sd">    diagonalization step leaving out these states.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -469,7 +472,10 @@
 <span class="sd">    Compute energies of the impurity and bath for an</span>
 <span class="sd">    Anderson impurity or charge-transfer model</span>
 <span class="sd">    appropriate for a :math:`d`-shell transition metal compound</span>
-<span class="sd">    with a core hole.</span>
+<span class="sd">    with a core hole. Take note that this involves a</span>
+<span class="sd">    re-definition of :math:`\\Delta` compared to the</span>
+<span class="sd">    :code:`CT_imp_bath` function, which leaves out</span>
+<span class="sd">    core hole effects.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -491,7 +497,7 @@
 <span class="sd">        Energy of the bath states :math:`E_{Lc}` with a core</span>
 <span class="sd">        hole</span>
 <span class="sd">    E_p : float</span>
-<span class="sd">        Energy of the core hole state :math:`E_\\textrm{E_p}`</span>
+<span class="sd">        Energy of the core hole state :math:`E_p`</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
