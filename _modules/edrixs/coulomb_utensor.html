@@ -168,13 +168,26 @@
 <a class="viewcode-back" href="../../reference/coulomb_utensor.html#edrixs.coulomb_utensor.umat_slater">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">umat_slater</span><span class="p">(</span><span class="n">l_list</span><span class="p">,</span> <span class="n">fk</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculate the Coulomb interaction tensor which is parameterized by</span>
+<span class="sd">    Calculate the Coulomb interaction tensor defined via</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \\hat{U} = \\sum_{i j u t} \\sum_{m_l​,m_s}</span>
+<span class="sd">         U_{m_{l_i}m_{s_i}, m_{l_j}m_{s_j}, m_{l_u}m_{s_u},</span>
+<span class="sd">        m_{l_t}m_{s_t}}^{i,j,u,t}</span>
+<span class="sd">        \\hat{f}^{\\dagger}_{i}</span>
+<span class="sd">        \\hat{f}^{\\dagger}_{j}</span>
+<span class="sd">        \\hat{f}_{t}</span>
+<span class="sd">        \\hat{f}_{u} ,</span>
+
+
+<span class="sd">    which is parameterized by</span>
 <span class="sd">    Slater integrals :math:`F^{k}`:</span>
 
 <span class="sd">    .. math::</span>
 
-<span class="sd">        U_{m_{l_i}m_{s_i}, m_{l_j}m_{s_j}, m_{l_t}m_{s_t},</span>
-<span class="sd">        m_{l_u}m_{s_u}}^{i,j,t,u}</span>
+<span class="sd">        U_{m_{l_i}m_{s_i}, m_{l_j}m_{s_j}, m_{l_u}m_{s_u},</span>
+<span class="sd">        m_{l_t}m_{s_t}}^{i,j,u,t}</span>
 <span class="sd">        =\\frac{1}{2} \\delta_{m_{s_i},m_{s_t}}\\delta_{m_{s_j},m_{s_u}}</span>
 <span class="sd">        \\delta_{m_{l_i}+m_{l_j}, m_{l_t}+m_{l_u}}</span>
 <span class="sd">        \\sum_{k}C_{l_i,l_t}(k,m_{l_i},m_{l_t})C_{l_u,l_j}</span>
@@ -184,6 +197,12 @@
 <span class="sd">    and :math:`m_l` is the magnetic quantum number for orbital.</span>
 <span class="sd">    :math:`F^{k}_{i,j,t,u}` are Slater integrals.</span>
 <span class="sd">    :math:`C_{l_i,l_j}(k,m_{l_i},m_{l_j})` are Gaunt coefficients.</span>
+<span class="sd">    Note that the matrix is indexed with respect to the second</span>
+<span class="sd">    quantization convention, where the last two indices in the</span>
+<span class="sd">    tensor are swapped with respect to the operators so double</span>
+<span class="sd">    occupancy involves matrix elements :code:`umat[i, j, j, i]`.</span>
+
+<span class="sd">    .. math::</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>

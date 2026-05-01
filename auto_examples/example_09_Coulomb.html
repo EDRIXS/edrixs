@@ -148,8 +148,8 @@ a tensor <span class="math notranslate nohighlight">\(U\)</span></p>
 <blockquote>
 <div><div class="math notranslate nohighlight">
 \[\begin{equation}
-\hat{H} = \sum_{\alpha,\beta,\gamma,\delta,\sigma,\sigma^\prime}
-U_{\alpha\sigma,\beta\sigma^\prime,\gamma\sigma^\prime,\delta\sigma}
+\hat{H} = \sum_{\alpha,\beta,\delta,\gamma,\sigma,\sigma^\prime}
+U_{\alpha\sigma,\beta\sigma^\prime,\delta\sigma^\prime,\gamma\sigma}
 \hat{f}^{\dagger}_{\alpha\sigma}
 \hat{f}^{\dagger}_{\beta\sigma^\prime}
 \hat{f}_{\gamma\sigma^\prime}\hat{f}_{\delta\sigma},
@@ -158,6 +158,10 @@ U_{\alpha\sigma,\beta\sigma^\prime,\gamma\sigma^\prime,\delta\sigma}
 <p>where <span class="math notranslate nohighlight">\(\alpha\)</span>, <span class="math notranslate nohighlight">\(\beta\)</span>, <span class="math notranslate nohighlight">\(\gamma\)</span>, <span class="math notranslate nohighlight">\(\delta\)</span> are
 orbital indices and <span class="math notranslate nohighlight">\(\hat{f}^{\dagger}\)</span>
 (<span class="math notranslate nohighlight">\(\hat{f}\)</span>) are the creation (anihilation) operators.
+Notice that the indexing order of the last two elements of the tensor
+is opposite to that of the operators because
+these operators are associated with a ket state <span class="math notranslate nohighlight">\(\ket{\gamma \delta}\)</span>,
+which acts from left-to-right.
 For a <span class="math notranslate nohighlight">\(d\)</span>-electron system, we have <span class="math notranslate nohighlight">\(10\)</span> distinct spin-orbitals
 (<span class="math notranslate nohighlight">\(5\)</span> orbitals each with <span class="math notranslate nohighlight">\(2\)</span> spins), which makes matrix the
 <span class="math notranslate nohighlight">\(10\times10\times10\times10\)</span> in total size.
@@ -646,7 +650,7 @@ orbital terms are included or not.</p>
 Transition-Metal Ions in Crystals. Academic Press, New York and London.</p>
 </aside>
 </aside>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.352 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.344 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-example-09-coulomb-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/7e525b7048c2af11c7e1a7d745475124/example_09_Coulomb.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">example_09_Coulomb.ipynb</span></code></a></p>
