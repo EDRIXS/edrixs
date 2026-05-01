@@ -180,6 +180,3 @@ or go to ``examples`` directory to run some examples::
     mpirun -np 2 ./run_rixs_fsolver.py
 
 if no errors, the installation is successful.
-
-
-.. [#] To change your default pip you need to add a line to your ``~/.bashrc`` on linux or to your ``~/.bash_profile`` on macOS. This should be ``alias pip='/usr/bin/pip3'`` where the path is determined by calling ``which pip3`` from your terminal.
