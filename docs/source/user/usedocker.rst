@@ -41,6 +41,25 @@ Follow these steps to use the docker image:
     docker compose run --rm edrixs-ipython
 
 
+Use the docker image as a Dev Container
+----------------------------------------
+
+You can use the edrixs docker image as a `Dev Container
+<https://containers.readthedocs.io/>`_ in VS Code or GitHub Codespaces without
+cloning the full repository. Create a file ``.devcontainer/devcontainer.json``
+in your project with the following contents ::
+
+    {
+        "name": "edrixs",
+        "image": "edrixs/edrixs"
+    }
+
+Open the project in VS Code with the `Dev Containers
+<https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers>`_
+extension installed and choose **Reopen in Container** when prompted.
+
+See :ref:`devcontainer` for more details on using Dev Containers with edrixs.
+
 Sharing your code
 -----------------
 

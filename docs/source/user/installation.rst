@@ -1,7 +1,7 @@
 ************
 Installation
 ************
-For Linux users we suggest :ref:`installing with anaconda <AnacondaInstall>`. For Windows and macOS machines, we suggest using the :ref:`docker instructions <edrixsanddocker>`, which are relatively straightforward.  If desired, you can also compile the code from the source for Linux.
+For Linux users we suggest :ref:`installing with anaconda <AnacondaInstall>`. For Windows and macOS machines, we suggest using the :ref:`docker instructions <edrixsanddocker>`, which are relatively straightforward.  In principle, you can also compile the code from the source for Linux, but this is quite involved and we recommend against this for standard use.
 
 
 .. _AnacondaInstall:
