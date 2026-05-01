@@ -13,6 +13,7 @@ edrixs User Guide
    whatisedrixs
    installation
    usedocker
+   devcontainer
    quickstart
    basics
    pythontips

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>XAS &mdash; edrixs  documentation</title>
+  <title>Dev Container &mdash; edrixs  documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -28,8 +28,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="RIXS" href="basics.rixs.html" />
-    <link rel="prev" title="ED" href="basics.ed.html" /> 
+    <link rel="next" title="Quickstart tutorial" href="quickstart.html" />
+    <link rel="prev" title="edrixs and docker" href="usedocker.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -57,14 +57,14 @@
 <li class="toctree-l2"><a class="reference internal" href="whatisedrixs.html">What is edrixs?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="usedocker.html">edrixs and docker</a></li>
-<li class="toctree-l2"><a class="reference internal" href="devcontainer.html">Dev Container</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart.html">Quickstart tutorial</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="basics.html">edrixs basics</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="basics.ed.html">ED</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">XAS</a></li>
-<li class="toctree-l3"><a class="reference internal" href="basics.rixs.html">RIXS</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Dev Container</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#supported-environments">Supported environments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-vs-code">Using VS Code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-github-codespaces">Using GitHub Codespaces</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="quickstart.html">Quickstart tutorial</a></li>
+<li class="toctree-l2"><a class="reference internal" href="basics.html">edrixs basics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pythontips.html">Tips for python and edrixs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="papers.html">EDRIXS papers</a></li>
@@ -90,10 +90,9 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">edrixs User Guide</a></li>
-          <li class="breadcrumb-item"><a href="basics.html">edrixs basics</a></li>
-      <li class="breadcrumb-item active">XAS</li>
+      <li class="breadcrumb-item active">Dev Container</li>
       <li class="wy-breadcrumbs-aside">
-            <a href="../_sources/user/basics.xas.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/user/devcontainer.rst.txt" rel="nofollow"> View page source</a>
       </li>
   </ul>
   <hr/>
@@ -101,16 +100,51 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="xas">
-<span id="basics-xas"></span><h1>XAS<a class="headerlink" href="#xas" title="Link to this heading"></a></h1>
+  <section id="dev-container">
+<span id="devcontainer"></span><h1>Dev Container<a class="headerlink" href="#dev-container" title="Link to this heading"></a></h1>
+<p>The edrixs repository includes a <a class="reference external" href="https://containers.readthedocs.io/">Dev Container</a> configuration, which gives you a
+fully working edrixs development environment without any manual installation.</p>
+<section id="supported-environments">
+<h2>Supported environments<a class="headerlink" href="#supported-environments" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>VS Code</strong> with the <a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers">Dev Containers</a>
+extension</p></li>
+<li><p><strong>GitHub Codespaces</strong> — runs the container in the cloud directly from the
+GitHub repository page, with no local setup at all</p></li>
+<li><p><strong>JetBrains IDEs</strong> (PyCharm, IntelliJ, etc.) via their Dev Containers support</p></li>
+<li><p><strong>The devcontainer CLI</strong> (<code class="docutils literal notranslate"><span class="pre">&#64;devcontainers/cli</span></code>) for terminal-only use</p></li>
+</ul>
+</section>
+<section id="using-vs-code">
+<h2>Using VS Code<a class="headerlink" href="#using-vs-code" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Install <a class="reference external" href="https://www.docker.com/">Docker</a> and start the Docker daemon.</p></li>
+<li><p>Install the <a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers">Dev Containers</a>
+extension in VS Code.</p></li>
+<li><p>Clone the edrixs repository and open it in VS Code.</p></li>
+<li><p>When prompted <em>“Reopen in Container”</em>, click it — or open the Command
+Palette (<code class="docutils literal notranslate"><span class="pre">Ctrl+Shift+P</span></code>) and run <strong>Dev Containers: Reopen in Container</strong>.</p></li>
+</ol>
+<p>VS Code will build the image on the first launch (this takes a few minutes)
+and then reopen with edrixs fully installed and ready to use.</p>
+</section>
+<section id="using-github-codespaces">
+<h2>Using GitHub Codespaces<a class="headerlink" href="#using-github-codespaces" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Go to the edrixs repository on GitHub.</p></li>
+<li><p>Click <strong>Code → Codespaces → Create codespace on master</strong>.</p></li>
+</ol>
+<p>The codespace opens a browser-based VS Code session with edrixs already
+installed — no local software required.</p>
+</section>
 </section>
 
 
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="basics.ed.html" class="btn btn-neutral float-left" title="ED" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="basics.rixs.html" class="btn btn-neutral float-right" title="RIXS" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="usedocker.html" class="btn btn-neutral float-left" title="edrixs and docker" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="quickstart.html" class="btn btn-neutral float-right" title="Quickstart tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

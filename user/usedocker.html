@@ -28,7 +28,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Quickstart tutorial" href="quickstart.html" />
+    <link rel="next" title="Dev Container" href="devcontainer.html" />
     <link rel="prev" title="Installation" href="installation.html" /> 
 </head>
 
@@ -58,9 +58,11 @@
 <li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">edrixs and docker</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#run-edrixs-in-a-docker-container">Run edrixs in a docker container</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#use-the-docker-image-as-a-dev-container">Use the docker image as a Dev Container</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#sharing-your-code">Sharing your code</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="devcontainer.html">Dev Container</a></li>
 <li class="toctree-l2"><a class="reference internal" href="quickstart.html">Quickstart tutorial</a></li>
 <li class="toctree-l2"><a class="reference internal" href="basics.html">edrixs basics</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pythontips.html">Tips for python and edrixs</a></li>
@@ -137,6 +139,21 @@ Follow these steps to use the docker image:</p>
 </li>
 </ul>
 </section>
+<section id="use-the-docker-image-as-a-dev-container">
+<h2>Use the docker image as a Dev Container<a class="headerlink" href="#use-the-docker-image-as-a-dev-container" title="Link to this heading"></a></h2>
+<p>You can use the edrixs docker image as a <a class="reference external" href="https://containers.readthedocs.io/">Dev Container</a> in VS Code or GitHub Codespaces without
+cloning the full repository. Create a file <code class="docutils literal notranslate"><span class="pre">.devcontainer/devcontainer.json</span></code>
+in your project with the following contents</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;edrixs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;edrixs/edrixs&quot;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Open the project in VS Code with the <a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers">Dev Containers</a>
+extension installed and choose <strong>Reopen in Container</strong> when prompted.</p>
+<p>See <a class="reference internal" href="devcontainer.html#devcontainer"><span class="std std-ref">Dev Container</span></a> for more details on using Dev Containers with edrixs.</p>
+</section>
 <section id="sharing-your-code">
 <h2>Sharing your code<a class="headerlink" href="#sharing-your-code" title="Link to this heading"></a></h2>
 <p>Using Docker is a nice way to straightforwardly share your code with others. The standard way to specify which docker image is needed to run your code is to include a file named <code class="docutils literal notranslate"><span class="pre">Dockerfile</span></code> with the following contents</p>
@@ -152,7 +169,7 @@ Follow these steps to use the docker image:</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="quickstart.html" class="btn btn-neutral float-right" title="Quickstart tutorial" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="devcontainer.html" class="btn btn-neutral float-right" title="Dev Container" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
