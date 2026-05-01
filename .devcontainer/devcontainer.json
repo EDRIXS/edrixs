@@ -1,0 +1,13 @@
+{
+  "name": "edrixs",
+  "build": {
+    "context": "..",
+    "dockerfile": "../docker/Dockerfile",
+    "target": "developer"
+  },
+  "remoteUser": "docker",
+  "remoteEnv": {
+    "LANG": "C.UTF-8",
+    "LC_ALL": "C.UTF-8"
+  }
+}
