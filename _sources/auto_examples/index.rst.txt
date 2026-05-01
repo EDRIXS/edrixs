@@ -6,6 +6,10 @@ Pedagogical examples
 Below are some examples illustrating the concepts behind and usage of EDRIXS.
 
 
+.. raw:: html
+
+  <div id='sg-tag-list' class='sphx-glr-tag-list'></div>
+
 
 .. raw:: html
 
