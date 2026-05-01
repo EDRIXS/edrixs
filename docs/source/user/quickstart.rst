@@ -6,7 +6,7 @@ If you are already familiar with multiplet calculations this page and our
 :ref:`examples page <examples>` are a good part to start. Otherwise, checkout
 our Pedagogical examples to learn the concepts
 behind how edrixs works. The first example explains :ref:`Exact diagonalization 
-<sphx_glr_auto_examples_example_0_ed_calculator.py>`.
+<sphx_glr_auto_examples_example_00_ed_calculator.py>`.
 
 Use edrixs as an ED calculator
 ------------------------------
