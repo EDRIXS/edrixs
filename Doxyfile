@@ -1,0 +1,62 @@
+# Doxyfile for EDRIXS Fortran source documentation
+# Run: doxygen Doxyfile  (output goes to docs/doxygen/html/index.html)
+
+#---------------------------------------------------------------------------
+# Project
+#---------------------------------------------------------------------------
+PROJECT_NAME           = "EDRIXS"
+PROJECT_BRIEF          = "An open source toolkit for simulating RIXS spectra"
+PROJECT_NUMBER         =
+OUTPUT_DIRECTORY       = docs/doxygen
+
+#---------------------------------------------------------------------------
+# Input
+#---------------------------------------------------------------------------
+INPUT                  = src
+FILE_PATTERNS          = *.f90 *.F90 *.f *.F
+RECURSIVE              = NO
+EXCLUDE                = src/arpack.f90
+
+#---------------------------------------------------------------------------
+# Fortran optimisation
+#---------------------------------------------------------------------------
+OPTIMIZE_FOR_FORTRAN   = YES
+EXTENSION_MAPPING      = f90=FortranFree F90=FortranFree
+
+# Doxygen treats !> and !! as documentation comments in Fortran
+JAVADOC_AUTOBRIEF      = YES
+
+#---------------------------------------------------------------------------
+# Output formats
+#---------------------------------------------------------------------------
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+HTML_TIMESTAMP         = NO
+
+GENERATE_LATEX         = NO
+
+# XML output is consumed by Breathe to embed docs in Sphinx
+GENERATE_XML           = YES
+XML_OUTPUT             = xml
+
+#---------------------------------------------------------------------------
+# Extraction settings
+#---------------------------------------------------------------------------
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = NO
+EXTRACT_STATIC         = YES
+
+#---------------------------------------------------------------------------
+# Source browsing
+#---------------------------------------------------------------------------
+SOURCE_BROWSER         = YES
+INLINE_SOURCES         = NO
+REFERENCED_BY_RELATION = YES
+REFERENCES_RELATION    = YES
+
+#---------------------------------------------------------------------------
+# Graphs (requires graphviz dot — optional, gracefully skipped if absent)
+#---------------------------------------------------------------------------
+HAVE_DOT               = NO
+CALL_GRAPH             = NO
+CALLER_GRAPH           = NO

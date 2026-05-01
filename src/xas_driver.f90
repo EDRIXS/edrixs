@@ -1,14 +1,28 @@
+!> XAS driver: compute the X-ray Absorption Spectrum via the Krylov method.
+!!
+!! For each of the num_gs initial states (stored as eigvec.k files from ed.x):
+!!
+!!  1. Build the absorption transition operator T as a distributed CSR matrix
+!!     mapping the initial-state Hilbert space into the intermediate-state space
+!!     (ndim_n rows, ndim_i columns).
+!!  2. Apply T to the ground-state eigenvector to produce phi = T|psi_0>, the
+!!     seed vector in the intermediate-state space.
+!!  3. Build and diagonalise the intermediate-state Hamiltonian H_n.
+!!  4. Run build_krylov_mp to compute the Lanczos coefficients alpha/beta that
+!!     define the continued-fraction Green's function G(omega) = <phi|(omega-H_n)^{-1}|phi>.
+!!  5. Write the Krylov data to xas_poles.k for post-processing with build_spectrum.
+!!
+!! The XAS intensity for a given polarisation is proportional to -Im G(omega_in).
 subroutine xas_driver()
     use m_constants
-    use m_control 
+    use m_control
     use m_types
     use m_global
     use m_lanczos
     use mpi
-    
+
     implicit none
 
-    ! local variables
     integer :: nblock
     integer :: mloc
     integer :: nloc
@@ -18,7 +32,7 @@ subroutine xas_driver()
     integer :: needed2(nprocs,nprocs)
     integer :: end_indx(2,2,nprocs)
     integer :: end_indx2(2,2,nprocs)
-    integer :: ierror 
+    integer :: ierror
     integer(dp) :: num_of_nonzeros
 
     real(dp) :: rtemp
@@ -96,7 +110,7 @@ subroutine xas_driver()
         write(char_I, '(i5)') igs
         fname="eigvec."//trim(adjustl(char_I))
         call read_eigvecs(fname, ndim_i, eigvecs_mpi, eigvals)
-        eigvecs = eigvecs_mpi(end_indx(1,2,myid+1): end_indx(2,2,myid+1)) 
+        eigvecs = eigvecs_mpi(end_indx(1,2,myid+1): end_indx(2,2,myid+1))
         deallocate(eigvecs_mpi)
         allocate(phi_vec(mloc))
         phi_vec = czero

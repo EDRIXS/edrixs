@@ -1,11 +1,16 @@
+!> Standalone XAS executable: initialise MPI, run xas_driver, finalise.
+!!
+!! Entry point for the fedrixs xas.x binary.  Rank reduction guards against the
+!! case where nprocs > min(ndim_i, ndim_n): excess ranks are split to an idle
+!! communicator, and only the active ranks call xas_driver.
 program xas_main
     use m_control, only: master, origin_myid, origin_nprocs, origin_comm
     use m_control, only: myid, nprocs, new_comm, ndim_n, ndim_i, ndim_n_nocore, num_core_orbs
     use m_global, only: dealloc_fock_i, dealloc_fock_n
-    use mpi 
+    use mpi
 
     implicit none
- 
+
     integer :: ierror
     integer :: color
     integer :: key
@@ -17,7 +22,7 @@ program xas_main
     call MPI_COMM_SIZE(origin_comm, origin_nprocs, ierror)
     call MPI_BARRIER(origin_comm, ierror)
 
-    call config()  
+    call config()
     call read_fock_i()
     call dealloc_fock_i()
     call read_fock_n()
@@ -31,7 +36,7 @@ program xas_main
             print *, " fedrixs >>> Only ", min_dim, " processors will really work!"
         endif
         if (origin_myid < min_dim) then
-            color = 1 
+            color = 1
             key = origin_myid
         else
             color = 2

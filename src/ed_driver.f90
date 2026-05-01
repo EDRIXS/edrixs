@@ -1,11 +1,28 @@
+!> Exact Diagonalization (ED) driver: diagonalise the initial-state Hamiltonian.
+!!
+!! Reads all inputs (hopping, Coulomb, Fock basis), builds the distributed CSR
+!! Hamiltonian, diagonalises it with the solver selected by the control variable
+!! ed_solver (0 = full LAPACK ZHEEV, 1 = Lanczos, 2 = ARPACK), then computes
+!! the single-particle density matrix for the nvector lowest eigenstates.
+!!
+!! Output files written:
+!!  - eigvec.k  (if idump = .true.): full eigenvector for state k
+!!  - eigvals.dat: the neval lowest eigenvalues
+!!  - denmat.dat: single-particle density matrices
+!!
+!! If ed_solver = 1 or 2 the Hamiltonian is distributed across ranks and each
+!! rank stores a contiguous column block.  For the density matrix calculation
+!! the distributed eigenvectors are gathered to every rank via MPI_ISEND/MPI_RECV
+!! so that off-diagonal density-matrix elements (c^dag_i c_j) can be evaluated
+!! by searching the full Fock basis with binary_search.
 subroutine ed_driver()
     use m_constants
-    use m_control 
+    use m_control
     use m_types
     use m_global
     use m_lanczos
     use mpi
-    
+
     implicit none
 
     integer :: i,j,k
@@ -15,7 +32,7 @@ subroutine ed_driver()
     integer :: nloc
     integer :: needed(nprocs,nprocs)
     integer :: end_indx(2,2,nprocs)
-    integer :: ierror 
+    integer :: ierror
     integer :: info
     integer :: actual_step
     integer :: nconv
@@ -139,7 +156,7 @@ subroutine ed_driver()
         enddo
         call MPI_ALLREDUCE(ham_full_mpi, ham_full, size(ham_full_mpi), MPI_DOUBLE_COMPLEX, MPI_SUM, new_comm, ierror)
         if (myid==master) then
-            call full_diag_ham(ndim_i, ham_full, eigval_full, eigvecs_full) 
+            call full_diag_ham(ndim_i, ham_full, eigval_full, eigvecs_full)
         endif
         call MPI_BARRIER(new_comm, ierror)
         call MPI_BCAST(eigval_full,   size(eigval_full),  MPI_DOUBLE_PRECISION, master, new_comm, ierror)
@@ -190,7 +207,7 @@ subroutine ed_driver()
     call read_fock_i()
     denmat = czero
     denmat_mpi = czero
-    allocate(eigvecs_mpi(ndim_i))    
+    allocate(eigvecs_mpi(ndim_i))
     do k=1, nvector
         eigvecs_mpi = czero
         if (ed_solver==0) then
@@ -219,7 +236,7 @@ subroutine ed_driver()
         do icfg=end_indx(1,1,myid+1), end_indx(2,1,myid+1)
             do j=1,num_val_orbs
                 if (btest(fock_i(icfg), j-1)) then
-                    denmat_mpi(j,j,k) = denmat_mpi(j,j,k) + conjg(eigvecs_mpi(icfg)) * eigvecs_mpi(icfg) 
+                    denmat_mpi(j,j,k) = denmat_mpi(j,j,k) + conjg(eigvecs_mpi(icfg)) * eigvecs_mpi(icfg)
                 endif
             enddo
 
@@ -230,16 +247,16 @@ subroutine ed_driver()
                     old = fock_i(icfg)
 
                     tot_sign = 1
-                    call make_newfock('-', i, old, new, sgn) 
+                    call make_newfock('-', i, old, new, sgn)
                     tot_sign = tot_sign * sgn
                     old = new
 
                     if (btest(old, j-1)) cycle
-                    call make_newfock('+', j,  old, new, sgn) 
+                    call make_newfock('+', j,  old, new, sgn)
                     tot_sign = tot_sign * sgn
 
                     jcfg = binary_search(ndim_i, fock_i, new)
-                    
+
                     if (jcfg == -1) cycle
                     denmat_mpi(i,j,k) = denmat_mpi(i,j,k) + conjg(eigvecs_mpi(icfg)) * eigvecs_mpi(jcfg) * tot_sign
                     denmat_mpi(j,i,k) = denmat_mpi(j,i,k) + conjg(eigvecs_mpi(jcfg)) * eigvecs_mpi(icfg) * tot_sign
@@ -247,8 +264,8 @@ subroutine ed_driver()
             enddo
         enddo
 
-        ! dump eigenvectors 
-        if ( idump ) then 
+        ! dump eigenvectors
+        if ( idump ) then
             write(char_I, '(i5)') k
             fname="eigvec."//trim(adjustl(char_I))
             if (myid==master) then

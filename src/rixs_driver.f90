@@ -1,11 +1,31 @@
+!> RIXS driver: compute the Resonant Inelastic X-ray Scattering spectrum.
+!!
+!! Implements the full RIXS second-order cross-section for each initial state k:
+!!
+!!  1. Build the absorption transition operator T_i (ndim_n x ndim_i) and apply
+!!     it to the initial-state eigenvector: phi = T_i |psi_k>.
+!!  2. Build the intermediate-state Hamiltonian H_n shifted by the complex photon
+!!     energy: (H_n - omega_in - E_k - i*gamma_in).  The sign convention rtemp=-1
+!!     means the stored matrix is -(H_n - omega) so that pminres_csr solves the
+!!     equation with the correct sign.
+!!  3. Solve the linear system (H_n - omega_in - E_k - i*gamma_in) x = phi via
+!!     pminres_csr to obtain the resolvent x = (H_n - omega)^{-1} phi.
+!!  4. Build the emission transition operator T_f (ndim_f x ndim_n) and apply it
+!!     to x: phi_f = T_f x, giving the seed vector in the final-state space.
+!!  5. Build the final-state Hamiltonian H_f (same form as H_i since no core hole).
+!!  6. Run build_krylov_mp on H_f starting from phi_f to get the continued-fraction
+!!     Krylov data; write it to rixs_poles.k for post-processing.
+!!
+!! The RIXS intensity is proportional to |<f|T_f (H_n-omega)^{-1} T_i|i>|^2
+!! summed over final states f, which is evaluated via the continued fraction.
 subroutine rixs_driver()
     use m_constants
-    use m_control 
+    use m_control
     use m_types
     use m_global
     use m_lanczos
     use mpi
-    
+
     implicit none
 
     integer :: nblock
@@ -18,7 +38,7 @@ subroutine rixs_driver()
     integer :: needed2(nprocs,nprocs)
     integer :: end_indx(2,2,nprocs)
     integer :: end_indx2(2,2,nprocs)
-    integer :: ierror 
+    integer :: ierror
     integer(dp) :: num_of_nonzeros
 
     real(dp) :: rtemp
@@ -82,8 +102,8 @@ subroutine rixs_driver()
         call partition_task(nprocs, ndim_n, ndim_i, end_indx)
         mloc = end_indx(2,1,myid+1)-end_indx(1,1,myid+1) + 1
         nloc = end_indx(2,2,myid+1)-end_indx(1,2,myid+1) + 1
-        call read_fock_i() 
-        call read_fock_n() 
+        call read_fock_i()
+        call read_fock_n()
         call alloc_tran_csr(nblock)
         call build_transop_i(ndim_n_nocore, ndim_i, fock_n, fock_i, num_val_orbs,&
           num_core_orbs, nblock, end_indx, ntran_rixs_i, transop_rixs_i, tran_csr)
@@ -128,7 +148,7 @@ subroutine rixs_driver()
         call read_fock_n()
         call alloc_ham_csr(nblock)
         rtemp = -1.0_dp
-        omega = dcmplx(omega_in+eigvals, gamma_in) 
+        omega = dcmplx(omega_in+eigvals, gamma_in)
         call build_ham_n(ndim_n_nocore, fock_n, num_val_orbs, num_core_orbs, nblock, end_indx2, &
                         nhopp_n, hopping_n, ncoul_n, coulomb_n, omega, rtemp, ham_csr)
         call MPI_BARRIER(new_comm, ierror)
@@ -146,7 +166,7 @@ subroutine rixs_driver()
             print *, "    Solve linear equation ..."
         endif
         allocate(x_vec(mloc))
-        x_vec = czero 
+        x_vec = czero
         call pminres_csr(nblock, end_indx2, needed2, mloc, ham_csr, phi_vec, x_vec, info)
         call MPI_BARRIER(new_comm, ierror)
         deallocate(phi_vec)
@@ -194,7 +214,7 @@ subroutine rixs_driver()
         call partition_task(nprocs, ndim_f, ndim_f, end_indx2)
         call alloc_ham_csr(nblock)
         rtemp = 1.0_dp
-        omega = dcmplx(0.0_dp, 0.0_dp) 
+        omega = dcmplx(0.0_dp, 0.0_dp)
         call read_fock_f()
         call build_ham_i(ndim_f, fock_f, nblock, end_indx2, nhopp_i, hopping_i, ncoul_i, coulomb_i, omega, rtemp, ham_csr)
         call MPI_BARRIER(new_comm, ierror)
