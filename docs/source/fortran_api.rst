@@ -17,11 +17,13 @@ Fock basis:
 
 * **Initial space** (*i*): no core hole, described by hopping and Coulomb
   integrals read from ``hopping_i.in`` and ``coulomb_i.in``.
-* **Intermediate space** (*n*): one core hole created by X-ray absorption,
+* **Intermediate space** (*n*): one core hole and one extra valence electron
+  created by X-ray absorption (same total electron count as the initial space),
   described by ``hopping_n.in`` and ``coulomb_n.in``.
-* **Final space** (*f*): used in RIXS only; same form as the initial space
-  but with a different electron count after the emitted photon carries away
-  the core-hole energy.
+* **Final space** (*f*): used in RIXS only; no core hole, same total electron
+  count as the initial space.  After the core hole is filled by an emitted
+  photon the system is left in a (generally excited) valence configuration.
+  The Hamiltonian has the same form as :math:`H_i`.
 
 Step 1 — Exact diagonalisation (``ed.x`` / ``ed_driver``)
 ----------------------------------------------------------
