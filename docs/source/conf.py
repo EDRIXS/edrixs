@@ -44,7 +44,11 @@ extensions = [
     'numpydoc',
     'sphinx_copybutton',
     'sphinx_gallery.gen_gallery',
+    'breathe',
 ]
+
+breathe_projects = {"edrixs": "../../docs/doxygen/xml"}
+breathe_default_project = "edrixs"
 
 # Configuration options for plot_directive. See:
 # https://github.com/matplotlib/matplotlib/blob/f3ed922d935751e08494e5fb5311d3050a3b637b/lib/matplotlib/sphinxext/plot_directive.py#L81

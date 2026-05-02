@@ -1,11 +1,19 @@
+!> Standalone ED executable: initialise MPI, run ed_driver, finalise.
+!!
+!! This is the entry point for the fedrixs ed.x binary.  It mirrors the rank
+!! reduction logic in ed_fsolver: if more MPI processes are launched than there
+!! are Hilbert-space basis states (ndim_i), the excess ranks are split off into
+!! an inactive communicator and excluded from the Hamiltonian build and
+!! diagonalisation.  Active ranks call ed_driver; all ranks synchronise before
+!! MPI_FINALIZE.
 program ed_main
     use m_control, only: origin_myid, origin_nprocs, origin_comm
     use m_control, only: master, myid, nprocs, new_comm, ndim_i
     use m_global, only: dealloc_fock_i
-    use mpi 
+    use mpi
 
     implicit none
- 
+
     integer :: ierror
     integer :: color
     integer :: key
@@ -16,7 +24,7 @@ program ed_main
     call MPI_COMM_SIZE(origin_comm, origin_nprocs, ierror)
     call MPI_BARRIER(origin_comm, ierror)
 
-    call config()  
+    call config()
     ! read fock to know the dimension of the Hamiltonian
     call read_fock_i()
     call dealloc_fock_i()
@@ -27,7 +35,7 @@ program ed_main
             print *, " fedrixs >>> Only ", ndim_i, " processors will really work!"
         endif
         if (origin_myid < ndim_i) then
-            color = 1 
+            color = 1
             key = origin_myid
         else
             color = 2

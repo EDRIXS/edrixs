@@ -1,99 +1,58 @@
-!!>>> set control parameters
+!> Runtime control parameters broadcast to all MPI ranks via config().
+!!
+!! All variables are declared with the save attribute so they persist across
+!! subroutine calls. Default values are set in config() before reading
+!! config.in.
 module m_control
     use m_constants, only: dp
 
     implicit none
 
-    ! which ed solver is used
-    integer, public, save :: ed_solver = 1
+    integer, public, save :: ed_solver = 1       !< Eigensolver selection: 0=full diag, 1=Lanczos, 2=ARPACK
+    integer, public, save :: num_val_orbs = 1    !< Number of valence spin-orbitals
+    integer, public, save :: num_core_orbs = 1   !< Number of core spin-orbitals
 
-    ! number of valence orbitals
-    integer, public, save :: num_val_orbs = 1
-
-    ! number of core orbitals
-    integer, public, save :: num_core_orbs = 1
-
-    ! the dimension of initial Hilbert space 
-    integer, public, save :: ndim_i = 1
-
-    ! the dimension of intermediate Hilbert space without core orbitals 
-    integer, public, save :: ndim_n_nocore = 1
-
-    ! the dimension of intermediate Hilbert space with core orbitals 
-    ! ndim_n = ndim_n_nocore * num_core_orbs
+    integer, public, save :: ndim_i = 1          !< Dimension of the initial Hilbert space
+    integer, public, save :: ndim_n_nocore = 1   !< Dimension of intermediate space (valence sector only)
+    !> Total dimension of intermediate space including core-hole degree of freedom.
+    !! ndim_n = ndim_n_nocore * num_core_orbs
     integer, public, save :: ndim_n = 1
+    integer, public, save :: ndim_f = 1          !< Dimension of the final Hilbert space
 
-    ! the dimension of final Hilbert space
-    integer, public, save :: ndim_f = 1
+    integer, public, save :: nhopp_i = 1   !< Number of non-zero hopping terms for the initial Hamiltonian
+    integer, public, save :: ncoul_i = 1   !< Number of non-zero Coulomb terms for the initial Hamiltonian
+    integer, public, save :: nhopp_n = 1   !< Number of non-zero hopping terms for the intermediate Hamiltonian
+    integer, public, save :: ncoul_n = 1   !< Number of non-zero Coulomb terms for the intermediate Hamiltonian
 
-    ! number of nonzero elements of hopping and Coulomb interaction terms
-    ! for initial Hamiltonian
-    integer, public, save :: nhopp_i =1 
-    integer, public, save :: ncoul_i = 1
+    integer, public, save :: ntran_xas    = 1  !< Number of non-zero XAS transition operator elements
+    integer, public, save :: ntran_rixs_i = 1  !< Number of non-zero RIXS absorption transition operator elements
+    integer, public, save :: ntran_rixs_f = 1  !< Number of non-zero RIXS emission transition operator elements
 
-    ! number of nonzero elements of hopping and Coulomb interaction terms
-    ! for intermediate Hamiltonian
-    integer, public, save :: nhopp_n =1 
-    integer, public, save :: ncoul_n = 1
+    integer, public, save :: neval   = 1    !< Number of lowest eigenvalues to compute
+    logical, public, save :: idump   = .false.  !< Whether to write eigenvectors to disk
+    integer, public, save :: nvector = 1    !< Number of eigenvectors to dump
 
-    ! number of nonzeros of transition operators
-    integer, public, save :: ntran_xas = 1
-    integer, public, save :: ntran_rixs_i = 1
-    integer, public, save :: ntran_rixs_f = 1
-   
-    ! how many smallest eigenvalues to be found
-    integer, public, save :: neval = 1
+    integer, public, save :: num_gs  = 1    !< Number of ground states used to compute XAS/RIXS
 
-    ! indicate how to dump the eigenvectors
-    logical, public, save :: idump = .false.
+    integer, public, save :: maxiter   = 1    !< Maximum Lanczos/ARPACK iterations for the initial Hamiltonian
+    integer, public, save :: linsys_max = 1  !< Maximum MINRES iterations for the linear system solver
+    integer, public, save :: min_ndim  = 100 !< Minimum Hilbert-space dimension below which full diag is used
+    integer, public, save :: ncv       = 1   !< Number of Arnoldi vectors for ARPACK (ncv >= neval + 2)
+    integer, public, save :: nkryl     = 500 !< Dimension of the Krylov space for building XAS/RIXS spectra
 
-    ! how many eigenvectors are dumped out
-    integer, public, save :: nvector = 1
+    real(dp), public, save :: eigval_tol = 1E-10  !< Convergence tolerance for eigenvalues
+    real(dp), public, save :: linsys_tol = 1E-12  !< Convergence tolerance for the linear system solver
 
-    ! how many ground state are used to calculate XAS or RIXS
-    integer, public, save :: num_gs = 1
+    real(dp), public, save :: omega_in   !< Incident photon energy for RIXS (eV)
+    real(dp), public, save :: gamma_in   !< Core-hole lifetime broadening for RIXS (eV, half-width)
 
-    ! maximum of the dimension of Krylov space
-    ! for diagonalizing initial Hamiltonian
-    integer, public, save :: maxiter = 1
+    integer, public, save :: origin_nprocs = 1  !< Total number of MPI processes in the original communicator
+    integer, public, save :: nprocs        = 1  !< Number of MPI processes actually used for computation
+    integer, public, save :: origin_myid   = 0  !< Rank in the original communicator
+    integer, public, save :: myid          = 0  !< Rank in the active communicator
 
-    ! maximum step for linear system solver, minres
-    integer, public, save :: linsys_max = 1
-
-    ! minimum dimension for Lanczos or Arpack
-    integer, public, save :: min_ndim = 100
-
-    ! ncv, for arpack
-    integer, public, save :: ncv = 1
-
-    ! dimension of Krylov space, for building XAS and RIXS
-    integer, public, save :: nkryl = 500
-
-    ! the tolerance of eigen values
-    real(dp), public, save :: eigval_tol = 1E-10 
-
-    ! the tolerance for linear system
-    real(dp), public, save :: linsys_tol = 1E-12 
-
-    ! the frequency of incident photon, for RIXS
-    real(dp), public, save :: omega_in 
-
-    ! life-time of core-hole (in eV)
-    real(dp), public, save :: gamma_in 
-
-    ! number of process
-    integer, public, save :: origin_nprocs = 1
-    integer, public, save :: nprocs = 1
-
-    ! the index of process
-    integer, public, save :: origin_myid = 0
-    integer, public, save :: myid = 0
-
-    ! the index of master process
-    integer, public, save :: master = 0 
-
-    ! MPI communicator
-    integer, public, save :: new_comm = 0
-    integer, public, save :: origin_comm = 0
+    integer, public, save :: master      = 0  !< Rank of the master process
+    integer, public, save :: new_comm    = 0  !< Active MPI communicator (may be a sub-communicator of origin_comm)
+    integer, public, save :: origin_comm = 0  !< Original MPI communicator passed in from Python
 
 end module m_control
