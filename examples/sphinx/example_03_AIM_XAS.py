@@ -93,27 +93,31 @@ slater = ([F0_dd, F2_dd, F4_dd],  # initial
 ################################################################################
 # Energy of the bath states
 # ------------------------------------------------------------------------------
-# In the notation used here, :math:`\Delta` sets the energy difference
-# between the bath and impurity states. :math:`\Delta` is defined in the atomic
-# limit without crystal field (i.e. in terms of the centers of the impurity and
-# bath states before hybridization is considered) as the energy for a
-# :math:`d^{n_d} \rightarrow d^{n_d + 1} \underline{L}` transition.
-# Note that as electrons are moved one has to pay energy
-# costs associated with the Coulomb interactions. The
-# energy splitting between the bath and impurity is consequently not simply
-# :math:`\Delta`. One must therefore determine the energies by solving
-# a set of linear equations. See the :ref:`edrixs.utils functions <utils>`
-# for details. We can call these functions to get the impurity energy
-# :math:`E_d`, bath energy :math:`E_L`, impurity energy with a core hole
-# :math:`E_{dc}`, bath energy with a core hole :math:`E_{Lc}` and the
-# core hole energy :math:`E_p`. The initial ground state calculation is
-# done in electron language leaving out the core shell.
+# The charge-transfer energy :math:`\Delta` is defined in the atomic limit
+# (without crystal field or hybridization) as the energy cost of transferring
+# one electron from the bath to the impurity:
+# :math:`\Delta = E(d^{n_d+1}\underline{L}) - E(d^{n_d})`.
+# For NiO we take the value from Ref. [1]_, obtained by fitting theory to
+# experiment.
 Delta = 4.7
+################################################################################
+# Because moving electrons also changes the Coulomb energy, the single-particle
+# level splitting between impurity and bath is not simply :math:`\Delta`.
+# The site energies :math:`E_d` and :math:`E_L` must instead be found by
+# solving a pair of linear equations. We fix the overall energy scale by
+# setting :math:`E(d^{n_d} L^{10}) = 0` as the reference, which together with
+# the definition of :math:`\Delta` uniquely determines :math:`E_d` and
+# :math:`E_L`. The core shell is omitted for the ground-state calculation.
 E_d, E_L = edrixs.CT_imp_bath(U_dd, Delta, nd)
 ################################################################################
-# In the intermediate state, we include the core shell and the core hole
-# potential. For this reason, the energies will shift differently to account
-# for this.
+# For the intermediate (core-hole) state we use the same :math:`\Delta`,
+# which ensures the bath–impurity interaction is defined consistently with
+# the ground state. The core-hole Coulomb potential :math:`U_{dp}` shifts
+# all energies, so we now need two reference conditions: one for the
+# full-core state :math:`E(d^{n_d} L^{10} p^6) = 0` and one for the
+# core-hole state :math:`E(d^{n_d+1} L^{10} p^5) = 0`. These three
+# conditions uniquely determine :math:`E_{dc}`, :math:`E_{Lc}`, and the
+# core-level energy :math:`E_p`.
 E_dc, E_Lc, E_p = edrixs.CT_imp_bath_core_hole(U_dd, U_dp, Delta, nd)
 message = ("E_d = {:.3f} eV\n"
            "E_L = {:.3f} eV\n"

@@ -3,42 +3,47 @@ import edrixs
 
 
 def test_CT_imp_bath():
-    n, Delta, E_L, E_d, U_dd = sympy.symbols('n \\Delta, E_L, E_d, U_{dd}')
+    """CT_imp_bath solves for impurity (E_d) and bath (E_L) energies with no
+    core hole, using two conditions:
+      1. E(d^{n+1} L^9) - E(d^n L^10) = Delta  (charge-transfer energy)
+      2. E(d^n L^10) = 0                         (reference state)
+    The expected closed-form values are verified against the function output.
+    """
+    n = 8
+    Delta = 3
+    U_dd = 2
 
-    Eq1 = sympy.Eq(10*E_L + n*E_d + n*(n - 1)*U_dd/2, rhs=0)
-    Eq2 = sympy.Eq(9*E_L + (n+1)*E_d + (n + 1)*n*U_dd/2, rhs=Delta)
-    Eq3 = sympy.Eq(8*E_L + (n+2)*E_d + (n + 1)*(n + 2)*U_dd/2, rhs=2*Delta + U_dd)
+    E_d_val = (10*Delta - n*(19 + n)*U_dd/2)/(10 + n)
+    E_L_val = n*((1 + n)*U_dd/2-Delta)/(10 + n)
 
-    # from IPython.display import display
-    # display(Eq1, Eq2, Eq3)
-
-    answers = sympy.solve([Eq1, Eq2, Eq3], [E_d, E_L])
-
-    E_d_eq = sympy.Eq(E_d, rhs=answers[E_d])
-    E_L_eq = sympy.Eq(E_L, rhs=answers[E_L])
-
-    # from IPython.display import display
-    # display(E_d_eq, E_L_eq)
-
-    n_val = 8
-    Delta_val = 3
-    U_dd_val = 2
-
-    E_d_val = E_d_eq.rhs.evalf(subs={n: n_val,
-                                     Delta: Delta_val,
-                                     U_dd: U_dd_val})
-
-    E_L_val = E_L_eq.rhs.evalf(subs={n: n_val,
-                                     Delta: Delta_val,
-                                     U_dd: U_dd_val})
-
-    E_d_cal, E_L_cal = edrixs.CT_imp_bath(U_dd_val, Delta_val, n_val)
+    E_d_cal, E_L_cal = edrixs.CT_imp_bath(U_dd, Delta, n)
 
     assert E_d_val == E_d_cal
     assert E_L_val == E_L_cal
 
 
 def test_CT_imp_bath_core_hole():
+    """CT_imp_bath_core_hole solves for E_dc, E_Lc, E_p with a core hole
+    present, using three conditions:
+      1. E(d^n  L^10 p^6) = 0          (reference: full core, no ligand holes)
+      2. E(d^{n+1} L^10 p^5) = 0       (reference: one core hole)
+      3. E(d^{n+1} L^9  p^6) - E(d^n L^10 p^6) = Delta  (same Delta as no-core)
+
+    The test constructs six independent transition-energy equations
+    symbolically (all d^n/d^{n+1}/d^{n+2} transitions for np=5 and np=6),
+    solves them as an overdetermined system, evaluates numerically, and
+    compares against the function.
+
+    With np=6 (full core):
+      Eq1: E(d^n  L^10) = 0
+      Eq2: E(d^{n+1} L^9)  = Delta
+      Eq3: E(d^{n+2} L^8)  = 2*Delta + U_dd
+
+    With np=5 (one core hole):
+      Eq4: E(d^{n+1} L^10) = 0
+      Eq5: E(d^{n+2} L^9)  = Delta + U_dd - U_pd
+      Eq6: E(d^{n+3} L^8)  = 2*Delta + 3*U_dd - 2*U_pd
+    """
     n, Delta, E_Lc, E_dc, E_p, U_dd, U_pd = (
         sympy.symbols('n \\Delta E_{Lc} E_{dc} E_p U_{dd} U_{pd}'))
 
@@ -61,17 +66,11 @@ def test_CT_imp_bath_core_hole():
         5*E_p + 8*E_Lc + (n + 3)*E_dc + (n + 3)*(n + 2)*U_dd/2 + 5*(n + 3)*U_pd,
         rhs=2*Delta + 3*U_dd - 2*U_pd)
 
-    # from IPython.display import display
-    # display(Eq1, Eq2, Eq3, Eq4, Eq5, Eq6)
-
     answer = sympy.solve([Eq1, Eq2, Eq3, Eq4, Eq5, Eq6], [E_dc, E_Lc, E_p])
 
     E_dc_eq = sympy.Eq(E_dc, rhs=answer[E_dc])
     E_Lc_eq = sympy.Eq(E_dc, rhs=answer[E_Lc])
     E_p_eq = sympy.Eq(E_p, rhs=answer[E_p])
-
-    # from IPython.display import display
-    # display(E_dc_eq, E_Lc_eq, E_p_eq)
 
     n_val = 8
     Delta_val = 3
@@ -95,6 +94,9 @@ def test_CT_imp_bath_core_hole():
 
 
 def test_get_atom_data():
+    """get_atom_data returns Hartree-Fock Slater integrals and SOC parameters
+    from the edrixs atomic database. Spot-checks F0, F2, F4 for Ni d^8.
+    """
     res = edrixs.get_atom_data('Ni', v_name='3d', v_noccu=8)
     slater_i = res['slater_i']
     assert slater_i[0][0] == 'F0_11'
