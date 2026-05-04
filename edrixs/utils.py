@@ -8,7 +8,8 @@ __all__ = ['beta_to_kelvin', 'kelvin_to_beta', 'boltz_dist', 'UJ_to_UdJH',
 import numpy as np
 import json
 from importlib.resources import files
-from sympy import Symbol, symbols, solve
+from sympy import symbols, solve
+
 
 def beta_to_kelvin(beta):
     """
@@ -275,17 +276,18 @@ def F0F2F4F6_to_UdJH(F0, F2, F4, F6):
     JH = (286 * F2 + 195 * F4 + 250 * F6) / 6435.0
     return Ud, JH
 
+
 def _master_energy_level_eq():
     """Define master equation relating Coulomb interactions, Delta,
     and energy levels.
 
     Notes
     -----
-    We label the d-electrons $d$, ligand electrons $L$, and the core electrons $p$. 
+    We label the d-electrons $d$, ligand electrons $L$, and the core electrons $p$.
 
     Electron count variables: $n_d$, $n_L$, $n_p$
 
-    Site energy: $E_d$, $E_L$, $E_p$ 
+    Site energy: $E_d$, $E_L$, $E_p$
 
     Coulomb energy between $d$ electrons: $U_{dd}$
 
@@ -293,17 +295,15 @@ def _master_energy_level_eq():
 
     $n$ is the reference number of electrons. e.g. $n=8$ for NiO.
 
-    Note that we will ignore Coulomb interactions in the ligand levels and intra-core hole repulsion. 
+    Note that we will ignore Coulomb interactions in the ligand levels and intra-core hole repulsion.
     """
     n, n_d, n_L, n_p = symbols('n, n_d, n_L, n_p')
     E_d, E_L, E_p = symbols('E_d, E_L, E_p')
     U_dd, U_dp = symbols('U_dd, U_dp')
-    Delta = symbols('Delta')
-    parameters = []
 
-    master = (E_d*n_d + E_L*n_L + E_p*n_p 
-            + n_d*(n_d - 1)*U_dd/2
-            + n_d*n_p*U_dp)
+    master = (E_d*n_d + E_L*n_L + E_p*n_p
+              + n_d*(n_d - 1)*U_dd/2
+              + n_d*n_p*U_dp)
     return master
 
 
@@ -351,6 +351,7 @@ def CT_imp_bath(U_dd, Delta, n):
     S = solve([cond0, cond1], [E_d, E_L])
 
     return float(S[E_d].subs({'U_dd': U_dd})), float(S[E_L].subs({'U_dd': U_dd}))
+
 
 def CT_imp_bath_core_hole(U_dd, U_pd, Delta, n):
     """
