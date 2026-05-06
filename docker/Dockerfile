@@ -1,10 +1,10 @@
-FROM ubuntu:22.04 as base
+FROM ubuntu:24.04 as base
 
 # general environment for docker
 ENV DEBIAN_FRONTEND=noninteractive
 
 # base packages
-RUN apt-get update && apt-get install -y --no-install-recommends sudo curl vim libgfortran-11-dev libopenmpi-dev libopenblas-dev python3 libpython3-dev python3-pip python3-venv && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends sudo curl vim libgfortran-13-dev libopenmpi-dev libopenblas-dev python3 libpython3-dev python3-pip python3-venv && rm -rf /var/lib/apt/lists/*
 
 # create docker user
 RUN useradd -m -s /bin/bash -u 1999 docker && echo "docker:docker" | chpasswd && adduser docker sudo
