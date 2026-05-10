@@ -43,8 +43,8 @@ module m_control
     real(dp), public, save :: eigval_tol = 1E-10  !< Convergence tolerance for eigenvalues
     real(dp), public, save :: linsys_tol = 1E-12  !< Convergence tolerance for the linear system solver
 
-    real(dp), public, save :: omega_in   !< Incident photon energy for RIXS (eV)
-    real(dp), public, save :: gamma_in   !< Core-hole lifetime broadening for RIXS (eV, half-width)
+    real(dp), public, save :: omega_in   !< Incident photon energy omega_in for RIXS (eV); paper symbol omega_{in}
+    real(dp), public, save :: gamma_in   !< Core-hole (intermediate-state) lifetime broadening for RIXS (eV, half-width); paper symbol Gamma_c
 
     integer, public, save :: origin_nprocs = 1  !< Total number of MPI processes in the original communicator
     integer, public, save :: nprocs        = 1  !< Number of MPI processes actually used for computation

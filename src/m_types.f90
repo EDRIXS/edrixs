@@ -8,24 +8,33 @@ module m_types
     use m_constants, only: dp, czero
     implicit none
 
-    !> One-body operator element: value at orbital indices (ind1, ind2).
-    !! Represents the matrix element t_{ind1,ind2} of a hopping term
-    !! c^dagger_{ind2} c_{ind1}.
+    !> One-body operator element for the Hamiltonian
+    !! H_i = sum_{alpha,beta} t_{alpha,beta} f^dagger_alpha f_beta
+    !! of Wang et al. (CPC 2019).  This struct stores one non-zero entry of
+    !! t_{alpha,beta} together with its two orbital indices.  The convention
+    !! used internally is: ind1 is the orbital being annihilated (paper index
+    !! beta) and ind2 is the orbital being created (paper index alpha), so
+    !! the term contributed is val * f^dagger_{ind2} f_{ind1}.
     type T_tensor2
-        integer    :: ind1  !< Row orbital index (annihilation site)
-        integer    :: ind2  !< Column orbital index (creation site)
-        complex(dp) :: val  !< Matrix element value
+        integer    :: ind1  !< Annihilation orbital index (paper: beta)
+        integer    :: ind2  !< Creation orbital index (paper: alpha)
+        complex(dp) :: val  !< Matrix element t_{alpha,beta}
     end type T_tensor2
 
-    !> Two-body operator element: value at orbital indices (ind1,ind2,ind3,ind4).
-    !! Represents U_{ind1,ind2,ind3,ind4} for the Coulomb term
-    !! c^dagger_{ind4} c^dagger_{ind3} c_{ind2} c_{ind1}.
+    !> Two-body (Coulomb) operator element for the rank-4 tensor
+    !! U_{alpha,beta,gamma,delta} of the Hamiltonian
+    !! H_i = ... + sum U_{alpha,beta,gamma,delta} f^dagger_alpha f^dagger_beta f_gamma f_delta
+    !! defined in Wang et al. (CPC 2019).  Internally the struct stores indices
+    !! in annihilation-first order: ind1, ind2 are the orbitals annihilated
+    !! (paper indices delta, gamma) and ind3, ind4 are the orbitals created
+    !! (paper indices beta, alpha).  The term contributed is therefore
+    !! val * f^dagger_{ind4} f^dagger_{ind3} f_{ind2} f_{ind1}.
     type T_tensor4
-        integer    :: ind1  !< First annihilation orbital index
-        integer    :: ind2  !< Second annihilation orbital index
-        integer    :: ind3  !< First creation orbital index
-        integer    :: ind4  !< Second creation orbital index
-        complex(dp) :: val  !< Matrix element value
+        integer    :: ind1  !< First annihilation orbital index (paper: delta)
+        integer    :: ind2  !< Second annihilation orbital index (paper: gamma)
+        integer    :: ind3  !< First creation orbital index (paper: beta)
+        integer    :: ind4  !< Second creation orbital index (paper: alpha)
+        complex(dp) :: val  !< Matrix element U_{alpha,beta,gamma,delta}
     end type T_tensor4
 
     !> A single node in a per-row linked list of sparse matrix entries.

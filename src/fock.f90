@@ -41,22 +41,25 @@ subroutine cal_combination(n, m, cnm)
     return
 end subroutine cal_combination
 
-!> Apply a fermionic creation or annihilation operator to a Fock state.
+!> Apply a fermionic creation (f^dagger) or annihilation (f) operator to a
+!! Fock state |I>, following the second-quantisation convention of Wang et al.
+!! (CPC 2019, equation labelled binary in the paper).
 !!
-!! Each many-body basis state is encoded as a 64-bit integer whose k-th bit
-!! (0-indexed) equals 1 if spin-orbital k+1 is occupied.  This routine flips
-!! bit (pos-1) and computes the fermionic sign from the Jordan-Wigner string
-!! (the parity of the number of occupied orbitals below position pos).
+!! Each many-body basis state |I> is encoded as a 64-bit integer whose k-th bit
+!! (0-indexed) equals 1 if spin-orbital k+1 is occupied (digit 1) and 0 if it
+!! is empty.  This routine flips bit (pos-1) and computes the fermionic sign
+!! from the Jordan-Wigner string (the parity of the number of occupied orbitals
+!! below position pos).
 !!
 !! The caller is responsible for checking that the operator is valid (i.e.
 !! that the target orbital is occupied before annihilation, and empty before
 !! creation); no such check is performed here.
 !!
-!! @param[in]  c_type  Operator type: '+' for creation, '-' for annihilation
+!! @param[in]  c_type  Operator type: '+' for f^dagger (creation), '-' for f (annihilation)
 !! @param[in]  pos     1-based orbital index on which the operator acts
-!! @param[in]  old     Input Fock state (bit-encoded occupation integer)
-!! @param[out] new     Output Fock state after applying the operator
-!! @param[out] sgn     Fermionic sign: +1 or -1
+!! @param[in]  old     Input Fock state |I> (bit-encoded occupation integer)
+!! @param[out] new     Output Fock state f^dagger_pos|I> or f_pos|I>
+!! @param[out] sgn     Fermionic Jordan-Wigner sign: +1 or -1
 subroutine make_newfock(c_type, pos, old, new, sgn)
     use m_constants, only: mystd, dp
 

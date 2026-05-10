@@ -196,14 +196,16 @@ subroutine get_number_nonzeros(nblock, ham_csr, num_nonzeros)
     return
 end subroutine get_number_nonzeros
 
-!> Compute Boltzmann thermal occupation probabilities for a set of eigenstates.
+!> Compute Boltzmann thermal occupation probabilities (1/Z) e^{-E_i/(K_B T)}
+!! for a set of eigenstates, matching the partition-function weighting of
+!! equations (1) and (2) of Wang et al. (CPC 2019).
 !!
 !! Shifts energies by their minimum before exponentiation to avoid overflow,
-!! then normalises by the partition function.
+!! then normalises by the partition function Z = sum_i e^{-E_i/(K_B T)}.
 !!
 !! @param[in]  n       Number of eigenstates
-!! @param[in]  eigval  Eigenvalues (eV)
-!! @param[in]  beta    Inverse temperature beta = 1/(k_B T) in 1/eV
+!! @param[in]  eigval  Eigenvalues E_i (eV)
+!! @param[in]  beta    Inverse temperature beta = 1/(K_B T) in 1/eV (paper symbol K_B)
 !! @param[out] prob    Boltzmann weights, normalised so sum(prob) = 1
 subroutine get_prob(n, eigval, beta, prob)
     use m_constants

@@ -15,7 +15,7 @@ OUTPUT_DIRECTORY       = docs/doxygen
 INPUT                  = src
 FILE_PATTERNS          = *.f90 *.F90 *.f *.F
 RECURSIVE              = NO
-EXCLUDE                = src/arpack.f90
+EXCLUDE                =
 
 #---------------------------------------------------------------------------
 # Fortran optimisation

@@ -1,20 +1,40 @@
 !> Exact Diagonalization (ED) driver: diagonalise the initial-state Hamiltonian.
 !!
-!! Reads all inputs (hopping, Coulomb, Fock basis), builds the distributed CSR
-!! Hamiltonian, diagonalises it with the solver selected by the control variable
-!! ed_solver (0 = full LAPACK ZHEEV, 1 = Lanczos, 2 = ARPACK), then computes
-!! the single-particle density matrix for the nvector lowest eigenstates.
+!! Called by ed_fsolver (the f2py-exposed wrapper in pyapi.f90), which is in
+!! turn invoked from the Python solvers ed_siam_fort, ed_1v1c_fort and
+!! ed_2v1c_fort defined in edrixs/solvers.py.  The same kernel serves all three
+!! Python entry points; only the Hamiltonian elements written to the input
+!! files differ (atomic many-body for ed_1v1c_fort/ed_2v1c_fort, single-impurity
+!! Anderson model for ed_siam_fort).
 !!
-!! Output files written:
-!!  - eigvec.k  (if idump = .true.): full eigenvector for state k
-!!  - eigvals.dat: the neval lowest eigenvalues
-!!  - denmat.dat: single-particle density matrices
+!! Workflow:
+!!  1. read_hopping_i, read_coulomb_i, read_fock_i load the initial Hamiltonian
+!!     parameters from hopping_i.in, coulomb_i.in, fock_i.in (written by Python).
+!!  2. partition_task splits the ndim_i x ndim_i Hilbert space across ranks.
+!!  3. build_ham_i constructs the distributed CSR Hamiltonian.
+!!  4. The eigensolver selected by ed_solver runs:
+!!       - 0: full LAPACK ZHEEV (gathered to master, broadcast back)
+!!       - 1: parallel Lanczos (no re-orthogonalisation, less accurate)
+!!       - 2: parallel ARPACK   (recommended; default for SIAM)
+!!     If ndim_i < min_ndim, ed_solver is forced to 0.
+!!  5. The single-particle density matrix is computed for each of the nvector
+!!     lowest eigenstates by accumulating contributions <Gamma_i|f^dagger_alpha f_beta|Gamma_i>
+!!     over the local Fock basis (notation from Table 1 of Wang et al. CPC 2019).
+!!     When ed_solver != 0 the eigenvectors must
+!!     first be gathered with MPI_ISEND/MPI_RECV because off-diagonal density
+!!     matrix elements connect Fock states owned by different ranks.
 !!
-!! If ed_solver = 1 or 2 the Hamiltonian is distributed across ranks and each
-!! rank stores a contiguous column block.  For the density matrix calculation
-!! the distributed eigenvectors are gathered to every rank via MPI_ISEND/MPI_RECV
-!! so that off-diagonal density-matrix elements (c^dag_i c_j) can be evaluated
-!! by searching the full Fock basis with binary_search.
+!! Input files (written by Python in solvers.py):
+!!  - config.in        : Fortran namelist with ed_solver, num_val_orbs, neval, ...
+!!  - hopping_i.in     : non-zero one-body matrix elements
+!!  - coulomb_i.in     : non-zero two-body (Coulomb) matrix elements
+!!  - fock_i.in        : Fock basis (bit-string integers)
+!!
+!! Output files (read back by Python):
+!!  - eigvals.dat      : neval lowest eigenvalues
+!!  - denmat.dat       : single-particle density matrices for the nvector states
+!!  - eigvec.k         : (if idump=.true.) full eigenvector for state k,
+!!                       consumed later by xas_driver/rixs_driver
 subroutine ed_driver()
     use m_constants
     use m_control

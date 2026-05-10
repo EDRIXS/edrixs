@@ -69,11 +69,15 @@ subroutine config()
     return
 end subroutine config
 
-!> Read hopping terms for the initial Hamiltonian from hopping_i.in.
+!> Read hopping terms for the initial Hamiltonian H_i from hopping_i.in.
+!!
+!! These populate the t_{alpha,beta} term of equation (7) of Wang et al.
+!! (CPC 2019):  H_i = sum_{alpha,beta} t_{alpha,beta} f^dagger_alpha f_beta + ...
 !!
 !! File format: first line is the count nhopp_i, then nhopp_i lines each
-!! containing (i, j, Re(t), Im(t)) representing the matrix element
-!! t_{ij} = Re + i*Im for the hopping c^dagger_j c_i.
+!! containing (i, j, Re(t), Im(t)).  Each row stores one non-zero element
+!! with i = annihilation orbital (paper beta) and j = creation orbital
+!! (paper alpha), so the corresponding operator is t_{j,i} f^dagger_j f_i.
 !! The master rank reads the file and broadcasts to all ranks.
 subroutine read_hopping_i()
     use m_constants, only: dp, mystd, mytmp
@@ -120,11 +124,19 @@ subroutine read_hopping_i()
     return
 end subroutine read_hopping_i
 
-!> Read Coulomb interaction terms for the initial Hamiltonian from coulomb_i.in.
+!> Read Coulomb interaction terms for the initial Hamiltonian H_i
+!! from coulomb_i.in.
+!!
+!! These populate the rank-4 tensor U_{alpha,beta,gamma,delta} of equation (7)
+!! of Wang et al. (CPC 2019):
+!!   H_i = ... + sum U_{alpha,beta,gamma,delta} f^dagger_alpha f^dagger_beta f_gamma f_delta
 !!
 !! File format: first line is the count ncoul_i, then ncoul_i lines each
-!! containing (i, j, k, l, Re(U), Im(U)) for the two-body term
-!! U_{ijkl} c^dagger_l c^dagger_k c_j c_i.
+!! containing (i, j, k, l, Re(U), Im(U)).  The four indices are stored
+!! annihilation-first: i, j are the annihilation orbitals (paper indices
+!! delta, gamma) and k, l are the creation orbitals (paper indices beta,
+!! alpha).  The corresponding operator is therefore
+!!   U_{l,k,j,i} f^dagger_l f^dagger_k f_j f_i.
 !! The master rank reads and broadcasts.
 subroutine read_coulomb_i()
     use m_constants, only: dp, mystd, mytmp
@@ -372,8 +384,13 @@ end subroutine read_fock_f
 
 !> Read the XAS photon-absorption transition operator from transop_xas.in.
 !!
+!! Stores the non-zero one-body matrix elements of hat{D}_i, the photon
+!! absorption operator of equations (3,5) of Wang et al. (CPC 2019).
+!!
 !! File format: first line is ntran_xas, then ntran_xas lines each
-!! containing (i, j, Re(T), Im(T)) for c^dagger_j c_i.
+!! containing (i, j, Re, Im).  Indices follow the same annihilation-first
+!! convention as hopping_i.in: i = annihilation orbital, j = creation orbital,
+!! contributing the term val * f^dagger_j f_i to hat{D}_i.
 !! Master reads and broadcasts.
 subroutine read_transop_xas()
     use m_constants, only: dp, mystd, mytmp

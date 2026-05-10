@@ -4,8 +4,7 @@
 Fortran API
 ###########
 
-Documentation for the EDRIXS Fortran back-end, extracted from source comments
-via Doxygen and rendered here by Breathe.
+Documentation for the EDRIXS Fortran back-end.
 
 Overview of XAS and RIXS calculations
 ======================================
@@ -18,7 +17,7 @@ Fock basis:
 * **Initial space** (*i*): no core hole, described by hopping and Coulomb
   integrals read from ``hopping_i.in`` and ``coulomb_i.in``.
 * **Intermediate space** (*n*): one core hole and one extra valence electron
-  created by X-ray absorption (same total electron count as the initial space),
+  created by X-ray absorption,
   described by ``hopping_n.in`` and ``coulomb_n.in``.
 * **Final space** (*f*): used in RIXS only; no core hole, same total electron
   count as the initial space.  After the core hole is filled by an emitted

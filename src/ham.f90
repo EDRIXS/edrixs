@@ -1,16 +1,22 @@
-!> Build the many-body Hamiltonian for the initial (no core-hole) configuration.
+!> Build the many-body Hamiltonian H_i for the initial (no core-hole)
+!! configuration as defined in equation (7) of Wang et al. (CPC 2019):
+!!   H_i = sum_{alpha,beta} t_{alpha,beta} f^dagger_alpha f_beta
+!!         + sum_{alpha,beta,gamma,delta} U_{alpha,beta,gamma,delta} f^dagger_alpha f^dagger_beta f_gamma f_delta
+!! in the Fock basis |I> (equation labelled binary in the paper).
 !!
 !! Iterates over each Fock basis state owned by this MPI rank and applies every
-!! non-zero hopping and Coulomb operator.  For each operator the resulting
-!! state is located in the Fock basis with binary_search; if found, the matrix
-!! element (with Jordan-Wigner sign from make_newfock) is inserted into a
-!! per-row linked list.  The loop runs twice: the first pass counts non-zeros
-!! per row so CSR storage can be allocated exactly; the second pass fills the
-!! values.
+!! non-zero hopping (t) and Coulomb (U) operator.  For each operator the
+!! resulting state is located in the Fock basis with binary_search; if found,
+!! the matrix element (with Jordan-Wigner sign from make_newfock) is inserted
+!! into a per-row linked list.  The loop runs twice: the first pass counts
+!! non-zeros per row so CSR storage can be allocated exactly; the second pass
+!! fills the values.
 !!
 !! The optional diagonal shift omega (added only when ham_sign < 0) supports
-!! building the resolvent (H - omega I) needed for RIXS intermediate states.
-!! ham_sign = +1 builds H; ham_sign = -1 builds -(H - omega I).
+!! building the resolvent (omega_in - H_n + E_i + i*Gamma_c) needed for the
+!! RIXS linear system in equation (11) of the paper.  ham_sign = +1 builds H;
+!! ham_sign = -1 builds -(H - omega I), so passing the latter to pminres_csr
+!! solves (omega_in - H_n + E_i + i*Gamma_c)|x> = |b>.
 !!
 !! Parallelism: rows are distributed across nprocs ranks according to
 !! end_indx(1,1,myid+1)..end_indx(2,1,myid+1).  Column blocks are distributed
@@ -297,15 +303,22 @@ subroutine build_ham_i(ncfgs, fock, nblock, end_indx, nhopp, hopping, &
     return
 end subroutine build_ham_i
 
-!> Build the many-body Hamiltonian for the intermediate (core-hole) configuration.
+!> Build the many-body intermediate Hamiltonian H_n for the core-hole
+!! configuration as defined in equation (8) of Wang et al. (CPC 2019):
+!!   H_n = H_i + V_core-hole + H_core
+!! where V_core-hole is the Coulomb interaction between valence electrons and
+!! the core-hole and H_core is the core-electron Hamiltonian.
 !!
-!! Extends build_ham_i to the product Hilbert space
-!! H_n = H_val-only (x) H_core-hole, where H_core-hole has exactly one core
-!! orbital empty.  The num_core_orbs possible core-hole configurations are
-!! enumerated via fock_core(1..num_core_orbs), each encoding one missing
-!! core orbital as a bit pattern.  The composite Fock index is linearised as
+!! Extends build_ham_i to the product Hilbert space H_n = H_val (x) H_core-hole,
+!! where H_core-hole has exactly one core orbital empty.  The num_core_orbs
+!! possible core-hole configurations are enumerated via fock_core(1..num_core_orbs),
+!! each encoding one missing core orbital as a bit pattern.  The composite
+!! Fock index is linearised as
 !!   icfg = (core_indx - 1) * ncfgs + val_indx
-!! so the same CSR row-block structure as build_ham_i applies.
+!! so the same CSR row-block structure as build_ham_i applies.  The hopping
+!! and Coulomb tensors passed in (hopping, coulomb) carry the t_{alpha,beta}
+!! and U_{alpha,beta,gamma,delta} terms of H_n in paper notation, including
+!! valence-core mixing introduced by V_core-hole.
 !!
 !! @param[in]  ncfgs         Total dimension of the valence-sector Hilbert space
 !! @param[in]  fock          Valence-sector Fock basis (length ncfgs)
@@ -620,16 +633,17 @@ subroutine build_ham_n(ncfgs, fock, num_val_orbs, num_core_orbs, nblock, &
     return
 end subroutine build_ham_n
 
-!> Build the transition operator from the initial space to the intermediate space.
-!!
-!! Constructs the sparse matrix representation of the photon absorption operator
-!! T: H_i -> H_n, where H_i is the initial (no core-hole) space and H_n is
-!! the intermediate (core-hole) space.  The composite H_n index interleaves
-!! core-hole configurations with the valence-sector index.
+!> Build the photon-absorption transition operator hat{D}_i (equations (3,5) of
+!! Wang et al. CPC 2019) as a sparse matrix from the initial space H_i to the
+!! intermediate space H_n.  The composite H_n index interleaves core-hole
+!! configurations with the valence-sector index.
 !!
 !! The fock_left array contains valence-sector states from H_n (rows) and
-!! fock_right contains the initial states from H_i (columns).  The routine
-!! uses the same two-pass strategy as build_ham_i.
+!! fock_right contains the initial states from H_i (columns).  Each non-zero
+!! input element transop(num) = (i, j, val) contributes the term
+!! val * f^dagger_j f_i (with the Jordan-Wigner sign) to hat{D}_i, following
+!! the same annihilation-first index convention as hopping_i.in.
+!! The routine uses the same two-pass strategy as build_ham_i.
 !!
 !! @param[in]  mcfgs         Dimension of the left (intermediate valence) Hilbert space
 !! @param[in]  ncfgs         Dimension of the right (initial) Hilbert space
@@ -811,14 +825,17 @@ subroutine build_transop_i(mcfgs, ncfgs, fock_left, fock_right, num_val_orbs, &
     return
 end subroutine build_transop_i
 
-!> Build the transition operator from the intermediate space to the final space.
-!!
-!! Constructs the photon emission operator T: H_n -> H_f.  The intermediate
-!! space H_n has all core orbitals fully occupied (full core), so the
-!! composite Fock state for the row is built with ((2^num_core_orbs - 1) << num_val_orbs)
-!! ORed with the valence part from fock_left.  The column states in H_f are
-!! found by searching fock_right after decomposing the result into core and
-!! valence sectors.
+!> Build the photon-emission transition operator hat{D}_f^dagger
+!! (equations (4,6) of Wang et al. CPC 2019) as a sparse matrix from the
+!! intermediate space H_n to the final space H_f.  The final space H_f has
+!! all core orbitals fully occupied (no core hole), so the composite Fock
+!! state for the row is built with ((2^num_core_orbs - 1) << num_val_orbs)
+!! ORed with the valence part from fock_left.  The column states in the
+!! intermediate space are found by searching fock_right after decomposing
+!! the result into core and valence sectors.  Each non-zero input element
+!! transop(num) = (i, j, val) contributes val * f^dagger_j f_i to
+!! hat{D}_f^dagger, following the same annihilation-first index convention
+!! as the read_transop_* file format.
 !!
 !! @param[in]  mcfgs         Dimension of the left (final) Hilbert space
 !! @param[in]  ncfgs         Dimension of the right (intermediate valence) Hilbert space

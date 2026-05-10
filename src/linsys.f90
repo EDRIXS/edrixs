@@ -1,25 +1,31 @@
 !> Parallel MINRES solver for the complex symmetric linear system A x = b.
 !!
-!! Solves (H - omega) x = b where H is the intermediate-state Hamiltonian
-!! and omega = omega_in + i*gamma_in encodes the incident photon energy and
-!! core-hole lifetime broadening.  The system is complex symmetric (not
-!! Hermitian) because omega has a non-zero imaginary part.
+!! Solves the RIXS resolvent equation (11) of Wang et al. (CPC 2019),
+!!     (omega_in - H_n + E_i + i*Gamma_c) |x> = |b>,
+!! where H_n is the intermediate-state Hamiltonian, omega_in is the incident
+!! photon energy, E_i is the energy of the i-th ground state, and Gamma_c is
+!! the core-hole lifetime broadening.  rixs_driver supplies the matrix as
+!! A = -(H_n - omega) with omega = omega_in + E_i + i*Gamma_c so that
+!! solving A |x> = |b> here is equivalent to solving the paper equation.
+!! The system is complex symmetric (not Hermitian) because omega has a
+!! non-zero imaginary part.
 !!
 !! The algorithm is the Minimum Residual (MINRES) method adapted for
 !! complex systems, using pspmv_csr for the distributed matrix-vector
 !! product.  Iteration stops when the relative residual drops below
 !! linsys_tol or linsys_max iterations are reached.
 !!
-!! On exit the actual residual |H x - b| is printed by the master rank
+!! On exit the actual residual |A x - b| is printed by the master rank
 !! as a diagnostic check.
 !!
 !! @param[in]  nblock    Number of CSR column blocks
 !! @param[in]  end_indx  Global index ranges per rank: end_indx(start/end, row/col, rank)
 !! @param[in]  needed    Communication map from get_needed_indx
 !! @param[in]  nloc      Number of local rows / columns
-!! @param[in]  ham       Local CSR blocks of the shifted Hamiltonian (H - omega I)
-!! @param[in]  b_vec     Right-hand-side vector (length nloc)
-!! @param[out] x_vec     Solution vector (length nloc)
+!! @param[in]  ham       Local CSR blocks of the shifted Hamiltonian
+!!                       A = -(H_n - omega) = omega_in - H_n + E_i + i*Gamma_c
+!! @param[in]  b_vec     Right-hand-side |b> = hat{D}_i |Gamma_i> (length nloc)
+!! @param[out] x_vec     Solution |x> = (omega_in - H_n + E_i + i*Gamma_c)^{-1} |b>
 !! @param[out] info      Return code: 0 = converged, 1 = max iterations reached
 subroutine pminres_csr(nblock, end_indx, needed, nloc, ham, b_vec, x_vec, info)
     use m_constants, only: dp, zero, czero, cone, mystd

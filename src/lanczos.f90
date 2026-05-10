@@ -368,24 +368,30 @@ module m_lanczos
 
     !> Evaluate the continued-fraction Green's function on a frequency mesh.
     !!
-    !! Given the Lanczos coefficients alpha, beta and the squared norm of the
-    !! starting vector, computes the spectral function
-    !!
-    !!   spec(omega) = -(1/pi) * Im[ norm / (omega + i*gamma + E_gs - CF) ]
-    !!
-    !! where CF is the continued fraction built bottom-up from level nkrylov to 1.
-    !! The ground-state energy e_gs shifts the frequency axis so that the
-    !! excitation energy is measured from the ground state.  gamma_final provides
-    !! frequency-dependent Lorentzian broadening (final-state lifetime).
+    !! Implements equation (12) of Wang et al. (CPC 2019):
+    !!   I_RIXS(omega_in, omega) = <F| (omega - H_i + E_i + i*Gamma)^{-1} |F>,
+    !! and the analogous expression for XAS,
+    !!   I_XAS(omega_in)         = <b| (omega_in - H_n + E_i + i*Gamma_c)^{-1} |b>.
+    !! Given the Lanczos coefficients alpha_j, beta_j produced by build_krylov_mp
+    !! on H_i (RIXS) or H_n (XAS) with seed |F> or |b>, the matrix element is
+    !! evaluated as the continued fraction
+    !!   G(omega) = norm / (z - alpha_1 - beta_1^2 / (z - alpha_2 - beta_2^2 / (...)))
+    !! with z = omega + E_i + i*Gamma (RIXS) or z = omega_in + E_i + i*Gamma_c
+    !! (XAS), and the spectral weight is
+    !!   spec(omega) = -(1/pi) Im[G(omega)].
+    !! The argument e_gs holds the ground-state energy E_i that shifts the
+    !! frequency axis; gamma_final supplies the Lorentzian broadening (Gamma
+    !! for RIXS final states, Gamma_c for XAS), evaluated at each frequency.
     !!
     !! @param[in]  nkrylov      Number of Krylov steps (depth of continued fraction)
-    !! @param[in]  alpha        Diagonal Lanczos coefficients (length nkrylov)
+    !! @param[in]  alpha        Diagonal Lanczos coefficients alpha_j (length nkrylov)
     !! @param[in]  beta         Off-diagonal coefficients with beta(0)=0 (length 0:nkrylov)
-    !! @param[in]  norm         Squared norm of the starting vector (prefactor)
+    !! @param[in]  norm         ||seed||^2 prefactor (||F||^2 for RIXS, ||b||^2 for XAS)
     !! @param[in]  nw           Number of frequency points
-    !! @param[in]  om_mesh      Frequency mesh (eV), length nw
-    !! @param[in]  e_gs         Ground-state energy used to shift the frequency axis (eV)
+    !! @param[in]  om_mesh      Frequency mesh (eV), length nw; energy loss for RIXS, omega_in for XAS
+    !! @param[in]  e_gs         Ground-state energy E_i used to shift the frequency axis (eV)
     !! @param[in]  gamma_final  Lorentzian broadening at each frequency point (eV), length nw
+    !!                          (Gamma for RIXS final states, Gamma_c for XAS intermediate states)
     !! @param[out] spec         Spectral function values (length nw)
     subroutine build_spectrum(nkrylov, alpha, beta, norm, nw, om_mesh, e_gs, gamma_final, spec)
         use m_constants, only: dp, czero, pi
