@@ -14,3 +14,4 @@ Pillow
 sphinx-copybutton
 sphinx_rtd_theme
 sphinx-gallery
+breathe

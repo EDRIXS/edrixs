@@ -12,4 +12,5 @@ edrixs Documentation
    user/index
    auto_examples/index
    reference/index
+   fortran_api
    release-history

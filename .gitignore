@@ -79,6 +79,9 @@ docs/source/generated/
 docs/source/auto_examples/
 docs/source/sg_execution_times.rst
 
+# Doxygen output
+docs/doxygen/
+
 # pytest
 .pytest_cache/
 

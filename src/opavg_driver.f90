@@ -1,9 +1,21 @@
+!> Operator-average driver: compute <psi_k|H|psi_k> for stored eigenstates.
+!!
+!! Reads the initial-state Hamiltonian and applies it to each eigenvector
+!! stored on disk by ed.x.  For state k the expectation value is
+!!
+!!   opavg(k) = <psi_k| H |psi_k>
+!!
+!! computed as a distributed dot product v^H (H v) using pspmv_csr.
+!! Results are written to opavg.dat via write_opavg.
+!!
+!! This is useful for verifying the ED eigenvalues and for computing
+!! operator averages when the operator shares the same Fock basis as H_i.
 subroutine opavg_driver()
     use m_constants
-    use m_control 
+    use m_control
     use m_global
     use mpi
-    
+
     implicit none
 
     integer :: mblock
@@ -11,7 +23,7 @@ subroutine opavg_driver()
     integer :: nloc
     integer :: needed(nprocs,nprocs)
     integer :: end_indx(2,2,nprocs)
-    integer :: ierror 
+    integer :: ierror
     integer :: igs
     integer(dp) :: num_of_nonzeros
 
@@ -75,7 +87,7 @@ subroutine opavg_driver()
     time_used = time_used + time_end - time_begin
     if (myid==master) then
         print *, " fedrixs >>> Number of nonzero elements of the Hamiltonian", num_of_nonzeros
-        print *, " fedrixs >>> Done !" 
+        print *, " fedrixs >>> Done !"
         print *, " fedrixs >>> Time used: ", time_end - time_begin, "  seconds"
         print *
     endif
@@ -96,13 +108,13 @@ subroutine opavg_driver()
         write(char_I, '(i5)') igs
         fname="eigvec."//trim(adjustl(char_I))
         call read_eigvecs(fname, ndim_i, v_vector_mpi, eigvals(igs))
-        v_vector = v_vector_mpi(end_indx(1,2,myid+1): end_indx(2,2,myid+1)) 
+        v_vector = v_vector_mpi(end_indx(1,2,myid+1): end_indx(2,2,myid+1))
         deallocate(v_vector_mpi)
         call MPI_BARRIER(new_comm, ierror)
         call pspmv_csr(new_comm, nblock, end_indx, needed, nloc, nloc, ham_csr, v_vector, w_vector)
         call MPI_BARRIER(new_comm, ierror)
-        temp1 = czero 
-        temp1_mpi = czero 
+        temp1 = czero
+        temp1_mpi = czero
         temp1 = dot_product(v_vector, w_vector)
         call MPI_ALLREDUCE(temp1, temp1_mpi, 1, MPI_DOUBLE_COMPLEX, MPI_SUM, new_comm, ierror)
         opavg(igs) = temp1_mpi

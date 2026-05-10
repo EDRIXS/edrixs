@@ -1,11 +1,48 @@
+!> Exact Diagonalization (ED) driver: diagonalise the initial-state Hamiltonian.
+!!
+!! Called by ed_fsolver (the f2py-exposed wrapper in pyapi.f90), which is in
+!! turn invoked from the Python solvers ed_siam_fort, ed_1v1c_fort and
+!! ed_2v1c_fort defined in edrixs/solvers.py.  The same kernel serves all three
+!! Python entry points; only the Hamiltonian elements written to the input
+!! files differ (atomic many-body for ed_1v1c_fort/ed_2v1c_fort, single-impurity
+!! Anderson model for ed_siam_fort).
+!!
+!! Workflow:
+!!  1. read_hopping_i, read_coulomb_i, read_fock_i load the initial Hamiltonian
+!!     parameters from hopping_i.in, coulomb_i.in, fock_i.in (written by Python).
+!!  2. partition_task splits the ndim_i x ndim_i Hilbert space across ranks.
+!!  3. build_ham_i constructs the distributed CSR Hamiltonian.
+!!  4. The eigensolver selected by ed_solver runs:
+!!       - 0: full LAPACK ZHEEV (gathered to master, broadcast back)
+!!       - 1: parallel Lanczos (no re-orthogonalisation, less accurate)
+!!       - 2: parallel ARPACK   (recommended; default for SIAM)
+!!     If ndim_i < min_ndim, ed_solver is forced to 0.
+!!  5. The single-particle density matrix is computed for each of the nvector
+!!     lowest eigenstates by accumulating contributions <Gamma_i|f^dagger_alpha f_beta|Gamma_i>
+!!     over the local Fock basis (notation from Table 1 of Wang et al. CPC 2019).
+!!     When ed_solver != 0 the eigenvectors must
+!!     first be gathered with MPI_ISEND/MPI_RECV because off-diagonal density
+!!     matrix elements connect Fock states owned by different ranks.
+!!
+!! Input files (written by Python in solvers.py):
+!!  - config.in        : Fortran namelist with ed_solver, num_val_orbs, neval, ...
+!!  - hopping_i.in     : non-zero one-body matrix elements
+!!  - coulomb_i.in     : non-zero two-body (Coulomb) matrix elements
+!!  - fock_i.in        : Fock basis (bit-string integers)
+!!
+!! Output files (read back by Python):
+!!  - eigvals.dat      : neval lowest eigenvalues
+!!  - denmat.dat       : single-particle density matrices for the nvector states
+!!  - eigvec.k         : (if idump=.true.) full eigenvector for state k,
+!!                       consumed later by xas_driver/rixs_driver
 subroutine ed_driver()
     use m_constants
-    use m_control 
+    use m_control
     use m_types
     use m_global
     use m_lanczos
     use mpi
-    
+
     implicit none
 
     integer :: i,j,k
@@ -15,7 +52,7 @@ subroutine ed_driver()
     integer :: nloc
     integer :: needed(nprocs,nprocs)
     integer :: end_indx(2,2,nprocs)
-    integer :: ierror 
+    integer :: ierror
     integer :: info
     integer :: actual_step
     integer :: nconv
@@ -139,7 +176,7 @@ subroutine ed_driver()
         enddo
         call MPI_ALLREDUCE(ham_full_mpi, ham_full, size(ham_full_mpi), MPI_DOUBLE_COMPLEX, MPI_SUM, new_comm, ierror)
         if (myid==master) then
-            call full_diag_ham(ndim_i, ham_full, eigval_full, eigvecs_full) 
+            call full_diag_ham(ndim_i, ham_full, eigval_full, eigvecs_full)
         endif
         call MPI_BARRIER(new_comm, ierror)
         call MPI_BCAST(eigval_full,   size(eigval_full),  MPI_DOUBLE_PRECISION, master, new_comm, ierror)
@@ -190,7 +227,7 @@ subroutine ed_driver()
     call read_fock_i()
     denmat = czero
     denmat_mpi = czero
-    allocate(eigvecs_mpi(ndim_i))    
+    allocate(eigvecs_mpi(ndim_i))
     do k=1, nvector
         eigvecs_mpi = czero
         if (ed_solver==0) then
@@ -219,7 +256,7 @@ subroutine ed_driver()
         do icfg=end_indx(1,1,myid+1), end_indx(2,1,myid+1)
             do j=1,num_val_orbs
                 if (btest(fock_i(icfg), j-1)) then
-                    denmat_mpi(j,j,k) = denmat_mpi(j,j,k) + conjg(eigvecs_mpi(icfg)) * eigvecs_mpi(icfg) 
+                    denmat_mpi(j,j,k) = denmat_mpi(j,j,k) + conjg(eigvecs_mpi(icfg)) * eigvecs_mpi(icfg)
                 endif
             enddo
 
@@ -230,16 +267,16 @@ subroutine ed_driver()
                     old = fock_i(icfg)
 
                     tot_sign = 1
-                    call make_newfock('-', i, old, new, sgn) 
+                    call make_newfock('-', i, old, new, sgn)
                     tot_sign = tot_sign * sgn
                     old = new
 
                     if (btest(old, j-1)) cycle
-                    call make_newfock('+', j,  old, new, sgn) 
+                    call make_newfock('+', j,  old, new, sgn)
                     tot_sign = tot_sign * sgn
 
                     jcfg = binary_search(ndim_i, fock_i, new)
-                    
+
                     if (jcfg == -1) cycle
                     denmat_mpi(i,j,k) = denmat_mpi(i,j,k) + conjg(eigvecs_mpi(icfg)) * eigvecs_mpi(jcfg) * tot_sign
                     denmat_mpi(j,i,k) = denmat_mpi(j,i,k) + conjg(eigvecs_mpi(jcfg)) * eigvecs_mpi(icfg) * tot_sign
@@ -247,8 +284,8 @@ subroutine ed_driver()
             enddo
         enddo
 
-        ! dump eigenvectors 
-        if ( idump ) then 
+        ! dump eigenvectors
+        if ( idump ) then
             write(char_I, '(i5)') k
             fname="eigvec."//trim(adjustl(char_I))
             if (myid==master) then

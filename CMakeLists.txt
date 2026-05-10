@@ -63,3 +63,14 @@ if (EDRIXS_PY_INTERFACE)
 endif()
 
 add_subdirectory(src)
+
+# Optional Doxygen target: cmake --build . --target docs
+find_package(Doxygen OPTIONAL_COMPONENTS dot)
+if(DOXYGEN_FOUND)
+    add_custom_target(docs
+        COMMAND ${DOXYGEN_EXECUTABLE} ${CMAKE_SOURCE_DIR}/Doxyfile
+        WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+        COMMENT "Generating Fortran API docs with Doxygen"
+        VERBATIM
+    )
+endif()

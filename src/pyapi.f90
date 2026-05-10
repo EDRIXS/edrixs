@@ -1,3 +1,24 @@
+!> Python API entry points exposing the four EDRIXS solvers via f2py.
+!!
+!! Each *_fsolver subroutine accepts an MPI communicator, rank, and size from
+!! the calling Python layer (typically obtained from mpi4py) and handles the
+!! rank-reduction logic: if the user launched more MPI processes than there are
+!! Hilbert-space basis states, the excess ranks are split off into a second
+!! communicator with MPI_COMM_SPLIT and excluded from the actual computation.
+!! This prevents zero-row partitions that would crash the CSR builder.
+!!
+!! After rank reduction each active rank calls the corresponding *_driver
+!! subroutine, then all ranks (including idle ones) synchronise on the original
+!! communicator via MPI_BARRIER before returning.
+
+!> Python-callable wrapper for the ED solver.
+!!
+!! Accepts the MPI communicator from the Python side, performs rank reduction
+!! if nprocs > ndim_i, then calls ed_driver on active ranks.
+!!
+!! @param[in] comm      MPI communicator handle (from mpi4py)
+!! @param[in] my_id     Rank of the calling process in comm
+!! @param[in] num_procs Total number of processes in comm
 subroutine ed_fsolver(comm, my_id, num_procs)
     use m_control, only: master, origin_myid, origin_nprocs, origin_comm
     use m_control, only: myid, nprocs, new_comm, ndim_i
@@ -21,7 +42,7 @@ subroutine ed_fsolver(comm, my_id, num_procs)
     origin_myid = my_id
     origin_nprocs = num_procs
 
-    call config()  
+    call config()
     ! read fock to know the dimension of the Hamiltonian
     call read_fock_i()
     call dealloc_fock_i()
@@ -32,7 +53,7 @@ subroutine ed_fsolver(comm, my_id, num_procs)
             print *, " fedrixs >>> Only ", ndim_i, " processors will really work!"
         endif
         if (origin_myid < ndim_i) then
-            color = 1 
+            color = 1
             key = origin_myid
         else
             color = 2
@@ -55,6 +76,14 @@ subroutine ed_fsolver(comm, my_id, num_procs)
     return
 end subroutine ed_fsolver
 
+!> Python-callable wrapper for the XAS solver.
+!!
+!! Performs rank reduction if nprocs > min(ndim_i, ndim_n), then calls
+!! xas_driver on active ranks.
+!!
+!! @param[in] comm      MPI communicator handle (from mpi4py)
+!! @param[in] my_id     Rank of the calling process in comm
+!! @param[in] num_procs Total number of processes in comm
 subroutine xas_fsolver(comm, my_id, num_procs)
     use m_control, only: master, origin_myid, origin_nprocs, origin_comm
     use m_control, only: myid, nprocs, new_comm, ndim_n, ndim_i, ndim_n_nocore, num_core_orbs
@@ -79,7 +108,7 @@ subroutine xas_fsolver(comm, my_id, num_procs)
     origin_myid = my_id
     origin_nprocs = num_procs
 
-    call config()  
+    call config()
     call read_fock_i()
     call dealloc_fock_i()
     call read_fock_n()
@@ -93,7 +122,7 @@ subroutine xas_fsolver(comm, my_id, num_procs)
             print *, " fedrixs >>> Only ", min_dim, " processors will really work!"
         endif
         if (origin_myid < min_dim) then
-            color = 1 
+            color = 1
             key = origin_myid
         else
             color = 2
@@ -117,6 +146,14 @@ subroutine xas_fsolver(comm, my_id, num_procs)
     return
 end subroutine xas_fsolver
 
+!> Python-callable wrapper for the RIXS solver.
+!!
+!! Performs rank reduction if nprocs > min(ndim_i, ndim_n, ndim_f), then calls
+!! rixs_driver on active ranks.
+!!
+!! @param[in] comm      MPI communicator handle (from mpi4py)
+!! @param[in] my_id     Rank of the calling process in comm
+!! @param[in] num_procs Total number of processes in comm
 subroutine rixs_fsolver(comm, my_id, num_procs)
     use m_control, only: master, origin_myid, origin_nprocs, origin_comm
     use m_control, only: myid, nprocs, new_comm, ndim_n, ndim_i, ndim_f, ndim_n_nocore, num_core_orbs
@@ -142,7 +179,7 @@ subroutine rixs_fsolver(comm, my_id, num_procs)
     origin_myid = my_id
     origin_nprocs = num_procs
 
-    call config()  
+    call config()
     call read_fock_i()
     call dealloc_fock_i()
     call read_fock_n()
@@ -158,7 +195,7 @@ subroutine rixs_fsolver(comm, my_id, num_procs)
             print *, " fedrixs >>> Only ", min_dim, " processors will really work!"
         endif
         if (origin_myid < min_dim) then
-            color = 1 
+            color = 1
             key = origin_myid
         else
             color = 2
@@ -181,6 +218,14 @@ subroutine rixs_fsolver(comm, my_id, num_procs)
     return
 end subroutine rixs_fsolver
 
+!> Python-callable wrapper for the operator-average solver.
+!!
+!! Performs rank reduction if nprocs > ndim_i, then calls opavg_driver on
+!! active ranks.
+!!
+!! @param[in] comm      MPI communicator handle (from mpi4py)
+!! @param[in] my_id     Rank of the calling process in comm
+!! @param[in] num_procs Total number of processes in comm
 subroutine opavg_fsolver(comm, my_id, num_procs)
     use m_control, only: master, origin_myid, origin_nprocs, origin_comm
     use m_control, only: myid, nprocs, new_comm, ndim_i
@@ -204,7 +249,7 @@ subroutine opavg_fsolver(comm, my_id, num_procs)
     origin_myid = my_id
     origin_nprocs = num_procs
 
-    call config()  
+    call config()
     call read_fock_i()
     call dealloc_fock_i()
     if (ndim_i < origin_nprocs) then
@@ -214,7 +259,7 @@ subroutine opavg_fsolver(comm, my_id, num_procs)
             print *, " fedrixs >>> Only ", ndim_i, " processors will really work!"
         endif
         if (origin_myid < ndim_i) then
-            color = 1 
+            color = 1
             key = origin_myid
         else
             color = 2
