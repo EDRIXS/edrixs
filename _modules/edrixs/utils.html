@@ -91,6 +91,7 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">importlib.resources</span><span class="w"> </span><span class="kn">import</span> <span class="n">files</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="kn">import</span> <span class="n">symbols</span><span class="p">,</span> <span class="n">solve</span>
 
 
 <div class="viewcode-block" id="beta_to_kelvin">
@@ -389,6 +390,36 @@
 
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_master_energy_level_eq</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Define master equation relating Coulomb interactions, Delta,</span>
+<span class="sd">    and energy levels.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    We label the d-electrons $d$, ligand electrons $L$, and the core electrons $p$.</span>
+
+<span class="sd">    Electron count variables: $n_d$, $n_L$, $n_p$</span>
+
+<span class="sd">    Site energy: $E_d$, $E_L$, $E_p$</span>
+
+<span class="sd">    Coulomb energy between $d$ electrons: $U_{dd}$</span>
+
+<span class="sd">    Core hole potential $d$ electrons: $U_{dp}$</span>
+
+<span class="sd">    $n$ is the reference number of electrons. e.g. $n=8$ for NiO.</span>
+
+<span class="sd">    Note that we will ignore Coulomb interactions in the ligand levels and intra-core hole repulsion.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span><span class="p">,</span> <span class="n">n_d</span><span class="p">,</span> <span class="n">n_L</span><span class="p">,</span> <span class="n">n_p</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;n, n_d, n_L, n_p&#39;</span><span class="p">)</span>
+    <span class="n">E_d</span><span class="p">,</span> <span class="n">E_L</span><span class="p">,</span> <span class="n">E_p</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;E_d, E_L, E_p&#39;</span><span class="p">)</span>
+    <span class="n">U_dd</span><span class="p">,</span> <span class="n">U_dp</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;U_dd, U_dp&#39;</span><span class="p">)</span>
+
+    <span class="n">master</span> <span class="o">=</span> <span class="p">(</span><span class="n">E_d</span><span class="o">*</span><span class="n">n_d</span> <span class="o">+</span> <span class="n">E_L</span><span class="o">*</span><span class="n">n_L</span> <span class="o">+</span> <span class="n">E_p</span><span class="o">*</span><span class="n">n_p</span>
+              <span class="o">+</span> <span class="n">n_d</span><span class="o">*</span><span class="p">(</span><span class="n">n_d</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">U_dd</span><span class="o">/</span><span class="mi">2</span>
+              <span class="o">+</span> <span class="n">n_d</span><span class="o">*</span><span class="n">n_p</span><span class="o">*</span><span class="n">U_dp</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">master</span>
+
+
 <div class="viewcode-block" id="CT_imp_bath">
 <a class="viewcode-back" href="../../reference/utils.html#edrixs.utils.CT_imp_bath">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">CT_imp_bath</span><span class="p">(</span><span class="n">U_dd</span><span class="p">,</span> <span class="n">Delta</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
@@ -418,51 +449,23 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    We credit our approach to Maurits Hakverkort,</span>
-<span class="sd">    Heidelberg University.</span>
-<span class="sd">    We define the state with a full set of bath orbitals to be zero</span>
-<span class="sd">    energy and write the energy levels using the same definitions</span>
-<span class="sd">    as [1]_ [2]_ [3]_.</span>
-
-<span class="sd">    * :math:`d^{n}L^{10}` has energy :math:`0`</span>
-
-<span class="sd">    * :math:`d^{n+1}L^9` has energy :math:`\\Delta`</span>
-
-<span class="sd">    * :math:`d^{n+2}L^8` has energy :math:`2\\Delta + U_{dd}`</span>
-
-<span class="sd">    Using this we can write and solve three linear equations to get</span>
-<span class="sd">    :math:`E_d` and :math:`E_L` the energies of the impurity and bath.</span>
-
-<span class="sd">       .. math::</span>
-<span class="sd">           \\begin{aligned}</span>
-<span class="sd">           10 E_L + n     E_d + n(n-1) \\frac{U_{dd}}{2} &amp;= 0 \\\\</span>
-<span class="sd">            9 E_L + (n+1) E_d + (n+1)n \\frac{U_{dd}}{2} &amp;= \\Delta \\\\</span>
-<span class="sd">            8 E_L + (n+2) E_d + (n+1)(n+2) \\frac{U_{dd}}{2}</span>
-<span class="sd">            &amp;= 2\\Delta + U_{dd}</span>
-<span class="sd">           \\end{aligned}</span>
-
-<span class="sd">    The solutions are:</span>
-
-<span class="sd">       .. math::</span>
-<span class="sd">           \\begin{aligned}</span>
-<span class="sd">           E_d &amp;=</span>
-<span class="sd">           \\frac{10 \\Delta - n (19 +  n) U_{dd}/2}{10 + n}  \\\\</span>
-<span class="sd">           E_L &amp;=</span>
-<span class="sd">           \\frac{n ((1+n) U_{dd}/2-\\Delta)}{10 + n}</span>
-<span class="sd">           \\end{aligned}.</span>
-
-<span class="sd">    References</span>
-<span class="sd">    ----------</span>
-<span class="sd">    .. [1] J. Zaanen, G. A. Sawatzky, and J. W. Allen</span>
-<span class="sd">           `Phys. Rev. Lett. 55, 418 (1985) &lt;https://doi.org/10.1103/PhysRevLett.55.418&gt;`_</span>
-<span class="sd">    .. [2] Maurits Haverkort et al.,</span>
-<span class="sd">           `Phys. Rev. B 85, 165113 (2012) &lt;https://doi.org/10.1103/PhysRevB.85.165113&gt;`_</span>
-<span class="sd">    .. [3] A. E. Bocquet et al.,</span>
-<span class="sd">           `Phys. Rev. B 53, 1161 (1996) &lt;https://doi.org/10.1103/PhysRevB.53.1161&gt;`_</span>
+<span class="sd">    We emit core electrons for initial state calculation which is done</span>
+<span class="sd">    by setting $n_p=0$. It is crucial to properly set the energy</span>
+<span class="sd">    splitting of $E_d$ and $E_L$ as defined by $\\Delta$.</span>
+<span class="sd">    The initial state energy is ill-defined to within an additive factor,</span>
+<span class="sd">    so we arbitrarily set the energy with no ligand holes to zero.</span>
+<span class="sd">    From there, obtain energies by solving the relevant linear equations.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">E_d</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="o">*</span><span class="n">Delta</span> <span class="o">-</span> <span class="n">n</span><span class="o">*</span><span class="p">(</span><span class="mi">19</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="n">U_dd</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">10</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span>
-    <span class="n">E_L</span> <span class="o">=</span> <span class="n">n</span><span class="o">*</span><span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="n">U_dd</span><span class="o">/</span><span class="mi">2</span><span class="o">-</span><span class="n">Delta</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mi">10</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">E_d</span><span class="p">,</span> <span class="n">E_L</span></div>
+    <span class="n">master</span> <span class="o">=</span> <span class="n">_master_energy_level_eq</span><span class="p">()</span>
+    <span class="n">E_d</span><span class="p">,</span> <span class="n">E_L</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;E_d E_L&#39;</span><span class="p">)</span>
+    <span class="n">master_no_core</span> <span class="o">=</span> <span class="n">master</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="s1">&#39;n_p&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">})</span>
+    <span class="n">cond0</span> <span class="o">=</span> <span class="p">(</span><span class="n">master_no_core</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="s1">&#39;n_d&#39;</span><span class="p">:</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;n_L&#39;</span><span class="p">:</span> <span class="mi">10</span> <span class="o">-</span> <span class="mi">1</span><span class="p">})</span>
+             <span class="o">-</span> <span class="n">master_no_core</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="s1">&#39;n_d&#39;</span><span class="p">:</span> <span class="n">n</span><span class="p">,</span> <span class="s1">&#39;n_L&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">})</span> <span class="o">-</span> <span class="n">Delta</span><span class="p">)</span>
+    <span class="n">cond1</span> <span class="o">=</span> <span class="n">master_no_core</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="s1">&#39;n_d&#39;</span><span class="p">:</span> <span class="n">n</span><span class="p">,</span> <span class="s1">&#39;n_L&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">})</span>
+
+    <span class="n">S</span> <span class="o">=</span> <span class="n">solve</span><span class="p">([</span><span class="n">cond0</span><span class="p">,</span> <span class="n">cond1</span><span class="p">],</span> <span class="p">[</span><span class="n">E_d</span><span class="p">,</span> <span class="n">E_L</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">E_d</span><span class="p">]</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="s1">&#39;U_dd&#39;</span><span class="p">:</span> <span class="n">U_dd</span><span class="p">})),</span> <span class="nb">float</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">E_L</span><span class="p">]</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="s1">&#39;U_dd&#39;</span><span class="p">:</span> <span class="n">U_dd</span><span class="p">}))</span></div>
 
 
 
@@ -473,10 +476,7 @@
 <span class="sd">    Compute energies of the impurity and bath for an</span>
 <span class="sd">    Anderson impurity or charge-transfer model</span>
 <span class="sd">    appropriate for a :math:`d`-shell transition metal compound</span>
-<span class="sd">    with a core hole. Take note that this involves a</span>
-<span class="sd">    re-definition of :math:`\\Delta` compared to the</span>
-<span class="sd">    :code:`CT_imp_bath` function, which leaves out</span>
-<span class="sd">    core hole effects.</span>
+<span class="sd">    with a core hole.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -502,60 +502,38 @@
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
-<span class="sd">    We credit our approach to Maurits Hakverkort,</span>
-<span class="sd">    Heidelberg University.</span>
-<span class="sd">    We define the state with a full set of bath orbitals to be zero</span>
-<span class="sd">    energy and write the energy levels using the same definitions as</span>
-<span class="sd">    [1]_ [2]_ [3]_.</span>
+<span class="sd">   For the XAS states, we need to introduce core states into</span>
+<span class="sd">   the Hamiltonian and account for their presence when setting</span>
+<span class="sd">   energies. It is crucial to define the charge transfer energy</span>
+<span class="sd">   in the same way as the intial states, as this affects the way</span>
+<span class="sd">   the d and ligand states interact. We do this by imposing the</span>
+<span class="sd">   same condition as before just accounting for the presence of</span>
+<span class="sd">   core electrons.</span>
 
-<span class="sd">    * :math:`2p^5 d^{n}L^{10}` has energy :math:`0`</span>
-
-<span class="sd">    * :math:`2p^5 d^{n+1}L^9` has energy :math:`\\Delta + U_{dd} - U_{pd}`</span>
-
-<span class="sd">    * :math:`2p^5 d^{n+2}L^8` has energy :math:`2\\Delta + 3 U_{dd} - 2 U_{pd}`</span>
-
-<span class="sd">    Using this we can write and solve linear equations to get</span>
-<span class="sd">    :math:`E_{dc}`, :math:`E_{Lc}` and :math:`E_p` the energies of the</span>
-<span class="sd">    impurity and bath with a core hole and the energy of the core hole.</span>
-
-<span class="sd">       .. math::</span>
-<span class="sd">           \\begin{aligned}</span>
-<span class="sd">               6 E_p + 10 E_{Lc} +  n    E_{dc} + n(n-1) \\frac{U_{dd}}{2}</span>
-<span class="sd">               + 6 n     U_{pd} &amp;= 0    \\\\</span>
-<span class="sd">               6 E_p +  9 E_{Lc} + (n+1) E_{dc} + (n+1)n \\frac{U_{dd}}{2}</span>
-<span class="sd">               + 6 (n+1) U_{pd} &amp;= \\Delta  \\\\</span>
-<span class="sd">               6 E_p +  8 E_{Lc} + (n+2) E_{d} + (n+1)(n+2) \\frac{U_{dd}}{2}</span>
-<span class="sd">               + 6 (n+2) U_{pd} &amp;= 2 \\Delta+U_{dd} \\\\</span>
-<span class="sd">               5 E_p + 10 E_{Lc} + (n+1) E_{d} + (n+1) n \\frac{U_{dd}}{2}</span>
-<span class="sd">               + 5 (n+1) U_{pd} &amp;= 0 \\\\</span>
-<span class="sd">               5 E_p +  9 E_{Lc} + (n+2) E_{dc} + (n+2)(n+1) \\frac{U_{dd}}{2}</span>
-<span class="sd">               + 5 (n+2) U_{pd} &amp;= \\Delta+U_{dd}-U_{pd} \\\\</span>
-<span class="sd">               5 E_p +  8 E_{Lc} + (n+3) E_{dc} + (n+3)(n+2) \\frac{U_{dd}}{2}</span>
-<span class="sd">               + 5 (n+3) U_{pd} &amp;= 2 \\Delta+3 U_{dd}-2 U_{pd}</span>
-<span class="sd">           \\end{aligned}</span>
-
-<span class="sd">    The solutions are:</span>
-
-<span class="sd">       .. math::</span>
-<span class="sd">           \\begin{aligned}</span>
-<span class="sd">              E_{dc} &amp;= \\frac{10 \\Delta - n (31+n) \\frac{U_{dd}}{2}-90 U_{pd}}{16+n} \\\\</span>
-<span class="sd">              E_{Lc} &amp;= \\frac{(1+n) (n \\frac{U_{dd}}{2}+6*U_{pd})-(6+n) \\Delta}{16+n} \\\\</span>
-<span class="sd">              E_p    &amp;= \\frac{10 \\Delta + (1+n)(n\\frac{U_{dd}}{2}-(10+n)*U_{pd}}{16+n}</span>
-<span class="sd">           \\end{aligned}</span>
-
-<span class="sd">    References</span>
-<span class="sd">    ----------</span>
-<span class="sd">    .. [1] J. Zaanen, G. A. Sawatzky, and J. W. Allen</span>
-<span class="sd">           `Phys. Rev. Lett. 55, 418 (1985) &lt;https://doi.org/10.1103/PhysRevLett.55.418&gt;`_</span>
-<span class="sd">    .. [2] Maurits Haverkort et al.,</span>
-<span class="sd">           `Phys. Rev. B 85, 165113 (2012) &lt;https://doi.org/10.1103/PhysRevB.85.165113&gt;`_</span>
-<span class="sd">    .. [3] A. E. Bocquet et al.,</span>
-<span class="sd">           `Phys. Rev. B 53, 1161 (1996) &lt;https://doi.org/10.1103/PhysRevB.53.1161&gt;`_</span>
+<span class="sd">    We now have two arbitrary choices. The overall energy is</span>
+<span class="sd">    ill-defined to within an additive factor. Since the core states</span>
+<span class="sd">    are not hybridized, we can also set those to whatever energy</span>
+<span class="sd">    we like (eventually, the core energy will be shifted to match</span>
+<span class="sd">    the experiment). Arbitrarily, we pick the same condition as</span>
+<span class="sd">    before with $d^n$ no core hole as zero, and we also set the</span>
+<span class="sd">    core state energy to make $d^{n+1}$ one core hole zero energy.</span>
+<span class="sd">    The relevant energies can be obtained by solving the resulting</span>
+<span class="sd">    linear equations.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">E_dc</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="o">*</span><span class="n">Delta</span> <span class="o">-</span> <span class="n">n</span><span class="o">*</span><span class="p">(</span><span class="mi">31</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="n">U_dd</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">90</span><span class="o">*</span><span class="n">U_pd</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">16</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span>
-    <span class="n">E_Lc</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="n">U_dd</span><span class="o">/</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">6</span><span class="o">*</span><span class="n">U_pd</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="mi">6</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="n">Delta</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">16</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span>
-    <span class="n">E_p</span> <span class="o">=</span> <span class="p">(</span><span class="mi">10</span><span class="o">*</span><span class="n">Delta</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="n">U_dd</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="p">(</span><span class="mi">10</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span><span class="o">*</span><span class="n">U_pd</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">16</span> <span class="o">+</span> <span class="n">n</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">E_dc</span><span class="p">,</span> <span class="n">E_Lc</span><span class="p">,</span> <span class="n">E_p</span></div>
+    <span class="n">master</span> <span class="o">=</span> <span class="n">_master_energy_level_eq</span><span class="p">()</span>
+    <span class="n">E_d</span><span class="p">,</span> <span class="n">E_L</span><span class="p">,</span> <span class="n">E_p</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s1">&#39;E_d E_L E_p&#39;</span><span class="p">)</span>
+
+    <span class="n">cond0</span> <span class="o">=</span> <span class="p">(</span><span class="n">master</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="s1">&#39;n_d&#39;</span><span class="p">:</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;n_L&#39;</span><span class="p">:</span> <span class="mi">10</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;n_p&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">})</span>
+             <span class="o">-</span> <span class="n">master</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="s1">&#39;n_d&#39;</span><span class="p">:</span> <span class="n">n</span><span class="p">,</span> <span class="s1">&#39;n_L&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;n_p&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">})</span> <span class="o">-</span> <span class="n">Delta</span><span class="p">)</span>
+    <span class="n">cond1</span> <span class="o">=</span> <span class="n">master</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="s1">&#39;n_d&#39;</span><span class="p">:</span> <span class="n">n</span><span class="p">,</span> <span class="s1">&#39;n_L&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;n_p&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">})</span>
+    <span class="n">cond2</span> <span class="o">=</span> <span class="n">master</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="s1">&#39;n_d&#39;</span><span class="p">:</span> <span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;n_L&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">&#39;n_p&#39;</span><span class="p">:</span> <span class="mi">5</span><span class="p">})</span>
+
+    <span class="n">S</span> <span class="o">=</span> <span class="n">solve</span><span class="p">([</span><span class="n">cond0</span><span class="p">,</span> <span class="n">cond1</span><span class="p">,</span> <span class="n">cond2</span><span class="p">],</span> <span class="p">[</span><span class="n">E_d</span><span class="p">,</span> <span class="n">E_L</span><span class="p">,</span> <span class="n">E_p</span><span class="p">])</span>
+
+    <span class="n">E_dc</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">E_d</span><span class="p">]</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="s1">&#39;U_dd&#39;</span><span class="p">:</span> <span class="n">U_dd</span><span class="p">,</span> <span class="s1">&#39;U_dp&#39;</span><span class="p">:</span> <span class="n">U_pd</span><span class="p">}))</span>
+    <span class="n">E_Lc</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">E_L</span><span class="p">]</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="s1">&#39;U_dd&#39;</span><span class="p">:</span> <span class="n">U_dd</span><span class="p">,</span> <span class="s1">&#39;U_dp&#39;</span><span class="p">:</span> <span class="n">U_pd</span><span class="p">}))</span>
+    <span class="n">E_p_val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">S</span><span class="p">[</span><span class="n">E_p</span><span class="p">]</span><span class="o">.</span><span class="n">subs</span><span class="p">({</span><span class="s1">&#39;U_dd&#39;</span><span class="p">:</span> <span class="n">U_dd</span><span class="p">,</span> <span class="s1">&#39;U_dp&#39;</span><span class="p">:</span> <span class="n">U_pd</span><span class="p">}))</span>
+    <span class="k">return</span> <span class="n">E_dc</span><span class="p">,</span> <span class="n">E_Lc</span><span class="p">,</span> <span class="n">E_p_val</span></div>
 
 
 

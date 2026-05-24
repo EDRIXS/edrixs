@@ -138,11 +138,11 @@ atoms. This NiO cluster used to simulate the
 crystal would then contain 10 Ni <span class="math notranslate nohighlight">\(3d\)</span> spin-orbitals and <span class="math notranslate nohighlight">\(6\)</span>
 spin-orbitals per O <span class="math notranslate nohighlight">\(\times 6\)</span> O atoms <span class="math notranslate nohighlight">\(=36\)</span> oxygen
 spin-orbitals. As explained by, for example, Maurits Haverkort
-et al. in <a class="footnote-reference brackets" href="#id7" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> symmetry allows us to represent the bath with 10 symmetry
+et al. in <a class="footnote-reference brackets" href="#id8" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> symmetry allows us to represent the bath with 10 symmetry
 adapted linear combinations of the different O <span class="math notranslate nohighlight">\(p_x, p_y, p_z\)</span> states.
 The crystal field and hopping parameters for
 such a calculation can be obtained by post-processing DFT calculations. We will
-use values for NiO from <a class="footnote-reference brackets" href="#id7" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. If you use values from a paper the relevant
+use values for NiO from <a class="footnote-reference brackets" href="#id8" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. If you use values from a paper the relevant
 references should, of course, be cited.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -178,8 +178,8 @@ edrixs has a database of these.</p>
 </div>
 <p>The atomic values are typically scaled to account for screening in the solid.
 Here we use 80% scaling. Let’s write these out in full, so that nothing is
-hidden. Values for <span class="math notranslate nohighlight">\(U_{dd}\)</span> and <span class="math notranslate nohighlight">\(U_{dp}\)</span> are those of Ref. <a class="footnote-reference brackets" href="#id7" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>
-obtained by comparing theory and experiment <a class="footnote-reference brackets" href="#id8" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> <a class="footnote-reference brackets" href="#id9" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
+hidden. Values for <span class="math notranslate nohighlight">\(U_{dd}\)</span> and <span class="math notranslate nohighlight">\(U_{dp}\)</span> are those of Ref. <a class="footnote-reference brackets" href="#id8" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>
+obtained by comparing theory and experiment <a class="footnote-reference brackets" href="#id9" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> <a class="footnote-reference brackets" href="#id10" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">scale_dd</span></a> <span class="o">=</span> <span class="mf">0.8</span>
 <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">F2_dd</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">info</span></a><span class="p">[</span><span class="s1">&#39;slater_i&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">scale_dd</span></a>
 <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">F4_dd</span></a> <span class="o">=</span> <a href="https://docs.python.org/3/library/stdtypes.html#dict" title="builtins.dict" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">info</span></a><span class="p">[</span><span class="s1">&#39;slater_i&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">scale_dd</span></a>
@@ -200,28 +200,33 @@ obtained by comparing theory and experiment <a class="footnote-reference bracket
 </section>
 <section id="energy-of-the-bath-states">
 <h2>Energy of the bath states<a class="headerlink" href="#energy-of-the-bath-states" title="Link to this heading"></a></h2>
-<p>In the notation used here, <span class="math notranslate nohighlight">\(\Delta\)</span> sets the energy difference
-between the bath and impurity states. <span class="math notranslate nohighlight">\(\Delta\)</span> is defined in the atomic
-limit without crystal field (i.e. in terms of the centers of the impurity and
-bath states before hybridization is considered) as the energy for a
-<span class="math notranslate nohighlight">\(d^{n_d} \rightarrow d^{n_d + 1} \underline{L}\)</span> transition.
-Note that as electrons are moved one has to pay energy
-costs associated with the Coulomb interactions. The
-energy splitting between the bath and impurity is consequently not simply
-<span class="math notranslate nohighlight">\(\Delta\)</span>. One must therefore determine the energies by solving
-a set of linear equations. See the <a class="reference internal" href="../reference/utils.html#utils"><span class="std std-ref">edrixs.utils functions</span></a>
-for details. We can call these functions to get the impurity energy
-<span class="math notranslate nohighlight">\(E_d\)</span>, bath energy <span class="math notranslate nohighlight">\(E_L\)</span>, impurity energy with a core hole
-<span class="math notranslate nohighlight">\(E_{dc}\)</span>, bath energy with a core hole <span class="math notranslate nohighlight">\(E_{Lc}\)</span> and the
-core hole energy <span class="math notranslate nohighlight">\(E_p\)</span>. The initial ground state calculation is
-done in electron language leaving out the core shell.</p>
+<p>The charge-transfer energy <span class="math notranslate nohighlight">\(\Delta\)</span> is defined in the atomic limit
+(without crystal field or hybridization) as the energy cost of transferring
+one electron from the bath to the impurity:
+<span class="math notranslate nohighlight">\(\Delta = E(d^{n_d+1}\underline{L}) - E(d^{n_d})\)</span>.
+For NiO we take the value from Ref. <a class="footnote-reference brackets" href="#id8" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>, obtained by fitting theory to
+experiment.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Delta</span></a> <span class="o">=</span> <span class="mf">4.7</span>
-<a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">E_d</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">E_L</span></a> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">CT_imp_bath</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">U_dd</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Delta</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nd</span></a><span class="p">)</span>
 </pre></div>
 </div>
-<p>In the intermediate state, we include the core shell and the core hole
-potential. For this reason, the energies will shift differently to account
-for this.</p>
+<p>Because moving electrons also changes the Coulomb energy, the single-particle
+level splitting between impurity and bath is not simply <span class="math notranslate nohighlight">\(\Delta\)</span>.
+The site energies <span class="math notranslate nohighlight">\(E_d\)</span> and <span class="math notranslate nohighlight">\(E_L\)</span> must instead be found by
+solving a pair of linear equations. We fix the overall energy scale by
+setting <span class="math notranslate nohighlight">\(E(d^{n_d} L^{10}) = 0\)</span> as the reference, which together with
+the definition of <span class="math notranslate nohighlight">\(\Delta\)</span> uniquely determines <span class="math notranslate nohighlight">\(E_d\)</span> and
+<span class="math notranslate nohighlight">\(E_L\)</span>. The core shell is omitted for the ground-state calculation.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">E_d</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">E_L</span></a> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">CT_imp_bath</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">U_dd</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Delta</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nd</span></a><span class="p">)</span>
+</pre></div>
+</div>
+<p>For the intermediate (core-hole) state we use the same <span class="math notranslate nohighlight">\(\Delta\)</span>,
+which ensures the bath–impurity interaction is defined consistently with
+the ground state. The core-hole Coulomb potential <span class="math notranslate nohighlight">\(U_{dp}\)</span> shifts
+all energies, so we now need two reference conditions: one for the
+full-core state <span class="math notranslate nohighlight">\(E(d^{n_d} L^{10} p^6) = 0\)</span> and one for the
+core-hole state <span class="math notranslate nohighlight">\(E(d^{n_d+1} L^{10} p^5) = 0\)</span>. These three
+conditions uniquely determine <span class="math notranslate nohighlight">\(E_{dc}\)</span>, <span class="math notranslate nohighlight">\(E_{Lc}\)</span>, and the
+core-level energy <span class="math notranslate nohighlight">\(E_p\)</span>.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">E_dc</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">E_Lc</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">E_p</span></a> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">CT_imp_bath_core_hole</span><span class="p">(</span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">U_dd</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">U_dp</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Delta</span></a><span class="p">,</span> <a href="https://docs.python.org/3/library/functions.html#int" title="builtins.int" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">nd</span></a><span class="p">)</span>
 <a href="https://docs.python.org/3/library/stdtypes.html#str" title="builtins.str" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">message</span></a> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;E_d = </span><span class="si">{:.3f}</span><span class="s2"> eV</span><span class="se">\n</span><span class="s2">&quot;</span>
            <span class="s2">&quot;E_L = </span><span class="si">{:.3f}</span><span class="s2"> eV</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -323,7 +328,7 @@ only one bath, with 10 spin-orbitals. We initialize the matrix to
 and the impurity. This is called either <span class="math notranslate nohighlight">\(V\)</span> or <span class="math notranslate nohighlight">\(T\)</span> in the
 literature and matrix sign can either be positive or negative based.
 This is the same shape as the bath matrix. We take our
-values from Maurits Haverkort et al.’s DFT calculations <a class="footnote-reference brackets" href="#id7" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
+values from Maurits Haverkort et al.’s DFT calculations <a class="footnote-reference brackets" href="#id8" id="id7" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span></span><a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Veg</span></a> <span class="o">=</span> <span class="mf">2.06</span>
 <a href="https://docs.python.org/3/library/functions.html#float" title="builtins.float" class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance"><span class="n">Vt2g</span></a> <span class="o">=</span> <span class="mf">1.21</span>
 
@@ -488,24 +493,24 @@ edrixs &gt;&gt;&gt; Isotropic, component:  2
 </div>
 <img src="../_images/sphx_glr_example_03_AIM_XAS_001.png" srcset="../_images/sphx_glr_example_03_AIM_XAS_001.png" alt="Anderson impurity model for NiO" class = "sphx-glr-single-img"/><p class="rubric">Footnotes</p>
 <aside class="footnote-list brackets">
-<aside class="footnote brackets" id="id7" role="doc-footnote">
+<aside class="footnote brackets" id="id8" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
-<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>,<a role="doc-backlink" href="#id3">3</a>,<a role="doc-backlink" href="#id6">4</a>)</span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>,<a role="doc-backlink" href="#id3">3</a>,<a role="doc-backlink" href="#id6">4</a>,<a role="doc-backlink" href="#id7">5</a>)</span>
 <p>Maurits Haverkort et al
 <a class="reference external" href="https://doi.org/10.1103/PhysRevB.85.165113">Phys. Rev. B 85, 165113 (2012)</a>.</p>
 </aside>
-<aside class="footnote brackets" id="id8" role="doc-footnote">
+<aside class="footnote brackets" id="id9" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">2</a><span class="fn-bracket">]</span></span>
 <p>A. E. Bocquet et al.,
 <a class="reference external" href="https://doi.org/10.1103/PhysRevB.53.1161">Phys. Rev. B 53, 1161 (1996)</a>.</p>
 </aside>
-<aside class="footnote brackets" id="id9" role="doc-footnote">
+<aside class="footnote brackets" id="id10" role="doc-footnote">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">3</a><span class="fn-bracket">]</span></span>
 <p>Arata Tanaka, and Takeo Jo,
 <a class="reference external" href="https://doi.org/10.1143/JPSJ.63.2788">J. Phys. Soc. Jpn. 63, 2788-2807(1994)</a>.</p>
 </aside>
 </aside>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.492 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.522 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-example-03-aim-xas-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/fb3c04d30abd45a0ba95741ec9da2ff1/example_03_AIM_XAS.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">example_03_AIM_XAS.ipynb</span></code></a></p>
