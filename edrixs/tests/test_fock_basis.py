@@ -1,7 +1,5 @@
-import numpy as np
 import pytest
 from math import comb
-import edrixs
 from edrixs.fock_basis import (
     fock_bin, get_fock_bin_by_N, get_fock_full_N,
     get_fock_basis_by_NLz, get_fock_basis_by_NSz,

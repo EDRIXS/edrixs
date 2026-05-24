@@ -81,7 +81,6 @@ def test_ly_is_minus_i_half_ladd_minus_lminus(ll):
 def test_lz_with_spin_diagonal_structure(ll):
     """Lz with ispin=True has each Lz eigenvalue appearing twice (once per spin)."""
     lz_spin = edrixs.get_lz(ll, ispin=True)
-    norbs = 2 * ll + 1
     diag = np.diag(lz_spin).real
     expected = np.repeat(np.arange(-ll, ll + 1, dtype=float), 2)
     # Sort both since ordering interleaves up/down

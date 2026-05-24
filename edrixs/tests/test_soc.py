@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-import edrixs
 from edrixs.soc import atom_hsoc
 
 

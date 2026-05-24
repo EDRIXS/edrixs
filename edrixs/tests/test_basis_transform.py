@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-import edrixs
 from edrixs.basis_transform import (
     cb_op, cb_op2, tmat_c2r, tmat_r2c, tmat_c2j,
     tmat_r2cub_f, tmat_cub2r_f, transform_utensor
@@ -76,10 +75,9 @@ def test_cb_op_identity_leaves_operator_unchanged():
     n = 5
     np.random.seed(42)
     A = np.random.random((n, n)) + 1j * np.random.random((n, n))
-    O = A + np.conj(A.T)
-    I = np.eye(n, dtype=complex)
-    O_transformed = cb_op(O, I)
-    assert np.allclose(O_transformed, O)
+    op = A + np.conj(A.T)
+    op_transformed = cb_op(op, np.eye(n, dtype=complex))
+    assert np.allclose(op_transformed, op)
 
 
 def test_cb_op_preserves_eigenvalues():
@@ -87,11 +85,11 @@ def test_cb_op_preserves_eigenvalues():
     n = 5
     np.random.seed(42)
     A = np.random.random((n, n)) + 1j * np.random.random((n, n))
-    O = A + np.conj(A.T)
+    op = A + np.conj(A.T)
     Q, _ = np.linalg.qr(np.random.random((n, n)) + 1j * np.random.random((n, n)))
-    O_transformed = cb_op(O, Q)
-    evals_orig = np.sort(np.linalg.eigvalsh(O))
-    evals_new = np.sort(np.linalg.eigvalsh(O_transformed))
+    op_transformed = cb_op(op, Q)
+    evals_orig = np.sort(np.linalg.eigvalsh(op))
+    evals_new = np.sort(np.linalg.eigvalsh(op_transformed))
     assert np.allclose(evals_orig, evals_new)
 
 
@@ -100,11 +98,11 @@ def test_cb_op_batch_applies_per_matrix():
     n = 4
     np.random.seed(0)
     Q, _ = np.linalg.qr(np.random.random((n, n)) + 1j * np.random.random((n, n)))
-    O_batch = np.random.random((3, n, n)) + 1j * np.random.random((3, n, n))
-    result = cb_op(O_batch, Q)
+    op_batch = np.random.random((3, n, n)) + 1j * np.random.random((3, n, n))
+    result = cb_op(op_batch, Q)
     assert result.shape == (3, n, n)
     for i in range(3):
-        expected = cb_op(O_batch[i], Q)
+        expected = cb_op(op_batch[i], Q)
         assert np.allclose(result[i], expected)
 
 
@@ -113,11 +111,9 @@ def test_cb_op2_equivalent_to_cb_op_when_TR_equals_TL():
     n = 4
     np.random.seed(1)
     A = np.random.random((n, n)) + 1j * np.random.random((n, n))
-    O = A + np.conj(A.T)
+    op = A + np.conj(A.T)
     Q, _ = np.linalg.qr(np.random.random((n, n)) + 1j * np.random.random((n, n)))
-    result1 = cb_op(O, Q)
-    result2 = cb_op2(O, Q, Q)
-    assert np.allclose(result1, result2)
+    assert np.allclose(cb_op(op, Q), cb_op2(op, Q, Q))
 
 
 def test_transform_utensor_identity_leaves_tensor_unchanged():
@@ -126,8 +122,7 @@ def test_transform_utensor_identity_leaves_tensor_unchanged():
     umat = np.zeros((n, n, n, n), dtype=complex)
     umat[0, 1, 1, 0] = 1.0
     umat[1, 0, 0, 1] = 1.0
-    I = np.eye(n, dtype=complex)
-    umat_new = transform_utensor(umat, I)
+    umat_new = transform_utensor(umat, np.eye(n, dtype=complex))
     assert np.allclose(umat_new, umat)
 
 
@@ -147,8 +142,8 @@ def test_tmat_c2r_round_trip_operator():
     norbs = 2 * ll + 1
     np.random.seed(5)
     A = np.random.random((norbs, norbs)) + 1j * np.random.random((norbs, norbs))
-    O = A + np.conj(A.T)
+    op = A + np.conj(A.T)
     Tc2r = tmat_c2r('d')
     Tr2c = tmat_r2c('d')
-    O_prime = cb_op(cb_op(O, Tc2r), Tr2c)
-    assert np.allclose(O_prime, O)
+    op_prime = cb_op(cb_op(op, Tc2r), Tr2c)
+    assert np.allclose(op_prime, op)

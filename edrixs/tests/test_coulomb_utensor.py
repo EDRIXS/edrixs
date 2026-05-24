@@ -1,6 +1,5 @@
 import numpy as np
 import pytest
-import edrixs
 from edrixs.coulomb_utensor import (
     get_gaunt, umat_slater, get_umat_slater, get_umat_kanamori,
     get_umat_kanamori_ge, get_F0
