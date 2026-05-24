@@ -15,6 +15,7 @@ edrixs User Guide
    usedocker
    devcontainer
    quickstart
+   expectationvalues
    basics
    pythontips
    examples
