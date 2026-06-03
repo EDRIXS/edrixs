@@ -1,8 +1,10 @@
-__all__ = ['Ops_1v1c_scipy','ed_krylov_scipy', 'rixs_krylov_scipy',
-           'ed_1v1c_py', 'xas_1v1c_py', 'rixs_1v1c_py',
-           'ed_1v1c_fort', 'xas_1v1c_fort', 'rixs_1v1c_fort',
-           'ed_2v1c_fort', 'xas_2v1c_fort', 'rixs_2v1c_fort',
-           'ed_siam_fort', 'xas_siam_fort', 'rixs_siam_fort']
+__all__ = [
+    'Ops_1v1c_scipy', 'ed_krylov_scipy', 'rixs_krylov_scipy',
+    'ed_1v1c_py', 'xas_1v1c_py', 'rixs_1v1c_py',
+    'ed_1v1c_fort', 'xas_1v1c_fort', 'rixs_1v1c_fort',
+    'ed_2v1c_fort', 'xas_2v1c_fort', 'rixs_2v1c_fort',
+    'ed_siam_fort', 'xas_siam_fort', 'rixs_siam_fort'
+]
 
 import numpy as np
 import scipy
@@ -30,10 +32,11 @@ from .soc import atom_hsoc
 from .krylov import lanczos_tridiagonal
 from .manybody_operator_csr import two_fermion_csr, four_fermion_csr
 
+
 def Ops_1v1c_scipy(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
-                v_noccu=1, slater=None, ext_B=None, on_which='spin',
-                v_cfmat=None, v_othermat=None, loc_axis=None, verbose=0,
-                csr=True):
+                    v_noccu=1, slater=None, ext_B=None, on_which='spin',
+                    v_cfmat=None, v_othermat=None, loc_axis=None, verbose=0,
+                    csr=True):
     """
     Assemble sparse one-valence-one-core RIXS operators for Krylov solvers.
 
@@ -244,6 +247,7 @@ def Ops_1v1c_scipy(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
 
     return hmat_i, hmat_n, trans_ops
 
+
 def ed_krylov_scipy(hmat_i, num_gs=1, blocksize=None, *,
                     tol=1e-10, maxiter=200,
                     seed=None, initial_guess=None, suppress_lobpcg_warnings=True):
@@ -359,6 +363,7 @@ def ed_krylov_scipy(hmat_i, num_gs=1, blocksize=None, *,
     evec_i = np.asarray(evecs)[:, order[:num_gs]]
 
     return eval_i, evec_i
+
 
 def rixs_krylov_scipy(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
                       gamma_c=0.1, gamma_f=0.01, thin=1.0, thout=1.0, phi=0.0,
@@ -659,7 +664,6 @@ def _gmres_scipy_compat(A, b, *, tol, restart, maxiter):
         return gmres(A, b, rtol=tol, atol=0.0, restart=restart, maxiter=maxiter)
 
     return gmres(A, b, tol=tol, restart=restart, maxiter=maxiter)
-
 
 
 def ed_1v1c_py(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
