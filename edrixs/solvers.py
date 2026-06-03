@@ -1,10 +1,14 @@
-__all__ = ['ed_1v1c_py', 'xas_1v1c_py', 'rixs_1v1c_py',
+__all__ = ['Ops_1v1c_scipy','ed_krylov_scipy', 'rixs_krylov_scipy',
+           'ed_1v1c_py', 'xas_1v1c_py', 'rixs_1v1c_py',
            'ed_1v1c_fort', 'xas_1v1c_fort', 'rixs_1v1c_fort',
            'ed_2v1c_fort', 'xas_2v1c_fort', 'rixs_2v1c_fort',
            'ed_siam_fort', 'xas_siam_fort', 'rixs_siam_fort']
 
 import numpy as np
 import scipy
+from scipy.sparse.linalg import LinearOperator, aslinearoperator, lobpcg, gmres
+import inspect
+import warnings
 
 from .iostream import (
     write_tensor, write_emat, write_umat, write_config, read_poles_from_file
@@ -23,6 +27,639 @@ from .utils import info_atomic_shell, slater_integrals_name, boltz_dist
 from .rixs_utils import scattering_mat
 from .plot_spectrum import get_spectra_from_poles, merge_pole_dicts
 from .soc import atom_hsoc
+from .krylov import lanczos_tridiagonal
+from .manybody_operator_csr import two_fermion_csr, four_fermion_csr
+
+def Ops_1v1c_scipy(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
+                v_noccu=1, slater=None, ext_B=None, on_which='spin',
+                v_cfmat=None, v_othermat=None, loc_axis=None, verbose=0,
+                csr=True):
+    """
+    Assemble sparse one-valence-one-core RIXS operators for Krylov solvers.
+
+    This routine mirrors the model-construction part of ed_1v1c_py, but it does
+    not diagonalize either Hamiltonian and it does not transform transition
+    operators to an eigenbasis.
+
+    Returns
+    -------
+    hmat_i : scipy.sparse.linalg.LinearOperator
+        Initial/final many-body Hamiltonian in the initial Fock basis.
+
+    hmat_n : scipy.sparse.linalg.LinearOperator
+        Intermediate many-body Hamiltonian in the intermediate Fock basis.
+
+    trans_ops : list of scipy.sparse.linalg.LinearOperator
+        Transition operators in the many-body basis.  Each operator maps from
+        the initial Hilbert space to the intermediate Hilbert space and has
+        shape (dim_n, dim_i).  The list has length 3 for dipole transitions or
+        length 5 for quadrupole transitions.
+    """
+    if csr is not True:
+        raise ValueError("Ops_1v1c_sp always builds sparse CSR operators; use csr=True")
+
+    print("edrixs >>> Building sparse 1v1c operators ...")
+
+    v_name_options = ['s', 'p', 't2g', 'd', 'f']
+    c_name_options = ['s', 'p', 'p12', 'p32', 't2g', 'd', 'd32', 'd52',
+                      'f', 'f52', 'f72']
+
+    v_name = shell_name[0].strip()
+    c_name = shell_name[1].strip()
+
+    if v_name not in v_name_options:
+        raise Exception("NOT supported type of valence shell: ", v_name)
+    if c_name not in c_name_options:
+        raise Exception("NOT supported type of core shell: ", c_name)
+
+    info_shell = info_atomic_shell()
+
+    v_orbl = info_shell[v_name][0]
+    v_norb = info_shell[v_name][1]
+    c_norb = info_shell[c_name][1]
+    ntot = v_norb + c_norb
+
+    emat_i = np.zeros((ntot, ntot), dtype=complex)
+    emat_n = np.zeros((ntot, ntot), dtype=complex)
+
+    # Coulomb interaction.
+    slater_name = slater_integrals_name((v_name, c_name), ('v', 'c'))
+    nslat = len(slater_name)
+
+    slater_i = np.zeros(nslat, dtype=float)
+    slater_n = np.zeros(nslat, dtype=float)
+
+    if slater is not None:
+        if nslat > len(slater[0]):
+            slater_i[0:len(slater[0])] = slater[0]
+        else:
+            slater_i[:] = slater[0][0:nslat]
+
+        if nslat > len(slater[1]):
+            slater_n[0:len(slater[1])] = slater[1]
+        else:
+            slater_n[:] = slater[1][0:nslat]
+
+    print()
+    print("    Summary of Slater integrals:")
+    print("    ------------------------------")
+    print("    Terms,   Initial Hamiltonian,  Intermediate Hamiltonian")
+    for i in range(nslat):
+        print("    ", slater_name[i], ":  {:20.10f}{:20.10f}".format(
+            slater_i[i], slater_n[i]
+        ))
+    print()
+
+    case = v_name + c_name
+    umat_i = get_umat_slater(case, *slater_i)
+    umat_n = get_umat_slater(case, *slater_n)
+
+    if verbose > 0:
+        write_umat(umat_i, 'coulomb_i.in')
+        write_umat(umat_n, 'coulomb_n.in')
+
+    # Spin-orbit coupling.
+    if v_soc is not None:
+        emat_i[0:v_norb, 0:v_norb] += atom_hsoc(v_name, v_soc[0])
+        emat_n[0:v_norb, 0:v_norb] += atom_hsoc(v_name, v_soc[1])
+
+    # For split core shells such as p12/p32, d32/d52, f52/f72, the SOC is
+    # already encoded by the shell choice.
+    if c_name in ['p', 'd', 'f']:
+        emat_n[v_norb:ntot, v_norb:ntot] += atom_hsoc(c_name, c_soc)
+
+    # Crystal field and additional one-body terms.
+    if v_cfmat is not None:
+        emat_i[0:v_norb, 0:v_norb] += np.asarray(v_cfmat)
+        emat_n[0:v_norb, 0:v_norb] += np.asarray(v_cfmat)
+
+    if v_othermat is not None:
+        emat_i[0:v_norb, 0:v_norb] += np.asarray(v_othermat)
+        emat_n[0:v_norb, 0:v_norb] += np.asarray(v_othermat)
+
+    # Shell levels.
+    if shell_level is not None:
+        emat_i[0:v_norb, 0:v_norb] += np.eye(v_norb) * shell_level[0]
+        emat_i[v_norb:ntot, v_norb:ntot] += np.eye(c_norb) * shell_level[1]
+
+        emat_n[0:v_norb, 0:v_norb] += np.eye(v_norb) * shell_level[0]
+        emat_n[v_norb:ntot, v_norb:ntot] += np.eye(c_norb) * shell_level[1]
+
+    # External field on valence shell.
+    if v_name == 't2g':
+        lx, ly, lz = get_lx(1, True), get_ly(1, True), get_lz(1, True)
+        sx, sy, sz = get_sx(1), get_sy(1), get_sz(1)
+        lx, ly, lz = -lx, -ly, -lz
+    else:
+        lx, ly, lz = get_lx(v_orbl, True), get_ly(v_orbl, True), get_lz(v_orbl, True)
+        sx, sy, sz = get_sx(v_orbl), get_sy(v_orbl), get_sz(v_orbl)
+
+    if ext_B is not None:
+        if on_which.strip() == 'spin':
+            zeeman = ext_B[0] * (2 * sx) + ext_B[1] * (2 * sy) + ext_B[2] * (2 * sz)
+        elif on_which.strip() == 'orbital':
+            zeeman = ext_B[0] * lx + ext_B[1] * ly + ext_B[2] * lz
+        elif on_which.strip() == 'both':
+            zeeman = (
+                ext_B[0] * (lx + 2 * sx)
+                + ext_B[1] * (ly + 2 * sy)
+                + ext_B[2] * (lz + 2 * sz)
+            )
+        else:
+            raise Exception("Unknown value of on_which", on_which)
+
+        emat_i[0:v_norb, 0:v_norb] += zeeman
+        emat_n[0:v_norb, 0:v_norb] += zeeman
+
+    if verbose > 0:
+        write_emat(emat_i, 'hopping_i.in')
+        write_emat(emat_n, 'hopping_n.in')
+
+    # Fock bases.
+    basis_i = get_fock_bin_by_N(v_norb, v_noccu, c_norb, c_norb)
+    basis_n = get_fock_bin_by_N(v_norb, v_noccu + 1, c_norb, c_norb - 1)
+
+    ncfg_i = len(basis_i)
+    ncfg_n = len(basis_n)
+
+    print("edrixs >>> Dimension of the initial Hamiltonian: ", ncfg_i)
+    print("edrixs >>> Dimension of the intermediate Hamiltonian: ", ncfg_n)
+
+    # Sparse many-body Hamiltonians in the Fock bases.
+    print("edrixs >>> Building sparse many-body Hamiltonians ...")
+
+    hmat_i_sp = two_fermion_csr(emat_i, basis_i, basis_i)
+    hmat_i_sp = hmat_i_sp + four_fermion_csr(umat_i, basis_i)
+
+    hmat_n_sp = two_fermion_csr(emat_n, basis_n, basis_n)
+    hmat_n_sp = hmat_n_sp + four_fermion_csr(umat_n, basis_n)
+
+    hmat_i_sp = hmat_i_sp.tocsr()
+    hmat_n_sp = hmat_n_sp.tocsr()
+
+    print("edrixs >>> Done !")
+
+    # Transition operators in local coordinates, rotated to global coordinates.
+    if loc_axis is not None:
+        local_axis = np.asarray(loc_axis)
+    else:
+        local_axis = np.eye(3)
+
+    tmp = get_trans_oper(case)
+    npol, n, m = tmp.shape
+    tmp_g = np.zeros((npol, n, m), dtype=complex)
+
+    if npol == 3:
+        for i in range(3):
+            for j in range(3):
+                tmp_g[i] += local_axis[i, j] * tmp[j]
+    elif npol == 5:
+        alpha, beta, gamma = rmat_to_euler(local_axis)
+        wignerD = get_wigner_dmat(4, alpha, beta, gamma)
+        rotmat = np.dot(
+            np.dot(tmat_r2c('d'), wignerD),
+            np.conj(np.transpose(tmat_r2c('d')))
+        )
+        for i in range(5):
+            for j in range(5):
+                tmp_g[i] += rotmat[i, j] * tmp[j]
+    else:
+        raise Exception("Have NOT implemented this case: ", npol)
+
+    print("edrixs >>> Building sparse transition operators ...")
+
+    trans_ops_sp = []
+    for i in range(npol):
+        trans_mat = np.zeros((ntot, ntot), dtype=complex)
+        trans_mat[0:v_norb, v_norb:ntot] = tmp_g[i]
+        trans_ops_sp.append(
+            two_fermion_csr(trans_mat, basis_n, basis_i).tocsr()
+        )
+
+    print("edrixs >>> Sparse operator assembly Done !")
+
+    hmat_i = aslinearoperator(hmat_i_sp)
+    hmat_n = aslinearoperator(hmat_n_sp)
+    trans_ops = [aslinearoperator(T) for T in trans_ops_sp]
+
+    return hmat_i, hmat_n, trans_ops
+
+def ed_krylov_scipy(hmat_i, num_gs=1, blocksize=None, *,
+                    tol=1e-10, maxiter=200,
+                    seed=None, initial_guess=None, suppress_lobpcg_warnings=True):
+    """
+    Compute the lowest retained initial-state eigenpairs using SciPy LOBPCG.
+
+    This routine is intended to prepare the low-energy initial states used by
+    rixs_krylov_scipy. It diagonalizes only the initial/final Hamiltonian
+    hmat_i and returns the lowest num_gs eigenpairs.
+
+    Parameters
+    ----------
+    hmat_i : sparse matrix or scipy.sparse.linalg.LinearOperator
+        Initial/final Hamiltonian. It must be square and Hermitian.
+
+    num_gs : int, optional
+        Number of lowest-energy initial states to retain and return.
+
+    blocksize : int or None, optional
+        Number of eigenpairs requested internally from LOBPCG. If None, it is
+        set to num_gs. If larger than num_gs, extra eigenpairs are computed
+        and then discarded. This can help when low-energy degeneracies are
+        expected or when a larger block improves convergence.
+
+    tol : float, optional
+        LOBPCG convergence tolerance.
+
+    maxiter : int, optional
+        Maximum number of LOBPCG iterations.
+
+    seed : int or None, optional
+        Random seed used to construct the initial block if initial_guess is not
+        provided.
+
+    initial_guess : ndarray or None, optional
+        Initial approximation block X for LOBPCG. If provided, it must have
+        shape ``(dim_i, blocksize)``.
+
+    Returns
+    -------
+    eval_i : ndarray
+        Lowest retained eigenvalues, shape ``(num_gs,)``.
+
+    evec_i : ndarray
+        Corresponding eigenvectors, shape ``(dim_i, num_gs)``.
+    """
+    hmat_i = aslinearoperator(hmat_i)
+
+    if hmat_i.shape[0] != hmat_i.shape[1]:
+        raise ValueError("hmat_i must be square")
+
+    num_gs = int(num_gs)
+    if num_gs < 1:
+        raise ValueError("num_gs must be a positive integer")
+
+    dim_i = hmat_i.shape[0]
+
+    if blocksize is None:
+        blocksize = num_gs
+
+    blocksize = int(blocksize)
+
+    if blocksize < num_gs:
+        raise ValueError("blocksize must be greater than or equal to num_gs")
+
+    if blocksize > dim_i:
+        raise ValueError("blocksize cannot exceed hmat_i.shape[0]")
+
+    if initial_guess is None:
+        rng = np.random.default_rng(seed)
+        X = rng.normal(size=(dim_i, blocksize))
+    else:
+        X = np.asarray(initial_guess)
+        if X.shape != (dim_i, blocksize):
+            raise ValueError(
+                "initial_guess must have shape {}, got {}".format(
+                    (dim_i, blocksize), X.shape
+                )
+            )
+
+    if suppress_lobpcg_warnings:
+        with warnings.catch_warnings():
+            warnings.filterwarnings(
+                "ignore",
+                category=UserWarning,
+                message=r"Exited at iteration .*",
+            )
+            warnings.filterwarnings(
+                "ignore",
+                category=UserWarning,
+                message=r"Exited postprocessing .*",
+            )
+
+            evals, evecs = lobpcg(
+                hmat_i,
+                X,
+                largest=False,
+                tol=tol,
+                maxiter=maxiter,
+            )
+    else:
+        evals, evecs = lobpcg(
+            hmat_i,
+            X,
+            largest=False,
+            tol=tol,
+            maxiter=maxiter,
+        )
+
+    order = np.argsort(evals)
+
+    eval_i = np.asarray(evals)[order[:num_gs]]
+    evec_i = np.asarray(evecs)[:, order[:num_gs]]
+
+    return eval_i, evec_i
+
+def rixs_krylov_scipy(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
+                      gamma_c=0.1, gamma_f=0.01, thin=1.0, thout=1.0, phi=0.0,
+                      pol_type=None, temperature=1.0, scatter_axis=None,
+                      skip_gs=False, nkryl=200, linsys_tol=1e-9,
+                      linsys_maxiter=50000, linsys_restart=200, return_poles=False):
+    """
+    Calculate RIXS spectra with a SciPy Krylov correction-vector solver.
+
+    This routine assumes that eval_i and evec_i contain only the kept initial
+    states. It does not use gs_list.
+
+    hmat_i, hmat_n, and every element of trans_op are converted with
+    scipy.sparse.linalg.aslinearoperator. The transition operators must provide
+    an adjoint action, because the absorption step uses T @ v and the emission
+    step uses T.H @ v.
+
+    Parameters
+    ----------
+    eval_i : 1d array
+        Energies of the kept initial states.
+
+    evec_i : 2d array
+        Kept initial-state eigenvectors in the basis of hmat_i.
+        Column i corresponds to eval_i[i].
+
+    hmat_i : sparse matrix or LinearOperator
+        Initial/final Hamiltonian.
+
+    hmat_n : sparse matrix or LinearOperator
+        Intermediate-state Hamiltonian.
+
+    trans_op : list
+        List of transition operators. Each operator maps the initial/final
+        Hilbert space to the intermediate Hilbert space and must have shape
+        (dim_n, dim_i). For dipole transitions this list has length 3;
+        for quadrupole transitions it has length 5.
+
+    ominc : 1d array
+        Incident photon energies.
+
+    eloss : 1d array
+        Energy-loss grid.
+
+    Returns
+    -------
+    rixs : 3d array
+        RIXS spectra with shape (len(ominc), len(eloss), len(pol_type)).
+
+    poles : list, optional
+        Returned only if return_poles is True. Nested list of pole dictionaries
+        with shape (len(ominc), len(pol_type)).
+    """
+    print("edrixs >>> Running Krylov RIXS ... ")
+
+    eval_i = np.asarray(eval_i, dtype=float)
+    evec_i = np.asarray(evec_i, dtype=complex)
+    ominc = np.asarray(ominc, dtype=float)
+    eloss = np.asarray(eloss, dtype=float)
+
+    hmat_i = aslinearoperator(hmat_i)
+    hmat_n = aslinearoperator(hmat_n)
+    trans_op = [aslinearoperator(T) for T in trans_op]
+
+    if hmat_i.shape[0] != hmat_i.shape[1]:
+        raise ValueError("hmat_i must be square")
+    if hmat_n.shape[0] != hmat_n.shape[1]:
+        raise ValueError("hmat_n must be square")
+    if evec_i.ndim != 2:
+        raise ValueError("evec_i must be a two-dimensional array")
+    if len(eval_i) != evec_i.shape[1]:
+        raise ValueError("len(eval_i) must equal evec_i.shape[1]")
+    if evec_i.shape[0] != hmat_i.shape[0]:
+        raise ValueError("evec_i.shape[0] must equal hmat_i.shape[0]")
+
+    dim_i = hmat_i.shape[0]
+    dim_n = hmat_n.shape[0]
+    ntrans = len(trans_op)
+
+    if ntrans not in (3, 5):
+        raise ValueError("len(trans_op) must be 3 for dipole or 5 for quadrupole transitions")
+
+    for i, T in enumerate(trans_op):
+        if T.shape != (dim_n, dim_i):
+            raise ValueError(
+                "trans_op[{}] has shape {}, expected {}".format(
+                    i, T.shape, (dim_n, dim_i)
+                )
+            )
+        _check_adjoint_action(T, "trans_op[{}]".format(i))
+
+    if pol_type is None:
+        pol_type = [('linear', 0, 'linear', 0)]
+
+    if scatter_axis is None:
+        scatter_axis = np.eye(3)
+    else:
+        scatter_axis = np.asarray(scatter_axis, dtype=float)
+
+    n_ominc = len(ominc)
+    n_eloss = len(eloss)
+    n_init = len(eval_i)
+    n_pol = len(pol_type)
+
+    gamma_core = _expand_broadening(gamma_c, n_ominc, "gamma_c")
+    gamma_final = _expand_broadening(gamma_f, n_eloss, "gamma_f")
+
+    rixs = np.zeros((n_ominc, n_eloss, n_pol), dtype=float)
+    poles_all = [[None for _ in range(n_pol)] for _ in range(n_ominc)]
+
+    trans_op_H = [T.H for T in trans_op]
+
+    for iom, omega in enumerate(ominc):
+        for ipol, (it, alpha, jt, beta) in enumerate(pol_type):
+            polvec_i, polvec_f = _rixs_polarization_vectors(
+                ntrans, thin, thout, phi, it, alpha, jt, beta, scatter_axis
+            )
+
+            poles_dict = {
+                'npoles': [],
+                'eigval': [],
+                'norm': [],
+                'alpha': [],
+                'beta': []
+            }
+
+            for istate in range(n_init):
+                rhs = _apply_linear_combination(
+                    trans_op, polvec_i, evec_i[:, istate]
+                )
+
+                rec = _rixs_krylov_one_contribution_scipy(
+                    hmat_i=hmat_i,
+                    hmat_n=hmat_n,
+                    trans_op_H=trans_op_H,
+                    polvec_f=polvec_f,
+                    eval_i=eval_i,
+                    evec_i=evec_i,
+                    istate=istate,
+                    omega=omega,
+                    gamma_c=gamma_core[iom],
+                    rhs=rhs,
+                    skip_gs=skip_gs,
+                    nkryl=nkryl,
+                    linsys_tol=linsys_tol,
+                    linsys_maxiter=linsys_maxiter,
+                    linsys_restart=linsys_restart
+                )
+
+                poles_dict['npoles'].append(rec['npoles'])
+                poles_dict['eigval'].append(rec['eigval'])
+                poles_dict['norm'].append(rec['norm'])
+                poles_dict['alpha'].append(rec['alpha'])
+                poles_dict['beta'].append(rec['beta'])
+
+            poles_all[iom][ipol] = poles_dict
+            rixs[iom, :, ipol] = get_spectra_from_poles(
+                poles_dict, eloss, gamma_final, temperature
+            )
+
+    print("edrixs >>> Krylov RIXS Done !")
+
+    if return_poles:
+        return rixs, poles_all
+    return rixs
+
+
+def _rixs_krylov_one_contribution_scipy(*, hmat_i, hmat_n, trans_op_H, polvec_f,
+                                        eval_i, evec_i, istate, omega, gamma_c,
+                                        rhs, skip_gs, nkryl, linsys_tol,
+                                        linsys_maxiter, linsys_restart):
+    """Compute one kept-initial-state contribution to one RIXS pole dictionary."""
+    Ei = eval_i[istate]
+
+    if np.linalg.norm(rhs) == 0:
+        alpha = np.array([0.0], dtype=float)
+        beta = np.array([], dtype=float)
+        return {
+            'eigval': Ei,
+            'npoles': 1,
+            'norm': 0.0,
+            'alpha': alpha,
+            'beta': beta
+        }
+
+    z = omega + Ei + 1j * gamma_c
+
+    A = LinearOperator(
+        shape=hmat_n.shape,
+        matvec=lambda x, z=z: z * x - hmat_n @ x,
+        dtype=np.complex128
+    )
+
+    x, info = _gmres_scipy_compat(
+        A, rhs, tol=linsys_tol, restart=linsys_restart, maxiter=linsys_maxiter
+    )
+
+    if info != 0:
+        raise RuntimeError(
+            "GMRES did not converge for istate={}, omega={}; info={}".format(
+                istate, omega, info
+            )
+        )
+
+    phi_vec = _apply_linear_combination(trans_op_H, np.conj(polvec_f), x)
+
+    if skip_gs:
+        for j in range(len(eval_i)):
+            gj = evec_i[:, j]
+            phi_vec = phi_vec - gj * np.vdot(gj, phi_vec)
+
+    if np.linalg.norm(phi_vec) == 0:
+        alpha = np.array([0.0], dtype=float)
+        beta = np.array([], dtype=float)
+        norm = 0.0
+    else:
+        alpha, beta, norm = lanczos_tridiagonal(hmat_i, phi_vec, m=nkryl)
+
+    return {
+        'eigval': Ei,
+        'npoles': len(alpha),
+        'norm': norm,
+        'alpha': alpha,
+        'beta': beta
+    }
+
+
+def _rixs_polarization_vectors(ntrans, thin, thout, phi, it, alpha, jt, beta, scatter_axis):
+    """Return incoming and outgoing polarization vectors in transition-operator space."""
+    ei, ef = dipole_polvec_rixs(thin, thout, phi, alpha, beta, scatter_axis, (it, jt))
+
+    if it.lower() == 'isotropic':
+        ei = np.ones(3, dtype=complex) / np.sqrt(3.0)
+    if jt.lower() == 'isotropic':
+        ef = np.ones(3, dtype=complex) / np.sqrt(3.0)
+
+    polvec_i = np.zeros(ntrans, dtype=complex)
+    polvec_f = np.zeros(ntrans, dtype=complex)
+
+    if ntrans == 3:
+        polvec_i[:] = ei
+        polvec_f[:] = ef
+    elif ntrans == 5:
+        ki = unit_wavevector(thin, phi, scatter_axis, direction='in')
+        kf = unit_wavevector(thout, phi, scatter_axis, direction='out')
+        polvec_i[:] = quadrupole_polvec(ei, ki)
+        polvec_f[:] = quadrupole_polvec(ef, kf)
+    else:
+        raise ValueError("ntrans must be 3 or 5")
+
+    return polvec_i, polvec_f
+
+
+def _apply_linear_combination(ops, coeffs, vec):
+    """Apply sum_i coeffs[i] ops[i] to vec without constructing the summed operator."""
+    out = None
+    for coeff, op in zip(coeffs, ops):
+        if coeff == 0:
+            continue
+        term = coeff * (op @ vec)
+        out = term if out is None else out + term
+
+    if out is None:
+        return np.zeros(ops[0].shape[0], dtype=complex)
+    return out
+
+
+def _check_adjoint_action(op, name):
+    """Require op.H @ x to work."""
+    try:
+        test_vec = np.zeros(op.shape[0], dtype=complex)
+        _ = op.H @ test_vec
+    except Exception as exc:
+        raise TypeError(
+            "{} must provide an adjoint action. For a custom LinearOperator, "
+            "define rmatvec or _adjoint.".format(name)
+        ) from exc
+
+
+def _expand_broadening(gamma, n, name):
+    """Return gamma as a length-n float array."""
+    out = np.empty(n, dtype=float)
+    if np.isscalar(gamma):
+        out[:] = gamma
+    else:
+        gamma = np.asarray(gamma, dtype=float)
+        if gamma.shape != (n,):
+            raise ValueError("{} must be scalar or have shape ({},)".format(name, n))
+        out[:] = gamma
+    return out
+
+
+def _gmres_scipy_compat(A, b, *, tol, restart, maxiter):
+    """Call scipy.sparse.linalg.gmres with either old or new SciPy tolerance names."""
+    sig = inspect.signature(gmres)
+
+    if "rtol" in sig.parameters:
+        return gmres(A, b, rtol=tol, atol=0.0, restart=restart, maxiter=maxiter)
+
+    return gmres(A, b, tol=tol, restart=restart, maxiter=maxiter)
+
 
 
 def ed_1v1c_py(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
