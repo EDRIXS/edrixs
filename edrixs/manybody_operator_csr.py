@@ -43,7 +43,7 @@ def two_fermion_csr(emat, lb, rb=None, tol=1E-10):
     cols = []
     data = []
 
-#    hmat = np.array((nl, nr), dtype=np.complex128)
+    # hmat = np.array((nl, nr), dtype=np.complex128)
     tmp_basis = np.zeros(norbs)
     for iorb, jorb in nonzero:
         for icfg in range(nr):
@@ -60,10 +60,10 @@ def two_fermion_csr(emat, lb, rb=None, tol=1E-10):
                 tmp_basis[iorb] = 1
             jcfg = indx[tuple(tmp_basis)]
             if jcfg != -1:
-#                hmat[jcfg, icfg] += emat[iorb, jorb] * s1 * s2
-                 rows.append(jcfg)
-                 cols.append(icfg)
-                 data.append(emat[iorb, jorb] * s1 * s2)
+                # hmat[jcfg, icfg] += emat[iorb, jorb] * s1 * s2
+                rows.append(jcfg)
+                cols.append(icfg)
+                data.append(emat[iorb, jorb] * s1 * s2)
     return sp.coo_matrix((data, (rows, cols)), shape=(nl, nr), dtype=np.complex128).tocsr()
 
 
@@ -108,7 +108,7 @@ def four_fermion_csr(umat, lb, rb=None, tol=1E-10):
     cols = []
     data = []
 
-    #hmat = np.zeros((nl, nr), dtype=np.complex128)
+    # hmat = np.zeros((nl, nr), dtype=np.complex128)
     tmp_basis = np.zeros(norbs)
     for lorb, korb, jorb, iorb in nonzero:
         if iorb == jorb or korb == lorb:
@@ -137,8 +137,8 @@ def four_fermion_csr(umat, lb, rb=None, tol=1E-10):
                 tmp_basis[lorb] = 1
             jcfg = indx[tuple(tmp_basis)]
             if jcfg != -1:
-                 rows.append(jcfg)
-                 cols.append(icfg)
-                 data.append(umat[lorb, korb, jorb, iorb] * s1 * s2 * s3 * s4)
-#                hmat[jcfg, icfg] += umat[lorb, korb, jorb, iorb] * s1 * s2 * s3 * s4
+                rows.append(jcfg)
+                cols.append(icfg)
+                data.append(umat[lorb, korb, jorb, iorb] * s1 * s2 * s3 * s4)
+                # hmat[jcfg, icfg] += umat[lorb, korb, jorb, iorb] * s1 * s2 * s3 * s4
     return sp.coo_matrix((data, (rows, cols)), shape=(nl, nr), dtype=np.complex128).tocsr()
