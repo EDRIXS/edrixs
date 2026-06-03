@@ -34,9 +34,9 @@ from .manybody_operator_csr import two_fermion_csr, four_fermion_csr
 
 
 def Ops_1v1c_scipy(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
-                    v_noccu=1, slater=None, ext_B=None, on_which='spin',
-                    v_cfmat=None, v_othermat=None, loc_axis=None, verbose=0,
-                    csr=True):
+                 v_noccu=1, slater=None, ext_B=None, on_which='spin',
+                 v_cfmat=None, v_othermat=None, loc_axis=None, verbose=0,
+                 csr=True):
     """
     Assemble sparse one-valence-one-core RIXS operators for Krylov solvers.
 
