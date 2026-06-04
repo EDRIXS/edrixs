@@ -236,6 +236,7 @@ def setup_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
 
     return emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
 
+
 def setup_2v1c(
     shell_name, *, shell_level=None,
     v1_soc=None, v2_soc=None, c_soc=0, v_tot_noccu=1, slater=None,
@@ -671,7 +672,6 @@ def setup_siam(
     return emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
 
 
-
 def _rotated_transition_blocks(case, loc_axis=None):
     """
     Build transition blocks in global coordinates for a shell-transition case.
@@ -731,7 +731,6 @@ def _valence_zeeman_matrix(shell_name, orbl, ext_B, on_which):
         )
 
     raise Exception("Unknown value of on_which", on_which)
-
 
 
 def _umat_dense_to_sparse(umat, tol=1E-10):
