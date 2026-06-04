@@ -1,5 +1,5 @@
 __all__ = [
-    'setup_1v1c', 'ops', 'ed_krylov_scipy', 'rixs_krylov_scipy'
+    'setup_1v1c', 'ops', 'ed_krylov_scipy', 'rixs_krylov_scipy',
     'setup_2v1c','setup_siam',
     'ed_1v1c_py', 'xas_1v1c_py', 'rixs_1v1c_py',
     'ed_1v1c_fort', 'xas_1v1c_fort', 'rixs_1v1c_fort',
@@ -9,6 +9,7 @@ __all__ = [
 
 import numpy as np
 import scipy
+import scipy.sparse as sp
 from scipy.sparse.linalg import LinearOperator, aslinearoperator, lobpcg, gmres
 import inspect
 import warnings
