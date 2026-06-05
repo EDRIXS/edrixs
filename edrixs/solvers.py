@@ -13,7 +13,6 @@ import scipy.sparse as sp
 from scipy.sparse.linalg import LinearOperator, aslinearoperator, lobpcg, gmres
 import inspect
 import warnings
-from collections import defaultdict
 
 from .iostream import (
     write_tensor, write_emat, write_umat, write_config, read_poles_from_file
@@ -33,7 +32,9 @@ from .rixs_utils import scattering_mat
 from .plot_spectrum import get_spectra_from_poles, merge_pole_dicts
 from .soc import atom_hsoc
 from .krylov import lanczos_tridiagonal
-from .manybody_operator_csr import two_fermion_csr, four_fermion_csr
+from .manybody_operator_csr import (
+    two_fermion_csr, four_fermion_csr_auto, get_fock_basis_int
+)
 
 
 def setup_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
@@ -195,8 +196,8 @@ def setup_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
         write_emat(emat_n, 'hopping_n.in')
 
     # Fock bases.
-    basis_i = get_fock_bin_by_N(v_norb, v_noccu, c_norb, c_norb)
-    basis_n = get_fock_bin_by_N(v_norb, v_noccu + 1, c_norb, c_norb - 1)
+    basis_i = get_fock_basis_int(v_norb, v_noccu, c_norb, c_norb)
+    basis_n = get_fock_basis_int(v_norb, v_noccu + 1, c_norb, c_norb - 1)
 
     print("edrixs >>> Dimension of the initial Hamiltonian: ", len(basis_i))
     print("edrixs >>> Dimension of the intermediate Hamiltonian: ", len(basis_n))
@@ -434,10 +435,10 @@ def setup_2v1c(
         write_emat(emat_i, 'hopping_i.in')
         write_emat(emat_n, 'hopping_n.in')
 
-    basis_i = get_fock_bin_by_N(
+    basis_i = get_fock_basis_int(
         v1v2_norb, v_tot_noccu, c_norb, c_norb
     )
-    basis_n = get_fock_bin_by_N(
+    basis_n = get_fock_basis_int(
         v1v2_norb, v_tot_noccu + 1, c_norb, c_norb - 1
     )
 
@@ -657,8 +658,8 @@ def setup_siam(
         write_emat(emat_i, 'hopping_i.in')
         write_emat(emat_n, 'hopping_n.in')
 
-    basis_i = get_fock_bin_by_N(ntot_v, v_noccu, c_norb, c_norb)
-    basis_n = get_fock_bin_by_N(ntot_v, v_noccu + 1, c_norb, c_norb - 1)
+    basis_i = get_fock_basis_int(ntot_v, v_noccu, c_norb, c_norb)
+    basis_n = get_fock_basis_int(ntot_v, v_noccu + 1, c_norb, c_norb - 1)
 
     print("edrixs >>> Dimension of the initial Hamiltonian: ", len(basis_i))
     print("edrixs >>> Dimension of the intermediate Hamiltonian: ", len(basis_n))
@@ -864,10 +865,10 @@ def ops(emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
     print("edrixs >>> Building many-body operators with backend='{}' ...".format(backend))
 
     hmat_i_sp = two_fermion_csr(emat_i, basis_i, basis_i, tol=tol)
-    hmat_i_sp = hmat_i_sp + _four_fermion_csr_auto(umat_i, basis_i, tol=tol)
+    hmat_i_sp = hmat_i_sp + four_fermion_csr_auto(umat_i, basis_i, tol=tol)
 
     hmat_n_sp = two_fermion_csr(emat_n, basis_n, basis_n, tol=tol)
-    hmat_n_sp = hmat_n_sp + _four_fermion_csr_auto(umat_n, basis_n, tol=tol)
+    hmat_n_sp = hmat_n_sp + four_fermion_csr_auto(umat_n, basis_n, tol=tol)
 
     trans_ops_sp = [
         two_fermion_csr(trans_mat[i], basis_n, basis_i, tol=tol).tocsr()
@@ -887,103 +888,6 @@ def ops(emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
         )
 
     return hmat_i_sp.toarray(), hmat_n_sp.toarray(), [T.toarray() for T in trans_ops_sp]
-
-
-def _four_fermion_csr_auto(umat, basis, rb=None, tol=1E-10):
-    """Dispatch four-fermion construction based on dense or sparse U format."""
-    if sp.issparse(umat):
-        return _four_fermion_csr_from_sparse_umat(umat, basis, rb=rb, tol=tol)
-
-    return four_fermion_csr(umat, basis, rb=rb, tol=tol)
-
-
-def _four_fermion_csr_from_sparse_umat(umat, lb, rb=None, tol=1E-10):
-    """
-    Build a four-fermion many-body operator from sparse flattened U.
-
-    The sparse U matrix must have shape (norbs*norbs, norbs*norbs), with
-
-        row = lorb * norbs + korb
-        col = jorb * norbs + iorb
-
-    representing tensor entries umat[lorb, korb, jorb, iorb].
-    """
-    if rb is None:
-        rb = lb
-
-    lb = np.asarray(lb)
-    rb = np.asarray(rb)
-
-    nr = len(rb)
-    nl = len(lb)
-    norbs = len(rb[0])
-
-    expected_shape = (norbs * norbs, norbs * norbs)
-    if umat.shape != expected_shape:
-        raise ValueError(
-            "sparse umat has shape {}, expected {}".format(
-                umat.shape, expected_shape
-            )
-        )
-
-    umat = umat.tocoo()
-
-    indx = defaultdict(lambda: -1)
-    for i, cfg in enumerate(lb):
-        indx[tuple(cfg)] = i
-
-    rows = []
-    cols = []
-    data = []
-
-    tmp_basis = np.zeros(norbs, dtype=rb.dtype)
-
-    for row, col, val in zip(umat.row, umat.col, umat.data):
-        if abs(val) <= tol:
-            continue
-
-        lorb = row // norbs
-        korb = row % norbs
-        jorb = col // norbs
-        iorb = col % norbs
-
-        if iorb == jorb or korb == lorb:
-            continue
-
-        for icfg in range(nr):
-            tmp_basis[:] = rb[icfg]
-
-            if tmp_basis[iorb] == 0:
-                continue
-            s1 = (-1)**np.count_nonzero(tmp_basis[0:iorb])
-            tmp_basis[iorb] = 0
-
-            if tmp_basis[jorb] == 0:
-                continue
-            s2 = (-1)**np.count_nonzero(tmp_basis[0:jorb])
-            tmp_basis[jorb] = 0
-
-            if tmp_basis[korb] == 1:
-                continue
-            s3 = (-1)**np.count_nonzero(tmp_basis[0:korb])
-            tmp_basis[korb] = 1
-
-            if tmp_basis[lorb] == 1:
-                continue
-            s4 = (-1)**np.count_nonzero(tmp_basis[0:lorb])
-            tmp_basis[lorb] = 1
-
-            jcfg = indx[tuple(tmp_basis)]
-            if jcfg != -1:
-                rows.append(jcfg)
-                cols.append(icfg)
-                data.append(val * s1 * s2 * s3 * s4)
-
-    return sp.coo_matrix(
-        (data, (rows, cols)),
-        shape=(nl, nr),
-        dtype=np.complex128
-    ).tocsr()
 
 
 def ed_krylov_scipy(hmat_i, num_gs=1, blocksize=None, *,
