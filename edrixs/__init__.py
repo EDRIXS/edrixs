@@ -1,3 +1,12 @@
+import warnings
+warnings.warn(
+    "Changes to the EDRIXS user interface are currently being considered. "
+    "Everything should continue to work for this version, but please plan "
+    "for breaking changes in the next release.",
+    FutureWarning,
+    stacklevel=2,
+)
+
 from .angular_momentum import *
 from .basis_transform import *
 from .coulomb_utensor import *
