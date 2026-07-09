@@ -1,5 +1,6 @@
 __all__ = ['cb_op', 'cb_op2', 'tmat_c2r', 'tmat_r2c', 'tmat_r2cub_f',
-           'tmat_cub2r_f', 'tmat_c2j', 'transform_utensor', 'fourier_hr2hk']
+           'tmat_cub2r_f', 'tmat_c2j', 'tmat_r2trig', 'tmat_trig2r',
+           'transform_utensor', 'fourier_hr2hk']
 
 import numpy as np
 
@@ -121,7 +122,7 @@ def tmat_c2r(case, ispin=False):
         - 'd': for :math:`d`-shell
         - 'f': for :math:`f`-shell
     ispin: logical
-        Whether including spin degree of freedom or not (default: False).
+        Whether to include spin degree of freedom or not (default: False).
 
     Returns
     -------
@@ -239,7 +240,7 @@ def tmat_r2c(case, ispin=False):
         - 'd': for :math:`d`-shell
         - 'f': for :math:`f`-shell
     ispin: logical
-        Whether including spin degree of freedom or not (default: False).
+        Whether to include spin degree of freedom or not (default: False).
 
     Returns
     -------
@@ -423,6 +424,137 @@ def tmat_c2j(orb_l):
 
     else:
         raise Exception("error in tmat_c2j: Have NOT implemented for this case: ", orb_l)
+
+
+def tmat_r2trig(case, ispin=False):
+    """
+    Get the unitary transformation matrix from the real spherical harmonics to the
+    trigonal harmonic basis. See PHYSICAL REVIEW B 105, 245153 (2022) for the
+    definition of the orbitals.
+
+    Parameters
+    ----------
+    case: string
+        Label for different systems.
+
+        - '111': :math:`z` axis along diagonal of coordinate system
+        - '100': :math:`z` axis vertical
+
+    ispin: logical
+        Whether to include spin degree of freedom or not (default: False).
+
+    Returns
+    -------
+    t_r2trig: 2d complex array
+        The transformation matrix.
+    """
+    t_r2trig = np.zeros((5, 5), dtype=complex)
+    cone = np.complex128(1.0 + 0.0j)
+
+    # trig-orbitals a1g epi_g epi_g esigma_g esigma_g
+    # d-orbitals dz2, dzx, dzy, dx2-y2, dxy
+
+    if case == '111':
+
+        # a1g = 3z^2-r^2
+        t_r2trig[0, 0] = cone
+
+        # epi_g =  2 dxy/ sqrt(6) + dyz/sqrt(3)
+        t_r2trig[4, 1] = 2*cone/np.sqrt(6)
+        t_r2trig[2, 1] = cone/np.sqrt(3)
+
+        # epi_g =  2 dx^2-y^2/ sqrt(6) - dzx/sqrt(3)
+        t_r2trig[3, 2] = 2*cone/np.sqrt(6)
+        t_r2trig[1, 2] = -cone/np.sqrt(3)
+
+        # esigma_g =  dx^2-y^2/ sqrt(3) + 2dzx/sqrt(6)
+        t_r2trig[3, 3] = cone/np.sqrt(3)
+        t_r2trig[1, 3] = 2*cone/np.sqrt(6)
+
+        # esigma_g =  dxy/ sqrt(3) - 2dyz/sqrt(6)
+        t_r2trig[4, 4] = cone/np.sqrt(3)
+        t_r2trig[2, 4] = -2*cone/np.sqrt(6)
+
+    elif case == '100':
+        t_r2trig[1, 0] = cone/np.sqrt(3)
+        t_r2trig[2, 0] = cone/np.sqrt(3)
+        t_r2trig[4, 0] = cone/np.sqrt(3)
+
+        om = np.exp(1j*2*np.pi/3)
+        t_r2trig[1, 1] = -cone/np.sqrt(3)
+        t_r2trig[2, 1] = -om/np.sqrt(3)
+        t_r2trig[4, 1] = -om**2/np.sqrt(3)
+
+        t_r2trig[1, 2] = cone/np.sqrt(3)
+        t_r2trig[2, 2] = om**-1/np.sqrt(3)
+        t_r2trig[4, 2] = om**-2/np.sqrt(3)
+
+        t_r2trig[1, 3] = -cone/np.sqrt(2)
+        t_r2trig[3, 3] = -1j/np.sqrt(2)
+
+        t_r2trig[1, 4] = cone/np.sqrt(2)
+        t_r2trig[3, 4] = -1j/np.sqrt(2)
+        
+        # # a1g = (dzx + dzy + dxy)/sqrt(3)
+        # t_r2trig[1, 0] = cone/np.sqrt(3)
+        # t_r2trig[2, 0] = cone/np.sqrt(3)
+        # t_r2trig[4, 0] = cone/np.sqrt(3)
+
+        # # epi_g = (2dxy - dyz - dzx)/sqrt(6)
+        # t_r2trig[4, 1] = 2/np.sqrt(6)
+        # t_r2trig[2, 1] = -cone/np.sqrt(6)
+        # t_r2trig[1, 1] = -cone/np.sqrt(6)
+
+        # # epi_g = (dyz - dzx)/sqrt(2)
+        # t_r2trig[2, 2] = cone/np.sqrt(2)
+        # t_r2trig[1, 2] = -cone/np.sqrt(2)
+
+        # # esigma_g =  dz^2
+        # t_r2trig[0, 3] = cone
+
+        # # esigma_g =  dx^2-y^2
+        # t_r2trig[3, 4] = cone
+
+    else:
+        raise Exception(f"case {case} not implemented."
+                        "It should be either '111' or '110'")
+
+    # the spin order is: up dn up dn ... up dn
+    if ispin:
+        t_r2trig_spin = np.zeros((10, 10), dtype=complex)
+        # spin up
+        t_r2trig_spin[0::2, 0::2] = t_r2trig
+        # spin dn
+        t_r2trig_spin[1::2, 1::2] = t_r2trig
+        return t_r2trig_spin
+    else:
+        return t_r2trig
+
+
+def tmat_trig2r(case, ispin=False):
+    """
+    Get the unitary transformation matrix from the trigonal harmonic basis to the
+    real spherical harmonics. See PHYSICAL REVIEW B 105, 245153 (2022) for the
+    definition of the orbitals.
+
+    Parameters
+    ----------
+    case: string
+        Label for different systems.
+
+        - '111': :math:`z` axis along diagonal of coordinate system
+        - '100': :math:`z` axis vertical
+
+    ispin: logical
+        Whether to include spin degree of freedom or not (default: False).
+
+    Returns
+    -------
+    t_trig2r: 2d complex array
+        The transformation matrix.
+    """
+    t_trig2r = np.conj(np.transpose(tmat_r2trig(case, ispin=ispin)))
+    return t_trig2r
 
 
 def transform_utensor(umat, tmat):
