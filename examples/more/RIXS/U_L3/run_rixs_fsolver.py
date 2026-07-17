@@ -71,7 +71,7 @@ if __name__ == "__main__":
         comm, shell_name, shell_level=(0, 5.0, 0),
         v1_soc=(zeta_f_i, zeta_f_n), v2_soc=(zeta_d_i, zeta_d_n),
         v_tot_noccu=noccu, slater=slater, ed_solver=2, neval=20,
-        nvector=2, ncv=50, idump=True
+        nvector=9, ncv=50, idump=True
     )
     if rank == 0:
         print('eigvals:', eval_i)
@@ -81,7 +81,7 @@ if __name__ == "__main__":
     xas, xas_poles = edrixs.xas_2v1c_fort(
         comm, shell_name, ominc_xas, gamma_c=gamma_c,
         v_tot_noccu=noccu, trans_to_which=2, thin=thin, phi=phi,
-        pol_type=poltype_xas, num_gs=1, nkryl=200, temperature=300
+        pol_type=poltype_xas, num_gs=9, nkryl=200, temperature=300
     )
     if rank == 0:
         np.savetxt('xas.dat', np.concatenate((np.array([ominc_xas]).T, xas), axis=1))
@@ -91,7 +91,7 @@ if __name__ == "__main__":
     rixs, rixs_poles = edrixs.rixs_2v1c_fort(
         comm, shell_name, ominc_rixs, eloss, gamma_c=gamma_c, gamma_f=gamma_f,
         v_tot_noccu=noccu, trans_to_which=2, thin=thin, thout=thout, phi=phi,
-        pol_type=poltype_rixs, num_gs=1, nkryl=200, linsys_max=1000, temperature=300
+        pol_type=poltype_rixs, num_gs=9, nkryl=200, linsys_max=1000, temperature=300
     )
 
     if rank == 0:
