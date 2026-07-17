@@ -1,5 +1,6 @@
 __all__ = [
-    'setup_1v1c', 'ops', 'ed_krylov_scipy', 'rixs_krylov_scipy',
+    'setup_1v1c', 'ops', 'ed_krylov_scipy', 'xas_krylov_scipy',
+    'rixs_krylov_scipy',
     'setup_2v1c', 'setup_siam',
     'ed_1v1c_py', 'xas_1v1c_py', 'rixs_1v1c_py',
     'ed_1v1c_fort', 'xas_1v1c_fort', 'rixs_1v1c_fort',
@@ -12,7 +13,11 @@ import scipy
 import scipy.sparse as sp
 from scipy.sparse.linalg import LinearOperator, aslinearoperator, lobpcg, gmres
 import inspect
+import multiprocessing as mp
+import os
+import pickle
 import warnings
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 from .iostream import (
     write_tensor, write_emat, write_umat, write_config, read_poles_from_file
@@ -1007,57 +1012,391 @@ def ed_krylov_scipy(hmat_i, num_gs=1, blocksize=None, *,
     return eval_i, evec_i
 
 
-def rixs_krylov_scipy(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
-                      gamma_c=0.1, gamma_f=0.01, thin=1.0, thout=1.0, phi=0.0,
-                      pol_type=None, temperature=1.0, scatter_axis=None,
-                      skip_gs=False, nkryl=200, linsys_tol=1e-9,
-                      linsys_maxiter=50000, linsys_restart=200, return_poles=False):
+def xas_krylov_scipy(
+    eval_i, evec_i, hmat_n, trans_op, ominc, *,
+    gamma_c=0.1, thin=1.0, phi=0.0, pol_type=None,
+    temperature=1.0, scatter_axis=None, nkryl=200,
+):
     """
-    Calculate RIXS spectra with a SciPy Krylov correction-vector solver.
+    Calculate XAS spectra with a SciPy Lanczos continued-fraction solver.
 
-    This routine assumes that eval_i and evec_i contain only the kept initial
-    states. It does not use gs_list.
-
-    hmat_i, hmat_n, and every element of trans_op are converted with
-    scipy.sparse.linalg.aslinearoperator. The transition operators must provide
-    an adjoint action, because the absorption step uses T @ v and the emission
-    step uses T.H @ v.
+    ``eval_i`` and ``evec_i`` are the retained initial states, normally
+    returned by :func:`ed_krylov_scipy`.  For every retained initial state the
+    transition operator is applied in the original Fock basis, and a Lanczos
+    tridiagonalization of the intermediate Hamiltonian generates the pole
+    representation consumed by :func:`get_spectra_from_poles`.
 
     Parameters
     ----------
     eval_i : 1d array
-        Energies of the kept initial states.
+        Energies of the retained initial states.
 
     evec_i : 2d array
-        Kept initial-state eigenvectors in the basis of hmat_i.
-        Column i corresponds to eval_i[i].
+        Retained initial-state eigenvectors. Column ``i`` corresponds to
+        ``eval_i[i]``.
 
-    hmat_i : sparse matrix or LinearOperator
-        Initial/final Hamiltonian.
-
-    hmat_n : sparse matrix or LinearOperator
+    hmat_n : sparse matrix or scipy.sparse.linalg.LinearOperator
         Intermediate-state Hamiltonian.
 
-    trans_op : list
-        List of transition operators. Each operator maps the initial/final
-        Hilbert space to the intermediate Hilbert space and must have shape
-        (dim_n, dim_i). For dipole transitions this list has length 3;
-        for quadrupole transitions it has length 5.
+    trans_op : sequence
+        Transition operators mapping the initial Hilbert space to the
+        intermediate Hilbert space. The sequence length must be 3 for a
+        dipole transition or 5 for a quadrupole transition.
 
     ominc : 1d array
-        Incident photon energies.
+        Incident photon-energy grid.
 
-    eloss : 1d array
-        Energy-loss grid.
+    gamma_c : float or 1d array, optional
+        Core-hole lifetime broadening. It can be scalar or have the same shape
+        as ``ominc``.
+
+    thin, phi : float, optional
+        Incoming angle and azimuthal angle, in radians.
+
+    pol_type : sequence of tuple, optional
+        Incoming polarizations. Each entry is ``(kind, alpha)`` where ``kind``
+        is ``'linear'``, ``'left'``, ``'right'``, or ``'isotropic'``. The
+        default is isotropic polarization.
+
+    temperature : float, optional
+        Temperature in kelvin used for the Boltzmann weights of ``eval_i``.
+
+    scatter_axis : (3, 3) array, optional
+        Scattering coordinate axes. The default is the identity matrix.
+
+    nkryl : int, optional
+        Maximum number of intermediate-state Lanczos iterations.
 
     Returns
     -------
-    rixs : 3d array
-        RIXS spectra with shape (len(ominc), len(eloss), len(pol_type)).
+    xas : 2d ndarray
+        Spectrum with shape ``(len(ominc), len(pol_type))``.
+    """
+    print("edrixs >>> Running Krylov XAS ...")
+
+    eval_i = np.asarray(eval_i, dtype=float)
+    evec_i = np.asarray(evec_i, dtype=complex)
+    ominc = np.asarray(ominc, dtype=float)
+    hmat_n = aslinearoperator(hmat_n)
+    trans_op = [aslinearoperator(T) for T in trans_op]
+
+    if eval_i.ndim != 1:
+        raise ValueError("eval_i must be a one-dimensional array")
+    if evec_i.ndim != 2:
+        raise ValueError("evec_i must be a two-dimensional array")
+    if evec_i.shape[1] != len(eval_i):
+        raise ValueError("evec_i columns must correspond to eval_i")
+    if hmat_n.shape[0] != hmat_n.shape[1]:
+        raise ValueError("hmat_n must be square")
+
+    dim_i = evec_i.shape[0]
+    dim_n = hmat_n.shape[0]
+    ntrans = len(trans_op)
+
+    if ntrans not in (3, 5):
+        raise ValueError(
+            "len(trans_op) must be 3 for dipole or 5 for quadrupole transitions"
+        )
+
+    for i, T in enumerate(trans_op):
+        if T.shape != (dim_n, dim_i):
+            raise ValueError(
+                "trans_op[{}] has shape {}, expected {}".format(
+                    i, T.shape, (dim_n, dim_i)
+                )
+            )
+
+    if pol_type is None:
+        pol_type = [('isotropic', 0.0)]
+
+    if scatter_axis is None:
+        scatter_axis = np.eye(3)
+    else:
+        scatter_axis = np.asarray(scatter_axis, dtype=float)
+
+    if scatter_axis.shape != (3, 3):
+        raise ValueError("scatter_axis must have shape (3, 3)")
+
+    nkryl = int(nkryl)
+    if nkryl < 1:
+        raise ValueError("nkryl must be a positive integer")
+
+    gamma_core = _expand_broadening(gamma_c, len(ominc), "gamma_c")
+    xas = np.zeros((len(ominc), len(pol_type)), dtype=float)
+    kvec = unit_wavevector(thin, phi, scatter_axis, direction='in')
+
+    for ipol, (kind, alpha) in enumerate(pol_type):
+        kind = kind.strip().lower()
+
+        if kind == 'isotropic':
+            # EDRIXS convention: average independent transition components.
+            for icomp in range(ntrans):
+                starts = [
+                    trans_op[icomp] @ evec_i[:, istate]
+                    for istate in range(len(eval_i))
+                ]
+                poles = _xas_poles_from_start_vectors(
+                    eval_i, starts, hmat_n, nkryl=nkryl
+                )
+                xas[:, ipol] += get_spectra_from_poles(
+                    poles, ominc, gamma_core, temperature
+                ) / ntrans
+            continue
+
+        if kind not in ('linear', 'left', 'right'):
+            raise ValueError("Unknown XAS polarization type: {}".format(kind))
+
+        dipole_vec = dipole_polvec_xas(
+            thin, phi, alpha, scatter_axis, kind
+        )
+        if ntrans == 3:
+            polvec = np.asarray(dipole_vec, dtype=complex)
+        else:
+            polvec = quadrupole_polvec(dipole_vec, kvec)
+
+        starts = [
+            _apply_linear_combination(trans_op, polvec, evec_i[:, istate])
+            for istate in range(len(eval_i))
+        ]
+        poles = _xas_poles_from_start_vectors(
+            eval_i, starts, hmat_n, nkryl=nkryl
+        )
+        xas[:, ipol] = get_spectra_from_poles(
+            poles, ominc, gamma_core, temperature
+        )
+
+    print("edrixs >>> Krylov XAS Done !")
+    return xas
+
+
+def _xas_poles_from_start_vectors(eval_i, start_vectors, hmat_n, *, nkryl):
+    """Build an EDRIXS-compatible XAS pole dictionary."""
+    poles = {
+        'eigval': [],
+        'npoles': [],
+        'norm': [],
+        'alpha': [],
+        'beta': [],
+    }
+
+    effective_nkryl = min(int(nkryl), hmat_n.shape[0])
+
+    for energy, start in zip(eval_i, start_vectors):
+        start = np.asarray(start, dtype=complex)
+        if np.linalg.norm(start) == 0:
+            alpha = np.array([0.0], dtype=float)
+            beta = np.array([], dtype=float)
+            norm = 0.0
+        else:
+            alpha, beta, norm = lanczos_tridiagonal(
+                hmat_n, start, m=effective_nkryl
+            )
+
+        poles['eigval'].append(float(energy))
+        poles['npoles'].append(len(alpha))
+        poles['norm'].append(float(np.real(norm)))
+        poles['alpha'].append(np.asarray(alpha))
+        poles['beta'].append(np.asarray(beta))
+
+    return poles
+
+
+_RIXS_WORKER_STATE = None
+_RIXS_THREADPOOL_LIMITER = None
+
+
+def _available_cpu_count():
+    """Return the CPU count available to this process, respecting affinity."""
+    process_cpu_count = getattr(os, 'process_cpu_count', None)
+    if process_cpu_count is not None:
+        count = process_cpu_count()
+        if count is not None:
+            return max(1, int(count))
+
+    try:
+        return max(1, len(os.sched_getaffinity(0)))
+    except (AttributeError, OSError):
+        return max(1, int(os.cpu_count() or 1))
+
+
+def _limit_worker_native_threads(nthreads):
+    """Limit BLAS/OpenMP pools inside a process-pool worker."""
+    global _RIXS_THREADPOOL_LIMITER
+
+    nthreads = int(nthreads)
+    for name in (
+        'OMP_NUM_THREADS',
+        'OPENBLAS_NUM_THREADS',
+        'MKL_NUM_THREADS',
+        'BLIS_NUM_THREADS',
+        'VECLIB_MAXIMUM_THREADS',
+        'NUMEXPR_NUM_THREADS',
+    ):
+        os.environ[name] = str(nthreads)
+
+    # threadpoolctl is optional. When present, it can change the thread count
+    # of libraries that were already loaded before a fork. The environment
+    # variables above remain the fallback for spawn/forkserver workers.
+    try:
+        from threadpoolctl import threadpool_limits
+    except ImportError:
+        _RIXS_THREADPOOL_LIMITER = None
+    else:
+        _RIXS_THREADPOOL_LIMITER = threadpool_limits(limits=nthreads)
+
+
+def _operator_for_process_pool(op, name):
+    """Return a picklable matrix/operator suitable for a worker initializer."""
+    if sp.issparse(op) or isinstance(op, np.ndarray):
+        candidate = op
+    else:
+        candidate = getattr(op, 'A', op)
+
+    try:
+        pickle.dumps(candidate, protocol=pickle.HIGHEST_PROTOCOL)
+    except Exception as exc:
+        raise TypeError(
+            "{} is not serializable for process-based parallel RIXS. "
+            "Use a SciPy sparse matrix, a NumPy array, a MatrixLinearOperator, "
+            "or set workers=1.".format(name)
+        ) from exc
+
+    return candidate
+
+
+def _init_rixs_worker(hmat_i, hmat_n, trans_op, eval_i, evec_i,
+                      ominc, gamma_core, polarizations, skip_gs, nkryl,
+                      linsys_tol, linsys_maxiter, linsys_restart,
+                      blas_threads):
+    """Initialize immutable solver state once in every process-pool worker."""
+    global _RIXS_WORKER_STATE
+
+    _limit_worker_native_threads(blas_threads)
+
+    trans_op = [aslinearoperator(T) for T in trans_op]
+    _RIXS_WORKER_STATE = {
+        'hmat_i': aslinearoperator(hmat_i),
+        'hmat_n': aslinearoperator(hmat_n),
+        'trans_op': trans_op,
+        'trans_op_H': [T.H for T in trans_op],
+        'eval_i': np.asarray(eval_i, dtype=float),
+        'evec_i': np.asarray(evec_i, dtype=complex),
+        'ominc': np.asarray(ominc, dtype=float),
+        'gamma_core': np.asarray(gamma_core, dtype=float),
+        'polarizations': polarizations,
+        'skip_gs': bool(skip_gs),
+        'nkryl': int(nkryl),
+        'linsys_tol': float(linsys_tol),
+        'linsys_maxiter': int(linsys_maxiter),
+        'linsys_restart': int(linsys_restart),
+    }
+
+
+def _rixs_pool_job(job):
+    """Compute one ``(incident energy, polarization, initial state)`` job."""
+    iom, ipol, istate = job
+    state = _RIXS_WORKER_STATE
+
+    if state is None:
+        raise RuntimeError("RIXS worker was not initialized")
+
+    polvec_i, polvec_f = state['polarizations'][ipol]
+    rhs = _apply_linear_combination(
+        state['trans_op'], polvec_i, state['evec_i'][:, istate]
+    )
+
+    rec = _rixs_krylov_one_contribution_scipy(
+        hmat_i=state['hmat_i'],
+        hmat_n=state['hmat_n'],
+        trans_op_H=state['trans_op_H'],
+        polvec_f=polvec_f,
+        eval_i=state['eval_i'],
+        evec_i=state['evec_i'],
+        istate=istate,
+        omega=state['ominc'][iom],
+        gamma_c=state['gamma_core'][iom],
+        rhs=rhs,
+        skip_gs=state['skip_gs'],
+        nkryl=state['nkryl'],
+        linsys_tol=state['linsys_tol'],
+        linsys_maxiter=state['linsys_maxiter'],
+        linsys_restart=state['linsys_restart'],
+    )
+
+    return iom, ipol, istate, rec
+
+
+def _pole_dict_from_records(records):
+    """Merge ordered per-initial-state records into one pole dictionary."""
+    keys = ('npoles', 'eigval', 'norm', 'alpha', 'beta')
+    return {
+        key: [record[key] for record in records]
+        for key in keys
+    }
+
+
+def rixs_krylov_scipy(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
+                      gamma_c=0.1, gamma_f=0.01, thin=1.0, thout=1.0, phi=0.0,
+                      pol_type=None, temperature=1.0, scatter_axis=None,
+                      skip_gs=False, nkryl=200, linsys_tol=1e-9,
+                      linsys_maxiter=50000, linsys_restart=200,
+                      return_poles=False, workers=None, blas_threads=1,
+                      mp_start_method=None):
+    """
+    Calculate RIXS spectra with a SciPy Krylov correction-vector solver.
+
+    Parallel execution uses one :class:`ProcessPoolExecutor` job for every
+    ``(incident energy, polarization, retained initial state)`` triple.  Jobs
+    are dynamically scheduled onto the worker pool.  By default, the number of
+    workers is the number of CPUs available to the process, capped by the
+    number of jobs. Set ``workers=1`` to use the original serial path.
+
+    Every worker is limited to ``blas_threads`` native BLAS/OpenMP threads.
+    The default of one avoids nested parallelism and the excessive
+    ``sched_yield`` traffic that can otherwise occur when many process jobs
+    each activate a multithreaded BLAS runtime.
+
+    Parameters
+    ----------
+    eval_i : 1d array
+        Energies of the retained initial states.
+
+    evec_i : 2d array
+        Retained initial-state eigenvectors in the basis of ``hmat_i``.
+        Column ``i`` corresponds to ``eval_i[i]``.
+
+    hmat_i, hmat_n : sparse matrix or LinearOperator
+        Initial/final and intermediate Hamiltonians.
+
+    trans_op : sequence
+        Transition operators mapping the initial/final Hilbert space to the
+        intermediate Hilbert space. The sequence length must be 3 or 5.
+
+    ominc, eloss : 1d arrays
+        Incident-energy and energy-loss grids.
+
+    workers : int or None, optional
+        Number of worker processes. ``None`` uses all CPUs available to the
+        process. The actual count is capped by the number of independent jobs.
+        ``workers=1`` selects serial execution.
+
+    blas_threads : int, optional
+        Native BLAS/OpenMP threads allowed in each worker. Keep this at one
+        when using more than one process.
+
+    mp_start_method : {'fork', 'spawn', 'forkserver'} or None, optional
+        Multiprocessing start method. ``None`` uses the platform default.
+        Calling scripts must protect their entry point with
+        ``if __name__ == '__main__':`` for spawn-based methods.
+
+    Returns
+    -------
+    rixs : 3d ndarray
+        RIXS spectra with shape ``(len(ominc), len(eloss), len(pol_type))``.
 
     poles : list, optional
-        Returned only if return_poles is True. Nested list of pole dictionaries
-        with shape (len(ominc), len(pol_type)).
+        Returned only when ``return_poles`` is true. Nested list of pole
+        dictionaries with shape ``(len(ominc), len(pol_type))``.
     """
     print("edrixs >>> Running Krylov RIXS ... ")
 
@@ -1074,6 +1413,8 @@ def rixs_krylov_scipy(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
         raise ValueError("hmat_i must be square")
     if hmat_n.shape[0] != hmat_n.shape[1]:
         raise ValueError("hmat_n must be square")
+    if eval_i.ndim != 1:
+        raise ValueError("eval_i must be a one-dimensional array")
     if evec_i.ndim != 2:
         raise ValueError("evec_i must be a two-dimensional array")
     if len(eval_i) != evec_i.shape[1]:
@@ -1086,7 +1427,9 @@ def rixs_krylov_scipy(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
     ntrans = len(trans_op)
 
     if ntrans not in (3, 5):
-        raise ValueError("len(trans_op) must be 3 for dipole or 5 for quadrupole transitions")
+        raise ValueError(
+            "len(trans_op) must be 3 for dipole or 5 for quadrupole transitions"
+        )
 
     for i, T in enumerate(trans_op):
         if T.shape != (dim_n, dim_i):
@@ -1105,6 +1448,23 @@ def rixs_krylov_scipy(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
     else:
         scatter_axis = np.asarray(scatter_axis, dtype=float)
 
+    if scatter_axis.shape != (3, 3):
+        raise ValueError("scatter_axis must have shape (3, 3)")
+
+    nkryl = int(nkryl)
+    linsys_maxiter = int(linsys_maxiter)
+    linsys_restart = int(linsys_restart)
+    blas_threads = int(blas_threads)
+
+    if nkryl < 1:
+        raise ValueError("nkryl must be a positive integer")
+    if linsys_maxiter < 1:
+        raise ValueError("linsys_maxiter must be a positive integer")
+    if linsys_restart < 1:
+        raise ValueError("linsys_restart must be a positive integer")
+    if blas_threads < 1:
+        raise ValueError("blas_threads must be a positive integer")
+
     n_ominc = len(ominc)
     n_eloss = len(eloss)
     n_init = len(eval_i)
@@ -1113,31 +1473,45 @@ def rixs_krylov_scipy(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
     gamma_core = _expand_broadening(gamma_c, n_ominc, "gamma_c")
     gamma_final = _expand_broadening(gamma_f, n_eloss, "gamma_f")
 
-    rixs = np.zeros((n_ominc, n_eloss, n_pol), dtype=float)
-    poles_all = [[None for _ in range(n_pol)] for _ in range(n_ominc)]
-
-    trans_op_H = [T.H for T in trans_op]
-
-    for iom, omega in enumerate(ominc):
-        for ipol, (it, alpha, jt, beta) in enumerate(pol_type):
-            polvec_i, polvec_f = _rixs_polarization_vectors(
+    polarizations = []
+    for it, alpha, jt, beta in pol_type:
+        polarizations.append(
+            _rixs_polarization_vectors(
                 ntrans, thin, thout, phi, it, alpha, jt, beta, scatter_axis
             )
+        )
 
-            poles_dict = {
-                'npoles': [],
-                'eigval': [],
-                'norm': [],
-                'alpha': [],
-                'beta': []
-            }
+    records = [
+        [
+            [None for _ in range(n_init)]
+            for _ in range(n_pol)
+        ]
+        for _ in range(n_ominc)
+    ]
 
-            for istate in range(n_init):
-                rhs = _apply_linear_combination(
-                    trans_op, polvec_i, evec_i[:, istate]
-                )
+    jobs = [
+        (iom, ipol, istate)
+        for iom in range(n_ominc)
+        for ipol in range(n_pol)
+        for istate in range(n_init)
+    ]
 
-                rec = _rixs_krylov_one_contribution_scipy(
+    if workers is None:
+        workers = _available_cpu_count()
+    workers = int(workers)
+    if workers < 1:
+        raise ValueError("workers must be None or a positive integer")
+    workers = min(workers, max(1, len(jobs)))
+
+    if workers == 1 or len(jobs) <= 1:
+        trans_op_H = [T.H for T in trans_op]
+        for iom, ipol, istate in jobs:
+            polvec_i, polvec_f = polarizations[ipol]
+            rhs = _apply_linear_combination(
+                trans_op, polvec_i, evec_i[:, istate]
+            )
+            records[iom][ipol][istate] = (
+                _rixs_krylov_one_contribution_scipy(
                     hmat_i=hmat_i,
                     hmat_n=hmat_n,
                     trans_op_H=trans_op_H,
@@ -1145,22 +1519,83 @@ def rixs_krylov_scipy(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
                     eval_i=eval_i,
                     evec_i=evec_i,
                     istate=istate,
-                    omega=omega,
+                    omega=ominc[iom],
                     gamma_c=gamma_core[iom],
                     rhs=rhs,
                     skip_gs=skip_gs,
                     nkryl=nkryl,
                     linsys_tol=linsys_tol,
                     linsys_maxiter=linsys_maxiter,
-                    linsys_restart=linsys_restart
+                    linsys_restart=linsys_restart,
                 )
+            )
+    else:
+        pool_hmat_i = _operator_for_process_pool(hmat_i, 'hmat_i')
+        pool_hmat_n = _operator_for_process_pool(hmat_n, 'hmat_n')
+        pool_trans_op = [
+            _operator_for_process_pool(T, 'trans_op[{}]'.format(i))
+            for i, T in enumerate(trans_op)
+        ]
 
-                poles_dict['npoles'].append(rec['npoles'])
-                poles_dict['eigval'].append(rec['eigval'])
-                poles_dict['norm'].append(rec['norm'])
-                poles_dict['alpha'].append(rec['alpha'])
-                poles_dict['beta'].append(rec['beta'])
+        if mp_start_method is None:
+            mp_context = mp.get_context()
+        else:
+            mp_context = mp.get_context(mp_start_method)
 
+        print(
+            "edrixs >>> RIXS process pool: {} workers, {} jobs, "
+            "{} BLAS thread(s)/worker".format(
+                workers, len(jobs), blas_threads
+            )
+        )
+
+        with ProcessPoolExecutor(
+            max_workers=workers,
+            mp_context=mp_context,
+            initializer=_init_rixs_worker,
+            initargs=(
+                pool_hmat_i,
+                pool_hmat_n,
+                pool_trans_op,
+                eval_i,
+                evec_i,
+                ominc,
+                gamma_core,
+                polarizations,
+                skip_gs,
+                nkryl,
+                linsys_tol,
+                linsys_maxiter,
+                linsys_restart,
+                blas_threads,
+            ),
+        ) as executor:
+            future_to_job = {
+                executor.submit(_rixs_pool_job, job): job
+                for job in jobs
+            }
+
+            for future in as_completed(future_to_job):
+                iom, ipol, istate = future_to_job[future]
+                try:
+                    _, _, _, rec = future.result()
+                except Exception as exc:
+                    for pending in future_to_job:
+                        pending.cancel()
+                    raise RuntimeError(
+                        "Parallel RIXS job failed for incident index {}, "
+                        "polarization index {}, initial-state index {}".format(
+                            iom, ipol, istate
+                        )
+                    ) from exc
+                records[iom][ipol][istate] = rec
+
+    rixs = np.zeros((n_ominc, n_eloss, n_pol), dtype=float)
+    poles_all = [[None for _ in range(n_pol)] for _ in range(n_ominc)]
+
+    for iom in range(n_ominc):
+        for ipol in range(n_pol):
+            poles_dict = _pole_dict_from_records(records[iom][ipol])
             poles_all[iom][ipol] = poles_dict
             rixs[iom, :, ipol] = get_spectra_from_poles(
                 poles_dict, eloss, gamma_final, temperature
