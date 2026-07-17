@@ -123,6 +123,7 @@ def run(output_dir: Path) -> None:
     valence_occupancy = 2
     core_offset = 99.7
     temperature = 300.0
+    neval = 30
     num_gs = 9
 
     thin = np.deg2rad(30.0)
@@ -172,18 +173,18 @@ def run(output_dir: Path) -> None:
     print(f"Intermediate-space dimension: {hmat_n.shape[0]}")
 
     # -------------------------------------------------------------------------
-    # 3. Compute the nine initial states used by the reference spectra.
+    # 3. Compute 30 eigenpairs, then retain nine states for spectra.
     # -------------------------------------------------------------------------
-    blocksize = 12
+    blocksize = neval
     rng = np.random.default_rng(12345)
     initial_guess = (
         rng.standard_normal((hmat_i.shape[0], blocksize))
         + 1j * rng.standard_normal((hmat_i.shape[0], blocksize))
     )
 
-    eval_i, evec_i = ed_krylov_scipy(
+    eval_all, evec_all = ed_krylov_scipy(
         hmat_i,
-        num_gs=num_gs,
+        num_gs=neval,
         blocksize=blocksize,
         tol=1.0e-12,
         maxiter=3000,
@@ -193,26 +194,29 @@ def run(output_dir: Path) -> None:
 
     residuals = np.array([
         np.linalg.norm(
-            hmat_i @ evec_i[:, state]
-            - eval_i[state] * evec_i[:, state]
+            hmat_i @ evec_all[:, state]
+            - eval_all[state] * evec_all[:, state]
         )
-        for state in range(num_gs)
+        for state in range(neval)
     ])
 
-    print("Retained initial energies:")
-    print(eval_i)
+    print("Computed initial energies:")
+    print(eval_all)
     print("Eigenpair residual norms:")
     print(residuals)
 
     np.savetxt(
         output_dir / "eval_i.dat",
         np.column_stack((
-            np.arange(num_gs),
-            eval_i,
+            np.arange(neval),
+            eval_all,
             residuals,
         )),
         header="state  energy_eV  residual_norm",
     )
+
+    eval_i = eval_all[:num_gs]
+    evec_i = evec_all[:, :num_gs]
 
     np.savetxt(
         output_dir / "gamma_c.dat",
@@ -296,7 +300,7 @@ def run(output_dir: Path) -> None:
 
     np.savez_compressed(
         output_dir / "uru2si2_scipy_results.npz",
-        eval_i=eval_i,
+        eval_i=eval_all,
         residuals=residuals,
         ominc=ominc,
         gamma_c=gamma_c,
