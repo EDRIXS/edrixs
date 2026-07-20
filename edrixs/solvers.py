@@ -1,5 +1,6 @@
 __all__ = [
-    'setup_1v1c', 'ops', 'ed_krylov_scipy', 'rixs_krylov_scipy',
+    'setup_1v1c', 'ops', 'ed_krylov_scipy', 'xas_krylov_scipy',
+    'rixs_krylov_scipy',
     'setup_2v1c', 'setup_siam',
     'ed_1v1c_py', 'xas_1v1c_py', 'rixs_1v1c_py',
     'ed_1v1c_fort', 'xas_1v1c_fort', 'rixs_1v1c_fort',
@@ -9,10 +10,10 @@ __all__ = [
 
 import numpy as np
 import scipy
-import scipy.sparse as sp
-from scipy.sparse.linalg import LinearOperator, aslinearoperator, lobpcg, gmres
-import inspect
+from scipy.sparse.linalg import aslinearoperator, lobpcg
+import multiprocessing as mp
 import warnings
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 from .iostream import (
     write_tensor, write_emat, write_umat, write_config, read_poles_from_file
@@ -31,9 +32,30 @@ from .utils import info_atomic_shell, slater_integrals_name, boltz_dist
 from .rixs_utils import scattering_mat
 from .plot_spectrum import get_spectra_from_poles, merge_pole_dicts
 from .soc import atom_hsoc
-from .krylov import lanczos_tridiagonal
 from .manybody_operator_csr import (
     two_fermion_csr, four_fermion_csr_auto, get_fock_basis_int
+)
+
+from ._solvers_helpers import (
+    _apply_linear_combination,
+    _available_cpu_count,
+    _check_adjoint_action,
+    _ed_1or2_valence_1core,
+    _embed_impurity_core_umat,
+    _embed_impurity_core_umat_sparse,
+    _expand_broadening,
+    _init_rixs_worker,
+    _operator_for_process_pool,
+    _pole_dict_from_records,
+    _rixs_1or2_valence_1core,
+    _rixs_krylov_one_contribution_scipy,
+    _rixs_polarization_vectors,
+    _rixs_pool_job,
+    _rotated_transition_blocks,
+    _umat_dense_to_sparse,
+    _valence_zeeman_matrix,
+    _xas_1or2_valence_1core,
+    _xas_poles_from_start_vectors,
 )
 
 
@@ -673,166 +695,6 @@ def setup_siam(
     return emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
 
 
-def _rotated_transition_blocks(case, loc_axis=None):
-    """
-    Build transition blocks in global coordinates for a shell-transition case.
-    """
-    if loc_axis is None:
-        loc_axis = np.eye(3)
-    else:
-        loc_axis = np.asarray(loc_axis)
-
-    tmp = get_trans_oper(case)
-    npol, n, m = tmp.shape
-    tmp_g = np.zeros((npol, n, m), dtype=complex)
-
-    if npol == 3:
-        for i in range(3):
-            for j in range(3):
-                tmp_g[i] += loc_axis[i, j] * tmp[j]
-    elif npol == 5:
-        alpha, beta, gamma = rmat_to_euler(loc_axis)
-        wignerD = get_wigner_dmat(4, alpha, beta, gamma)
-        rotmat = np.dot(
-            np.dot(tmat_r2c('d'), wignerD),
-            np.conj(np.transpose(tmat_r2c('d')))
-        )
-        for i in range(5):
-            for j in range(5):
-                tmp_g[i] += rotmat[i, j] * tmp[j]
-    else:
-        raise Exception("Have NOT implemented this case: ", npol)
-
-    return tmp_g
-
-
-def _valence_zeeman_matrix(shell_name, orbl, ext_B, on_which):
-    """
-    Build a Zeeman matrix for a valence shell.
-    """
-    if shell_name == 't2g':
-        lx, ly, lz = get_lx(1, True), get_ly(1, True), get_lz(1, True)
-        sx, sy, sz = get_sx(1), get_sy(1), get_sz(1)
-        lx, ly, lz = -lx, -ly, -lz
-    else:
-        lx, ly, lz = get_lx(orbl, True), get_ly(orbl, True), get_lz(orbl, True)
-        sx, sy, sz = get_sx(orbl), get_sy(orbl), get_sz(orbl)
-
-    if on_which.strip() == 'spin':
-        return ext_B[0] * (2 * sx) + ext_B[1] * (2 * sy) + ext_B[2] * (2 * sz)
-
-    if on_which.strip() == 'orbital':
-        return ext_B[0] * lx + ext_B[1] * ly + ext_B[2] * lz
-
-    if on_which.strip() == 'both':
-        return (
-            ext_B[0] * (lx + 2 * sx)
-            + ext_B[1] * (ly + 2 * sy)
-            + ext_B[2] * (lz + 2 * sz)
-        )
-
-    raise Exception("Unknown value of on_which", on_which)
-
-
-def _umat_dense_to_sparse(umat, tol=1E-10):
-    """
-    Convert a dense rank-4 Coulomb tensor to a sparse flattened matrix.
-
-    The flattening convention is
-
-        row = lorb * norbs + korb
-        col = jorb * norbs + iorb
-
-    corresponding to tensor entry umat[lorb, korb, jorb, iorb].
-    """
-    umat = np.asarray(umat)
-
-    if umat.ndim != 4:
-        raise ValueError("dense umat must be a rank-4 tensor")
-
-    norbs = umat.shape[0]
-    if umat.shape != (norbs, norbs, norbs, norbs):
-        raise ValueError("dense umat must have shape (n, n, n, n)")
-
-    lorb, korb, jorb, iorb = np.nonzero(np.abs(umat) > tol)
-
-    rows = lorb * norbs + korb
-    cols = jorb * norbs + iorb
-    data = umat[lorb, korb, jorb, iorb]
-
-    return sp.coo_matrix(
-        (data, (rows, cols)),
-        shape=(norbs * norbs, norbs * norbs),
-        dtype=np.complex128
-    ).tocsr()
-
-
-def _embed_impurity_core_umat_sparse(umat_tmp, v_norb, c_norb, ntot_v,
-                                     tol=1E-10):
-    """
-    Embed an impurity+core Coulomb tensor into full SIAM space sparsely.
-
-    The input umat_tmp is the dense tensor for the compact impurity+core
-    orbital space of size v_norb + c_norb. The returned object is a sparse
-    flattened matrix for the full SIAM space of size ntot_v + c_norb.
-
-    No dense full-space rank-4 tensor is allocated.
-    """
-    umat_tmp = np.asarray(umat_tmp)
-
-    nsmall = v_norb + c_norb
-    if umat_tmp.shape != (nsmall, nsmall, nsmall, nsmall):
-        raise ValueError(
-            "umat_tmp has shape {}, expected {}".format(
-                umat_tmp.shape, (nsmall, nsmall, nsmall, nsmall)
-            )
-        )
-
-    ntot = ntot_v + c_norb
-    index_map = np.array(
-        list(range(v_norb)) + [ntot_v + i for i in range(c_norb)],
-        dtype=int
-    )
-
-    a, b, c, d = np.nonzero(np.abs(umat_tmp) > tol)
-
-    lorb = index_map[a]
-    korb = index_map[b]
-    jorb = index_map[c]
-    iorb = index_map[d]
-
-    rows = lorb * ntot + korb
-    cols = jorb * ntot + iorb
-    data = umat_tmp[a, b, c, d]
-
-    return sp.coo_matrix(
-        (data, (rows, cols)),
-        shape=(ntot * ntot, ntot * ntot),
-        dtype=np.complex128
-    ).tocsr()
-
-
-def _embed_impurity_core_umat(umat_tmp, v_norb, c_norb, ntot_v):
-    """
-    Embed an impurity+core Coulomb tensor into the full SIAM orbital space.
-
-    The bath orbitals do not carry local Coulomb interactions in this SIAM
-    representation, so only impurity and core indices are populated.
-    """
-    ntot = ntot_v + c_norb
-    umat = np.zeros((ntot, ntot, ntot, ntot), dtype=complex)
-
-    idx = list(range(v_norb)) + [ntot_v + i for i in range(c_norb)]
-
-    for i in range(v_norb + c_norb):
-        for j in range(v_norb + c_norb):
-            for k in range(v_norb + c_norb):
-                for m in range(v_norb + c_norb):
-                    umat[idx[i], idx[j], idx[k], idx[m]] = umat_tmp[i, j, k, m]
-
-    return umat
-
-
 def ops(emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
         *, backend='scipy', tol=1E-10):
     """
@@ -1007,57 +869,225 @@ def ed_krylov_scipy(hmat_i, num_gs=1, blocksize=None, *,
     return eval_i, evec_i
 
 
-def rixs_krylov_scipy(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
-                      gamma_c=0.1, gamma_f=0.01, thin=1.0, thout=1.0, phi=0.0,
-                      pol_type=None, temperature=1.0, scatter_axis=None,
-                      skip_gs=False, nkryl=200, linsys_tol=1e-9,
-                      linsys_maxiter=50000, linsys_restart=200, return_poles=False):
+def xas_krylov_scipy(
+    eval_i, evec_i, hmat_n, trans_op, ominc, *,
+    gamma_c=0.1, thin=1.0, phi=0.0, pol_type=None,
+    temperature=1.0, scatter_axis=None, nkryl=200,
+):
     """
-    Calculate RIXS spectra with a SciPy Krylov correction-vector solver.
+    Calculate XAS spectra with a SciPy Lanczos continued-fraction solver.
 
-    This routine assumes that eval_i and evec_i contain only the kept initial
-    states. It does not use gs_list.
-
-    hmat_i, hmat_n, and every element of trans_op are converted with
-    scipy.sparse.linalg.aslinearoperator. The transition operators must provide
-    an adjoint action, because the absorption step uses T @ v and the emission
-    step uses T.H @ v.
+    ``eval_i`` and ``evec_i`` are the retained initial states, normally
+    returned by :func:`ed_krylov_scipy`.  For every retained initial state the
+    transition operator is applied in the original Fock basis, and a Lanczos
+    tridiagonalization of the intermediate Hamiltonian generates the pole
+    representation consumed by :func:`get_spectra_from_poles`.
 
     Parameters
     ----------
     eval_i : 1d array
-        Energies of the kept initial states.
+        Energies of the retained initial states.
 
     evec_i : 2d array
-        Kept initial-state eigenvectors in the basis of hmat_i.
-        Column i corresponds to eval_i[i].
+        Retained initial-state eigenvectors. Column ``i`` corresponds to
+        ``eval_i[i]``.
 
-    hmat_i : sparse matrix or LinearOperator
-        Initial/final Hamiltonian.
-
-    hmat_n : sparse matrix or LinearOperator
+    hmat_n : sparse matrix or scipy.sparse.linalg.LinearOperator
         Intermediate-state Hamiltonian.
 
-    trans_op : list
-        List of transition operators. Each operator maps the initial/final
-        Hilbert space to the intermediate Hilbert space and must have shape
-        (dim_n, dim_i). For dipole transitions this list has length 3;
-        for quadrupole transitions it has length 5.
+    trans_op : sequence
+        Transition operators mapping the initial Hilbert space to the
+        intermediate Hilbert space. The sequence length must be 3 for a
+        dipole transition or 5 for a quadrupole transition.
 
     ominc : 1d array
-        Incident photon energies.
+        Incident photon-energy grid.
 
-    eloss : 1d array
-        Energy-loss grid.
+    gamma_c : float or 1d array, optional
+        Core-hole lifetime broadening. It can be scalar or have the same shape
+        as ``ominc``.
+
+    thin, phi : float, optional
+        Incoming angle and azimuthal angle, in radians.
+
+    pol_type : sequence of tuple, optional
+        Incoming polarizations. Each entry is ``(kind, alpha)`` where ``kind``
+        is ``'linear'``, ``'left'``, ``'right'``, or ``'isotropic'``. The
+        default is isotropic polarization.
+
+    temperature : float, optional
+        Temperature in kelvin used for the Boltzmann weights of ``eval_i``.
+
+    scatter_axis : (3, 3) array, optional
+        Scattering coordinate axes. The default is the identity matrix.
+
+    nkryl : int, optional
+        Maximum number of intermediate-state Lanczos iterations.
 
     Returns
     -------
-    rixs : 3d array
-        RIXS spectra with shape (len(ominc), len(eloss), len(pol_type)).
+    xas : 2d ndarray
+        Spectrum with shape ``(len(ominc), len(pol_type))``.
+    """
+    print("edrixs >>> Running Krylov XAS ...")
+
+    eval_i = np.asarray(eval_i, dtype=float)
+    evec_i = np.asarray(evec_i, dtype=complex)
+    ominc = np.asarray(ominc, dtype=float)
+    hmat_n = aslinearoperator(hmat_n)
+    trans_op = [aslinearoperator(T) for T in trans_op]
+
+    if eval_i.ndim != 1:
+        raise ValueError("eval_i must be a one-dimensional array")
+    if evec_i.ndim != 2:
+        raise ValueError("evec_i must be a two-dimensional array")
+    if evec_i.shape[1] != len(eval_i):
+        raise ValueError("evec_i columns must correspond to eval_i")
+    if hmat_n.shape[0] != hmat_n.shape[1]:
+        raise ValueError("hmat_n must be square")
+
+    dim_i = evec_i.shape[0]
+    dim_n = hmat_n.shape[0]
+    ntrans = len(trans_op)
+
+    if ntrans not in (3, 5):
+        raise ValueError(
+            "len(trans_op) must be 3 for dipole or 5 for quadrupole transitions"
+        )
+
+    for i, T in enumerate(trans_op):
+        if T.shape != (dim_n, dim_i):
+            raise ValueError(
+                "trans_op[{}] has shape {}, expected {}".format(
+                    i, T.shape, (dim_n, dim_i)
+                )
+            )
+
+    if pol_type is None:
+        pol_type = [('isotropic', 0.0)]
+
+    if scatter_axis is None:
+        scatter_axis = np.eye(3)
+    else:
+        scatter_axis = np.asarray(scatter_axis, dtype=float)
+
+    if scatter_axis.shape != (3, 3):
+        raise ValueError("scatter_axis must have shape (3, 3)")
+
+    nkryl = int(nkryl)
+    if nkryl < 1:
+        raise ValueError("nkryl must be a positive integer")
+
+    gamma_core = _expand_broadening(gamma_c, len(ominc), "gamma_c")
+    xas = np.zeros((len(ominc), len(pol_type)), dtype=float)
+    kvec = unit_wavevector(thin, phi, scatter_axis, direction='in')
+
+    for ipol, (kind, alpha) in enumerate(pol_type):
+        kind = kind.strip().lower()
+
+        if kind == 'isotropic':
+            # EDRIXS convention: average independent transition components.
+            for icomp in range(ntrans):
+                starts = [
+                    trans_op[icomp] @ evec_i[:, istate]
+                    for istate in range(len(eval_i))
+                ]
+                poles = _xas_poles_from_start_vectors(
+                    eval_i, starts, hmat_n, nkryl=nkryl
+                )
+                xas[:, ipol] += get_spectra_from_poles(
+                    poles, ominc, gamma_core, temperature
+                ) / ntrans
+            continue
+
+        if kind not in ('linear', 'left', 'right'):
+            raise ValueError("Unknown XAS polarization type: {}".format(kind))
+
+        dipole_vec = dipole_polvec_xas(
+            thin, phi, alpha, scatter_axis, kind
+        )
+        if ntrans == 3:
+            polvec = np.asarray(dipole_vec, dtype=complex)
+        else:
+            polvec = quadrupole_polvec(dipole_vec, kvec)
+
+        starts = [
+            _apply_linear_combination(trans_op, polvec, evec_i[:, istate])
+            for istate in range(len(eval_i))
+        ]
+        poles = _xas_poles_from_start_vectors(
+            eval_i, starts, hmat_n, nkryl=nkryl
+        )
+        xas[:, ipol] = get_spectra_from_poles(
+            poles, ominc, gamma_core, temperature
+        )
+
+    print("edrixs >>> Krylov XAS Done !")
+    return xas
+
+
+def rixs_krylov_scipy(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
+                      gamma_c=0.1, gamma_f=0.01, thin=1.0, thout=1.0, phi=0.0,
+                      pol_type=None, temperature=1.0, scatter_axis=None,
+                      skip_gs=False, nkryl=200, linsys_tol=1e-9,
+                      linsys_maxiter=50000, linsys_restart=200,
+                      return_poles=False, workers=None, blas_threads=1,
+                      mp_start_method=None):
+    """
+    Calculate RIXS spectra with a SciPy Krylov correction-vector solver.
+
+    Parallel execution uses one :class:`ProcessPoolExecutor` job for every
+    ``(incident energy, polarization, retained initial state)`` triple.  Jobs
+    are dynamically scheduled onto the worker pool.  By default, the number of
+    workers is the number of CPUs available to the process, capped by the
+    number of jobs. Set ``workers=1`` to use the original serial path.
+
+    Every worker is limited to ``blas_threads`` native BLAS/OpenMP threads.
+    The default of one avoids nested parallelism and the excessive
+    ``sched_yield`` traffic that can otherwise occur when many process jobs
+    each activate a multithreaded BLAS runtime.
+
+    Parameters
+    ----------
+    eval_i : 1d array
+        Energies of the retained initial states.
+
+    evec_i : 2d array
+        Retained initial-state eigenvectors in the basis of ``hmat_i``.
+        Column ``i`` corresponds to ``eval_i[i]``.
+
+    hmat_i, hmat_n : sparse matrix or LinearOperator
+        Initial/final and intermediate Hamiltonians.
+
+    trans_op : sequence
+        Transition operators mapping the initial/final Hilbert space to the
+        intermediate Hilbert space. The sequence length must be 3 or 5.
+
+    ominc, eloss : 1d arrays
+        Incident-energy and energy-loss grids.
+
+    workers : int or None, optional
+        Number of worker processes. ``None`` uses all CPUs available to the
+        process. The actual count is capped by the number of independent jobs.
+        ``workers=1`` selects serial execution.
+
+    blas_threads : int, optional
+        Native BLAS/OpenMP threads allowed in each worker. Keep this at one
+        when using more than one process.
+
+    mp_start_method : {'fork', 'spawn', 'forkserver'} or None, optional
+        Multiprocessing start method. ``None`` uses the platform default.
+        Calling scripts must protect their entry point with
+        ``if __name__ == '__main__':`` for spawn-based methods.
+
+    Returns
+    -------
+    rixs : 3d ndarray
+        RIXS spectra with shape ``(len(ominc), len(eloss), len(pol_type))``.
 
     poles : list, optional
-        Returned only if return_poles is True. Nested list of pole dictionaries
-        with shape (len(ominc), len(pol_type)).
+        Returned only when ``return_poles`` is true. Nested list of pole
+        dictionaries with shape ``(len(ominc), len(pol_type))``.
     """
     print("edrixs >>> Running Krylov RIXS ... ")
 
@@ -1074,6 +1104,8 @@ def rixs_krylov_scipy(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
         raise ValueError("hmat_i must be square")
     if hmat_n.shape[0] != hmat_n.shape[1]:
         raise ValueError("hmat_n must be square")
+    if eval_i.ndim != 1:
+        raise ValueError("eval_i must be a one-dimensional array")
     if evec_i.ndim != 2:
         raise ValueError("evec_i must be a two-dimensional array")
     if len(eval_i) != evec_i.shape[1]:
@@ -1086,7 +1118,9 @@ def rixs_krylov_scipy(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
     ntrans = len(trans_op)
 
     if ntrans not in (3, 5):
-        raise ValueError("len(trans_op) must be 3 for dipole or 5 for quadrupole transitions")
+        raise ValueError(
+            "len(trans_op) must be 3 for dipole or 5 for quadrupole transitions"
+        )
 
     for i, T in enumerate(trans_op):
         if T.shape != (dim_n, dim_i):
@@ -1105,6 +1139,23 @@ def rixs_krylov_scipy(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
     else:
         scatter_axis = np.asarray(scatter_axis, dtype=float)
 
+    if scatter_axis.shape != (3, 3):
+        raise ValueError("scatter_axis must have shape (3, 3)")
+
+    nkryl = int(nkryl)
+    linsys_maxiter = int(linsys_maxiter)
+    linsys_restart = int(linsys_restart)
+    blas_threads = int(blas_threads)
+
+    if nkryl < 1:
+        raise ValueError("nkryl must be a positive integer")
+    if linsys_maxiter < 1:
+        raise ValueError("linsys_maxiter must be a positive integer")
+    if linsys_restart < 1:
+        raise ValueError("linsys_restart must be a positive integer")
+    if blas_threads < 1:
+        raise ValueError("blas_threads must be a positive integer")
+
     n_ominc = len(ominc)
     n_eloss = len(eloss)
     n_init = len(eval_i)
@@ -1113,31 +1164,45 @@ def rixs_krylov_scipy(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
     gamma_core = _expand_broadening(gamma_c, n_ominc, "gamma_c")
     gamma_final = _expand_broadening(gamma_f, n_eloss, "gamma_f")
 
-    rixs = np.zeros((n_ominc, n_eloss, n_pol), dtype=float)
-    poles_all = [[None for _ in range(n_pol)] for _ in range(n_ominc)]
-
-    trans_op_H = [T.H for T in trans_op]
-
-    for iom, omega in enumerate(ominc):
-        for ipol, (it, alpha, jt, beta) in enumerate(pol_type):
-            polvec_i, polvec_f = _rixs_polarization_vectors(
+    polarizations = []
+    for it, alpha, jt, beta in pol_type:
+        polarizations.append(
+            _rixs_polarization_vectors(
                 ntrans, thin, thout, phi, it, alpha, jt, beta, scatter_axis
             )
+        )
 
-            poles_dict = {
-                'npoles': [],
-                'eigval': [],
-                'norm': [],
-                'alpha': [],
-                'beta': []
-            }
+    records = [
+        [
+            [None for _ in range(n_init)]
+            for _ in range(n_pol)
+        ]
+        for _ in range(n_ominc)
+    ]
 
-            for istate in range(n_init):
-                rhs = _apply_linear_combination(
-                    trans_op, polvec_i, evec_i[:, istate]
-                )
+    jobs = [
+        (iom, ipol, istate)
+        for iom in range(n_ominc)
+        for ipol in range(n_pol)
+        for istate in range(n_init)
+    ]
 
-                rec = _rixs_krylov_one_contribution_scipy(
+    if workers is None:
+        workers = _available_cpu_count()
+    workers = int(workers)
+    if workers < 1:
+        raise ValueError("workers must be None or a positive integer")
+    workers = min(workers, max(1, len(jobs)))
+
+    if workers == 1 or len(jobs) <= 1:
+        trans_op_H = [T.H for T in trans_op]
+        for iom, ipol, istate in jobs:
+            polvec_i, polvec_f = polarizations[ipol]
+            rhs = _apply_linear_combination(
+                trans_op, polvec_i, evec_i[:, istate]
+            )
+            records[iom][ipol][istate] = (
+                _rixs_krylov_one_contribution_scipy(
                     hmat_i=hmat_i,
                     hmat_n=hmat_n,
                     trans_op_H=trans_op_H,
@@ -1145,22 +1210,83 @@ def rixs_krylov_scipy(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
                     eval_i=eval_i,
                     evec_i=evec_i,
                     istate=istate,
-                    omega=omega,
+                    omega=ominc[iom],
                     gamma_c=gamma_core[iom],
                     rhs=rhs,
                     skip_gs=skip_gs,
                     nkryl=nkryl,
                     linsys_tol=linsys_tol,
                     linsys_maxiter=linsys_maxiter,
-                    linsys_restart=linsys_restart
+                    linsys_restart=linsys_restart,
                 )
+            )
+    else:
+        pool_hmat_i = _operator_for_process_pool(hmat_i, 'hmat_i')
+        pool_hmat_n = _operator_for_process_pool(hmat_n, 'hmat_n')
+        pool_trans_op = [
+            _operator_for_process_pool(T, 'trans_op[{}]'.format(i))
+            for i, T in enumerate(trans_op)
+        ]
 
-                poles_dict['npoles'].append(rec['npoles'])
-                poles_dict['eigval'].append(rec['eigval'])
-                poles_dict['norm'].append(rec['norm'])
-                poles_dict['alpha'].append(rec['alpha'])
-                poles_dict['beta'].append(rec['beta'])
+        if mp_start_method is None:
+            mp_context = mp.get_context()
+        else:
+            mp_context = mp.get_context(mp_start_method)
 
+        print(
+            "edrixs >>> RIXS process pool: {} workers, {} jobs, "
+            "{} BLAS thread(s)/worker".format(
+                workers, len(jobs), blas_threads
+            )
+        )
+
+        with ProcessPoolExecutor(
+            max_workers=workers,
+            mp_context=mp_context,
+            initializer=_init_rixs_worker,
+            initargs=(
+                pool_hmat_i,
+                pool_hmat_n,
+                pool_trans_op,
+                eval_i,
+                evec_i,
+                ominc,
+                gamma_core,
+                polarizations,
+                skip_gs,
+                nkryl,
+                linsys_tol,
+                linsys_maxiter,
+                linsys_restart,
+                blas_threads,
+            ),
+        ) as executor:
+            future_to_job = {
+                executor.submit(_rixs_pool_job, job): job
+                for job in jobs
+            }
+
+            for future in as_completed(future_to_job):
+                iom, ipol, istate = future_to_job[future]
+                try:
+                    _, _, _, rec = future.result()
+                except Exception as exc:
+                    for pending in future_to_job:
+                        pending.cancel()
+                    raise RuntimeError(
+                        "Parallel RIXS job failed for incident index {}, "
+                        "polarization index {}, initial-state index {}".format(
+                            iom, ipol, istate
+                        )
+                    ) from exc
+                records[iom][ipol][istate] = rec
+
+    rixs = np.zeros((n_ominc, n_eloss, n_pol), dtype=float)
+    poles_all = [[None for _ in range(n_pol)] for _ in range(n_ominc)]
+
+    for iom in range(n_ominc):
+        for ipol in range(n_pol):
+            poles_dict = _pole_dict_from_records(records[iom][ipol])
             poles_all[iom][ipol] = poles_dict
             rixs[iom, :, ipol] = get_spectra_from_poles(
                 poles_dict, eloss, gamma_final, temperature
@@ -1171,141 +1297,6 @@ def rixs_krylov_scipy(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
     if return_poles:
         return rixs, poles_all
     return rixs
-
-
-def _rixs_krylov_one_contribution_scipy(*, hmat_i, hmat_n, trans_op_H, polvec_f,
-                                        eval_i, evec_i, istate, omega, gamma_c,
-                                        rhs, skip_gs, nkryl, linsys_tol,
-                                        linsys_maxiter, linsys_restart):
-    """Compute one kept-initial-state contribution to one RIXS pole dictionary."""
-    Ei = eval_i[istate]
-
-    if np.linalg.norm(rhs) == 0:
-        alpha = np.array([0.0], dtype=float)
-        beta = np.array([], dtype=float)
-        return {
-            'eigval': Ei,
-            'npoles': 1,
-            'norm': 0.0,
-            'alpha': alpha,
-            'beta': beta
-        }
-
-    z = omega + Ei + 1j * gamma_c
-
-    A = LinearOperator(
-        shape=hmat_n.shape,
-        matvec=lambda x, z=z: z * x - hmat_n @ x,
-        dtype=np.complex128
-    )
-
-    x, info = _gmres_scipy_compat(
-        A, rhs, tol=linsys_tol, restart=linsys_restart, maxiter=linsys_maxiter
-    )
-
-    if info != 0:
-        raise RuntimeError(
-            "GMRES did not converge for istate={}, omega={}; info={}".format(
-                istate, omega, info
-            )
-        )
-
-    phi_vec = _apply_linear_combination(trans_op_H, np.conj(polvec_f), x)
-
-    if skip_gs:
-        for j in range(len(eval_i)):
-            gj = evec_i[:, j]
-            phi_vec = phi_vec - gj * np.vdot(gj, phi_vec)
-
-    if np.linalg.norm(phi_vec) == 0:
-        alpha = np.array([0.0], dtype=float)
-        beta = np.array([], dtype=float)
-        norm = 0.0
-    else:
-        alpha, beta, norm = lanczos_tridiagonal(hmat_i, phi_vec, m=nkryl)
-
-    return {
-        'eigval': Ei,
-        'npoles': len(alpha),
-        'norm': norm,
-        'alpha': alpha,
-        'beta': beta
-    }
-
-
-def _rixs_polarization_vectors(ntrans, thin, thout, phi, it, alpha, jt, beta, scatter_axis):
-    """Return incoming and outgoing polarization vectors in transition-operator space."""
-    ei, ef = dipole_polvec_rixs(thin, thout, phi, alpha, beta, scatter_axis, (it, jt))
-
-    if it.lower() == 'isotropic':
-        ei = np.ones(3, dtype=complex) / np.sqrt(3.0)
-    if jt.lower() == 'isotropic':
-        ef = np.ones(3, dtype=complex) / np.sqrt(3.0)
-
-    polvec_i = np.zeros(ntrans, dtype=complex)
-    polvec_f = np.zeros(ntrans, dtype=complex)
-
-    if ntrans == 3:
-        polvec_i[:] = ei
-        polvec_f[:] = ef
-    elif ntrans == 5:
-        ki = unit_wavevector(thin, phi, scatter_axis, direction='in')
-        kf = unit_wavevector(thout, phi, scatter_axis, direction='out')
-        polvec_i[:] = quadrupole_polvec(ei, ki)
-        polvec_f[:] = quadrupole_polvec(ef, kf)
-    else:
-        raise ValueError("ntrans must be 3 or 5")
-
-    return polvec_i, polvec_f
-
-
-def _apply_linear_combination(ops, coeffs, vec):
-    """Apply sum_i coeffs[i] ops[i] to vec without constructing the summed operator."""
-    out = None
-    for coeff, op in zip(coeffs, ops):
-        if coeff == 0:
-            continue
-        term = coeff * (op @ vec)
-        out = term if out is None else out + term
-
-    if out is None:
-        return np.zeros(ops[0].shape[0], dtype=complex)
-    return out
-
-
-def _check_adjoint_action(op, name):
-    """Require op.H @ x to work."""
-    try:
-        test_vec = np.zeros(op.shape[0], dtype=complex)
-        _ = op.H @ test_vec
-    except Exception as exc:
-        raise TypeError(
-            "{} must provide an adjoint action. For a custom LinearOperator, "
-            "define rmatvec or _adjoint.".format(name)
-        ) from exc
-
-
-def _expand_broadening(gamma, n, name):
-    """Return gamma as a length-n float array."""
-    out = np.empty(n, dtype=float)
-    if np.isscalar(gamma):
-        out[:] = gamma
-    else:
-        gamma = np.asarray(gamma, dtype=float)
-        if gamma.shape != (n,):
-            raise ValueError("{} must be scalar or have shape ({},)".format(name, n))
-        out[:] = gamma
-    return out
-
-
-def _gmres_scipy_compat(A, b, *, tol, restart, maxiter):
-    """Call scipy.sparse.linalg.gmres with either old or new SciPy tolerance names."""
-    sig = inspect.signature(gmres)
-
-    if "rtol" in sig.parameters:
-        return gmres(A, b, rtol=tol, atol=0.0, restart=restart, maxiter=maxiter)
-
-    return gmres(A, b, tol=tol, restart=restart, maxiter=maxiter)
 
 
 def ed_1v1c_py(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
@@ -2174,195 +2165,6 @@ def ed_2v1c_fort(comm, shell_name, *, shell_level=None,
     return eval_i, denmat
 
 
-def _ed_1or2_valence_1core(
-        comm, shell_name, *, shell_level=None,
-        v1_soc=None, v2_soc=None, c_soc=0, v_tot_noccu=1, slater=None,
-        v1_ext_B=None, v2_ext_B=None, v1_on_which='spin', v2_on_which='spin',
-        v1_cfmat=None, v2_cfmat=None, v1_othermat=None, v2_othermat=None,
-        hopping_v1v2=None, do_ed=True, ed_solver=2, neval=1, nvector=1, ncv=3,
-        idump=False, maxiter=500, eigval_tol=1e-8, min_ndim=1000
-        ):
-    from .fedrixs import ed_fsolver
-
-    rank = comm.Get_rank()
-    size = comm.Get_size()
-    fcomm = comm.py2f()
-    if rank == 0:
-        print("edrixs >>> Running ED ...", flush=True)
-    v1_name = shell_name[0].strip()
-    v2_name = shell_name[1].strip()
-    c_name = shell_name[2].strip()
-    info_shell = info_atomic_shell()
-
-    # Quantum numbers of angular momentum
-    v1_orbl = info_shell[v1_name][0]
-    if v2_name != 'empty':
-        v2_orbl = info_shell[v2_name][0]
-    else:
-        v2_orbl = -1
-
-    # number of orbitals with spin
-    v1_norb = info_shell[v1_name][1]
-    if v2_name != 'empty':
-        v2_norb = info_shell[v2_name][1]
-    else:
-        v2_norb = 0
-    c_norb = info_shell[c_name][1]
-
-    # total number of orbitals
-    ntot = v1_norb + v2_norb + c_norb
-    v1v2_norb = v1_norb + v2_norb
-
-    # Coulomb interaction
-    if v2_name == 'empty':
-        slater_name = slater_integrals_name((v1_name, c_name), ('v', 'c'))
-    else:
-        slater_name = slater_integrals_name((v1_name, v2_name, c_name), ('v1', 'v2', 'c1'))
-    nslat = len(slater_name)
-    slater_i = np.zeros(nslat, dtype=float)
-    slater_n = np.zeros(nslat, dtype=float)
-
-    if slater is not None:
-        if nslat > len(slater[0]):
-            slater_i[0:len(slater[0])] = slater[0]
-        else:
-            slater_i[:] = slater[0][0:nslat]
-        if nslat > len(slater[1]):
-            slater_n[0:len(slater[1])] = slater[1]
-        else:
-            slater_n[:] = slater[1][0:nslat]
-
-    # print summary of slater integrals
-    if rank == 0:
-        print(flush=True)
-        print("    Summary of Slater integrals:", flush=True)
-        print("    ------------------------------", flush=True)
-        print("    Terms,  Initial Hamiltonian,  Intermediate Hamiltonian", flush=True)
-        for i in range(nslat):
-            print(
-                "    ", slater_name[i],
-                ":  {:20.10f}{:20.10f}".format(slater_i[i], slater_n[i]), flush=True
-            )
-        print(flush=True)
-
-    if v2_name == 'empty':
-        umat_i = get_umat_slater(v1_name + c_name, *slater_i)
-        umat_n = get_umat_slater(v1_name + c_name, *slater_n)
-    else:
-        umat_i = get_umat_slater_3shells((v1_name, v2_name, c_name), *slater_i)
-        umat_n = get_umat_slater_3shells((v1_name, v2_name, c_name), *slater_n)
-
-    if rank == 0:
-        write_umat(umat_i, 'coulomb_i.in')
-        write_umat(umat_n, 'coulomb_n.in')
-
-    emat_i = np.zeros((ntot, ntot), dtype=complex)
-    emat_n = np.zeros((ntot, ntot), dtype=complex)
-    # SOC
-    if v1_soc is not None and v1_name in ['p', 'd', 't2g', 'f']:
-        emat_i[0:v1_norb, 0:v1_norb] += atom_hsoc(v1_name, v1_soc[0])
-        emat_n[0:v1_norb, 0:v1_norb] += atom_hsoc(v1_name, v1_soc[1])
-
-    if v2_soc is not None and v2_name in ['p', 'd', 't2g', 'f']:
-        emat_i[v1_norb:v1v2_norb, v1_norb:v1v2_norb] += atom_hsoc(v2_name, v2_soc[0])
-        emat_n[v1_norb:v1v2_norb, v1_norb:v1v2_norb] += atom_hsoc(v2_name, v2_soc[1])
-
-    if c_name in ['p', 'd', 'f']:
-        emat_n[v1v2_norb:ntot, v1v2_norb:ntot] += atom_hsoc(c_name, c_soc)
-
-    # crystal field
-    if v1_cfmat is not None:
-        emat_i[0:v1_norb, 0:v1_norb] += np.array(v1_cfmat)
-        emat_n[0:v1_norb, 0:v1_norb] += np.array(v1_cfmat)
-
-    if v2_cfmat is not None and v2_name != 'empty':
-        emat_i[v1_norb:v1v2_norb, v1_norb:v1v2_norb] += np.array(v2_cfmat)
-        emat_n[v1_norb:v1v2_norb, v1_norb:v1v2_norb] += np.array(v2_cfmat)
-
-    # other mat
-    if v1_othermat is not None:
-        emat_i[0:v1_norb, 0:v1_norb] += np.array(v1_othermat)
-        emat_n[0:v1_norb, 0:v1_norb] += np.array(v1_othermat)
-
-    if v2_othermat is not None and v2_name != 'empty':
-        emat_i[v1_norb:v1v2_norb, v1_norb:v1v2_norb] += np.array(v2_othermat)
-        emat_n[v1_norb:v1v2_norb, v1_norb:v1v2_norb] += np.array(v2_othermat)
-
-    # energy of shell
-    if shell_level is not None:
-        eval_shift = shell_level[2] * c_norb / v_tot_noccu
-        emat_i[0:v1_norb, 0:v1_norb] += np.eye(v1_norb) * shell_level[0]
-        emat_i[0:v1_norb, 0:v1_norb] += np.eye(v1_norb) * eval_shift
-        emat_n[0:v1_norb, 0:v1_norb] += np.eye(v1_norb) * shell_level[0]
-        emat_n[v1v2_norb:ntot, v1v2_norb:ntot] += np.eye(c_norb) * shell_level[2]
-        if v2_name != 'empty':
-            emat_i[v1_norb:v1v2_norb, v1_norb:v1v2_norb] += np.eye(v2_norb) * shell_level[1]
-            emat_i[v1_norb:v1v2_norb, v1_norb:v1v2_norb] += np.eye(v2_norb) * eval_shift
-            emat_n[v1_norb:v1v2_norb, v1_norb:v1v2_norb] += np.eye(v2_norb) * shell_level[1]
-
-    # external magnetic field
-    for name, l, ext_B, which, i1, i2 in [
-        (v1_name, v1_orbl, v1_ext_B, v1_on_which, 0, v1_norb),
-        (v2_name, v2_orbl, v2_ext_B, v2_on_which, v1_norb, v1v2_norb)
-    ]:
-        if name == 'empty':
-            continue
-        if name == 't2g':
-            lx, ly, lz = get_lx(1, True), get_ly(1, True), get_lz(1, True)
-            sx, sy, sz = get_sx(1), get_sy(1), get_sz(1)
-            lx, ly, lz = -lx, -ly, -lz
-        else:
-            lx, ly, lz = get_lx(l, True), get_ly(l, True), get_lz(l, True)
-            sx, sy, sz = get_sx(l), get_sy(l), get_sz(l)
-        if ext_B is not None:
-            if which.strip() == 'spin':
-                zeeman = ext_B[0] * (2 * sx) + ext_B[1] * (2 * sy) + ext_B[2] * (2 * sz)
-            elif which.strip() == 'orbital':
-                zeeman = ext_B[0] * lx + ext_B[1] * ly + ext_B[2] * lz
-            elif which.strip() == 'both':
-                zeeman = (ext_B[0] * (lx + 2 * sx) +
-                          ext_B[1] * (ly + 2 * sy) +
-                          ext_B[2] * (lz + 2 * sz))
-            else:
-                raise Exception("Unknown value of zeeman_on_which", which)
-            emat_i[i1:i2, i1:i2] += zeeman
-            emat_n[i1:i2, i1:i2] += zeeman
-
-    # hopping between the two valence shells
-    if hopping_v1v2 is not None and v2_name != 'empty':
-        emat_i[0:v1_norb, v1_norb:v1v2_norb] += np.array(hopping_v1v2)
-        emat_i[v1_norb:v1v2_norb, 0:v1_norb] += np.conj(np.transpose(hopping_v1v2))
-        emat_n[0:v1_norb, v1_norb:v1v2_norb] += np.array(hopping_v1v2)
-        emat_n[v1_norb:v1v2_norb, 0:v1_norb] += np.conj(np.transpose(hopping_v1v2))
-
-    if rank == 0:
-        write_emat(emat_i, 'hopping_i.in')
-        write_emat(emat_n, 'hopping_n.in')
-        write_config(
-            './', ed_solver, v1v2_norb, c_norb, neval, nvector, ncv, idump,
-            maxiter=maxiter, min_ndim=min_ndim, eigval_tol=eigval_tol
-        )
-        write_fock_dec_by_N(v1v2_norb, v_tot_noccu, "fock_i.in")
-
-    if do_ed:
-        # now, call ed solver
-        comm.Barrier()
-        ed_fsolver(fcomm, rank, size)
-        comm.Barrier()
-
-        # read eigvals.dat and denmat.dat
-        data = np.loadtxt('eigvals.dat', ndmin=2)
-        eval_i = np.zeros(neval, dtype=float)
-        eval_i[0:neval] = data[0:neval, 1]
-        data = np.loadtxt('denmat.dat', ndmin=2)
-        tmp = (nvector, v1v2_norb, v1v2_norb)
-        denmat = data[:, 3].reshape(tmp) + 1j * data[:, 4].reshape(tmp)
-
-        return eval_i, denmat
-    else:
-        return None, None
-
-
 def xas_1v1c_fort(comm, shell_name, ominc, *, gamma_c=0.1,
                   v_noccu=1, thin=1.0, phi=0, pol_type=None,
                   num_gs=1, nkryl=200, temperature=1.0,
@@ -2576,142 +2378,6 @@ def xas_2v1c_fort(comm, shell_name, ominc, *, gamma_c=0.1,
         num_gs=num_gs, nkryl=nkryl, temperature=temperature,
         loc_axis=loc_axis, scatter_axis=scatter_axis
     )
-
-    return xas, poles
-
-
-def _xas_1or2_valence_1core(
-        comm, shell_name, ominc, *, gamma_c=0.1,
-        v_tot_noccu=1, trans_to_which=1, thin=1.0, phi=0,
-        pol_type=None, num_gs=1, nkryl=200, temperature=1.0,
-        loc_axis=None, scatter_axis=None
-        ):
-    from .fedrixs import xas_fsolver
-
-    rank = comm.Get_rank()
-    size = comm.Get_size()
-    fcomm = comm.py2f()
-
-    v1_name = shell_name[0].strip()
-    v2_name = shell_name[1].strip()
-    c_name = shell_name[2].strip()
-
-    info_shell = info_atomic_shell()
-    v1_norb = info_shell[v1_name][1]
-    if v2_name != 'empty':
-        v2_norb = info_shell[v2_name][1]
-    else:
-        v2_norb = 0
-
-    c_norb = info_shell[c_name][1]
-    ntot = v1_norb + v2_norb + c_norb
-    v1v2_norb = v1_norb + v2_norb
-    if pol_type is None:
-        pol_type = [('isotropic', 0)]
-    if loc_axis is None:
-        loc_axis = np.eye(3)
-    else:
-        loc_axis = np.array(loc_axis)
-    if scatter_axis is None:
-        scatter_axis = np.eye(3)
-    else:
-        scatter_axis = np.array(scatter_axis)
-
-    if rank == 0:
-        print("edrixs >>> Running XAS ...", flush=True)
-        write_config(num_val_orbs=v1v2_norb, num_core_orbs=c_norb,
-                     num_gs=num_gs, nkryl=nkryl)
-        write_fock_dec_by_N(v1v2_norb, v_tot_noccu, "fock_i.in")
-        write_fock_dec_by_N(v1v2_norb, v_tot_noccu + 1, "fock_n.in")
-
-    # Build transition operators in local-xyz axis
-    if trans_to_which == 1:
-        case = v1_name + c_name
-    elif trans_to_which == 2 and v2_name != 'empty':
-        case = v2_name + c_name
-    else:
-        raise Exception('Unkonwn trans_to_which: ', trans_to_which)
-    tmp = get_trans_oper(case)
-    npol, n, m = tmp.shape
-    tmp_g = np.zeros((npol, n, m), dtype=complex)
-    trans_mat = np.zeros((npol, ntot, ntot), dtype=complex)
-    # Transform the transition operators to global-xyz axis
-    # dipolar transition
-    if npol == 3:
-        for i in range(3):
-            for j in range(3):
-                tmp_g[i] += loc_axis[i, j] * tmp[j]
-    # quadrupolar transition
-    elif npol == 5:
-        alpha, beta, gamma = rmat_to_euler(loc_axis)
-        wignerD = get_wigner_dmat(4, alpha, beta, gamma)
-        rotmat = np.dot(np.dot(tmat_r2c('d'), wignerD), np.conj(np.transpose(tmat_r2c('d'))))
-        for i in range(5):
-            for j in range(5):
-                tmp_g[i] += rotmat[i, j] * tmp[j]
-    else:
-        raise Exception("Have NOT implemented this case: ", npol)
-    if trans_to_which == 1:
-        trans_mat[:, 0:v1_norb, v1v2_norb:ntot] = tmp_g
-    else:
-        trans_mat[:, v1_norb:v1v2_norb, v1v2_norb:ntot] = tmp_g
-
-    n_om = len(ominc)
-    gamma_core = np.zeros(n_om, dtype=float)
-    if np.isscalar(gamma_c):
-        gamma_core[:] = np.ones(n_om) * gamma_c
-    else:
-        gamma_core[:] = gamma_c
-
-    # loop over different polarization
-    xas = np.zeros((n_om, len(pol_type)), dtype=float)
-    poles = []
-    comm.Barrier()
-    for it, (pt, alpha) in enumerate(pol_type):
-        if pt.strip() == 'left' or pt.strip() == 'right' or pt.strip() == 'linear':
-            if rank == 0:
-                print("edrixs >>> Loop over for polarization: ", it, pt, flush=True)
-                kvec = unit_wavevector(thin, phi, scatter_axis, 'in')
-                polvec = np.zeros(npol, dtype=complex)
-                pol = dipole_polvec_xas(thin, phi, alpha, scatter_axis, pt)
-                if npol == 3:  # Dipolar transition
-                    polvec[:] = pol
-                if npol == 5:  # Quadrupolar transition
-                    polvec[:] = quadrupole_polvec(pol, kvec)
-                trans = np.zeros((ntot, ntot), dtype=complex)
-                for i in range(npol):
-                    trans[:, :] += trans_mat[i] * polvec[i]
-                write_emat(trans, 'transop_xas.in')
-
-            # call XAS solver in fedrixs
-            comm.Barrier()
-            xas_fsolver(fcomm, rank, size)
-            comm.Barrier()
-
-            file_list = ['xas_poles.' + str(i+1) for i in range(num_gs)]
-            pole_dict = read_poles_from_file(file_list)
-            poles.append(pole_dict)
-            xas[:, it] = get_spectra_from_poles(pole_dict, ominc, gamma_core, temperature)
-        elif pt.strip() == 'isotropic':
-            pole_dicts = []
-            for k in range(npol):
-                if rank == 0:
-                    print("edrixs >>> Loop over for polarization: ", it, pt, flush=True)
-                    print("edrixs >>> Isotropic, component: ", k, flush=True)
-                    write_emat(trans_mat[k], 'transop_xas.in')
-                # call XAS solver in fedrixs
-                comm.Barrier()
-                xas_fsolver(fcomm, rank, size)
-                comm.Barrier()
-
-                file_list = ['xas_poles.' + str(i+1) for i in range(num_gs)]
-                pole_tmp = read_poles_from_file(file_list)
-                xas[:, it] += get_spectra_from_poles(pole_tmp, ominc, gamma_core, temperature)
-                pole_dicts.append(pole_tmp)
-            xas[:, it] = xas[:, it] / npol
-            poles.append(merge_pole_dicts(pole_dicts))
-        else:
-            raise Exception("Unknown polarization type: ", pt)
 
     return xas, poles
 
@@ -2946,155 +2612,6 @@ def rixs_2v1c_fort(comm, shell_name, ominc, eloss, *, gamma_c=0.1, gamma_f=0.1,
         linsys_max=linsys_max, linsys_tol=linsys_tol, temperature=temperature,
         loc_axis=loc_axis, scatter_axis=loc_axis
     )
-
-    return rixs, poles
-
-
-def _rixs_1or2_valence_1core(
-        comm, shell_name, ominc, eloss, *, gamma_c=0.1, gamma_f=0.1,
-        v_tot_noccu=1, trans_to_which=1, thin=1.0, thout=1.0, phi=0,
-        pol_type=None, num_gs=1, nkryl=200, linsys_max=500, linsys_tol=1e-8,
-        temperature=1.0, loc_axis=None, scatter_axis=None
-        ):
-    from .fedrixs import rixs_fsolver
-
-    rank = comm.Get_rank()
-    size = comm.Get_size()
-    fcomm = comm.py2f()
-
-    v1_name = shell_name[0].strip()
-    v2_name = shell_name[1].strip()
-    c_name = shell_name[2].strip()
-
-    info_shell = info_atomic_shell()
-
-    v1_norb = info_shell[v1_name][1]
-    if v2_name != 'empty':
-        v2_norb = info_shell[v2_name][1]
-    else:
-        v2_norb = 0
-    c_norb = info_shell[c_name][1]
-    ntot = v1_norb + v2_norb + c_norb
-    v1v2_norb = v1_norb + v2_norb
-    if pol_type is None:
-        pol_type = [('linear', 0, 'linear', 0)]
-    if loc_axis is None:
-        loc_axis = np.eye(3)
-    else:
-        loc_axis = np.array(loc_axis)
-    if scatter_axis is None:
-        scatter_axis = np.eye(3)
-    else:
-        scatter_axis = np.array(scatter_axis)
-
-    if rank == 0:
-        print("edrixs >>> Running RIXS ...", flush=True)
-        write_fock_dec_by_N(v1v2_norb, v_tot_noccu, "fock_i.in")
-        write_fock_dec_by_N(v1v2_norb, v_tot_noccu + 1, "fock_n.in")
-        write_fock_dec_by_N(v1v2_norb, v_tot_noccu, "fock_f.in")
-
-        # Build transition operators in local-xyz axis
-        if trans_to_which == 1:
-            case = v1_name + c_name
-        elif trans_to_which == 2:
-            case = v2_name + c_name
-        else:
-            raise Exception('Unkonwn trans_to_which: ', trans_to_which)
-        tmp = get_trans_oper(case)
-        npol, n, m = tmp.shape
-        tmp_g = np.zeros((npol, n, m), dtype=complex)
-        trans_mat = np.zeros((npol, ntot, ntot), dtype=complex)
-        # Transform the transition operators to global-xyz axis
-        # dipolar transition
-        if npol == 3:
-            for i in range(3):
-                for j in range(3):
-                    tmp_g[i] += loc_axis[i, j] * tmp[j]
-        # quadrupolar transition
-        elif npol == 5:
-            alpha, beta, gamma = rmat_to_euler(loc_axis)
-            wignerD = get_wigner_dmat(4, alpha, beta, gamma)
-            rotmat = np.dot(np.dot(tmat_r2c('d'), wignerD), np.conj(np.transpose(tmat_r2c('d'))))
-            for i in range(5):
-                for j in range(5):
-                    tmp_g[i] += rotmat[i, j] * tmp[j]
-        else:
-            raise Exception("Have NOT implemented this case: ", npol)
-        if trans_to_which == 1:
-            trans_mat[:, 0:v1_norb, v1v2_norb:ntot] = tmp_g
-        else:
-            trans_mat[:, v1_norb:v1v2_norb, v1v2_norb:ntot] = tmp_g
-
-    n_om = len(ominc)
-    neloss = len(eloss)
-    gamma_core = np.zeros(n_om, dtype=float)
-    if np.isscalar(gamma_c):
-        gamma_core[:] = np.ones(n_om) * gamma_c
-    else:
-        gamma_core[:] = gamma_c
-    gamma_final = np.zeros(neloss, dtype=float)
-    if np.isscalar(gamma_f):
-        gamma_final[:] = np.ones(neloss) * gamma_f
-    else:
-        gamma_final[:] = gamma_f
-
-    # loop over different polarization
-    rixs = np.zeros((n_om, neloss, len(pol_type)), dtype=float)
-    poles = []
-    comm.Barrier()
-    # loop over different polarization
-    for iom, omega in enumerate(ominc):
-        if rank == 0:
-            write_config(
-                num_val_orbs=v1v2_norb, num_core_orbs=c_norb,
-                omega_in=omega, gamma_in=gamma_core[iom],
-                num_gs=num_gs, nkryl=nkryl, linsys_max=linsys_max,
-                linsys_tol=linsys_tol
-            )
-        poles_per_om = []
-        # loop over polarization
-        for ip, (it, alpha, jt, beta) in enumerate(pol_type):
-            if rank == 0:
-                print(flush=True)
-                print("edrixs >>> Calculate RIXS for incident energy: ", omega, flush=True)
-                print("edrixs >>> Polarization: ", ip, flush=True)
-                polvec_i = np.zeros(npol, dtype=complex)
-                polvec_f = np.zeros(npol, dtype=complex)
-                ei, ef = dipole_polvec_rixs(thin, thout, phi, alpha, beta,
-                                            scatter_axis, (it, jt))
-                # dipolar transition
-                if npol == 3:
-                    polvec_i[:] = ei
-                    polvec_f[:] = ef
-                # quadrupolar transition
-                elif npol == 5:
-                    ki = unit_wavevector(thin, phi, scatter_axis, direction='in')
-                    kf = unit_wavevector(thout, phi, scatter_axis, direction='out')
-                    polvec_i[:] = quadrupole_polvec(ei, ki)
-                    polvec_f[:] = quadrupole_polvec(ef, kf)
-                else:
-                    raise Exception("Have NOT implemented this type of transition operators")
-                trans_i = np.zeros((ntot, ntot), dtype=complex)
-                trans_f = np.zeros((ntot, ntot), dtype=complex)
-                for i in range(npol):
-                    trans_i[:, :] += trans_mat[i] * polvec_i[i]
-                write_emat(trans_i, 'transop_rixs_i.in')
-                for i in range(npol):
-                    trans_f[:, :] += trans_mat[i] * polvec_f[i]
-                write_emat(np.conj(np.transpose(trans_f)), 'transop_rixs_f.in')
-
-            # call RIXS solver in fedrixs
-            comm.Barrier()
-            rixs_fsolver(fcomm, rank, size)
-            comm.Barrier()
-
-            file_list = ['rixs_poles.' + str(i+1) for i in range(num_gs)]
-            pole_dict = read_poles_from_file(file_list)
-            poles_per_om.append(pole_dict)
-            rixs[iom, :, ip] = get_spectra_from_poles(pole_dict, eloss,
-                                                      gamma_final, temperature)
-
-        poles.append(poles_per_om)
 
     return rixs, poles
 

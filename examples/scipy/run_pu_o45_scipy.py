@@ -96,6 +96,7 @@ def run(
 
     shell_name = ("f", "d")
     temperature = 300.0
+    neval = 30
     num_gs = 1
 
     thin = np.deg2rad(45.0)
@@ -135,15 +136,15 @@ def run(
     print(f"Intermediate-space dimension: {hmat_n.shape[0]}")
 
     stage_start = time.perf_counter()
-    blocksize = 4
+    blocksize = neval
     rng = np.random.default_rng(12345)
     initial_guess = (
         rng.standard_normal((hmat_i.shape[0], blocksize))
         + 1j * rng.standard_normal((hmat_i.shape[0], blocksize))
     )
-    eval_i, evec_i = ed_krylov_scipy(
+    eval_all, evec_all = ed_krylov_scipy(
         hmat_i,
-        num_gs=num_gs,
+        num_gs=neval,
         blocksize=blocksize,
         tol=1.0e-12,
         maxiter=5000,
@@ -154,20 +155,23 @@ def run(
 
     residuals = np.array([
         np.linalg.norm(
-            hmat_i @ evec_i[:, state] - eval_i[state] * evec_i[:, state]
+            hmat_i @ evec_all[:, state] - eval_all[state] * evec_all[:, state]
         )
-        for state in range(num_gs)
+        for state in range(neval)
     ])
-    print("Retained initial energy:")
-    print(eval_i)
-    print("Eigenpair residual norm:")
+    print("Computed initial energies:")
+    print(eval_all)
+    print("Eigenpair residual norms:")
     print(residuals)
 
     np.savetxt(
         output_dir / "eval_i.dat",
-        np.column_stack((np.arange(num_gs), eval_i, residuals)),
+        np.column_stack((np.arange(neval), eval_all, residuals)),
         header="state  energy_eV  residual_norm",
     )
+
+    eval_i = eval_all[:num_gs]
+    evec_i = evec_all[:, :num_gs]
 
     xas = None
     if not skip_xas:
@@ -234,7 +238,7 @@ def run(
     timings["total_s"] = time.perf_counter() - total_start
 
     arrays = {
-        "eval_i": eval_i,
+        "eval_i": eval_all,
         "residuals": residuals,
         "ominc_xas": ominc_xas,
         "ominc_rixs": ominc_rixs,

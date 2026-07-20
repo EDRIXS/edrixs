@@ -150,6 +150,7 @@ def run(output_dir: Path) -> None:
     parameters = build_physical_parameters()
 
     temperature = 300.0
+    neval = 50
     num_gs = 3
     thin = 0.0
     phi = 0.0
@@ -182,16 +183,16 @@ def run(output_dir: Path) -> None:
     print(f"Initial-space dimension:      {hmat_i.shape[0]}")
     print(f"Intermediate-space dimension: {hmat_n.shape[0]}")
 
-    blocksize = 6
+    blocksize = neval
     rng = np.random.default_rng(12345)
     initial_guess = (
         rng.standard_normal((hmat_i.shape[0], blocksize))
         + 1j * rng.standard_normal((hmat_i.shape[0], blocksize))
     )
 
-    eval_i, evec_i = ed_krylov_scipy(
+    eval_all, evec_all = ed_krylov_scipy(
         hmat_i,
-        num_gs=num_gs,
+        num_gs=neval,
         blocksize=blocksize,
         tol=1.0e-12,
         maxiter=3000,
@@ -201,22 +202,25 @@ def run(output_dir: Path) -> None:
 
     residuals = np.array([
         np.linalg.norm(
-            hmat_i @ evec_i[:, state]
-            - eval_i[state] * evec_i[:, state]
+            hmat_i @ evec_all[:, state]
+            - eval_all[state] * evec_all[:, state]
         )
-        for state in range(num_gs)
+        for state in range(neval)
     ])
 
-    print("Retained initial energies:")
-    print(eval_i)
+    print("Computed initial energies:")
+    print(eval_all)
     print("Eigenpair residual norms:")
     print(residuals)
 
     np.savetxt(
         output_dir / "eval_i.dat",
-        np.column_stack((np.arange(num_gs), eval_i, residuals)),
+        np.column_stack((np.arange(neval), eval_all, residuals)),
         header="state  energy_eV  residual_norm",
     )
+
+    eval_i = eval_all[:num_gs]
+    evec_i = evec_all[:, :num_gs]
 
     xas = xas_krylov_scipy(
         eval_i,
@@ -249,7 +253,7 @@ def run(output_dir: Path) -> None:
 
     np.savez_compressed(
         output_dir / "nio_aim_xas_scipy_results.npz",
-        eval_i=eval_i,
+        eval_i=eval_all,
         residuals=residuals,
         ominc_xas=ominc_xas,
         gamma_c=gamma_c,

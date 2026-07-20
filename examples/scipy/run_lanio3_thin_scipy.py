@@ -91,6 +91,7 @@ def run(output_dir: Path) -> None:
     shell_name = ("d", "p")
     core_offset = 857.4
     temperature = 300.0
+    neval = 10
     num_gs = 3
 
     thin = np.deg2rad(15.0)
@@ -145,18 +146,18 @@ def run(output_dir: Path) -> None:
     print(f"Intermediate-space dimension: {hmat_n.shape[0]}")
 
     # -------------------------------------------------------------------------
-    # 3. Calculate the three retained low-energy initial states.
+    # 3. Calculate the Fortran eigenvalue count, then retain three states.
     # -------------------------------------------------------------------------
-    blocksize = 6
+    blocksize = neval
     rng = np.random.default_rng(12345)
     initial_guess = (
         rng.standard_normal((hmat_i.shape[0], blocksize))
         + 1j * rng.standard_normal((hmat_i.shape[0], blocksize))
     )
 
-    eval_i, evec_i = ed_krylov_scipy(
+    eval_all, evec_all = ed_krylov_scipy(
         hmat_i,
-        num_gs=num_gs,
+        num_gs=neval,
         blocksize=blocksize,
         tol=1.0e-12,
         maxiter=2000,
@@ -165,17 +166,20 @@ def run(output_dir: Path) -> None:
     )
 
     residuals = np.array([
-        np.linalg.norm(hmat_i @ evec_i[:, index] - eval_i[index] * evec_i[:, index])
-        for index in range(num_gs)
+        np.linalg.norm(hmat_i @ evec_all[:, index] - eval_all[index] * evec_all[:, index])
+        for index in range(neval)
     ])
-    print("Retained initial energies:", eval_i)
+    print("Computed initial energies:", eval_all)
     print("Eigenpair residual norms: ", residuals)
 
     np.savetxt(
         output_dir / "eval_i.dat",
-        np.column_stack((np.arange(num_gs), eval_i, residuals)),
+        np.column_stack((np.arange(neval), eval_all, residuals)),
         header="state  energy_eV  residual_norm",
     )
+
+    eval_i = eval_all[:num_gs]
+    evec_i = evec_all[:, :num_gs]
 
     # The original Fortran input requests nkryl=100. The effective Krylov
     # dimensions cannot exceed the Hilbert-space dimensions (60 for XAS and
@@ -255,7 +259,7 @@ def run(output_dir: Path) -> None:
     # A compact machine-readable bundle is useful for backend comparisons.
     np.savez_compressed(
         output_dir / "lanio3_thin_scipy_results.npz",
-        eval_i=eval_i,
+        eval_i=eval_all,
         residuals=residuals,
         ominc_xas=ominc_xas,
         xas=xas,
