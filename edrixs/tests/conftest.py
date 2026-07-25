@@ -1,3 +1,5 @@
+"""Small shared physical model used by unit and consistency tests."""
+
 import numpy as np
 import pytest
 
@@ -6,7 +8,7 @@ from edrixs.solvers import setup_1v1c
 
 @pytest.fixture(scope="module")
 def small_1v1c_kwargs():
-    # A small dipole-allowed p <- s problem with nonzero one- and two-body terms.
+    """Return a tiny dipole-allowed model that keeps complete workflows fast."""
     return {
         "shell_name": ("p", "s"),
         "shell_level": (0.2, -4.0),
@@ -19,4 +21,5 @@ def small_1v1c_kwargs():
 
 @pytest.fixture(scope="module")
 def small_1v1c_problem(small_1v1c_kwargs):
+    """Build the shared orbital-space model before any backend is selected."""
     return setup_1v1c(**small_1v1c_kwargs, sparse_U=False)
