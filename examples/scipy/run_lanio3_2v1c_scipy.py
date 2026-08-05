@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
-"""
-LaNiO3 3d+4p / 2p two-valence-shell benchmark using the EDRIXS SciPy path.
+"""LaNiO3 3d+4p / 2p two-valence-shell benchmark.
+
+This example uses the EDRIXS backend-neutral solver interface with the
+SciPy backend.
 
 This is the SciPy/Krylov counterpart of:
     examples/more/RIXS/LaNiO3_thin/test_2v1c.py
 
 The model retains the original physical parameters and spectral grids, but uses:
-    setup_2v1c -> ops -> ed_krylov_scipy
-                 -> xas_krylov_scipy
-                 -> rixs_krylov_scipy
+    setup_2v1c -> ops -> ed -> xas / rixs
 
-The RIXS solver creates one process-pool job for every
-(incident energy, polarization, retained initial state) triple.  By default it
-uses all CPUs available to the process, capped by the number of jobs.
+This example requests the SciPy process-pool RIXS implementation through
+backend_kws={"parallel": True, ...}. It creates one job for every
+(incident energy, polarization, retained initial state) triple.
 """
 
 import argparse
@@ -29,9 +29,9 @@ import edrixs  # noqa: E402
 from edrixs.solvers import (  # noqa: E402
     setup_2v1c,
     ops,
-    ed_krylov_scipy,
-    xas_krylov_scipy,
-    rixs_krylov_scipy,
+    ed as solve_ed,
+    xas as solve_xas,
+    rixs as solve_rixs,
 )
 
 
@@ -169,14 +169,17 @@ def run(
         rng.standard_normal((hmat_i.shape[0], blocksize))
         + 1j * rng.standard_normal((hmat_i.shape[0], blocksize))
     )
-    eval_all, evec_all = ed_krylov_scipy(
+    eval_all, evec_all = solve_ed(
         hmat_i,
-        num_gs=neval,
-        blocksize=blocksize,
-        tol=1.0e-10,
-        maxiter=1000,
-        initial_guess=initial_guess,
-        suppress_lobpcg_warnings=False,
+        num_evals=neval,
+        backend="scipy",
+        backend_kws={
+            "blocksize": blocksize,
+            "tol": 1.0e-10,
+            "maxiter": 1000,
+            "initial_guess": initial_guess,
+            "suppress_lobpcg_warnings": False,
+        },
     )
     timings["ed_s"] = time.perf_counter() - stage_start
 
@@ -203,7 +206,7 @@ def run(
     xas = None
     if not skip_xas:
         stage_start = time.perf_counter()
-        xas = xas_krylov_scipy(
+        xas = solve_xas(
             eval_i,
             evec_i,
             hmat_n,
@@ -214,7 +217,10 @@ def run(
             phi=phi,
             pol_type=poltype_xas,
             temperature=temperature,
-            nkryl=100,
+            backend="scipy",
+            backend_kws={
+                "nkryl": 100,
+            },
         )
         timings["xas_s"] = time.perf_counter() - stage_start
 
@@ -228,7 +234,7 @@ def run(
     rixs_pi = None
     if not skip_rixs:
         stage_start = time.perf_counter()
-        rixs = rixs_krylov_scipy(
+        rixs = solve_rixs(
             eval_i,
             evec_i,
             hmat_i,
@@ -243,13 +249,17 @@ def run(
             phi=phi,
             pol_type=poltype_rixs,
             temperature=temperature,
-            nkryl=100,
-            linsys_tol=1.0e-8,
-            linsys_maxiter=500,
-            linsys_restart=200,
-            workers=workers,
-            blas_threads=blas_threads,
-            mp_start_method=mp_start_method,
+            backend="scipy",
+            backend_kws={
+                "parallel": True,
+                "nkryl": 100,
+                "linsys_tol": 1.0e-8,
+                "linsys_maxiter": 500,
+                "linsys_restart": 200,
+                "workers": workers,
+                "blas_threads": blas_threads,
+                "mp_start_method": mp_start_method,
+            },
         )
         timings["rixs_s"] = time.perf_counter() - stage_start
 
@@ -301,7 +311,7 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description=(
             "Run the LaNiO3 3d+4p/2p two-valence-shell benchmark through "
-            "the SciPy/Krylov pathway."
+            "the backend-neutral solver interface with the SciPy backend."
         )
     )
     parser.add_argument(

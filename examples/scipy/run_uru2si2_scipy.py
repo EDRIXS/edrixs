@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-"""
-URu2Si2 U O4,5-edge XAS/RIXS using the experimental EDRIXS SciPy pathway:
+"""URu2Si2 U O4,5-edge XAS/RIXS.
+
+This example uses the EDRIXS backend-neutral solver interface with the
+SciPy backend:
 
     setup_1v1c(...) -> ops(..., backend="scipy")
-        -> ed_krylov_scipy(...)
-        -> XAS/RIXS Krylov solvers
+        -> ed(...) -> xas(...) / rixs(...)
 
 This reproduces the physical model and output grids of:
     examples/more/RIXS/URu2Si2/run_rixs_fsolver.py
-
 """
 
 from __future__ import annotations
@@ -26,9 +26,9 @@ import edrixs  # noqa: E402
 from edrixs.solvers import (  # noqa: E402
     setup_1v1c,
     ops,
-    ed_krylov_scipy,
-    xas_krylov_scipy,
-    rixs_krylov_scipy,
+    ed as solve_ed,
+    xas as solve_xas,
+    rixs as solve_rixs,
 )
 
 
@@ -182,14 +182,17 @@ def run(output_dir: Path) -> None:
         + 1j * rng.standard_normal((hmat_i.shape[0], blocksize))
     )
 
-    eval_all, evec_all = ed_krylov_scipy(
+    eval_all, evec_all = solve_ed(
         hmat_i,
-        num_gs=neval,
-        blocksize=blocksize,
-        tol=1.0e-12,
-        maxiter=3000,
-        initial_guess=initial_guess,
-        suppress_lobpcg_warnings=False,
+        num_evals=neval,
+        backend="scipy",
+        backend_kws={
+            "blocksize": blocksize,
+            "tol": 1.0e-12,
+            "maxiter": 3000,
+            "initial_guess": initial_guess,
+            "suppress_lobpcg_warnings": False,
+        },
     )
 
     residuals = np.array([
@@ -227,7 +230,7 @@ def run(output_dir: Path) -> None:
     # -------------------------------------------------------------------------
     # 4. XAS.
     # -------------------------------------------------------------------------
-    xas = xas_krylov_scipy(
+    xas = solve_xas(
         eval_i,
         evec_i,
         hmat_n,
@@ -238,7 +241,10 @@ def run(output_dir: Path) -> None:
         phi=phi,
         pol_type=poltype_xas,
         temperature=temperature,
-        nkryl=100,
+        backend="scipy",
+        backend_kws={
+            "nkryl": 100,
+        },
     )
 
     np.savetxt(
@@ -250,7 +256,7 @@ def run(output_dir: Path) -> None:
     # -------------------------------------------------------------------------
     # 5. RIXS.
     # -------------------------------------------------------------------------
-    rixs = rixs_krylov_scipy(
+    rixs = solve_rixs(
         eval_i,
         evec_i,
         hmat_i,
@@ -265,10 +271,14 @@ def run(output_dir: Path) -> None:
         phi=phi,
         pol_type=poltype_rixs,
         temperature=temperature,
-        nkryl=100,
-        linsys_tol=1.0e-10,
-        linsys_maxiter=50000,
-        linsys_restart=200,
+        backend="scipy",
+        backend_kws={
+            "parallel": True,
+            "nkryl": 100,
+            "linsys_tol": 1.0e-10,
+            "linsys_maxiter": 50000,
+            "linsys_restart": 200,
+        },
     )
 
     rixs_pi = np.sum(rixs[:, :, 0:2], axis=2)
@@ -316,7 +326,10 @@ def run(output_dir: Path) -> None:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run the URu2Si2 benchmark through the new SciPy pathway."
+        description=(
+            "Run the URu2Si2 benchmark through the backend-neutral "
+            "interface using the SciPy backend."
+        )
     )
     parser.add_argument(
         "--output-dir",

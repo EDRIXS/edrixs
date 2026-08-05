@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
-"""
-NiO Anderson-impurity-model L-edge XAS using the experimental EDRIXS
-SciPy pathway:
+"""NiO Anderson-impurity-model L-edge XAS.
+
+This example uses the EDRIXS backend-neutral solver interface with the
+SciPy backend:
 
     setup_siam(...) -> ops(..., backend="scipy")
-        -> ed_krylov_scipy(...)
-        -> Lanczos continued-fraction XAS
+        -> ed(...) -> xas(...)
 
 This reproduces the physical model and output grid of:
     examples/sphinx/example_03_AIM_XAS.py
-
 """
 
 from __future__ import annotations
@@ -26,10 +25,10 @@ import numpy as np  # noqa: E402
 import edrixs  # noqa: E402
 
 from edrixs.solvers import (  # noqa: E402
-    ed_krylov_scipy,
-    ops,
     setup_siam,
-    xas_krylov_scipy,
+    ops,
+    ed as solve_ed,
+    xas as solve_xas,
 )
 
 
@@ -190,14 +189,17 @@ def run(output_dir: Path) -> None:
         + 1j * rng.standard_normal((hmat_i.shape[0], blocksize))
     )
 
-    eval_all, evec_all = ed_krylov_scipy(
+    eval_all, evec_all = solve_ed(
         hmat_i,
-        num_gs=neval,
-        blocksize=blocksize,
-        tol=1.0e-12,
-        maxiter=3000,
-        initial_guess=initial_guess,
-        suppress_lobpcg_warnings=False,
+        num_evals=neval,
+        backend="scipy",
+        backend_kws={
+            "blocksize": blocksize,
+            "tol": 1.0e-12,
+            "maxiter": 3000,
+            "initial_guess": initial_guess,
+            "suppress_lobpcg_warnings": False,
+        },
     )
 
     residuals = np.array([
@@ -222,7 +224,7 @@ def run(output_dir: Path) -> None:
     eval_i = eval_all[:num_gs]
     evec_i = evec_all[:, :num_gs]
 
-    xas = xas_krylov_scipy(
+    xas = solve_xas(
         eval_i,
         evec_i,
         hmat_n,
@@ -233,7 +235,10 @@ def run(output_dir: Path) -> None:
         phi=phi,
         pol_type=poltype_xas,
         temperature=temperature,
-        nkryl=200,
+        backend="scipy",
+        backend_kws={
+            "nkryl": 200,
+        },
     )
 
     np.savetxt(
@@ -265,7 +270,10 @@ def run(output_dir: Path) -> None:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run the NiO AIM XAS benchmark through the SciPy pathway."
+        description=(
+            "Run the NiO AIM XAS benchmark through the backend-neutral "
+            "interface using the SciPy backend."
+        )
     )
     parser.add_argument(
         "--output-dir",

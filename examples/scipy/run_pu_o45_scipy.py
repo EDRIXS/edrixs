@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-"""
-Pu 5f6 O4,5-edge XAS/RIXS using the experimental EDRIXS SciPy pathway.
+"""Pu 5f6 O4,5-edge XAS/RIXS.
+
+This example uses the EDRIXS backend-neutral solver interface with the
+SciPy backend.
 
 Reference: examples/more/RIXS/Pu_O45/run_rixs_fsolver.py
 Expected dimensions: initial 3,003; intermediate 34,320.
@@ -23,9 +25,9 @@ import edrixs  # noqa: E402
 from edrixs.solvers import (  # noqa: E402
     setup_1v1c,
     ops,
-    ed_krylov_scipy,
-    xas_krylov_scipy,
-    rixs_krylov_scipy,
+    ed as solve_ed,
+    xas as solve_xas,
+    rixs as solve_rixs,
 )
 
 
@@ -142,14 +144,17 @@ def run(
         rng.standard_normal((hmat_i.shape[0], blocksize))
         + 1j * rng.standard_normal((hmat_i.shape[0], blocksize))
     )
-    eval_all, evec_all = ed_krylov_scipy(
+    eval_all, evec_all = solve_ed(
         hmat_i,
-        num_gs=neval,
-        blocksize=blocksize,
-        tol=1.0e-12,
-        maxiter=5000,
-        initial_guess=initial_guess,
-        suppress_lobpcg_warnings=False,
+        num_evals=neval,
+        backend="scipy",
+        backend_kws={
+            "blocksize": blocksize,
+            "tol": 1.0e-12,
+            "maxiter": 5000,
+            "initial_guess": initial_guess,
+            "suppress_lobpcg_warnings": False,
+        },
     )
     timings["ed_s"] = time.perf_counter() - stage_start
 
@@ -176,7 +181,7 @@ def run(
     xas = None
     if not skip_xas:
         stage_start = time.perf_counter()
-        xas = xas_krylov_scipy(
+        xas = solve_xas(
             eval_i,
             evec_i,
             hmat_n,
@@ -187,7 +192,10 @@ def run(
             phi=phi,
             pol_type=poltype_xas,
             temperature=temperature,
-            nkryl=200,
+            backend="scipy",
+            backend_kws={
+                "nkryl": 200,
+            },
         )
         timings["xas_s"] = time.perf_counter() - stage_start
         np.savetxt(
@@ -200,7 +208,7 @@ def run(
     rixs_pi = None
     if not skip_rixs:
         stage_start = time.perf_counter()
-        rixs = rixs_krylov_scipy(
+        rixs = solve_rixs(
             eval_i,
             evec_i,
             hmat_i,
@@ -215,10 +223,14 @@ def run(
             phi=phi,
             pol_type=poltype_rixs,
             temperature=temperature,
-            nkryl=200,
-            linsys_tol=1.0e-10,
-            linsys_maxiter=5000,
-            linsys_restart=200,
+            backend="scipy",
+            backend_kws={
+            "parallel": True,
+                "nkryl": 200,
+                "linsys_tol": 1.0e-10,
+                "linsys_maxiter": 5000,
+                "linsys_restart": 200,
+            },
         )
         timings["rixs_s"] = time.perf_counter() - stage_start
 
@@ -264,7 +276,10 @@ def run(
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run the Pu O4,5-edge benchmark through the SciPy pathway."
+        description=(
+            "Run the Pu O4,5-edge benchmark through the backend-neutral "
+            "interface using the SciPy backend."
+        )
     )
     parser.add_argument(
         "--output-dir",
