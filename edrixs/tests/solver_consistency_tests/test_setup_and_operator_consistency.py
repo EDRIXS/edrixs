@@ -177,13 +177,17 @@ def test_ops_scipy_backend_matches_dense_operator_action(small_1v1c_problem):
         size=hmat_n.shape[1]
     )
     assert_allclose(hmat_i_sp @ vec_i, hmat_i @ vec_i, atol=1e-12)
-    assert_allclose(hmat_i_sp.H @ vec_i, hmat_i.conj().T @ vec_i, atol=1e-12)
+    assert_allclose(
+        hmat_i_sp.conj().T @ vec_i,
+        hmat_i.conj().T @ vec_i,
+        atol=1e-12,
+    )
     assert_allclose(hmat_n_sp @ vec_n, hmat_n @ vec_n, atol=1e-12)
 
     for sparse_op, dense_op in zip(trans_sp, transitions):
         assert_allclose(sparse_op @ vec_i, dense_op @ vec_i, atol=1e-12)
         assert_allclose(
-            sparse_op.H @ vec_n,
+            sparse_op.conj().T @ vec_n,
             dense_op.conj().T @ vec_n,
             atol=1e-12,
         )

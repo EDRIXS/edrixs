@@ -72,14 +72,22 @@ def assert_dense_and_scipy_ops_match(dense_problem, sparse_problem, seed=0):
     )
 
     assert_allclose(hmat_i_sp @ vec_i, hmat_i @ vec_i, atol=2e-12)
-    assert_allclose(hmat_i_sp.H @ vec_i, hmat_i.conj().T @ vec_i, atol=2e-12)
+    assert_allclose(
+        hmat_i_sp.conj().T @ vec_i,
+        hmat_i.conj().T @ vec_i,
+        atol=2e-12,
+    )
     assert_allclose(hmat_n_sp @ vec_n, hmat_n @ vec_n, atol=2e-12)
-    assert_allclose(hmat_n_sp.H @ vec_n, hmat_n.conj().T @ vec_n, atol=2e-12)
+    assert_allclose(
+        hmat_n_sp.conj().T @ vec_n,
+        hmat_n.conj().T @ vec_n,
+        atol=2e-12,
+    )
 
     for transition_sp, transition in zip(transitions_sp, transitions):
         assert_allclose(transition_sp @ vec_i, transition @ vec_i, atol=2e-12)
         assert_allclose(
-            transition_sp.H @ vec_n,
+            transition_sp.conj().T @ vec_n,
             transition.conj().T @ vec_n,
             atol=2e-12,
         )
