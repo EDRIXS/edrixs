@@ -1,5 +1,8 @@
 """Private implementation helpers for :mod:`edrixs.solvers`."""
 
+from collections.abc import Mapping
+import importlib
+
 import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import LinearOperator, aslinearoperator, gmres
@@ -21,6 +24,72 @@ from .utils import info_atomic_shell, slater_integrals_name
 from .plot_spectrum import get_spectra_from_poles, merge_pole_dicts
 from .soc import atom_hsoc
 from .krylov import lanczos_tridiagonal
+
+
+_BACKEND_MODULES = {
+    "scipy": ".scipy_backend",
+    "petsc": ".petsc_backend",
+    # Compatibility alias until a true NumPy backend is introduced.
+    "dense": ".scipy_backend",
+}
+
+_INFERABLE_BACKENDS = ("scipy", "petsc")
+
+
+def _normalize_backend_name(backend):
+    if not isinstance(backend, str):
+        raise TypeError("backend must be a string")
+
+    name = backend.strip().lower()
+    if name not in _BACKEND_MODULES:
+        raise ValueError(
+            "Unknown backend {!r}; available backends are {}".format(
+                backend, sorted(_BACKEND_MODULES)
+            )
+        )
+    return name
+
+
+def _load_backend(backend):
+    name = _normalize_backend_name(backend)
+    module = importlib.import_module(_BACKEND_MODULES[name], package=__package__)
+    return name, module
+
+
+def _copy_backend_kws(backend_kws):
+    if backend_kws is None:
+        return {}
+    if not isinstance(backend_kws, Mapping):
+        raise TypeError("backend_kws must be a mapping or None")
+    return dict(backend_kws)
+
+
+def _infer_backend(*operators):
+    candidates = []
+    for name in _INFERABLE_BACKENDS:
+        _, module = _load_backend(name)
+        owns = getattr(module, "owns_operator_" + name)
+        if operators and all(owns(operator) for operator in operators):
+            candidates.append(name)
+
+    if len(candidates) == 1:
+        return candidates[0]
+    if not candidates:
+        raise TypeError(
+            "Could not infer a backend from the supplied operators; "
+            "pass backend='scipy' or backend='petsc' explicitly"
+        )
+    raise TypeError(
+        "Backend inference is ambiguous ({}); pass backend explicitly".format(
+            ", ".join(candidates)
+        )
+    )
+
+
+def _resolve_backend(backend, *operators):
+    if backend is None:
+        return _infer_backend(*operators)
+    return _normalize_backend_name(backend)
 
 
 def _rotated_transition_blocks(case, loc_axis=None):
