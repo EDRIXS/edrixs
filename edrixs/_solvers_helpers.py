@@ -37,6 +37,12 @@ _INFERABLE_BACKENDS = ("scipy", "petsc")
 
 
 def _normalize_backend_name(backend):
+    """
+    Normalize and validate a backend name.
+
+    ``None`` is preserved so solver entry points can request inference.
+    Aliases are converted to the canonical lowercase backend key.
+    """
     if not isinstance(backend, str):
         raise TypeError("backend must be a string")
 
@@ -51,12 +57,20 @@ def _normalize_backend_name(backend):
 
 
 def _load_backend(backend):
+    """
+    Import and return the module implementing ``backend``.
+    """
     name = _normalize_backend_name(backend)
     module = importlib.import_module(_BACKEND_MODULES[name], package=__package__)
     return name, module
 
 
 def _copy_backend_kws(backend_kws):
+    """
+    Return a mutable copy of backend-specific keyword arguments.
+
+    A non-mapping value is rejected at the public API boundary.
+    """
     if backend_kws is None:
         return {}
     if not isinstance(backend_kws, Mapping):
@@ -65,6 +79,15 @@ def _copy_backend_kws(backend_kws):
 
 
 def _infer_backend(*operators):
+    """
+    Infer the unique backend that owns all supplied operators.
+
+    Raises
+    ------
+    ValueError
+        If no backend recognizes the operators or different backends own
+        different operators.
+    """
     candidates = []
     for name in _INFERABLE_BACKENDS:
         _, module = _load_backend(name)
@@ -87,6 +110,9 @@ def _infer_backend(*operators):
 
 
 def _resolve_backend(backend, *operators):
+    """
+    Return an explicit backend or infer one from the supplied operators.
+    """
     if backend is None:
         return _infer_backend(*operators)
     return _normalize_backend_name(backend)
@@ -562,6 +588,7 @@ def _ed_1or2_valence_1core(
         hopping_v1v2=None, do_ed=True, ed_solver=2, neval=1, nvector=1, ncv=3,
         idump=False, maxiter=500, eigval_tol=1e-8, min_ndim=1000
         ):
+    """Run the shared Fortran ED workflow for one or two valence shells."""
     from .fedrixs import ed_fsolver
 
     rank = comm.Get_rank()
@@ -749,6 +776,7 @@ def _xas_1or2_valence_1core(
         pol_type=None, num_gs=1, nkryl=200, temperature=1.0,
         loc_axis=None, scatter_axis=None
         ):
+    """Run the shared Fortran XAS workflow for one or two valence shells."""
     from .fedrixs import xas_fsolver
 
     rank = comm.Get_rank()
@@ -885,6 +913,7 @@ def _rixs_1or2_valence_1core(
         pol_type=None, num_gs=1, nkryl=200, linsys_max=500, linsys_tol=1e-8,
         temperature=1.0, loc_axis=None, scatter_axis=None
         ):
+    """Run the shared Fortran RIXS workflow for one or two valence shells."""
     from .fedrixs import rixs_fsolver
 
     rank = comm.Get_rank()

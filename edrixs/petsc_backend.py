@@ -15,6 +15,9 @@ __all__ = [
 
 
 def _petsc_module():
+    """
+    Import petsc4py lazily and return its PETSc module.
+    """
     try:
         from petsc4py import PETSc
     except ImportError as exc:
@@ -25,6 +28,9 @@ def _petsc_module():
 
 
 def owns_operator_petsc(operator):
+    """
+    Return whether ``operator`` is a petsc4py matrix or linear operator.
+    """
     try:
         PETSc = _petsc_module()
     except ImportError:
@@ -33,6 +39,9 @@ def owns_operator_petsc(operator):
 
 
 def _not_implemented(operation):
+    """
+    Raise the standard PETSc-backend stub error.
+    """
     raise NotImplementedError(
         "The PETSc backend contract is present, but {} has not yet been "
         "implemented".format(operation)

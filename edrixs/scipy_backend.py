@@ -33,6 +33,9 @@ __all__ = [
 
 
 def _backend_kws(backend_kws):
+    """
+    Validate and copy SciPy backend keyword arguments.
+    """
     if backend_kws is None:
         return {}
     if not isinstance(backend_kws, Mapping):
@@ -60,10 +63,26 @@ def owns_operator_dense(operator):
 
 
 def _count_occupied_before(state, orbital, norbs):
+    """
+    Count occupied orbitals preceding ``orbital`` in the bit convention.
+    """
     return (int(state) >> (norbs - orbital)).bit_count()
 
 
 def two_fermion_csr(emat, left_basis, right_basis=None, tol=1e-10):
+    """
+    Build a sparse many-body representation of a one-body operator.
+
+    Parameters
+    ----------
+    emat : 2d array
+        Orbital-space coefficients of :math:`c_i^\\dagger c_j`.
+    left_basis, right_basis : FockBasis
+        Output and input many-electron bases. ``right_basis`` defaults to
+        ``left_basis``.
+    tol : float, optional
+        Ignore coefficients with magnitude not exceeding this threshold.
+    """
     if right_basis is None:
         right_basis = left_basis
 
@@ -115,6 +134,9 @@ def two_fermion_csr(emat, left_basis, right_basis=None, tol=1e-10):
 
 
 def four_fermion_csr(umat, left_basis, right_basis=None, tol=1e-10):
+    """
+    Build a sparse many-body representation of a dense Coulomb tensor.
+    """
     if right_basis is None:
         right_basis = left_basis
 
@@ -184,6 +206,9 @@ def four_fermion_csr(umat, left_basis, right_basis=None, tol=1e-10):
 
 def _four_fermion_csr_from_sparse_umat(
         umat, left_basis, right_basis=None, tol=1e-10):
+    """
+    Build a sparse two-body operator from a flattened sparse Coulomb tensor.
+    """
     if right_basis is None:
         right_basis = left_basis
 
@@ -256,6 +281,9 @@ def _four_fermion_csr_from_sparse_umat(
 
 
 def four_fermion_csr_auto(umat, basis, right_basis=None, tol=1e-10):
+    """
+    Build a sparse two-body operator from dense or sparse Coulomb data.
+    """
     if sp.issparse(umat):
         return _four_fermion_csr_from_sparse_umat(
             umat, basis, right_basis=right_basis, tol=tol
@@ -322,6 +350,9 @@ def get_transition_operators_dense(
 
 
 def ed_scipy(hmat_i, num_evals=1, *, backend_kws=None):
+    """
+    Adapt the public ED call to :func:`ed_krylov_scipy`.
+    """
     kws = _backend_kws(backend_kws)
     return ed_krylov_scipy(hmat_i, num_gs=num_evals, **kws)
 
@@ -329,6 +360,9 @@ def ed_scipy(hmat_i, num_evals=1, *, backend_kws=None):
 def xas_scipy(eval_i, evec_i, hmat_n, trans_op, ominc, *,
               gamma_c=0.1, thin=1.0, phi=0.0, pol_type=None,
               temperature=1.0, scatter_axis=None, backend_kws=None):
+    """
+    Adapt the public XAS call to :func:`xas_krylov_scipy`.
+    """
     kws = _backend_kws(backend_kws)
     return xas_krylov_scipy(
         eval_i, evec_i, hmat_n, trans_op, ominc,
@@ -341,6 +375,9 @@ def rixs_scipy(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
                gamma_c=0.1, gamma_f=0.01, thin=1.0, thout=1.0, phi=0.0,
                pol_type=None, temperature=1.0, scatter_axis=None,
                skip_gs=False, return_poles=False, backend_kws=None):
+    """
+    Adapt the public RIXS call to the serial or parallel SciPy implementation.
+    """
     kws = _backend_kws(backend_kws)
     parallel = bool(kws.pop('parallel', False))
     implementation = (
@@ -367,10 +404,54 @@ rixs_dense = rixs_scipy
 # -----------------------------------------------------------------------------
 
 
-def ed_krylov_scipy(hmat_i, num_gs=1, blocksize=None, *,
-                     tol=1e-10, maxiter=200, seed=None, initial_guess=None,
-                     suppress_lobpcg_warnings=True):
-    """Compute the lowest retained eigenpairs with SciPy LOBPCG."""
+def ed_krylov_scipy(
+    hmat_i, num_gs=1, blocksize=None, *,
+    tol=1e-10, maxiter=200, seed=None, initial_guess=None,
+    suppress_lobpcg_warnings=True,
+):
+    """
+    Compute the lowest retained initial-state eigenpairs using SciPy LOBPCG.
+
+    This routine is intended to prepare the low-energy initial states used by
+    rixs_krylov_scipy. It diagonalizes only the initial/final Hamiltonian
+    hmat_i and returns the lowest num_gs eigenpairs.
+
+    Parameters
+    ----------
+    hmat_i : sparse matrix or scipy.sparse.linalg.LinearOperator
+        Initial/final Hamiltonian. It must be square and Hermitian.
+
+    num_gs : int, optional
+        Number of lowest-energy initial states to retain and return.
+
+    blocksize : int or None, optional
+        Number of eigenpairs requested internally from LOBPCG. If None, it is
+        set to num_gs. If larger than num_gs, extra eigenpairs are computed
+        and then discarded. This can help when low-energy degeneracies are
+        expected or when a larger block improves convergence.
+
+    tol : float, optional
+        LOBPCG convergence tolerance.
+
+    maxiter : int, optional
+        Maximum number of LOBPCG iterations.
+
+    seed : int or None, optional
+        Random seed used to construct the initial block if initial_guess is not
+        provided.
+
+    initial_guess : ndarray or None, optional
+        Initial approximation block X for LOBPCG. If provided, it must have
+        shape ``(dim_i, blocksize)``.
+
+    Returns
+    -------
+    eval_i : ndarray
+        Lowest retained eigenvalues, shape ``(num_gs,)``.
+
+    evec_i : ndarray
+        Corresponding eigenvectors, shape ``(dim_i, num_gs)``.
+    """
     hmat_i = aslinearoperator(hmat_i)
     if hmat_i.shape[0] != hmat_i.shape[1]:
         raise ValueError("hmat_i must be square")
@@ -427,6 +508,9 @@ def ed_krylov_scipy(hmat_i, num_gs=1, blocksize=None, *,
 
 
 def _apply_linear_combination(operators, coefficients, vector):
+    """
+    Apply sum_i coeffs[i] ops[i] to vec without constructing the summed operator.
+    """
     result = None
     for coefficient, operator in zip(coefficients, operators):
         if coefficient == 0:
@@ -439,6 +523,9 @@ def _apply_linear_combination(operators, coefficients, vector):
 
 
 def _check_adjoint_action(operator, name):
+    """
+    Require op.H @ x to work.
+    """
     try:
         _ = operator.H @ np.zeros(operator.shape[0], dtype=complex)
     except Exception as exc:
@@ -449,6 +536,9 @@ def _check_adjoint_action(operator, name):
 
 
 def _xas_poles_from_start_vectors(eval_i, start_vectors, hmat_n, *, nkryl):
+    """
+    Build an EDRIXS-compatible XAS pole dictionary.
+    """
     poles = {'eigval': [], 'npoles': [], 'norm': [], 'alpha': [], 'beta': []}
     effective_nkryl = min(int(nkryl), hmat_n.shape[0])
     for energy, start in zip(eval_i, start_vectors):
@@ -473,7 +563,61 @@ def xas_krylov_scipy(
         eval_i, evec_i, hmat_n, trans_op, ominc, *, gamma_c=0.1,
         thin=1.0, phi=0.0, pol_type=None, temperature=1.0,
         scatter_axis=None, nkryl=200):
-    """Calculate XAS with a SciPy Lanczos continued-fraction solver."""
+    """
+    Calculate XAS spectra with a SciPy Lanczos continued-fraction solver.
+
+    ``eval_i`` and ``evec_i`` are the retained initial states, normally
+    returned by :func:`ed_krylov_scipy`.  For every retained initial state the
+    transition operator is applied in the original Fock basis, and a Lanczos
+    tridiagonalization of the intermediate Hamiltonian generates the pole
+    representation consumed by :func:`get_spectra_from_poles`.
+
+    Parameters
+    ----------
+    eval_i : 1d array
+        Energies of the retained initial states.
+
+    evec_i : 2d array
+        Retained initial-state eigenvectors. Column ``i`` corresponds to
+        ``eval_i[i]``.
+
+    hmat_n : sparse matrix or scipy.sparse.linalg.LinearOperator
+        Intermediate-state Hamiltonian.
+
+    trans_op : sequence
+        Transition operators mapping the initial Hilbert space to the
+        intermediate Hilbert space. The sequence length must be 3 for a
+        dipole transition or 5 for a quadrupole transition.
+
+    ominc : 1d array
+        Incident photon-energy grid.
+
+    gamma_c : float or 1d array, optional
+        Core-hole lifetime broadening. It can be scalar or have the same shape
+        as ``ominc``.
+
+    thin, phi : float, optional
+        Incoming angle and azimuthal angle, in radians.
+
+    pol_type : sequence of tuple, optional
+        Incoming polarizations. Each entry is ``(kind, alpha)`` where ``kind``
+        is ``'linear'``, ``'left'``, ``'right'``, or ``'isotropic'``. The
+        default is isotropic polarization.
+
+    temperature : float, optional
+        Temperature in kelvin used for the Boltzmann weights of ``eval_i``.
+
+    scatter_axis : (3, 3) array, optional
+        Scattering coordinate axes. The default is the identity matrix.
+
+    nkryl : int, optional
+        Maximum number of intermediate-state Lanczos iterations.
+
+    Returns
+    -------
+    xas : 2d ndarray
+        Spectrum with shape ``(len(ominc), len(pol_type))``.
+    """
     eval_i = np.asarray(eval_i, dtype=float)
     evec_i = np.asarray(evec_i, dtype=complex)
     ominc = np.asarray(ominc, dtype=float)
@@ -564,6 +708,9 @@ def xas_krylov_scipy(
 
 
 def _gmres_scipy_compat(operator, rhs, *, tol, restart, maxiter):
+    """
+    Call scipy.sparse.linalg.gmres with either old or new SciPy tolerance names.
+    """
     signature = inspect.signature(gmres)
     if 'rtol' in signature.parameters:
         return gmres(
@@ -578,6 +725,9 @@ def _gmres_scipy_compat(operator, rhs, *, tol, restart, maxiter):
 def _rixs_polarization_vectors(
         ntrans, thin, thout, phi, incoming_kind, alpha,
         outgoing_kind, beta, scatter_axis):
+    """
+    Return incoming and outgoing polarization vectors in transition-operator space.
+    """
     incoming, outgoing = dipole_polvec_rixs(
         thin, thout, phi, alpha, beta, scatter_axis,
         (incoming_kind, outgoing_kind),
@@ -614,6 +764,9 @@ def _rixs_krylov_one_contribution_scipy(
         *, hmat_i, hmat_n, trans_op_H, polvec_f, eval_i, evec_i,
         istate, omega, gamma_c, rhs, skip_gs, nkryl, linsys_tol,
         linsys_maxiter, linsys_restart):
+    """
+    Compute one kept-initial-state contribution to one RIXS pole dictionary.
+    """
     initial_energy = eval_i[istate]
     if np.linalg.norm(rhs) == 0:
         return {
@@ -673,6 +826,9 @@ def _prepare_rixs(
         eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
         gamma_c, gamma_f, thin, thout, phi, pol_type, scatter_axis,
         skip_gs, nkryl, linsys_tol, linsys_maxiter, linsys_restart):
+    """
+    Validate RIXS inputs and prepare reusable solver state.
+    """
     eval_i = np.asarray(eval_i, dtype=float)
     evec_i = np.asarray(evec_i, dtype=complex)
     ominc = np.asarray(ominc, dtype=float)
@@ -759,11 +915,17 @@ def _prepare_rixs(
 
 
 def _pole_dict_from_records(records):
+    """
+    Merge ordered per-initial-state records into one pole dictionary.
+    """
     keys = ('npoles', 'eigval', 'norm', 'alpha', 'beta')
     return {key: [record[key] for record in records] for key in keys}
 
 
 def _compute_rixs_records_serial(problem):
+    """
+    Evaluate every prepared RIXS contribution in the calling process.
+    """
     eval_i = problem['eval_i']
     evec_i = problem['evec_i']
     trans_op = problem['trans_op']
@@ -806,6 +968,9 @@ def _compute_rixs_records_serial(problem):
 
 
 def _assemble_rixs(problem, records, temperature, return_poles):
+    """
+    Convert ordered RIXS pole records into spectra and optional pole output.
+    """
     spectrum = np.zeros(
         (
             len(problem['ominc']),
@@ -841,7 +1006,53 @@ def rixs_krylov_scipy(
         pol_type=None, temperature=1.0, scatter_axis=None,
         skip_gs=False, nkryl=200, linsys_tol=1e-9,
         linsys_maxiter=50000, linsys_restart=200, return_poles=False):
-    """Calculate RIXS with Python-native serial loops."""
+    """
+    Calculate RIXS spectra with the serial SciPy Krylov correction-vector solver.
+
+    This routine evaluates every incident-energy, polarization, and retained
+    initial-state contribution in the calling process. Use
+    :func:`rixs_krylov_scipy_parallel` for process-based execution.
+
+    Parameters
+    ----------
+    eval_i : 1d array
+        Energies of the retained initial states.
+    evec_i : 2d array
+        Retained initial-state eigenvectors in the basis of ``hmat_i``.
+        Column ``i`` corresponds to ``eval_i[i]``.
+    hmat_i, hmat_n : sparse matrix or LinearOperator
+        Initial/final and intermediate Hamiltonians.
+    trans_op : sequence
+        Transition operators mapping the initial/final Hilbert space to the
+        intermediate Hilbert space. The sequence length must be 3 or 5.
+    ominc, eloss : 1d arrays
+        Incident-energy and energy-loss grids.
+    gamma_c, gamma_f : float or 1d array, optional
+        Core-hole and final-state broadenings.
+    thin, thout, phi : float, optional
+        Scattering angles in radians.
+    pol_type : sequence of tuple, optional
+        Incoming and outgoing polarization specifications.
+    temperature : float, optional
+        Temperature in kelvin used for Boltzmann weights.
+    scatter_axis : (3, 3) array, optional
+        Scattering coordinate axes.
+    skip_gs : bool, optional
+        Remove retained initial states from the final-state response.
+    nkryl : int, optional
+        Maximum final-state Lanczos dimension.
+    linsys_tol, linsys_maxiter, linsys_restart : optional
+        GMRES controls for the intermediate correction-vector solve.
+    return_poles : bool, optional
+        Return the nested pole dictionaries together with the spectrum.
+
+    Returns
+    -------
+    rixs : 3d ndarray
+        Spectrum with shape ``(len(ominc), len(eloss), len(pol_type))``.
+    poles : list, optional
+        Returned only when ``return_poles`` is true.
+    """
     problem = _prepare_rixs(
         eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss,
         gamma_c=gamma_c, gamma_f=gamma_f, thin=thin, thout=thout,
@@ -858,6 +1069,9 @@ _RIXS_THREADPOOL_LIMITER = None
 
 
 def _available_cpu_count():
+    """
+    Return the CPU count available to this process, respecting affinity.
+    """
     process_cpu_count = getattr(os, 'process_cpu_count', None)
     if process_cpu_count is not None:
         count = process_cpu_count()
@@ -870,6 +1084,9 @@ def _available_cpu_count():
 
 
 def _limit_worker_native_threads(nthreads):
+    """
+    Limit BLAS/OpenMP pools inside a process-pool worker.
+    """
     global _RIXS_THREADPOOL_LIMITER
     for variable in (
         'OMP_NUM_THREADS', 'OPENBLAS_NUM_THREADS', 'MKL_NUM_THREADS',
@@ -885,6 +1102,9 @@ def _limit_worker_native_threads(nthreads):
 
 
 def _operator_for_process_pool(operator, name):
+    """
+    Return a picklable matrix/operator suitable for a worker initializer.
+    """
     if sp.issparse(operator) or isinstance(operator, np.ndarray):
         candidate = operator
     else:
@@ -904,6 +1124,9 @@ def _init_rixs_worker(
         hmat_i, hmat_n, trans_op, eval_i, evec_i, ominc, gamma_core,
         polarizations, skip_gs, nkryl, linsys_tol, linsys_maxiter,
         linsys_restart, blas_threads):
+    """
+    Initialize immutable solver state once in every process-pool worker.
+    """
     global _RIXS_WORKER_STATE
     _limit_worker_native_threads(blas_threads)
     trans_op = [aslinearoperator(operator) for operator in trans_op]
@@ -926,6 +1149,9 @@ def _init_rixs_worker(
 
 
 def _rixs_pool_job(job):
+    """
+    Compute one ``(incident energy, polarization, initial state)`` job.
+    """
     incident_index, polarization_index, initial_index = job
     state = _RIXS_WORKER_STATE
     if state is None:
@@ -956,7 +1182,62 @@ def rixs_krylov_scipy_parallel(
         skip_gs=False, nkryl=200, linsys_tol=1e-9,
         linsys_maxiter=50000, linsys_restart=200, return_poles=False,
         workers=None, blas_threads=1, mp_start_method=None):
-    """Calculate RIXS with a process pool over energy/polarization/state jobs."""
+    """
+    Calculate RIXS spectra with a SciPy Krylov correction-vector solver.
+
+    Parallel execution uses one :class:`ProcessPoolExecutor` job for every
+    ``(incident energy, polarization, retained initial state)`` triple.  Jobs
+    are dynamically scheduled onto the worker pool.  By default, the number of
+    workers is the number of CPUs available to the process, capped by the
+    number of jobs. Set ``workers=1`` to use the original serial path.
+
+    Every worker is limited to ``blas_threads`` native BLAS/OpenMP threads.
+    The default of one avoids nested parallelism and the excessive
+    ``sched_yield`` traffic that can otherwise occur when many process jobs
+    each activate a multithreaded BLAS runtime.
+
+    Parameters
+    ----------
+    eval_i : 1d array
+        Energies of the retained initial states.
+
+    evec_i : 2d array
+        Retained initial-state eigenvectors in the basis of ``hmat_i``.
+        Column ``i`` corresponds to ``eval_i[i]``.
+
+    hmat_i, hmat_n : sparse matrix or LinearOperator
+        Initial/final and intermediate Hamiltonians.
+
+    trans_op : sequence
+        Transition operators mapping the initial/final Hilbert space to the
+        intermediate Hilbert space. The sequence length must be 3 or 5.
+
+    ominc, eloss : 1d arrays
+        Incident-energy and energy-loss grids.
+
+    workers : int or None, optional
+        Number of worker processes. ``None`` uses all CPUs available to the
+        process. The actual count is capped by the number of independent jobs.
+        ``workers=1`` selects serial execution.
+
+    blas_threads : int, optional
+        Native BLAS/OpenMP threads allowed in each worker. Keep this at one
+        when using more than one process.
+
+    mp_start_method : {'fork', 'spawn', 'forkserver'} or None, optional
+        Multiprocessing start method. ``None`` uses the platform default.
+        Calling scripts must protect their entry point with
+        ``if __name__ == '__main__':`` for spawn-based methods.
+
+    Returns
+    -------
+    rixs : 3d ndarray
+        RIXS spectra with shape ``(len(ominc), len(eloss), len(pol_type))``.
+
+    poles : list, optional
+        Returned only when ``return_poles`` is true. Nested list of pole
+        dictionaries with shape ``(len(ominc), len(pol_type))``.
+    """
     problem = _prepare_rixs(
         eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss,
         gamma_c=gamma_c, gamma_f=gamma_f, thin=thin, thout=thout,

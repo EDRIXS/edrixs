@@ -258,6 +258,7 @@ def setup_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
 
     return emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
 
+
 def setup_2v1c(
     shell_name, *, shell_level=None,
     v1_soc=None, v2_soc=None, c_soc=0, v_tot_noccu=1, slater=None,
@@ -482,6 +483,7 @@ def setup_2v1c(
 
     return emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
 
+
 def setup_siam(
     shell_name, nbath, *, siam_type=0, v_noccu=1, static_core_pot=0,
     c_level=0, c_soc=0, trans_c2n=None, imp_mat=None, imp_mat_n=None,
@@ -698,11 +700,28 @@ def setup_siam(
 
 
 def get_H(emat, umat, basis, *, backend='scipy', backend_kws=None):
-    """Build a many-body Hamiltonian using the selected backend.
+    """
+    Build one many-body Hamiltonian with the selected backend.
 
-    ``emat``, ``umat`` and ``basis`` are backend-neutral problem-description
-    objects. A dense rank-four NumPy ``umat`` and the flattened SciPy sparse
-    ``umat`` representation are both supported by the SciPy backend.
+    Parameters
+    ----------
+    emat : array-like
+        One-body orbital-space matrix.
+    umat : array-like or sparse matrix
+        Two-body Coulomb interaction, either as a dense rank-4 tensor or a
+        backend-supported sparse representation.
+    basis : FockBasis
+        Many-electron basis for the Hamiltonian.
+    backend : str, optional
+        Backend name. The default is ``'scipy'``.
+    backend_kws : mapping, optional
+        Backend-specific construction options. For the SciPy backend this
+        includes ``tol``.
+
+    Returns
+    -------
+    operator
+        Many-body Hamiltonian in the representation owned by ``backend``.
     """
     name, module = _solver_helpers._load_backend(backend)
     implementation = getattr(module, 'get_H_' + name)
@@ -713,7 +732,26 @@ def get_H(emat, umat, basis, *, backend='scipy', backend_kws=None):
 
 def ops(emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
         *, backend='scipy', backend_kws=None):
-    """Build initial/intermediate Hamiltonians and transition operators."""
+    """
+    Build initial/intermediate Hamiltonians and transition operators.
+
+    Parameters
+    ----------
+    emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
+        Backend-neutral problem definition returned by :func:`setup_1v1c`,
+        :func:`setup_2v1c`, or :func:`setup_siam`.
+    backend : {'scipy', 'dense'}, optional
+        Backend used for the returned operators. The default is ``'scipy'``.
+    backend_kws : mapping, optional
+        Backend-specific operator-construction options. For the SciPy and
+        dense compatibility backends this includes ``tol``.
+
+    Returns
+    -------
+    hmat_i, hmat_n, trans_ops
+        Initial/final Hamiltonian, intermediate Hamiltonian, and transition
+        operators for the selected backend.
+    """
     name, module = _solver_helpers._load_backend(backend)
     kws = _solver_helpers._copy_backend_kws(backend_kws)
 
@@ -729,7 +767,25 @@ def ops(emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
 
 
 def ed(hmat_i, num_evals=1, *, backend=None, backend_kws=None):
-    """Obtain low-energy eigenvalues and eigenvectors."""
+    """
+    Compute low-energy initial states through a numerical backend.
+
+    Parameters
+    ----------
+    hmat_i : backend-owned operator
+        Initial/final Hamiltonian.
+    num_evals : int, optional
+        Number of lowest eigenpairs to return.
+    backend : str or None, optional
+        Backend name. When omitted, infer it from ``hmat_i``.
+    backend_kws : mapping, optional
+        Backend-specific eigensolver options.
+
+    Returns
+    -------
+    eigenvalues, eigenvectors
+        Lowest retained eigenpairs.
+    """
     name = _solver_helpers._resolve_backend(backend, hmat_i)
     _, module = _solver_helpers._load_backend(name)
     implementation = getattr(module, 'ed_' + name)
@@ -744,7 +800,14 @@ def xas(eval_i, evec_i, hmat_n, trans_op, ominc, *,
         gamma_c=0.1, thin=1.0, phi=0.0, pol_type=None,
         temperature=1.0, scatter_axis=None,
         backend=None, backend_kws=None):
-    """Calculate XAS using the backend owning ``hmat_n`` and ``trans_op``."""
+    """
+    Calculate X-ray absorption spectra through a numerical backend.
+
+    Backend-neutral physical arguments are passed directly. Numerical
+    controls such as the SciPy Lanczos dimension belong in ``backend_kws``.
+    When ``backend`` is omitted, it is inferred from ``hmat_n`` and the
+    transition operators.
+    """
     name = _solver_helpers._resolve_backend(backend, hmat_n, *trans_op)
     _, module = _solver_helpers._load_backend(name)
     implementation = getattr(module, 'xas_' + name)
@@ -765,10 +828,13 @@ def rixs(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
          pol_type=None, temperature=1.0, scatter_axis=None,
          skip_gs=False, return_poles=False,
          backend=None, backend_kws=None):
-    """Calculate RIXS using the backend owning the supplied operators.
+    """
+    Calculate resonant inelastic X-ray scattering spectra through a backend.
 
-    For the SciPy backend, serial execution is the default. Process-based
-    execution is requested with ``backend_kws={'parallel': True, ...}``.
+    Backend-neutral physical arguments are passed directly. Numerical
+    controls, including SciPy Lanczos, GMRES, and process-pool settings,
+    belong in ``backend_kws``. When ``backend`` is omitted, it is inferred
+    from the Hamiltonians and transition operators.
     """
     name = _solver_helpers._resolve_backend(backend, hmat_i, hmat_n, *trans_op)
     _, module = _solver_helpers._load_backend(name)
@@ -1063,6 +1129,7 @@ def ed_1v1c_py(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
 
     return eval_i, eval_n, trans_op
 
+
 def xas_1v1c_py(eval_i, eval_n, trans_op, ominc, *, gamma_c=0.1, thin=1.0, phi=0,
                 pol_type=None, gs_list=None, temperature=1.0, scatter_axis=None):
 
@@ -1182,6 +1249,7 @@ def xas_1v1c_py(eval_i, eval_n, trans_op, ominc, *, gamma_c=0.1, thin=1.0, phi=0
     print("edrixs >>> XAS Done !")
 
     return xas
+
 
 def rixs_1v1c_py(eval_i, eval_n, trans_op, ominc, eloss, *,
                  gamma_c=0.1, gamma_f=0.01, thin=1.0, thout=1.0, phi=0.0,
@@ -1334,6 +1402,7 @@ def rixs_1v1c_py(eval_i, eval_n, trans_op, ominc, eloss, *,
 
     return rixs
 
+
 def ed_1v1c_fort(comm, shell_name, *, shell_level=None,
                  v_soc=None, c_soc=0, v_noccu=1, slater=None,
                  ext_B=None, on_which='spin',
@@ -1480,6 +1549,7 @@ def ed_1v1c_fort(comm, shell_name, *, shell_level=None,
 
     return eval_i, denmat
 
+
 def xas_1v1c_fort(comm, shell_name, ominc, *, gamma_c=0.1,
                   v_noccu=1, thin=1.0, phi=0, pol_type=None,
                   num_gs=1, nkryl=200, temperature=1.0,
@@ -1583,6 +1653,7 @@ def xas_1v1c_fort(comm, shell_name, ominc, *, gamma_c=0.1,
     )
 
     return xas, poles
+
 
 def rixs_1v1c_fort(comm, shell_name, ominc, eloss, *, gamma_c=0.1, gamma_f=0.1,
                    v_noccu=1, thin=1.0, thout=1.0, phi=0, pol_type=None,
@@ -1695,6 +1766,7 @@ def rixs_1v1c_fort(comm, shell_name, ominc, eloss, *, gamma_c=0.1, gamma_f=0.1,
     )
 
     return rixs, poles
+
 
 def ed_2v1c_fort(comm, shell_name, *, shell_level=None,
                  v1_soc=None, v2_soc=None, c_soc=0, v_tot_noccu=1, slater=None,
@@ -1871,6 +1943,7 @@ def ed_2v1c_fort(comm, shell_name, *, shell_level=None,
     )
     return eval_i, denmat
 
+
 def xas_2v1c_fort(comm, shell_name, ominc, *, gamma_c=0.1,
                   v_tot_noccu=1, trans_to_which=1, thin=1.0, phi=0,
                   pol_type=None, num_gs=1, nkryl=200, temperature=1.0,
@@ -1981,6 +2054,7 @@ def xas_2v1c_fort(comm, shell_name, ominc, *, gamma_c=0.1,
     )
 
     return xas, poles
+
 
 def rixs_2v1c_fort(comm, shell_name, ominc, eloss, *, gamma_c=0.1, gamma_f=0.1,
                    v_tot_noccu=1, trans_to_which=1, thin=1.0, thout=1.0, phi=0,
@@ -2101,6 +2175,7 @@ def rixs_2v1c_fort(comm, shell_name, ominc, eloss, *, gamma_c=0.1, gamma_f=0.1,
     )
 
     return rixs, poles
+
 
 def ed_siam_fort(comm, shell_name, nbath, *, siam_type=0, v_noccu=1, static_core_pot=0, c_level=0,
                  c_soc=0, trans_c2n=None, imp_mat=None, imp_mat_n=None, bath_level=None,
@@ -2550,6 +2625,7 @@ def ed_siam_fort(comm, shell_name, nbath, *, siam_type=0, v_noccu=1, static_core
     else:
         raise Exception("Unknown case of do_ed ", do_ed)
 
+
 def xas_siam_fort(comm, shell_name, nbath, ominc, *, gamma_c=0.1,
                   v_noccu=1, thin=1.0, phi=0, pol_type=None,
                   num_gs=1, nkryl=200, temperature=1.0,
@@ -2758,6 +2834,7 @@ def xas_siam_fort(comm, shell_name, nbath, ominc, *, gamma_c=0.1,
             raise Exception("Unknown polarization type: ", pt)
 
     return xas, poles
+
 
 def rixs_siam_fort(comm, shell_name, nbath, ominc, eloss, *, gamma_c=0.1, gamma_f=0.1,
                    v_noccu=1, thin=1.0, thout=1.0, phi=0, pol_type=None, num_gs=1,
