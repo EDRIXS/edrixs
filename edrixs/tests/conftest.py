@@ -3,12 +3,12 @@
 import numpy as np
 import pytest
 
-from edrixs.solvers import setup_1v1c
+from edrixs.solvers import ops, setup_1v1c
 
 
 @pytest.fixture(scope="module")
 def small_1v1c_kwargs():
-    """Return a tiny dipole-allowed model that keeps complete workflows fast."""
+    """Return a tiny dipole-allowed model that keeps workflows fast."""
     return {
         "shell_name": ("p", "s"),
         "shell_level": (0.2, -4.0),
@@ -21,5 +21,11 @@ def small_1v1c_kwargs():
 
 @pytest.fixture(scope="module")
 def small_1v1c_problem(small_1v1c_kwargs):
-    """Build the shared orbital-space model before any backend is selected."""
+    """Build the shared orbital-space model before selecting a backend."""
     return setup_1v1c(**small_1v1c_kwargs, sparse_U=False)
+
+
+@pytest.fixture(scope="module")
+def small_1v1c_operators(small_1v1c_problem):
+    """Build SciPy Hamiltonians and transition operators for public-API tests."""
+    return ops(*small_1v1c_problem, backend="scipy")
