@@ -4,12 +4,7 @@ import numpy as np
 import pytest
 from numpy.testing import assert_allclose
 
-from edrixs.solvers import (
-    rixs_1v1c_py,
-    rixs_krylov_scipy,
-    xas_1v1c_py,
-    xas_krylov_scipy,
-)
+from edrixs.solvers import rixs, rixs_1v1c_py, xas, xas_1v1c_py
 
 from ._helpers import random_hermitian
 
@@ -41,7 +36,7 @@ def test_quadrupole_xas_matches_dense_reference_on_tiny_matrices():
     ominc = np.linspace(-1.0, 1.4, 8)
     pol_type = [("linear", 0.3), ("left", 0.0), ("isotropic", 0.0)]
 
-    actual = xas_krylov_scipy(
+    actual = xas(
         eval_i,
         evec_i,
         hmat_n,
@@ -52,7 +47,8 @@ def test_quadrupole_xas_matches_dense_reference_on_tiny_matrices():
         phi=0.2,
         pol_type=pol_type,
         temperature=5000.0,
-        nkryl=4,
+        backend="scipy",
+        backend_kws={"nkryl": 4},
     )
     expected = xas_1v1c_py(
         eval_i,
@@ -96,7 +92,7 @@ def test_quadrupole_rixs_matches_dense_reference_on_tiny_matrices():
     eloss = np.linspace(-0.5, 1.2, 8)
     pol_type = [("linear", 0.2, "left", 0.0)]
 
-    actual = rixs_krylov_scipy(
+    actual = rixs(
         eval_i,
         evec_i,
         hmat_i,
@@ -111,11 +107,14 @@ def test_quadrupole_rixs_matches_dense_reference_on_tiny_matrices():
         phi=0.16,
         pol_type=pol_type,
         temperature=5000.0,
-        nkryl=3,
-        linsys_tol=1e-13,
-        linsys_maxiter=200,
-        linsys_restart=8,
-        workers=1,
+        backend="scipy",
+        backend_kws={
+            "parallel": False,
+            "nkryl": 3,
+            "linsys_tol": 1e-13,
+            "linsys_maxiter": 200,
+            "linsys_restart": 8,
+        },
     )
     expected = rixs_1v1c_py(
         eval_i,

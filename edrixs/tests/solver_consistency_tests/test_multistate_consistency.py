@@ -9,12 +9,7 @@ import numpy as np
 import pytest
 from numpy.testing import assert_allclose
 
-from edrixs.solvers import (
-    rixs_1v1c_py,
-    rixs_krylov_scipy,
-    xas_1v1c_py,
-    xas_krylov_scipy,
-)
+from edrixs.solvers import rixs, rixs_1v1c_py, xas, xas_1v1c_py
 
 from ._helpers import exact_1v1c_reference_data
 
@@ -39,7 +34,7 @@ def test_xas_two_initial_states_and_energy_dependent_broadening_match_dense(
     gamma_c = np.linspace(0.18, 0.28, len(ominc))
     pol_type = [("left", 0.0), ("right", 0.0), ("isotropic", 0.0)]
 
-    actual = xas_krylov_scipy(
+    actual = xas(
         eval_i[kept],
         evec_i[:, kept],
         hmat_n,
@@ -50,7 +45,8 @@ def test_xas_two_initial_states_and_energy_dependent_broadening_match_dense(
         phi=0.17,
         pol_type=pol_type,
         temperature=3000.0,
-        nkryl=hmat_n.shape[0],
+        backend="scipy",
+        backend_kws={"nkryl": hmat_n.shape[0]},
     )
     expected = xas_1v1c_py(
         eval_i,
@@ -93,7 +89,7 @@ def test_rixs_two_initial_states_and_skip_gs_match_dense(
         ("isotropic", 0.0, "linear", 0.2),
     ]
 
-    actual = rixs_krylov_scipy(
+    actual = rixs(
         eval_i[kept],
         evec_i[:, kept],
         hmat_i,
@@ -109,11 +105,14 @@ def test_rixs_two_initial_states_and_skip_gs_match_dense(
         pol_type=pol_type,
         temperature=3000.0,
         skip_gs=skip_gs,
-        nkryl=hmat_i.shape[0],
-        linsys_tol=1e-12,
-        linsys_maxiter=500,
-        linsys_restart=max(5, hmat_n.shape[0]),
-        workers=1,
+        backend="scipy",
+        backend_kws={
+            "parallel": False,
+            "nkryl": hmat_i.shape[0],
+            "linsys_tol": 1e-12,
+            "linsys_maxiter": 500,
+            "linsys_restart": max(5, hmat_n.shape[0]),
+        },
     )
     expected = rixs_1v1c_py(
         eval_i,

@@ -8,14 +8,21 @@ from edrixs.solvers import ops
 
 
 def exact_1v1c_reference_data(problem):
-    """Diagonalize the tiny dense model used as a final-spectrum reference."""
-    hmat_i, hmat_n, transitions = ops(*problem, backend="dense")
-    eval_i, evec_i = np.linalg.eigh(hmat_i)
-    eval_n, evec_n = np.linalg.eigh(hmat_n)
+    """Return SciPy operators plus exact dense eigenbasis reference data."""
+    hmat_i_dense, hmat_n_dense, transitions_dense = ops(
+        *problem,
+        backend="dense",
+    )
+    hmat_i, hmat_n, transitions = ops(
+        *problem,
+        backend="scipy",
+    )
+    eval_i, evec_i = np.linalg.eigh(hmat_i_dense)
+    eval_n, evec_n = np.linalg.eigh(hmat_n_dense)
     transitions_eigenbasis = np.stack(
         [
             evec_n.conj().T @ transition @ evec_i
-            for transition in transitions
+            for transition in transitions_dense
         ]
     )
     return (
