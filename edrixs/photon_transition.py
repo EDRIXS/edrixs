@@ -455,6 +455,8 @@ def dipole_polvec_rixs(thin, thout, phi=0, alpha=0, beta=0, local_axis=None, pol
         ei_global = (ex + 1j * ey) / np.sqrt(2.0)
     elif pol_type[0].strip() == 'right':
         ei_global = (ex - 1j * ey) / np.sqrt(2.0)
+    elif pol_type[0].strip() == 'isotropic':
+        ei_global = np.ones(3)/np.sqrt(3)                        # Powder spectrum
     else:
         raise Exception("Unknown polarization type for incident photon: ", pol_type[0])
 
@@ -466,6 +468,9 @@ def dipole_polvec_rixs(thin, thout, phi=0, alpha=0, beta=0, local_axis=None, pol
         ef_global = (ex + 1j * ey) / np.sqrt(2.0)
     elif pol_type[1].strip() == 'right':
         ef_global = (ex - 1j * ey) / np.sqrt(2.0)
+    elif pol_type[0].strip() == 'isotropic':
+        ef_global = np.ones(3)/np.sqrt(3)
+
     else:
         raise Exception("Unknown polarization type for scattered photon: ", pol_type[1])
 
