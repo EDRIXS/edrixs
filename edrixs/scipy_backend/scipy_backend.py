@@ -19,8 +19,7 @@ from ..plot_spectrum import get_spectra_from_poles
 
 __all__ = [
     'owns_operator_scipy', 'owns_operator_dense',
-    'build_op_scipy', 'get_transition_operators_scipy',
-    'build_op_dense', 'get_transition_operators_dense',
+    'build_op_scipy', 'build_op_dense',
     'ed_scipy', 'xas_scipy', 'rixs_scipy',
     'ed_dense', 'xas_dense', 'rixs_dense',
     'ed_krylov_scipy', 'xas_krylov_scipy', 'rixs_krylov_scipy',
@@ -288,8 +287,8 @@ def four_fermion_csr_auto(umat, basis, right_basis=None, tol=1e-10):
     )
 
 
-def build_op_scipy(emat, umat, basis, *, backend_kws=None):
-    """Build and return a SciPy CSR many-body Hamiltonian."""
+def build_op_scipy(emat, umat, lb, rb=None, *, backend_kws=None):
+    """Build and return a SciPy CSR many-body operator."""
     kws = _backend_kws(backend_kws)
     tol = kws.pop('tol', 1e-10)
     if kws:
@@ -297,46 +296,31 @@ def build_op_scipy(emat, umat, basis, *, backend_kws=None):
             sorted(kws)
         ))
 
-    hmat = two_fermion_csr(emat, basis, basis, tol=tol)
-    hmat = hmat + four_fermion_csr_auto(umat, basis, tol=tol)
-    return hmat.tocsr()
+    if rb is None:
+        rb = lb
+    if lb.norbs != rb.norbs:
+        raise ValueError("left and right Fock bases must have the same norbs")
+
+    operator = sp.csr_matrix(
+        (len(lb), len(rb)),
+        dtype=np.complex128,
+    )
+    if emat is not None:
+        operator = operator + two_fermion_csr(
+            emat, lb, rb, tol=tol
+        )
+    if umat is not None:
+        operator = operator + four_fermion_csr_auto(
+            umat, lb, right_basis=rb, tol=tol
+        )
+    return operator.tocsr()
 
 
-def get_transition_operators_scipy(
-        trans_mat, basis_n, basis_i, *, backend_kws=None):
-    """Build transition operators as SciPy CSR matrices."""
-    kws = _backend_kws(backend_kws)
-    tol = kws.pop('tol', 1e-10)
-    if kws:
-        raise TypeError("Unknown SciPy operator-construction options: {}".format(
-            sorted(kws)
-        ))
-
-    trans_mat = np.asarray(trans_mat)
-    if trans_mat.ndim != 3:
-        raise ValueError("trans_mat must be a three-dimensional array")
-    return [
-        two_fermion_csr(component, basis_n, basis_i, tol=tol)
-        for component in trans_mat
-    ]
-
-
-def build_op_dense(emat, umat, basis, *, backend_kws=None):
+def build_op_dense(emat, umat, lb, rb=None, *, backend_kws=None):
     """Compatibility dense constructor implemented through SciPy CSR."""
     return build_op_scipy(
-        emat, umat, basis, backend_kws=backend_kws
+        emat, umat, lb, rb, backend_kws=backend_kws
     ).toarray()
-
-
-def get_transition_operators_dense(
-        trans_mat, basis_n, basis_i, *, backend_kws=None):
-    """Compatibility dense transition construction through SciPy CSR."""
-    return [
-        operator.toarray()
-        for operator in get_transition_operators_scipy(
-            trans_mat, basis_n, basis_i, backend_kws=backend_kws
-        )
-    ]
 
 
 # -----------------------------------------------------------------------------
