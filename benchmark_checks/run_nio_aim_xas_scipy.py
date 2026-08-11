@@ -4,7 +4,7 @@
 This example uses the EDRIXS backend-neutral solver interface with the
 SciPy backend:
 
-    setup_siam(...) -> get_ops(..., backend="scipy")
+    model_siam(...) -> get_ops(..., backend="scipy")
         -> ed(...) -> xas(...)
 
 This reproduces the physical model and output grid of:
@@ -24,7 +24,7 @@ import numpy as np  # noqa: E402
 
 import edrixs  # noqa: E402
 
-from edrixs.models import setup_siam  # noqa: E402
+from edrixs.models import model_siam  # noqa: E402
 from edrixs.solvers import (  # noqa: E402
     get_ops,
     ed as solve_ed,
@@ -158,7 +158,7 @@ def run(output_dir: Path) -> None:
     gamma_c = np.full(ominc_xas.shape, 0.48 / 2.0)
     poltype_xas = [("isotropic", 0.0)]
 
-    problem = setup_siam(
+    problem = model_siam(
         parameters["shell_name"],
         parameters["nbath"],
         siam_type=0,

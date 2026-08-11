@@ -22,7 +22,7 @@ import numpy as np  # noqa: E402
 
 import edrixs  # noqa: E402
 
-from edrixs.models import setup_1v1c  # noqa: E402
+from edrixs.models import model_1v1c  # noqa: E402
 from edrixs.solvers import (  # noqa: E402
     get_ops,
     ed as solve_ed,
@@ -119,7 +119,7 @@ def run(
     ]
 
     stage_start = time.perf_counter()
-    problem = setup_1v1c(
+    problem = model_1v1c(
         shell_name,
         shell_level=(0.0, -om_shift),
         v_soc=parameters["v_soc"],
@@ -128,7 +128,7 @@ def run(
         slater=parameters["slater"],
         sparse_U=True,
     )
-    timings["setup_1v1c_s"] = time.perf_counter() - stage_start
+    timings["model_1v1c_s"] = time.perf_counter() - stage_start
 
     stage_start = time.perf_counter()
     hmat_i, hmat_n, trans_ops = get_ops(*problem, backend="scipy")

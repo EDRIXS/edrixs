@@ -8,7 +8,7 @@ This is the SciPy/Krylov counterpart of:
     examples/more/RIXS/LaNiO3_thin/test_2v1c.py
 
 The model retains the original physical parameters and spectral grids, but uses:
-    setup_2v1c -> get_ops -> ed -> xas / rixs
+    model_2v1c -> get_ops -> ed -> xas / rixs
 """
 
 import argparse
@@ -22,7 +22,7 @@ matplotlib.use("Agg")
 import numpy as np  # noqa: E402
 
 import edrixs  # noqa: E402
-from edrixs.models import setup_2v1c  # noqa: E402
+from edrixs.models import model_2v1c  # noqa: E402
 from edrixs.solvers import (  # noqa: E402
     get_ops,
     ed as solve_ed,
@@ -135,7 +135,7 @@ def run(
     ]
 
     stage_start = time.perf_counter()
-    problem = setup_2v1c(
+    problem = model_2v1c(
         shell_name,
         shell_level=(0.0, 3.0, -core_offset),
         v1_soc=parameters["v1_soc"],
@@ -146,7 +146,7 @@ def run(
         trans_to_which=1,
         sparse_U=sparse_u,
     )
-    timings["setup_2v1c_s"] = time.perf_counter() - stage_start
+    timings["model_2v1c_s"] = time.perf_counter() - stage_start
 
     stage_start = time.perf_counter()
     hmat_i, hmat_n, trans_ops = get_ops(*problem, backend="scipy")

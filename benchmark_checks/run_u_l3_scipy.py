@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """U L3-edge XAS/RIXS using the EDRIXS backend-neutral solver interface with the SciPy backend:
 
-    setup_2v1c(...) -> get_ops(..., backend="scipy")
+    model_2v1c(...) -> get_ops(..., backend="scipy")
         -> ed(...) -> xas(...) / rixs(...)
 
 This reproduces the physical model and output grids of:
@@ -27,7 +27,7 @@ matplotlib.use("Agg")
 import numpy as np  # noqa: E402
 
 import edrixs  # noqa: E402
-from edrixs.models import setup_2v1c  # noqa: E402
+from edrixs.models import model_2v1c  # noqa: E402
 from edrixs.solvers import (  # noqa: E402
     get_ops,
     ed as solve_ed,
@@ -139,7 +139,7 @@ def run(output_dir: Path) -> None:
 
     # 1. Define the orbital-space model. trans_to_which=2 is essential:
     #    the L3 transition is 2p3/2 -> 6d, not 2p3/2 -> 5f.
-    problem = setup_2v1c(
+    problem = model_2v1c(
         shell_name,
         shell_level=(0.0, 5.0, 0.0),
         v1_soc=parameters["v1_soc"],
