@@ -32,10 +32,10 @@ import numpy as np
 
 EXAMPLES = (
     ("LaNiO3_2v1c", "run_lanio3_2v1c_scipy.py"),
-#    ("LaNiO3_thin", "run_lanio3_thin_scipy.py"),
-#    ("NiO_AIM_XAS", "run_nio_aim_xas_scipy.py"),
-#    ("U_L3", "run_u_l3_scipy.py"),
-#    ("URu2Si2", "run_uru2si2_scipy.py"),
+    # ("LaNiO3_thin", "run_lanio3_thin_scipy.py"),
+    # ("NiO_AIM_XAS", "run_nio_aim_xas_scipy.py"),
+    # ("U_L3", "run_u_l3_scipy.py"),
+    # ("URu2Si2", "run_uru2si2_scipy.py"),
     ("Pu_O45", "run_pu_o45_scipy.py"),
 )
 

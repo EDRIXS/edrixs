@@ -225,7 +225,6 @@ def run(
             temperature=temperature,
             backend="scipy",
             backend_kws={
-#                "parallel": True,
                 "nkryl": 200,
                 "linsys_tol": 1.0e-10,
                 "linsys_maxiter": 5000,
