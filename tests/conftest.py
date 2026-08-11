@@ -3,7 +3,7 @@
 import numpy as np
 import pytest
 
-from edrixs.models import setup_1v1c
+from edrixs.models import model_1v1c
 from edrixs.solvers import get_ops
 
 
@@ -23,7 +23,7 @@ def small_1v1c_kwargs():
 @pytest.fixture(scope="module")
 def small_1v1c_problem(small_1v1c_kwargs):
     """Build the shared orbital-space model before selecting a backend."""
-    return setup_1v1c(**small_1v1c_kwargs, sparse_U=False)
+    return model_1v1c(**small_1v1c_kwargs, sparse_U=False)
 
 
 @pytest.fixture(scope="module")

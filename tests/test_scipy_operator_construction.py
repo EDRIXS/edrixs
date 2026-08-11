@@ -77,6 +77,18 @@ def test_public_build_op_matches_backend_operator_construction():
     assert_allclose(actual.toarray(), expected.toarray())
 
 
+def test_public_build_op_constructs_transition_operator():
+    """``build_op`` supports distinct left/right bases and no two-body part."""
+    left = FockBasis([0b10], norbs=2)
+    right = FockBasis([0b01], norbs=2)
+    emat = np.array([[0.0, 2.0 - 0.5j], [0.0, 0.0]], dtype=complex)
+
+    actual = build_op(emat, None, left, right, backend="scipy")
+
+    assert actual.shape == (1, 1)
+    assert_allclose(actual.toarray(), [[2.0 - 0.5j]])
+
+
 def test_tolerance_drops_small_terms():
     """The sparse constructor prunes only terms below the selected tolerance."""
     basis = fixed_particle_basis(2, 1)
