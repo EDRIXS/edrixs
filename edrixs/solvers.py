@@ -188,7 +188,7 @@ def xas(eval_i, evec_i, hmat_n, trans_op, ominc, *,
 def rixs(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
          gamma_c=0.1, gamma_f=0.01, thin=1.0, thout=1.0, phi=0.0,
          pol_type=None, temperature=1.0, scatter_axis=None,
-         return_poles=False, backend=None, backend_kws=None):
+         skip_gs=False, return_poles=False, backend=None, backend_kws=None):
     """
     Calculate resonant inelastic X-ray scattering spectra through a backend.
 
@@ -196,6 +196,10 @@ def rixs(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
     controls such as SciPy Lanczos and GMRES settings belong in
     ``backend_kws``. When ``backend`` is omitted, it is inferred from the
     Hamiltonians and transition operators.
+
+    If ``skip_gs`` is true, transitions into the retained initial-state
+    subspace are omitted from the final-state spectrum, matching the legacy
+    ``skip_gs`` behavior.
     """
     name = _solver_helpers._resolve_backend(backend, hmat_i, hmat_n, *trans_op)
     _, module = _solver_helpers._load_backend(name)
@@ -210,6 +214,7 @@ def rixs(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
         pol_type=pol_type,
         temperature=temperature,
         scatter_axis=scatter_axis,
+        skip_gs=skip_gs,
         return_poles=return_poles,
         backend_kws=_solver_helpers._copy_backend_kws(backend_kws),
     )
