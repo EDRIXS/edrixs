@@ -5,7 +5,7 @@ from numpy.testing import assert_allclose
 
 from edrixs.solvers import rixs
 
-from _helpers import exact_1v1c_reference_data
+from tests.solver_consistency_tests._helpers import exact_1v1c_reference_data
 
 
 pytestmark = pytest.mark.integration

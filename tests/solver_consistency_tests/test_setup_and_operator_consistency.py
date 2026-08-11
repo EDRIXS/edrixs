@@ -13,7 +13,7 @@ from numpy.testing import assert_allclose
 from edrixs.models import setup_1v1c, setup_2v1c, setup_siam
 from edrixs.solvers import get_ops
 
-from _helpers import (
+from tests.solver_consistency_tests._helpers import (
     assert_dense_and_scipy_get_ops_match,
     assert_only_transition_block_is_populated,
     assert_problem_sparse_dense_equivalent,
