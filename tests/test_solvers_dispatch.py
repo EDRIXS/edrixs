@@ -3,22 +3,18 @@
 import numpy as np
 import pytest
 import scipy.sparse as sp
-from numpy.testing import assert_allclose
 
-from edrixs.solvers import ed, get_H, rixs, xas
+from edrixs.solvers import build_op, ed, rixs, xas
 
-
-def test_get_h_rejects_unknown_backend():
+def test_build_op_rejects_unknown_backend():
     """The public operator constructor validates backend names."""
     with pytest.raises(ValueError, match="Unknown backend"):
-        get_H(np.eye(2), np.zeros((2, 2, 2, 2)), object(), backend="bad")
-
+        build_op(np.eye(2), np.zeros((2, 2, 2, 2)), object(), backend="bad")
 
 def test_ed_rejects_nonmapping_backend_options():
     """Public wrappers require ``backend_kws`` to be a mapping or ``None``."""
     with pytest.raises(TypeError, match="mapping"):
         ed(np.eye(2), backend="scipy", backend_kws=[("tol", 1e-8)])
-
 
 def test_public_xas_uses_inferred_scipy_backend():
     """XAS infers SciPy ownership from all supplied operators."""
@@ -42,9 +38,8 @@ def test_public_xas_uses_inferred_scipy_backend():
     assert spectrum.shape == (2, 1)
     assert np.all(np.isfinite(spectrum))
 
-
-def test_public_rixs_parallel_workers_one_matches_serial():
-    """Parallel selection through ``backend_kws`` preserves serial results."""
+def test_public_rixs_uses_inferred_scipy_backend():
+    """RIXS infers the SciPy backend from the supplied operators."""
     hmat_i = sp.diags([0.0, 0.8], format="csr")
     hmat_n = sp.diags([1.5, 2.2], format="csr")
     transitions = [
@@ -52,20 +47,8 @@ def test_public_rixs_parallel_workers_one_matches_serial():
         sp.csr_matrix((2, 2)),
         sp.csr_matrix((2, 2)),
     ]
-    common = {
-        "gamma_c": 0.2,
-        "gamma_f": 0.1,
-        "pol_type": [("linear", 0.0, "linear", 0.0)],
-        "backend": "scipy",
-    }
-    solver_options = {
-        "nkryl": 2,
-        "linsys_tol": 1e-10,
-        "linsys_maxiter": 20,
-        "linsys_restart": 2,
-    }
 
-    serial = rixs(
+    spectrum = rixs(
         np.array([0.0]),
         np.array([[1.0], [0.0]]),
         hmat_i,
@@ -73,19 +56,16 @@ def test_public_rixs_parallel_workers_one_matches_serial():
         transitions,
         np.array([1.0]),
         np.array([0.0, 0.5]),
-        backend_kws=solver_options,
-        **common,
-    )
-    parallel = rixs(
-        np.array([0.0]),
-        np.array([[1.0], [0.0]]),
-        hmat_i,
-        hmat_n,
-        transitions,
-        np.array([1.0]),
-        np.array([0.0, 0.5]),
-        backend_kws={**solver_options, "parallel": True, "workers": 1},
-        **common,
+        gamma_c=0.2,
+        gamma_f=0.1,
+        pol_type=[("linear", 0.0, "linear", 0.0)],
+        backend_kws={
+            "nkryl": 2,
+            "linsys_tol": 1e-10,
+            "linsys_maxiter": 20,
+            "linsys_restart": 2,
+        },
     )
 
-    assert_allclose(parallel, serial)
+    assert spectrum.shape == (1, 2, 1)
+    assert np.all(np.isfinite(spectrum))

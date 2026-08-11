@@ -10,7 +10,10 @@ from edrixs.solvers import ed
 
 def test_ed_returns_lowest_sorted_eigenpairs_and_infers_scipy():
     """The public ED interface returns matching low-energy eigenpairs."""
-    diagonal = np.array([-3.0, -1.0, 0.5, 1.0, 2.0, 4.0, 5.0, 8.0])
+    diagonal = np.array([
+        -3.0, -1.0, 0.5, 1.0, 2.0, 4.0,
+        5.0, 8.0, 9.0, 10.0, 11.0, 12.0,
+    ])
     hmat = sp.diags(diagonal, format="csr")
 
     evals, evecs = ed(

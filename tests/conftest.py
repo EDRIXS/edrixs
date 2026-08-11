@@ -3,7 +3,8 @@
 import numpy as np
 import pytest
 
-from edrixs.solvers import ops, setup_1v1c
+from edrixs.models import setup_1v1c
+from edrixs.solvers import get_ops
 
 
 @pytest.fixture(scope="module")
@@ -28,4 +29,4 @@ def small_1v1c_problem(small_1v1c_kwargs):
 @pytest.fixture(scope="module")
 def small_1v1c_operators(small_1v1c_problem):
     """Build SciPy Hamiltonians and transition operators for public-API tests."""
-    return ops(*small_1v1c_problem, backend="scipy")
+    return get_ops(*small_1v1c_problem, backend="scipy")
