@@ -11,9 +11,14 @@ from numpy.testing import assert_allclose
 
 from edrixs.solvers import rixs, rixs_1v1c_py, xas, xas_1v1c_py
 
-from ._helpers import exact_1v1c_reference_data
+from _helpers import exact_1v1c_reference_data
 
-pytestmark = pytest.mark.integration
+pytestmark = [
+    pytest.mark.integration,
+    pytest.mark.filterwarnings(
+        "ignore:.*is deprecated; use .* instead.:DeprecationWarning"
+    ),
+]
 
 
 def test_public_xas_matches_existing_dense_solver(small_1v1c_problem):
@@ -61,8 +66,8 @@ def test_public_xas_matches_existing_dense_solver(small_1v1c_problem):
     assert_allclose(sparse_result, dense_result, rtol=2e-8, atol=2e-10)
 
 
-def test_public_serial_rixs_matches_existing_dense_solver(small_1v1c_problem):
-    """Compare the complete serial SciPy and dense 1v1c RIXS command chains.
+def test_public_rixs_matches_existing_dense_solver(small_1v1c_problem):
+    """Compare the complete SciPy and dense 1v1c RIXS command chains.
 
     The check covers incoming transition, intermediate correction-vector solve,
     outgoing transition, final-state response, broadening, and assembly of the
@@ -94,7 +99,6 @@ def test_public_serial_rixs_matches_existing_dense_solver(small_1v1c_problem):
         temperature=20.0,
         backend="scipy",
         backend_kws={
-            "parallel": False,
             "nkryl": hmat_i.shape[0],
             "linsys_tol": 1e-12,
             "linsys_maxiter": 500,
@@ -143,7 +147,6 @@ def test_rixs_return_poles_contract(small_1v1c_problem):
         return_poles=True,
         backend="scipy",
         backend_kws={
-            "parallel": False,
             "nkryl": hmat_i.shape[0],
         },
     )

@@ -4,16 +4,16 @@ import numpy as np
 import scipy.sparse as sp
 from numpy.testing import assert_allclose
 
-from edrixs.solvers import ops
+from edrixs.solvers import get_ops
 
 
 def exact_1v1c_reference_data(problem):
     """Return SciPy operators plus exact dense eigenbasis reference data."""
-    hmat_i_dense, hmat_n_dense, transitions_dense = ops(
+    hmat_i_dense, hmat_n_dense, transitions_dense = get_ops(
         *problem,
         backend="dense",
     )
-    hmat_i, hmat_n, transitions = ops(
+    hmat_i, hmat_n, transitions = get_ops(
         *problem,
         backend="scipy",
     )
@@ -55,10 +55,10 @@ def assert_problem_sparse_dense_equivalent(dense, sparse):
         )
 
 
-def assert_dense_and_scipy_ops_match(dense_problem, sparse_problem, seed=0):
+def assert_dense_and_scipy_get_ops_match(dense_problem, sparse_problem, seed=0):
     """Compare dense and SciPy operator actions produced from the same model."""
-    hmat_i, hmat_n, transitions = ops(*dense_problem, backend="dense")
-    hmat_i_sp, hmat_n_sp, transitions_sp = ops(
+    hmat_i, hmat_n, transitions = get_ops(*dense_problem, backend="dense")
+    hmat_i_sp, hmat_n_sp, transitions_sp = get_ops(
         *sparse_problem,
         backend="scipy",
     )

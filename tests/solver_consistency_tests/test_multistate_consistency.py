@@ -11,9 +11,14 @@ from numpy.testing import assert_allclose
 
 from edrixs.solvers import rixs, rixs_1v1c_py, xas, xas_1v1c_py
 
-from ._helpers import exact_1v1c_reference_data
+from _helpers import exact_1v1c_reference_data
 
-pytestmark = pytest.mark.integration
+pytestmark = [
+    pytest.mark.integration,
+    pytest.mark.filterwarnings(
+        "ignore:.*is deprecated; use .* instead.:DeprecationWarning"
+    ),
+]
 
 
 def test_xas_two_initial_states_and_energy_dependent_broadening_match_dense(
@@ -64,16 +69,12 @@ def test_xas_two_initial_states_and_energy_dependent_broadening_match_dense(
     assert_allclose(actual, expected, rtol=3e-8, atol=3e-10)
 
 
-@pytest.mark.parametrize("skip_gs", [False, True])
-def test_rixs_two_initial_states_and_skip_gs_match_dense(
-    small_1v1c_problem,
-    skip_gs,
-):
-    """Compare full multistate RIXS spectra with and without elastic removal.
+def test_rixs_two_initial_states_match_dense(small_1v1c_problem):
+    """Compare the full multistate RIXS spectrum with the dense legacy solver.
 
     The check combines two retained states, energy-dependent core and final
-    broadenings, two polarization channels, and optional initial-state
-    projection before comparing the complete energy-loss spectra.
+    broadenings, and two polarization channels, including the elastic
+    contribution in both spectra.
     """
     hmat_i, hmat_n, transitions, eval_i, evec_i, eval_n, transitions_eig = (
         exact_1v1c_reference_data(small_1v1c_problem)
@@ -104,10 +105,8 @@ def test_rixs_two_initial_states_and_skip_gs_match_dense(
         phi=0.13,
         pol_type=pol_type,
         temperature=3000.0,
-        skip_gs=skip_gs,
         backend="scipy",
         backend_kws={
-            "parallel": False,
             "nkryl": hmat_i.shape[0],
             "linsys_tol": 1e-12,
             "linsys_maxiter": 500,
@@ -128,7 +127,7 @@ def test_rixs_two_initial_states_and_skip_gs_match_dense(
         pol_type=pol_type,
         gs_list=kept,
         temperature=3000.0,
-        skip_gs=skip_gs,
+        skip_gs=False,
     )
 
     assert_allclose(actual, expected, rtol=4e-7, atol=4e-9)

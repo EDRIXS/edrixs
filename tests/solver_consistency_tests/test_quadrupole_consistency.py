@@ -6,9 +6,14 @@ from numpy.testing import assert_allclose
 
 from edrixs.solvers import rixs, rixs_1v1c_py, xas, xas_1v1c_py
 
-from ._helpers import random_hermitian
+from _helpers import random_hermitian
 
-pytestmark = pytest.mark.integration
+pytestmark = [
+    pytest.mark.integration,
+    pytest.mark.filterwarnings(
+        "ignore:.*is deprecated; use .* instead.:DeprecationWarning"
+    ),
+]
 
 
 def test_quadrupole_xas_matches_dense_reference_on_tiny_matrices():
@@ -109,7 +114,6 @@ def test_quadrupole_rixs_matches_dense_reference_on_tiny_matrices():
         temperature=5000.0,
         backend="scipy",
         backend_kws={
-            "parallel": False,
             "nkryl": 3,
             "linsys_tol": 1e-13,
             "linsys_maxiter": 200,

@@ -1,6 +1,6 @@
 """Consistency checks for model setup and many-body operator construction.
 
-These checks follow the command chain from ``setup_*`` through ``ops`` but stop
+These checks follow the command chain from ``setup_*`` through ``get_ops`` but stop
 before any eigensolver or spectral solver.  They compare alternative dense and
 SciPy sparse representations of the same physical model.
 """
@@ -10,10 +10,11 @@ import pytest
 import scipy.sparse as sp
 from numpy.testing import assert_allclose
 
-from edrixs.solvers import ops, setup_1v1c, setup_2v1c, setup_siam
+from edrixs.models import setup_1v1c, setup_2v1c, setup_siam
+from edrixs.solvers import get_ops
 
-from ._helpers import (
-    assert_dense_and_scipy_ops_match,
+from _helpers import (
+    assert_dense_and_scipy_get_ops_match,
     assert_only_transition_block_is_populated,
     assert_problem_sparse_dense_equivalent,
     siam_kwargs,
@@ -23,8 +24,8 @@ pytestmark = pytest.mark.integration
 
 
 @pytest.mark.parametrize("trans_to_which", [1, 2])
-def test_setup_2v1c_sparse_dense_and_ops_equivalence(trans_to_which):
-    """Compare both representations through the 2v1c setup-to-``ops`` chain.
+def test_setup_2v1c_sparse_dense_and_get_ops_equivalence(trans_to_which):
+    """Compare both representations through the 2v1c setup-to-``get_ops`` chain.
 
     The check builds one model with dense and flattened sparse interactions,
     verifies the same orbital data and transition target, and confirms that
@@ -53,7 +54,7 @@ def test_setup_2v1c_sparse_dense_and_ops_equivalence(trans_to_which):
     sparse = setup_2v1c(**kwargs, sparse_U=True)
 
     assert_problem_sparse_dense_equivalent(dense, sparse)
-    assert_dense_and_scipy_ops_match(dense, sparse, seed=10 + trans_to_which)
+    assert_dense_and_scipy_get_ops_match(dense, sparse, seed=10 + trans_to_which)
 
     if trans_to_which == 1:
         assert_only_transition_block_is_populated(
@@ -75,8 +76,8 @@ def test_setup_2v1c_sparse_dense_and_ops_equivalence(trans_to_which):
 
 
 @pytest.mark.parametrize("siam_type", [0, 1])
-def test_setup_siam_sparse_dense_and_ops_equivalence(siam_type):
-    """Compare both representations through the SIAM setup-to-``ops`` chain.
+def test_setup_siam_sparse_dense_and_get_ops_equivalence(siam_type):
+    """Compare both representations through the SIAM setup-to-``get_ops`` chain.
 
     The check covers both supported SIAM input forms, confirms identical dense
     and sparse model data and operator actions, and verifies that the photon
@@ -87,7 +88,7 @@ def test_setup_siam_sparse_dense_and_ops_equivalence(siam_type):
     sparse = setup_siam(**kwargs, sparse_U=True)
 
     assert_problem_sparse_dense_equivalent(dense, sparse)
-    assert_dense_and_scipy_ops_match(dense, sparse, seed=20 + siam_type)
+    assert_dense_and_scipy_get_ops_match(dense, sparse, seed=20 + siam_type)
 
     transition = dense[6]
     assert_only_transition_block_is_populated(
@@ -133,7 +134,7 @@ def test_setup_1v1c_sparse_u_matches_dense_u(small_1v1c_kwargs):
 
     This check verifies the first stage of the 1v1c SciPy path: model definition
     must be unchanged when Coulomb tensors are stored sparsely for the later
-    ``ops(..., backend="scipy")`` construction.
+    ``get_ops(..., backend="scipy")`` construction.
     """
     dense = setup_1v1c(**small_1v1c_kwargs, sparse_U=False)
     sparse = setup_1v1c(**small_1v1c_kwargs, sparse_U=True)
@@ -157,14 +158,14 @@ def test_ops_scipy_backend_matches_dense_operator_action(small_1v1c_problem):
     """Compare dense and SciPy operators at the setup-to-solver boundary.
 
     Starting from one backend-neutral 1v1c model, this check confirms that the
-    two ``ops`` backends produce Hamiltonian and transition actions that agree
+    two ``get_ops`` backends produce Hamiltonian and transition actions that agree
     before either representation is used by ED, XAS, or RIXS.
     """
-    hmat_i_sp, hmat_n_sp, trans_sp = ops(
+    hmat_i_sp, hmat_n_sp, trans_sp = get_ops(
         *small_1v1c_problem,
         backend="scipy",
     )
-    hmat_i, hmat_n, transitions = ops(
+    hmat_i, hmat_n, transitions = get_ops(
         *small_1v1c_problem,
         backend="dense",
     )
