@@ -22,9 +22,9 @@ import numpy as np  # noqa: E402
 
 import edrixs  # noqa: E402
 
+from edrixs.models import model_1v1c  # noqa: E402
 from edrixs.solvers import (  # noqa: E402
-    setup_1v1c,
-    ops,
+    get_ops,
     ed as solve_ed,
     xas as solve_xas,
     rixs as solve_rixs,
@@ -119,7 +119,7 @@ def run(
     ]
 
     stage_start = time.perf_counter()
-    problem = setup_1v1c(
+    problem = model_1v1c(
         shell_name,
         shell_level=(0.0, -om_shift),
         v_soc=parameters["v_soc"],
@@ -128,10 +128,10 @@ def run(
         slater=parameters["slater"],
         sparse_U=True,
     )
-    timings["setup_1v1c_s"] = time.perf_counter() - stage_start
+    timings["model_1v1c_s"] = time.perf_counter() - stage_start
 
     stage_start = time.perf_counter()
-    hmat_i, hmat_n, trans_ops = ops(*problem, backend="scipy")
+    hmat_i, hmat_n, trans_ops = get_ops(*problem, backend="scipy")
     timings["ops_s"] = time.perf_counter() - stage_start
 
     print(f"Initial-space dimension:      {hmat_i.shape[0]}")
@@ -225,7 +225,6 @@ def run(
             temperature=temperature,
             backend="scipy",
             backend_kws={
-            "parallel": True,
                 "nkryl": 200,
                 "linsys_tol": 1.0e-10,
                 "linsys_maxiter": 5000,

@@ -4,7 +4,7 @@
 This example uses the EDRIXS backend-neutral solver interface with the
 SciPy backend:
 
-    setup_1v1c(...) -> ops(..., backend="scipy")
+    model_1v1c(...) -> get_ops(..., backend="scipy")
         -> ed(...) -> xas(...) / rixs(...)
 
 This reproduces the physical model and output grids of:
@@ -23,9 +23,9 @@ import numpy as np  # noqa: E402
 
 import edrixs  # noqa: E402
 
+from edrixs.models import model_1v1c  # noqa: E402
 from edrixs.solvers import (  # noqa: E402
-    setup_1v1c,
-    ops,
+    get_ops,
     ed as solve_ed,
     xas as solve_xas,
     rixs as solve_rixs,
@@ -151,7 +151,7 @@ def run(output_dir: Path) -> None:
     # -------------------------------------------------------------------------
     # 1. Define the orbital-space physical problem.
     # -------------------------------------------------------------------------
-    problem = setup_1v1c(
+    problem = model_1v1c(
         shell_name,
         shell_level=(0.0, -core_offset),
         v_soc=parameters["v_soc"],
@@ -164,7 +164,7 @@ def run(output_dir: Path) -> None:
     # -------------------------------------------------------------------------
     # 2. Lift the model into the initial and intermediate Fock spaces.
     # -------------------------------------------------------------------------
-    hmat_i, hmat_n, trans_ops = ops(
+    hmat_i, hmat_n, trans_ops = get_ops(
         *problem,
         backend="scipy",
     )
@@ -273,7 +273,6 @@ def run(output_dir: Path) -> None:
         temperature=temperature,
         backend="scipy",
         backend_kws={
-            "parallel": True,
             "nkryl": 100,
             "linsys_tol": 1.0e-10,
             "linsys_maxiter": 50000,

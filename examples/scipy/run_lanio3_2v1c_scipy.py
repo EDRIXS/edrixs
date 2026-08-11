@@ -8,11 +8,7 @@ This is the SciPy/Krylov counterpart of:
     examples/more/RIXS/LaNiO3_thin/test_2v1c.py
 
 The model retains the original physical parameters and spectral grids, but uses:
-    setup_2v1c -> ops -> ed -> xas / rixs
-
-This example requests the SciPy process-pool RIXS implementation through
-backend_kws={"parallel": True, ...}. It creates one job for every
-(incident energy, polarization, retained initial state) triple.
+    model_2v1c -> get_ops -> ed -> xas / rixs
 """
 
 import argparse
@@ -26,9 +22,9 @@ matplotlib.use("Agg")
 import numpy as np  # noqa: E402
 
 import edrixs  # noqa: E402
+from edrixs.models import model_2v1c  # noqa: E402
 from edrixs.solvers import (  # noqa: E402
-    setup_2v1c,
-    ops,
+    get_ops,
     ed as solve_ed,
     xas as solve_xas,
     rixs as solve_rixs,
@@ -102,9 +98,6 @@ def build_physical_parameters():
 
 def run(
     output_dir,
-    workers=None,
-    blas_threads=1,
-    mp_start_method=None,
     skip_xas=False,
     skip_rixs=False,
     sparse_u=True,
@@ -142,7 +135,7 @@ def run(
     ]
 
     stage_start = time.perf_counter()
-    problem = setup_2v1c(
+    problem = model_2v1c(
         shell_name,
         shell_level=(0.0, 3.0, -core_offset),
         v1_soc=parameters["v1_soc"],
@@ -153,17 +146,17 @@ def run(
         trans_to_which=1,
         sparse_U=sparse_u,
     )
-    timings["setup_2v1c_s"] = time.perf_counter() - stage_start
+    timings["model_2v1c_s"] = time.perf_counter() - stage_start
 
     stage_start = time.perf_counter()
-    hmat_i, hmat_n, trans_ops = ops(*problem, backend="scipy")
+    hmat_i, hmat_n, trans_ops = get_ops(*problem, backend="scipy")
     timings["ops_s"] = time.perf_counter() - stage_start
 
     print("Initial-space dimension:     ", hmat_i.shape[0])
     print("Intermediate-space dimension:", hmat_n.shape[0])
 
     stage_start = time.perf_counter()
-    blocksize = neval
+    blocksize = 30
     rng = np.random.default_rng(12345)
     initial_guess = (
         rng.standard_normal((hmat_i.shape[0], blocksize))
@@ -251,14 +244,10 @@ def run(
             temperature=temperature,
             backend="scipy",
             backend_kws={
-                "parallel": True,
                 "nkryl": 100,
-                "linsys_tol": 1.0e-8,
+                "linsys_tol": 1.0e-10,
                 "linsys_maxiter": 500,
                 "linsys_restart": 200,
-                "workers": workers,
-                "blas_threads": blas_threads,
-                "mp_start_method": mp_start_method,
             },
         )
         timings["rixs_s"] = time.perf_counter() - stage_start
@@ -321,27 +310,6 @@ def parse_args():
         help="Directory for spectra, map, eigenpairs, timings, and NPZ data.",
     )
     parser.add_argument(
-        "--workers",
-        type=int,
-        default=None,
-        help=(
-            "RIXS worker processes. The default uses all CPUs available to "
-            "the process, capped by the 60 independent RIXS jobs."
-        ),
-    )
-    parser.add_argument(
-        "--blas-threads",
-        type=int,
-        default=1,
-        help="Native BLAS/OpenMP threads per RIXS worker; keep at 1 normally.",
-    )
-    parser.add_argument(
-        "--mp-start-method",
-        choices=("fork", "spawn", "forkserver"),
-        default=None,
-        help="Optional multiprocessing start method.",
-    )
-    parser.add_argument(
         "--skip-xas",
         action="store_true",
         help="Run setup, operator construction, ED, and RIXS only.",
@@ -363,9 +331,6 @@ def main():
     args = parse_args()
     run(
         args.output_dir,
-        workers=args.workers,
-        blas_threads=args.blas_threads,
-        mp_start_method=args.mp_start_method,
         skip_xas=args.skip_xas,
         skip_rixs=args.skip_rixs,
         sparse_u=not args.dense_u,
