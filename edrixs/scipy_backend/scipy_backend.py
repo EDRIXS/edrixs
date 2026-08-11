@@ -369,14 +369,15 @@ def xas_scipy(eval_i, evec_i, hmat_n, trans_op, ominc, *,
 def rixs_scipy(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
                gamma_c=0.1, gamma_f=0.01, thin=1.0, thout=1.0, phi=0.0,
                pol_type=None, temperature=1.0, scatter_axis=None,
-               return_poles=False, backend_kws=None):
+               skip_gs=False, return_poles=False, backend_kws=None):
     """Run the SciPy RIXS implementation."""
     kws = _backend_kws(backend_kws)
     return rixs_krylov_scipy(
         eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss,
         gamma_c=gamma_c, gamma_f=gamma_f, thin=thin, thout=thout,
         phi=phi, pol_type=pol_type, temperature=temperature,
-        scatter_axis=scatter_axis, return_poles=return_poles, **kws
+        scatter_axis=scatter_axis, skip_gs=skip_gs,
+        return_poles=return_poles, **kws
     )
 
 
@@ -751,7 +752,7 @@ def _rixs_polarization_vectors(
 def _rixs_krylov_one_contribution_scipy(
         *, hmat_i, hmat_n, trans_op_H, polvec_f, eval_i,
         istate, omega, gamma_c, rhs, nkryl, linsys_tol,
-        linsys_maxiter, linsys_restart):
+        linsys_maxiter, linsys_restart, excluded_vectors=None):
     """
     Compute one kept-initial-state contribution to one RIXS pole dictionary.
     """
@@ -786,6 +787,11 @@ def _rixs_krylov_one_contribution_scipy(
         trans_op_H, np.conj(polvec_f), solution
     )
 
+    if excluded_vectors is not None:
+        final_vector = final_vector - excluded_vectors @ (
+            excluded_vectors.conj().T @ final_vector
+        )
+
     if np.linalg.norm(final_vector) == 0:
         alpha = np.array([0.0], dtype=float)
         beta = np.array([], dtype=float)
@@ -807,7 +813,7 @@ def _rixs_krylov_one_contribution_scipy(
 def _prepare_rixs(
         eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
         gamma_c, gamma_f, thin, thout, phi, pol_type, scatter_axis,
-        nkryl, linsys_tol, linsys_maxiter, linsys_restart):
+        nkryl, linsys_tol, linsys_maxiter, linsys_restart, skip_gs):
     """
     Validate RIXS inputs and prepare reusable solver state.
     """
@@ -887,6 +893,7 @@ def _prepare_rixs(
         'gamma_core': gamma_core,
         'gamma_final': gamma_final,
         'polarizations': polarizations,
+        'excluded_vectors': evec_i if skip_gs else None,
         'nkryl': nkryl,
         'linsys_tol': float(linsys_tol),
         'linsys_maxiter': linsys_maxiter,
@@ -938,6 +945,7 @@ def _compute_rixs_records(problem):
                         linsys_tol=problem['linsys_tol'],
                         linsys_maxiter=problem['linsys_maxiter'],
                         linsys_restart=problem['linsys_restart'],
+                        excluded_vectors=problem['excluded_vectors'],
                     )
                 )
     return records
@@ -981,7 +989,7 @@ def rixs_krylov_scipy(
         gamma_c=0.1, gamma_f=0.01, thin=1.0, thout=1.0, phi=0.0,
         pol_type=None, temperature=1.0, scatter_axis=None,
         nkryl=200, linsys_tol=1e-9, linsys_maxiter=50000,
-        linsys_restart=200, return_poles=False):
+        linsys_restart=200, skip_gs=False, return_poles=False):
     """
     Calculate RIXS spectra with the SciPy Krylov correction-vector solver.
 
@@ -1016,6 +1024,9 @@ def rixs_krylov_scipy(
         Maximum final-state Lanczos dimension.
     linsys_tol, linsys_maxiter, linsys_restart : optional
         GMRES controls for the intermediate correction-vector solve.
+    skip_gs : bool, optional
+        If true, omit transitions into the retained initial-state subspace
+        from the final-state spectrum.
     return_poles : bool, optional
         Return the nested pole dictionaries together with the spectrum.
 
@@ -1032,6 +1043,7 @@ def rixs_krylov_scipy(
         phi=phi, pol_type=pol_type, scatter_axis=scatter_axis,
         nkryl=nkryl, linsys_tol=linsys_tol,
         linsys_maxiter=linsys_maxiter, linsys_restart=linsys_restart,
+        skip_gs=skip_gs,
     )
     records = _compute_rixs_records(problem)
     return _assemble_rixs(problem, records, temperature, return_poles)
