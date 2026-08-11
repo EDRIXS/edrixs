@@ -1,6 +1,6 @@
-"""Consistency checks for model setup and many-body operator construction.
+"""Consistency checks for model definition and many-body operator construction.
 
-These checks follow the command chain from ``setup_*`` through ``get_ops`` but stop
+These checks follow the command chain from ``model_*`` through ``get_ops`` but stop
 before any eigensolver or spectral solver.  They compare alternative dense and
 SciPy sparse representations of the same physical model.
 """
@@ -10,7 +10,7 @@ import pytest
 import scipy.sparse as sp
 from numpy.testing import assert_allclose
 
-from edrixs.models import setup_1v1c, setup_2v1c, setup_siam
+from edrixs.models import model_1v1c, model_2v1c, model_siam
 from edrixs.solvers import get_ops
 
 from ._helpers import (
@@ -24,8 +24,8 @@ pytestmark = pytest.mark.integration
 
 
 @pytest.mark.parametrize("trans_to_which", [1, 2])
-def test_setup_2v1c_sparse_dense_and_get_ops_equivalence(trans_to_which):
-    """Compare both representations through the 2v1c setup-to-``get_ops`` chain.
+def test_model_2v1c_sparse_dense_and_get_ops_equivalence(trans_to_which):
+    """Compare both representations through the 2v1c model-to-``get_ops`` chain.
 
     The check builds one model with dense and flattened sparse interactions,
     verifies the same orbital data and transition target, and confirms that
@@ -50,8 +50,8 @@ def test_setup_2v1c_sparse_dense_and_get_ops_equivalence(trans_to_which):
         trans_to_which=trans_to_which,
     )
 
-    dense = setup_2v1c(**kwargs, sparse_U=False)
-    sparse = setup_2v1c(**kwargs, sparse_U=True)
+    dense = model_2v1c(**kwargs, sparse_U=False)
+    sparse = model_2v1c(**kwargs, sparse_U=True)
 
     assert_problem_sparse_dense_equivalent(dense, sparse)
     assert_dense_and_scipy_get_ops_match(dense, sparse, seed=10 + trans_to_which)
@@ -76,16 +76,16 @@ def test_setup_2v1c_sparse_dense_and_get_ops_equivalence(trans_to_which):
 
 
 @pytest.mark.parametrize("siam_type", [0, 1])
-def test_setup_siam_sparse_dense_and_get_ops_equivalence(siam_type):
-    """Compare both representations through the SIAM setup-to-``get_ops`` chain.
+def test_model_siam_sparse_dense_and_get_ops_equivalence(siam_type):
+    """Compare both representations through the SIAM model-to-``get_ops`` chain.
 
     The check covers both supported SIAM input forms, confirms identical dense
     and sparse model data and operator actions, and verifies that the photon
     transition reaches the impurity but not bath orbitals.
     """
     kwargs = siam_kwargs(siam_type)
-    dense = setup_siam(**kwargs, sparse_U=False)
-    sparse = setup_siam(**kwargs, sparse_U=True)
+    dense = model_siam(**kwargs, sparse_U=False)
+    sparse = model_siam(**kwargs, sparse_U=True)
 
     assert_problem_sparse_dense_equivalent(dense, sparse)
     assert_dense_and_scipy_get_ops_match(dense, sparse, seed=20 + siam_type)
@@ -99,14 +99,14 @@ def test_setup_siam_sparse_dense_and_get_ops_equivalence(siam_type):
     assert_allclose(transition[:, 2:4, :], 0.0)
 
 
-def test_setup_siam_static_core_potential_only_shifts_intermediate_impurity():
+def test_model_siam_static_core_potential_only_shifts_intermediate_impurity():
     """Check the SIAM core-hole term before operator construction and spectra.
 
     The static core potential should leave the initial orbital Hamiltonian
     unchanged and shift only the impurity block of the intermediate model that
     later enters XAS and the RIXS correction-vector solve.
     """
-    base = setup_siam(
+    base = model_siam(
         ("s", "p"),
         1,
         v_noccu=1,
@@ -114,7 +114,7 @@ def test_setup_siam_static_core_potential_only_shifts_intermediate_impurity():
         c_level=0.0,
         sparse_U=False,
     )
-    shifted = setup_siam(
+    shifted = model_siam(
         ("s", "p"),
         1,
         v_noccu=1,
@@ -129,15 +129,15 @@ def test_setup_siam_static_core_potential_only_shifts_intermediate_impurity():
     assert_allclose(shifted[3] - base[3], expected)
 
 
-def test_setup_1v1c_sparse_u_matches_dense_u(small_1v1c_kwargs):
-    """Compare dense and sparse interaction outputs from ``setup_1v1c``.
+def test_model_1v1c_sparse_u_matches_dense_u(small_1v1c_kwargs):
+    """Compare dense and sparse interaction outputs from ``model_1v1c``.
 
     This check verifies the first stage of the 1v1c SciPy path: model definition
     must be unchanged when Coulomb tensors are stored sparsely for the later
     ``get_ops(..., backend="scipy")`` construction.
     """
-    dense = setup_1v1c(**small_1v1c_kwargs, sparse_U=False)
-    sparse = setup_1v1c(**small_1v1c_kwargs, sparse_U=True)
+    dense = model_1v1c(**small_1v1c_kwargs, sparse_U=False)
+    sparse = model_1v1c(**small_1v1c_kwargs, sparse_U=True)
 
     for dense_u, sparse_u in ((dense[1], sparse[1]), (dense[4], sparse[4])):
         norbs = dense_u.shape[0]
