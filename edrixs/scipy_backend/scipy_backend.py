@@ -10,12 +10,12 @@ import numpy as np
 import scipy.sparse as sp
 from scipy.sparse.linalg import LinearOperator, aslinearoperator, gmres, lobpcg
 
-from ._solvers_helpers import _expand_broadening
-from .krylov import lanczos_tridiagonal
-from .photon_transition import (
+from .._solvers_helpers import _expand_broadening
+from ..krylov import lanczos_tridiagonal
+from ..photon_transition import (
     dipole_polvec_xas, dipole_polvec_rixs, quadrupole_polvec, unit_wavevector,
 )
-from .plot_spectrum import get_spectra_from_poles
+from ..plot_spectrum import get_spectra_from_poles
 
 __all__ = [
     'owns_operator_scipy', 'owns_operator_dense',
