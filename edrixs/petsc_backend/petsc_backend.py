@@ -9,7 +9,7 @@ from __future__ import annotations
 
 __all__ = [
     'owns_operator_petsc',
-    'build_op_petsc', 'get_transition_operators_petsc',
+    'build_op_petsc',
     'ed_petsc', 'xas_petsc', 'rixs_petsc',
 ]
 
@@ -48,17 +48,10 @@ def _not_implemented(operation):
     )
 
 
-def build_op_petsc(emat, umat, basis, *, backend_kws=None):
-    """Build a PETSc many-body Hamiltonian (stub)."""
+def build_op_petsc(emat, umat, lb, rb=None, *, backend_kws=None):
+    """Build a PETSc many-body operator (stub)."""
     _petsc_module()
     _not_implemented('build_op_petsc')
-
-
-def get_transition_operators_petsc(
-        trans_mat, basis_n, basis_i, *, backend_kws=None):
-    """Build PETSc transition operators (stub)."""
-    _petsc_module()
-    _not_implemented('get_transition_operators_petsc')
 
 
 def ed_petsc(hmat_i, num_evals=1, *, backend_kws=None):
