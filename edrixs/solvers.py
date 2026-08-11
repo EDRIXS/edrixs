@@ -56,19 +56,23 @@ __all__ = [
 # -----------------------------------------------------------------------------
 
 
-def build_op(emat, umat, basis, *, backend='scipy', backend_kws=None):
+def build_op(emat, umat, lb, rb=None, *, backend='scipy', backend_kws=None):
     """
-    Build one many-body Hamiltonian with the selected backend.
+    Build a many-body operator with the selected backend.
 
     Parameters
     ----------
-    emat : array-like
-        One-body orbital-space matrix.
-    umat : array-like or sparse matrix
-        Two-body Coulomb interaction, either as a dense rank-4 tensor or a
-        backend-supported sparse representation.
-    basis : FockBasis
-        Many-electron basis for the Hamiltonian.
+    emat : array-like or None
+        Coefficients of the one-body part. Pass ``None`` when the operator has
+        no one-body contribution.
+    umat : array-like, sparse matrix, or None
+        Coefficients of the two-body part. Pass ``None`` when the operator has
+        no two-body contribution.
+    lb : FockBasis
+        Basis for the output (left) many-body space.
+    rb : FockBasis or None, optional
+        Basis for the input (right) many-body space. When omitted, ``lb`` is
+        used for both sides.
     backend : str, optional
         Backend name. The default is ``'scipy'``.
     backend_kws : mapping, optional
@@ -78,12 +82,16 @@ def build_op(emat, umat, basis, *, backend='scipy', backend_kws=None):
     Returns
     -------
     operator
-        Many-body Hamiltonian in the representation owned by ``backend``.
+        Many-body operator in the representation owned by ``backend``.
     """
     name, module = _solver_helpers._load_backend(backend)
     implementation = getattr(module, 'build_op_' + name)
     return implementation(
-        emat, umat, basis, backend_kws=_solver_helpers._copy_backend_kws(backend_kws)
+        emat,
+        umat,
+        lb,
+        rb,
+        backend_kws=_solver_helpers._copy_backend_kws(backend_kws),
     )
 
 
@@ -98,7 +106,7 @@ def get_ops(
     ----------
     emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
         Backend-neutral problem definition returned by :mod:`edrixs.models`
-        setup functions.
+        model functions.
     backend : {'scipy', 'dense'}, optional
         Backend used for the returned operators. The default is ``'scipy'``.
     backend_kws : mapping, optional
@@ -111,10 +119,8 @@ def get_ops(
         Initial/final Hamiltonian, intermediate Hamiltonian, and transition
         operators for the selected backend.
     """
-    name, module = _solver_helpers._load_backend(backend)
+    name, _ = _solver_helpers._load_backend(backend)
     kws = _solver_helpers._copy_backend_kws(backend_kws)
-
-    get_trans = getattr(module, 'get_transition_operators_' + name)
 
     hmat_i = build_op(
         emat_i, umat_i, basis_i, backend=name, backend_kws=kws
@@ -122,9 +128,21 @@ def get_ops(
     hmat_n = build_op(
         emat_n, umat_n, basis_n, backend=name, backend_kws=kws
     )
-    trans_ops = get_trans(
-        trans_mat, basis_n, basis_i, backend_kws=kws
-    )
+
+    trans_mat = np.asarray(trans_mat)
+    if trans_mat.ndim != 3:
+        raise ValueError("trans_mat must be a three-dimensional array")
+    trans_ops = [
+        build_op(
+            component,
+            None,
+            basis_n,
+            basis_i,
+            backend=name,
+            backend_kws=kws,
+        )
+        for component in trans_mat
+    ]
     return hmat_i, hmat_n, trans_ops
 
 
@@ -330,7 +348,7 @@ def ed_1v1c_py(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
     """
     _warn_legacy(
         'ed_1v1c_py',
-        'edrixs.models.setup_1v1c + edrixs.solvers.get_ops/ed',
+        'edrixs.models.model_1v1c + edrixs.solvers.get_ops/ed',
     )
     print("edrixs >>> Running ED ...")
     v_name_options = ['s', 'p', 't2g', 'd', 'f']
@@ -574,7 +592,7 @@ def xas_1v1c_py(eval_i, eval_n, trans_op, ominc, *, gamma_c=0.1, thin=1.0, phi=0
     """
     _warn_legacy(
         'xas_1v1c_py',
-        'edrixs.models.setup_1v1c + edrixs.solvers.get_ops/ed/xas',
+        'edrixs.models.model_1v1c + edrixs.solvers.get_ops/ed/xas',
     )
 
     print("edrixs >>> Running XAS ...")
@@ -710,7 +728,7 @@ def rixs_1v1c_py(eval_i, eval_n, trans_op, ominc, eloss, *,
     """
     _warn_legacy(
         'rixs_1v1c_py',
-        'edrixs.models.setup_1v1c + edrixs.solvers.get_ops/ed/rixs',
+        'edrixs.models.model_1v1c + edrixs.solvers.get_ops/ed/rixs',
     )
 
     print("edrixs >>> Running RIXS ... ")
@@ -912,7 +930,7 @@ def ed_1v1c_fort(comm, shell_name, *, shell_level=None,
     """
     _warn_legacy(
         'ed_1v1c_fort',
-        'edrixs.models.setup_1v1c + edrixs.solvers.get_ops/ed',
+        'edrixs.models.model_1v1c + edrixs.solvers.get_ops/ed',
     )
     v_name_options = ['s', 'p', 't2g', 'd', 'f']
     c_name_options = ['s', 'p', 'p12', 'p32', 't2g', 'd', 'd32', 'd52', 'f', 'f52', 'f72']
@@ -1026,7 +1044,7 @@ def xas_1v1c_fort(comm, shell_name, ominc, *, gamma_c=0.1,
     """
     _warn_legacy(
         'xas_1v1c_fort',
-        'edrixs.models.setup_1v1c + edrixs.solvers.get_ops/ed/xas',
+        'edrixs.models.model_1v1c + edrixs.solvers.get_ops/ed/xas',
     )
     v_name_options = ['s', 'p', 't2g', 'd', 'f']
     c_name_options = ['s', 'p', 'p12', 'p32', 't2g', 'd', 'd32', 'd52', 'f', 'f52', 'f72']
@@ -1144,7 +1162,7 @@ def rixs_1v1c_fort(comm, shell_name, ominc, eloss, *, gamma_c=0.1, gamma_f=0.1,
     """
     _warn_legacy(
         'rixs_1v1c_fort',
-        'edrixs.models.setup_1v1c + edrixs.solvers.get_ops/ed/rixs',
+        'edrixs.models.model_1v1c + edrixs.solvers.get_ops/ed/rixs',
     )
     v_name_options = ['s', 'p', 't2g', 'd', 'f']
     c_name_options = ['s', 'p', 'p12', 'p32', 't2g', 'd', 'd32', 'd52', 'f', 'f52', 'f72']
@@ -1321,7 +1339,7 @@ def ed_2v1c_fort(comm, shell_name, *, shell_level=None,
     """
     _warn_legacy(
         'ed_2v1c_fort',
-        'edrixs.models.setup_2v1c + edrixs.solvers.get_ops/ed',
+        'edrixs.models.model_2v1c + edrixs.solvers.get_ops/ed',
     )
     v_name_options = ['s', 'p', 't2g', 'd', 'f']
     c_name_options = ['s', 'p', 'p12', 'p32', 't2g', 'd', 'd32', 'd52', 'f', 'f52', 'f72']
@@ -1438,7 +1456,7 @@ def xas_2v1c_fort(comm, shell_name, ominc, *, gamma_c=0.1,
     """
     _warn_legacy(
         'xas_2v1c_fort',
-        'edrixs.models.setup_2v1c + edrixs.solvers.get_ops/ed/xas',
+        'edrixs.models.model_2v1c + edrixs.solvers.get_ops/ed/xas',
     )
     v_name_options = ['s', 'p', 't2g', 'd', 'f']
     c_name_options = ['s', 'p', 'p12', 'p32', 't2g', 'd', 'd32', 'd52', 'f', 'f52', 'f72']
@@ -1563,7 +1581,7 @@ def rixs_2v1c_fort(comm, shell_name, ominc, eloss, *, gamma_c=0.1, gamma_f=0.1,
     """
     _warn_legacy(
         'rixs_2v1c_fort',
-        'edrixs.models.setup_2v1c + edrixs.solvers.get_ops/ed/rixs',
+        'edrixs.models.model_2v1c + edrixs.solvers.get_ops/ed/rixs',
     )
     v_name_options = ['s', 'p', 't2g', 'd', 'f']
     c_name_options = ['s', 'p', 'p12', 'p32', 't2g', 'd', 'd32', 'd52', 'f', 'f52', 'f72']
@@ -1731,7 +1749,7 @@ def ed_siam_fort(comm, shell_name, nbath, *, siam_type=0, v_noccu=1, static_core
     """
     _warn_legacy(
         'ed_siam_fort',
-        'edrixs.models.setup_siam + edrixs.solvers.get_ops/ed',
+        'edrixs.models.model_siam + edrixs.solvers.get_ops/ed',
     )
     from .fedrixs import ed_fsolver
 
@@ -2128,7 +2146,7 @@ def xas_siam_fort(comm, shell_name, nbath, ominc, *, gamma_c=0.1,
     """
     _warn_legacy(
         'xas_siam_fort',
-        'edrixs.models.setup_siam + edrixs.solvers.get_ops/ed/xas',
+        'edrixs.models.model_siam + edrixs.solvers.get_ops/ed/xas',
     )
     from .fedrixs import xas_fsolver
 
@@ -2351,7 +2369,7 @@ def rixs_siam_fort(comm, shell_name, nbath, ominc, eloss, *, gamma_c=0.1, gamma_
     """
     _warn_legacy(
         'rixs_siam_fort',
-        'edrixs.models.setup_siam + edrixs.solvers.get_ops/ed/rixs',
+        'edrixs.models.model_siam + edrixs.solvers.get_ops/ed/rixs',
     )
     from .fedrixs import rixs_fsolver
 

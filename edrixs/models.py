@@ -1,6 +1,6 @@
 """Backend-independent physical model construction for EDRIXS.
 
-The setup functions in this module describe orbital-space Hamiltonians,
+The model functions in this module describe orbital-space Hamiltonians,
 interactions, Fock bases, and photon-transition matrices without constructing
 backend-owned many-body operators.
 """
@@ -26,10 +26,10 @@ from ._solvers_helpers import (
     _valence_zeeman_matrix,
 )
 
-__all__ = ['setup_1v1c', 'setup_2v1c', 'setup_siam']
+__all__ = ['model_1v1c', 'model_2v1c', 'model_siam']
 
 
-def setup_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
+def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
                v_noccu=1, slater=None, ext_B=None, on_which='spin',
                v_cfmat=None, v_othermat=None, loc_axis=None, verbose=0,
                sparse_U=False, tol=1E-10):
@@ -230,7 +230,7 @@ def setup_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
     return emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
 
 
-def setup_2v1c(
+def model_2v1c(
     shell_name, *, shell_level=None,
     v1_soc=None, v2_soc=None, c_soc=0, v_tot_noccu=1, slater=None,
     v1_ext_B=None, v2_ext_B=None, v1_on_which='spin',
@@ -455,7 +455,7 @@ def setup_2v1c(
     return emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
 
 
-def setup_siam(
+def model_siam(
     shell_name, nbath, *, siam_type=0, v_noccu=1, static_core_pot=0,
     c_level=0, c_soc=0, trans_c2n=None, imp_mat=None, imp_mat_n=None,
     bath_level=None, bath_level_n=None, hyb=None, hyb_n=None,
