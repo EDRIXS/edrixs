@@ -106,4 +106,3 @@ def test_public_rixs_skip_gs_removes_retained_final_states():
 
     assert np.any(included > 0)
     np.testing.assert_allclose(skipped, 0.0, atol=1e-14)
-
