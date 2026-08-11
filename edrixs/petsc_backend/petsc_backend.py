@@ -78,7 +78,7 @@ def xas_petsc(eval_i, evec_i, hmat_n, trans_op, ominc, *,
 def rixs_petsc(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
                gamma_c=0.1, gamma_f=0.01, thin=1.0, thout=1.0, phi=0.0,
                pol_type=None, temperature=1.0, scatter_axis=None,
-               return_poles=False, backend_kws=None):
+               skip_gs=False, return_poles=False, backend_kws=None):
     """Calculate RIXS with PETSc (stub)."""
     _petsc_module()
     _not_implemented('rixs_petsc')
