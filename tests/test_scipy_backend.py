@@ -5,7 +5,7 @@ import pytest
 from numpy.testing import assert_allclose
 from scipy.sparse.linalg import aslinearoperator
 
-import edrixs.scipy_backend as backend
+import edrixs.scipy_backend.scipy_backend as backend
 
 
 def test_apply_linear_combination_handles_complex_and_zero_coefficients():

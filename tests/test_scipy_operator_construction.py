@@ -6,7 +6,7 @@ import scipy.sparse as sp
 from numpy.testing import assert_allclose
 
 from edrixs.fock_basis import FockBasis
-from edrixs.scipy_backend import (
+from edrixs.scipy_backend.scipy_backend import (
     _four_fermion_csr_from_sparse_umat,
     four_fermion_csr,
     four_fermion_csr_auto,
@@ -14,7 +14,7 @@ from edrixs.scipy_backend import (
 )
 from edrixs.solvers import build_op
 
-from _oracles import fixed_particle_basis, one_body_oracle, two_body_oracle
+from tests._oracles import fixed_particle_basis, one_body_oracle, two_body_oracle
 
 
 def test_fock_basis_encode_decode_roundtrip():
