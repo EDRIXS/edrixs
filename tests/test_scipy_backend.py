@@ -7,6 +7,7 @@ from scipy.sparse.linalg import aslinearoperator
 
 import edrixs.scipy_backend as backend
 
+
 def test_apply_linear_combination_handles_complex_and_zero_coefficients():
     """Polarization-weighted operator application supports complex weights."""
     operators = [
@@ -25,6 +26,7 @@ def test_apply_linear_combination_handles_complex_and_zero_coefficients():
         backend._apply_linear_combination(operators, [0, 0], vector),
         0,
     )
+
 
 def test_zero_rhs_short_circuits_rixs_contribution(monkeypatch):
     """A zero incoming-transition vector must bypass the GMRES solve."""
@@ -54,6 +56,7 @@ def test_zero_rhs_short_circuits_rixs_contribution(monkeypatch):
     assert_allclose(record["alpha"], [0.0])
     assert record["beta"].size == 0
 
+
 def test_gmres_failure_is_reported_with_context(monkeypatch):
     """A failed correction-vector solve identifies its RIXS contribution."""
     monkeypatch.setattr(
@@ -78,6 +81,7 @@ def test_gmres_failure_is_reported_with_context(monkeypatch):
             linsys_maxiter=10,
             linsys_restart=5,
         )
+
 
 def test_rixs_backend_forwards_to_krylov_implementation(monkeypatch):
     """The SciPy RIXS backend forwards numerical options to the Krylov solver."""
