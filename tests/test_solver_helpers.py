@@ -45,45 +45,6 @@ def test_expand_broadening_accepts_scalar_or_exact_length_array():
         helpers._expand_broadening([0.1], 2, "gamma")
 
 
-@pytest.mark.parametrize(
-    ("backend", "expected"),
-    [("scipy", "scipy"), (" SciPy ", "scipy"), ("DENSE", "dense")],
-)
-def test_normalize_backend_name(backend, expected):
-    """Backend names are case-insensitive and whitespace-tolerant."""
-    assert helpers._normalize_backend_name(backend) == expected
-
-
-def test_normalize_backend_name_rejects_invalid_values():
-    """Invalid backend selectors fail before any backend is imported."""
-    with pytest.raises(TypeError, match="string"):
-        helpers._normalize_backend_name(None)
-
-    with pytest.raises(ValueError, match="Unknown backend"):
-        helpers._normalize_backend_name("unknown")
-
-
-def test_copy_backend_kws_returns_independent_dictionary():
-    """Backend options are copied before a backend consumes or mutates them."""
-    original = {"tol": 1e-10}
-    copied = helpers._copy_backend_kws(original)
-    copied["tol"] = 1e-8
-
-    assert original == {"tol": 1e-10}
-    assert helpers._copy_backend_kws(None) == {}
-
-    with pytest.raises(TypeError, match="mapping"):
-        helpers._copy_backend_kws([("tol", 1e-10)])
-
-
-def test_load_backend_returns_requested_module():
-    """The dispatcher lazily imports the module associated with a backend."""
-    name, module = helpers._load_backend("scipy")
-
-    assert name == "scipy"
-    assert module.__name__.endswith(".scipy_backend")
-
-
 def test_infer_backend_recognizes_scipy_operators():
     """NumPy and SciPy sparse operators infer the SciPy solver backend."""
     assert helpers._infer_backend(np.eye(2)) == "scipy"

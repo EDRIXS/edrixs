@@ -13,10 +13,27 @@ def test_build_op_rejects_unknown_backend():
         build_op(np.eye(2), np.zeros((2, 2, 2, 2)), object(), backend="bad")
 
 
+@pytest.mark.parametrize("backend", [" SciPy ", "SCIPY", "DENSE"])
+def test_build_op_requires_exact_backend_name(backend):
+    """Backend selectors use the exact documented lowercase names."""
+    with pytest.raises(ValueError, match="Unknown backend"):
+        build_op(np.eye(2), np.zeros((2, 2, 2, 2)), object(), backend=backend)
+
+
 def test_ed_rejects_nonmapping_backend_options():
     """Public wrappers require ``backend_kws`` to be a mapping or ``None``."""
     with pytest.raises(TypeError, match="mapping"):
         ed(np.eye(2), backend="scipy", backend_kws=[("tol", 1e-8)])
+
+
+def test_solver_entry_points_reject_unknown_explicit_backend():
+    """Every public solver rejects selectors outside the documented names."""
+    with pytest.raises(ValueError, match="Unknown backend"):
+        ed(np.eye(2), backend="SCIPY")
+    with pytest.raises(ValueError, match="Unknown backend"):
+        xas(None, None, None, [], None, backend="SCIPY")
+    with pytest.raises(ValueError, match="Unknown backend"):
+        rixs(None, None, None, None, [], None, None, backend="SCIPY")
 
 
 def test_public_xas_uses_inferred_scipy_backend():

@@ -1,8 +1,5 @@
 """Private implementation helpers for :mod:`edrixs.solvers`."""
 
-from collections.abc import Mapping
-import importlib
-
 import numpy as np
 import scipy.sparse as sp
 
@@ -21,75 +18,32 @@ from .plot_spectrum import get_spectra_from_poles, merge_pole_dicts
 from .soc import atom_hsoc
 
 
-_BACKEND_MODULES = {
-    "scipy": ".scipy_backend.scipy_backend",
-    "petsc": ".petsc_backend.petsc_backend",
-    # Dense arrays currently use the SciPy implementation.
-    "dense": ".scipy_backend.scipy_backend",
-}
-
-_INFERABLE_BACKENDS = ("scipy", "petsc")
-
-
-def _normalize_backend_name(backend):
-    """Normalize and validate a backend name."""
-    if not isinstance(backend, str):
-        raise TypeError("backend must be a string")
-
-    name = backend.strip().lower()
-    if name not in _BACKEND_MODULES:
-        raise ValueError(
-            "Unknown backend {!r}; available backends are {}".format(
-                backend, sorted(_BACKEND_MODULES)
-            )
-        )
-    return name
-
-
-def _load_backend(backend):
-    """Import and return the module implementing ``backend``."""
-    name = _normalize_backend_name(backend)
-    module = importlib.import_module(_BACKEND_MODULES[name], package=__package__)
-    return name, module
-
-
-def _copy_backend_kws(backend_kws):
-    """Return a mutable copy of backend-specific keyword arguments."""
-    if backend_kws is None:
-        return {}
-    if not isinstance(backend_kws, Mapping):
-        raise TypeError("backend_kws must be a mapping or None")
-    return dict(backend_kws)
-
-
 def _infer_backend(*operators):
-    """Infer the unique backend that owns all supplied operators."""
-    candidates = []
-    for name in _INFERABLE_BACKENDS:
-        _, module = _load_backend(name)
-        owns = getattr(module, "owns_operator_" + name)
-        if operators and all(owns(operator) for operator in operators):
-            candidates.append(name)
+    """Infer which backend owns every supplied operator."""
+    from .petsc_backend import petsc_backend
+    from .scipy_backend import scipy_backend
 
-    if len(candidates) == 1:
-        return candidates[0]
-    if not candidates:
-        raise TypeError(
-            "Could not infer a backend from the supplied operators; "
-            "pass backend='scipy' or backend='petsc' explicitly"
-        )
-    raise TypeError(
-        "Backend inference is ambiguous ({}); pass backend explicitly".format(
-            ", ".join(candidates)
-        )
+    owned_by_scipy = bool(operators) and all(
+        scipy_backend.owns_operator_scipy(operator) for operator in operators
+    )
+    owned_by_petsc = bool(operators) and all(
+        petsc_backend.owns_operator_petsc(operator) for operator in operators
     )
 
-
-def _resolve_backend(backend, *operators):
-    """Return an explicit backend or infer one from supplied operators."""
-    if backend is None:
-        return _infer_backend(*operators)
-    return _normalize_backend_name(backend)
+    match owned_by_scipy, owned_by_petsc:
+        case True, False:
+            return 'scipy'
+        case False, True:
+            return 'petsc'
+        case False, False:
+            raise TypeError(
+                "Could not infer a backend from the supplied operators; "
+                "pass backend='scipy' or backend='petsc' explicitly"
+            )
+        case True, True:
+            raise TypeError(
+                "Backend inference is ambiguous; pass backend explicitly"
+            )
 
 
 def _rotated_transition_blocks(case, loc_axis=None):

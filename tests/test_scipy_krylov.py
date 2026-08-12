@@ -1,11 +1,11 @@
-"""Unit tests for the backend-independent Krylov response utilities."""
+"""Unit tests for the SciPy backend's Krylov response utilities."""
 
 import numpy as np
 import pytest
 from numpy.testing import assert_allclose
 from scipy.sparse import csr_matrix
 
-from edrixs.krylov import (
+from edrixs.scipy_backend.krylov import (
     lanczos_tridiagonal,
     resolvent_from_tridiag,
     spectral_function_from_tridiag,

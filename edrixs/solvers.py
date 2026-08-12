@@ -30,9 +30,11 @@ from .utils import info_atomic_shell, slater_integrals_name, boltz_dist
 from .rixs_utils import scattering_mat
 from .plot_spectrum import get_spectra_from_poles, merge_pole_dicts
 from .soc import atom_hsoc
-from . import _solvers_helpers as _solver_helpers
+from .petsc_backend import petsc_backend
+from .scipy_backend import scipy_backend
 from ._solvers_helpers import (
     _ed_1or2_valence_1core,
+    _infer_backend,
     _rixs_1or2_valence_1core,
     _xas_1or2_valence_1core,
 )
@@ -84,14 +86,25 @@ def build_op(emat, umat, lb, rb=None, *, backend='scipy', backend_kws=None):
     operator
         Many-body operator in the representation owned by ``backend``.
     """
-    name, module = _solver_helpers._load_backend(backend)
-    implementation = getattr(module, 'build_op_' + name)
-    return implementation(
+    match backend:
+        case 'scipy':
+            build_op_backend = scipy_backend.build_op_scipy
+        case 'dense':
+            build_op_backend = scipy_backend.build_op_dense
+        case 'petsc':
+            build_op_backend = petsc_backend.build_op_petsc
+        case _:
+            raise ValueError(
+                "Unknown backend {!r}; expected 'scipy', 'dense', or "
+                "'petsc'".format(backend)
+            )
+
+    return build_op_backend(
         emat,
         umat,
         lb,
         rb,
-        backend_kws=_solver_helpers._copy_backend_kws(backend_kws),
+        backend_kws=backend_kws,
     )
 
 
@@ -119,14 +132,13 @@ def get_ops(
         Initial/final Hamiltonian, intermediate Hamiltonian, and transition
         operators for the selected backend.
     """
-    name, _ = _solver_helpers._load_backend(backend)
-    kws = _solver_helpers._copy_backend_kws(backend_kws)
-
     hmat_i = build_op(
-        emat_i, umat_i, basis_i, backend=name, backend_kws=kws
+        emat_i, umat_i, basis_i, backend=backend,
+        backend_kws=backend_kws,
     )
     hmat_n = build_op(
-        emat_n, umat_n, basis_n, backend=name, backend_kws=kws
+        emat_n, umat_n, basis_n, backend=backend,
+        backend_kws=backend_kws,
     )
 
     trans_mat = np.asarray(trans_mat)
@@ -138,8 +150,8 @@ def get_ops(
             None,
             basis_n,
             basis_i,
-            backend=name,
-            backend_kws=kws,
+            backend=backend,
+            backend_kws=backend_kws,
         )
         for component in trans_mat
     ]
@@ -166,13 +178,24 @@ def ed(hmat_i, num_evals=1, *, backend=None, backend_kws=None):
     eigenvalues, eigenvectors
         Lowest retained eigenpairs.
     """
-    name = _solver_helpers._resolve_backend(backend, hmat_i)
-    _, module = _solver_helpers._load_backend(name)
-    implementation = getattr(module, 'ed_' + name)
-    return implementation(
+    backend_name = backend if backend is not None else _infer_backend(hmat_i)
+    match backend_name:
+        case 'scipy':
+            ed_backend = scipy_backend.ed_scipy
+        case 'dense':
+            ed_backend = scipy_backend.ed_dense
+        case 'petsc':
+            ed_backend = petsc_backend.ed_petsc
+        case _:
+            raise ValueError(
+                "Unknown backend {!r}; expected 'scipy', 'dense', or "
+                "'petsc'".format(backend_name)
+            )
+
+    return ed_backend(
         hmat_i,
         num_evals=num_evals,
-        backend_kws=_solver_helpers._copy_backend_kws(backend_kws),
+        backend_kws=backend_kws,
     )
 
 
@@ -188,10 +211,23 @@ def xas(eval_i, evec_i, hmat_n, trans_op, ominc, *,
     When ``backend`` is omitted, it is inferred from ``hmat_n`` and the
     transition operators.
     """
-    name = _solver_helpers._resolve_backend(backend, hmat_n, *trans_op)
-    _, module = _solver_helpers._load_backend(name)
-    implementation = getattr(module, 'xas_' + name)
-    return implementation(
+    backend_name = (
+        backend if backend is not None else _infer_backend(hmat_n, *trans_op)
+    )
+    match backend_name:
+        case 'scipy':
+            xas_backend = scipy_backend.xas_scipy
+        case 'dense':
+            xas_backend = scipy_backend.xas_dense
+        case 'petsc':
+            xas_backend = petsc_backend.xas_petsc
+        case _:
+            raise ValueError(
+                "Unknown backend {!r}; expected 'scipy', 'dense', or "
+                "'petsc'".format(backend_name)
+            )
+
+    return xas_backend(
         eval_i, evec_i, hmat_n, trans_op, ominc,
         gamma_c=gamma_c,
         thin=thin,
@@ -199,7 +235,7 @@ def xas(eval_i, evec_i, hmat_n, trans_op, ominc, *,
         pol_type=pol_type,
         temperature=temperature,
         scatter_axis=scatter_axis,
-        backend_kws=_solver_helpers._copy_backend_kws(backend_kws),
+        backend_kws=backend_kws,
     )
 
 
@@ -219,10 +255,25 @@ def rixs(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
     subspace are omitted from the final-state spectrum, matching the legacy
     ``skip_gs`` behavior.
     """
-    name = _solver_helpers._resolve_backend(backend, hmat_i, hmat_n, *trans_op)
-    _, module = _solver_helpers._load_backend(name)
-    implementation = getattr(module, 'rixs_' + name)
-    return implementation(
+    backend_name = (
+        backend
+        if backend is not None
+        else _infer_backend(hmat_i, hmat_n, *trans_op)
+    )
+    match backend_name:
+        case 'scipy':
+            rixs_backend = scipy_backend.rixs_scipy
+        case 'dense':
+            rixs_backend = scipy_backend.rixs_dense
+        case 'petsc':
+            rixs_backend = petsc_backend.rixs_petsc
+        case _:
+            raise ValueError(
+                "Unknown backend {!r}; expected 'scipy', 'dense', or "
+                "'petsc'".format(backend_name)
+            )
+
+    return rixs_backend(
         eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss,
         gamma_c=gamma_c,
         gamma_f=gamma_f,
@@ -234,7 +285,7 @@ def rixs(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
         scatter_axis=scatter_axis,
         skip_gs=skip_gs,
         return_poles=return_poles,
-        backend_kws=_solver_helpers._copy_backend_kws(backend_kws),
+        backend_kws=backend_kws,
     )
 
 
