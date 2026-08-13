@@ -164,3 +164,48 @@ def test_get_fock_basis_by_NLz_states_have_correct_Lz():
             # Compute Lz from the decimal representation
             Lz_computed = sum(lz_list[i] for i in range(norb) if (state >> i) & 1)
             assert Lz_computed == Lz_key
+
+
+# --- Independent regression oracles ---
+
+def test_get_fock_bin_by_N_two_shells_preserves_each_shell_occupancy():
+    """The correct total occupancy is insufficient if particles move between shells."""
+    n1, k1, n2, k2 = 4, 2, 2, 1
+    for state in get_fock_bin_by_N(n1, k1, n2, k2):
+        assert sum(state[:n1]) == k1
+        assert sum(state[n1:]) == k2
+
+
+def test_get_fock_basis_by_NSz_states_have_correct_Sz():
+    """Every state must be assigned to the sector named by its key."""
+    norb, N = 6, 2
+    sz_list = [1, -1, 1, -1, 1, -1]
+    basis = get_fock_basis_by_NSz(norb, N, sz_list)
+    for sz_key, states in basis.items():
+        for state in states:
+            value = sum(sz_list[i] for i in range(norb) if (state >> i) & 1)
+            assert value == sz_key
+
+
+def test_get_fock_basis_by_NJz_states_have_correct_Jz():
+    """Catch implementations that produce the right counts but mis-bin states."""
+    norb, N = 6, 2
+    jz_list = [-1, 1, -3, -1, 1, 3]
+    basis = get_fock_basis_by_NJz(norb, N, jz_list)
+    for jz_key, states in basis.items():
+        for state in states:
+            value = sum(jz_list[i] for i in range(norb) if (state >> i) & 1)
+            assert value == jz_key
+
+
+def test_get_fock_basis_by_N_LzSz_states_match_both_keys():
+    """Validate both quantum numbers state-by-state in the combined sectors."""
+    norb, N = 6, 2
+    lz_list = [-1, -1, 0, 0, 1, 1]
+    sz_list = [1, -1, 1, -1, 1, -1]
+    basis = get_fock_basis_by_N_LzSz(norb, N, lz_list, sz_list)
+    for (lz_key, sz_key), states in basis.items():
+        for state in states:
+            occupied = [i for i in range(norb) if (state >> i) & 1]
+            assert sum(lz_list[i] for i in occupied) == lz_key
+            assert sum(sz_list[i] for i in occupied) == sz_key
