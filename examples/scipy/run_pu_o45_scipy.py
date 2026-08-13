@@ -150,8 +150,8 @@ def run(
         backend="scipy",
         backend_kws={
             "blocksize": blocksize,
-            "tol": 1.0e-12,
-            "maxiter": 5000,
+            "tol": 1.0e-8,
+            "maxiter": 500,
             "initial_guess": initial_guess,
             "suppress_lobpcg_warnings": False,
         },
