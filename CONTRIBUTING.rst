@@ -2,8 +2,12 @@
 Contributing
 ============
 
-Contributions are welcome, and they are greatly appreciated! Every
-little bit helps, and credit will always be given.
+Contributions are welcome and greatly appreciated. Bug reports, fixes,
+features, tests, and documentation improvements all help the project.
+
+We are currently updating parts of the EDRIXS infrastructure on the
+``petsc_edrixs`` branch. Planning is tracked in the
+`GitHub wiki <https://github.com/EDRIXS/edrixs/wiki>`_.
 
 You can contribute in many ways:
 
@@ -13,7 +17,7 @@ Types of Contributions
 Report Bugs
 ~~~~~~~~~~~
 
-Report bugs at https://github.com/mrakitin/edrixs/issues.
+Report bugs at https://github.com/EDRIXS/edrixs/issues.
 
 If you are reporting a bug, please include:
 
@@ -35,37 +39,42 @@ is open to whoever wants to implement it.
 Write Documentation
 ~~~~~~~~~~~~~~~~~~~
 
-edrixs could always use more documentation, whether
-as part of the official edrixs docs, in docstrings,
-or even on the web in blog posts, articles, and such.
+EDRIXS could always use more documentation, whether in the official
+documentation, docstrings, examples, or tutorials.
 
 Submit Feedback
 ~~~~~~~~~~~~~~~
 
-The best way to send feedback is to file an issue at https://github.com/mrakitin/edrixs/issues.
+The best way to send feedback is to file an issue at
+https://github.com/EDRIXS/edrixs/issues.
 
 If you are proposing a feature:
 
 * Explain in detail how it would work.
 * Keep the scope as narrow as possible, to make it easier to implement.
-* Remember that this is a volunteer-driven project, and that contributions
-  are welcome :)
+* Remember that this is a volunteer-driven project.
 
 Get Started!
 ------------
 
-Ready to contribute? Here's how to set up `edrixs` for local development.
+Ready to contribute? EDRIXS requires Python 3.10 or later. The compiled
+extension also requires the native build dependencies described in the
+`installation guide <docs/source/user/installation.rst>`_.
 
-1. Fork the `edrixs` repo on GitHub.
+1. Fork the EDRIXS repository on GitHub.
 2. Clone your fork locally::
 
-    $ git clone git@github.com:your_name_here/edrixs.git
+    $ git clone git@github.com:your-name/edrixs.git
+    $ cd edrixs
 
-3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
+3. Create a virtual environment and install EDRIXS with its development
+   dependencies::
 
-    $ mkvirtualenv edrixs
-    $ cd edrixs/
-    $ python setup.py develop
+    $ python -m venv .venv
+    $ source .venv/bin/activate
+    $ python -m pip install --upgrade pip
+    $ python -m pip install -r requirements-dev.txt
+    $ python -m pip install -e .
 
 4. Create a branch for local development::
 
@@ -73,39 +82,54 @@ Ready to contribute? Here's how to set up `edrixs` for local development.
 
    Now you can make your changes locally.
 
-5. Commit your changes::
+5. Install the pre-commit hooks::
 
     $ pre-commit install
 
-    Now you can commit your changes. All commits will be checked
-    via `pre-commit` including `flake8`.
+   The hooks run checks such as ``flake8`` when you commit. To check all files
+   manually, run::
 
-    $ git commit -a -m "Your commit message"
+    $ pre-commit run --all-files
 
-6. When you're done making changes, check that your changes pass flake8 and the tests, including testing other Python versions with tox::
-
-    $ python setup.py test
-    $ tox
-
-   To get flake8 and tox, just pip install them into your virtualenv.
-
-7. Commit your changes and push your branch to GitHub::
+6. Run the test suite as described below, then commit and push your changes::
 
     $ git add .
-    $ git commit -m "Your detailed description of your changes."
+    $ git commit -m "Your detailed description of your changes"
     $ git push origin name-of-your-bugfix-or-feature
 
-8. Submit a pull request through the GitHub website.
+7. Submit a pull request through the GitHub website.
+
+Testing
+-------
+
+Run the complete test suite from the repository root::
+
+    $ python -m pytest
+
+During development, you can run a single test file or test by node ID::
+
+    $ python -m pytest tests/test_solvers_dispatch.py
+    $ python -m pytest tests/test_solvers_dispatch.py::test_build_op_rejects_unknown_backend
+
+Tests that exercise integration between solver components use the
+``integration`` marker. Run only those tests, or exclude them, with::
+
+    $ python -m pytest -m integration
+    $ python -m pytest -m "not integration"
+
+Register any new custom pytest marker in ``pyproject.toml`` so that pytest can
+validate it and does not emit ``PytestUnknownMarkWarning``.
 
 Pull Request Guidelines
 -----------------------
 
 Before you submit a pull request, check that it meets these guidelines:
 
-1. The pull request should include tests.
+1. The pull request should include tests for behavior changes and bug fixes.
 2. If the pull request adds functionality, the docs should be updated. Put
    your new functionality into a function with a docstring, and add the
    feature to the list in README.rst.
-3. The pull request should work for Python 2.7, 3.3, 3.4, 3.5 and for PyPy. Check
-   https://travis-ci.org/mrakitin/edrixs/pull_requests
-   and make sure that the tests pass for all supported Python versions.
+3. Run the full test suite and pre-commit checks before submitting the pull
+   request.
+4. Make sure the continuous-integration checks pass on all supported Python
+   versions.
