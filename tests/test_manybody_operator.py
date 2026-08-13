@@ -199,3 +199,54 @@ def test_one_fermion_annihilation_removes_one_particle():
             assert np.allclose(ann[:, j], 0)
         else:
             assert not np.allclose(ann[:, j], 0)
+
+
+# --- Independent regression oracles ---
+
+def test_one_fermion_annihilation_exact_matrix_and_fermionic_sign():
+    """Pin both destination rows and signs for an interior orbital."""
+    lb = get_fock_bin_by_N(3, 1)
+    rb = get_fock_bin_by_N(3, 2)
+    expected = np.array([
+        [-1, 0, 0],
+        [0, 0, 0],
+        [0, 0, 1],
+    ], dtype=complex)
+    assert np.allclose(one_fermion_annihilation(1, lb, rb), expected)
+
+
+def test_two_fermion_single_hop_exact_matrix_element():
+    """A single coefficient must land in the correct many-body matrix entry."""
+    basis = get_fock_bin_by_N(3, 1)
+    emat = np.zeros((3, 3), dtype=complex)
+    emat[0, 1] = 2.0 + 0.5j
+    expected = np.zeros((3, 3), dtype=complex)
+    expected[0, 1] = emat[0, 1]
+    assert np.allclose(two_fermion(emat, basis), expected)
+
+
+def test_density_matrix_offdiagonal_exact_sign_and_destination():
+    """Pin an off-diagonal density operator where the fermionic sign is negative."""
+    basis = get_fock_bin_by_N(3, 2)
+    expected = np.zeros((3, 3), dtype=complex)
+    expected[0, 2] = -1.0
+    assert np.allclose(density_matrix(0, 2, basis, basis), expected)
+
+
+def test_four_fermion_exact_single_matrix_element():
+    """A nonzero four-fermion tensor term must not collapse to a zero matrix."""
+    basis = get_fock_bin_by_N(4, 2)
+    umat = np.zeros((4, 4, 4, 4), dtype=complex)
+    umat[2, 3, 1, 0] = 1.75
+    expected = np.zeros((len(basis), len(basis)), dtype=complex)
+    expected[-1, 0] = 1.75
+    assert np.allclose(four_fermion(umat, basis), expected)
+
+
+def test_known_diagonal_one_body_spectrum():
+    """Use a model with an analytically known two-particle spectrum."""
+    basis = get_fock_bin_by_N(4, 2)
+    emat = np.diag([-3.0, -1.0, 2.0, 7.0])
+    evals = np.sort(np.linalg.eigvalsh(two_fermion(emat, basis)))
+    expected = np.sort([-4.0, -1.0, 4.0, 1.0, 6.0, 9.0])
+    assert np.allclose(evals, expected)

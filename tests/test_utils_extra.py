@@ -330,3 +330,38 @@ def test_get_atom_data_soc_nonzero():
     """SOC for Ni 3d shell is non-zero."""
     res = edrixs.get_atom_data('Ni', v_name='3d', v_noccu=8)
     assert res['v_soc_i'][0] > 0
+
+
+# --- Independent regression oracles added after review ---
+
+def test_boltz_dist_two_level_exact_ratio():
+    """Pin the quantitative Boltzmann factor, not only normalization/order."""
+    energies = [0.0, 0.25]
+    temperature = 300.0
+    kb = 8.6173303e-5
+    dist = boltz_dist(energies, temperature)
+    assert np.isclose(dist[1] / dist[0], np.exp(-0.25 / (kb * temperature)))
+
+
+def test_UJ_to_UdJH_matches_explicit_formula():
+    """An explicit formula prevents mutually-wrong inverse functions from passing."""
+    U, J = 4.0, 0.8
+    F2 = J / (3.0 / 49.0 + 20.0 * 0.625 / 441.0)
+    F4 = 0.625 * F2
+    expected = (U - 4.0 / 49.0 * (F2 + F4), (F2 + F4) / 14.0)
+    assert np.allclose(UJ_to_UdJH(U, J), expected)
+
+
+def test_UdJH_to_F0F2F4_pins_F4_over_F2_ratio():
+    """Roundtrip tests alone do not constrain the conventional F4/F2 ratio."""
+    F0, F2, F4 = UdJH_to_F0F2F4(4.0, 0.8)
+    assert np.isclose(F0, 4.0)
+    assert np.isclose(F4 / F2, 0.625)
+
+
+def test_UdJH_to_F0F2F4F6_pins_standard_ratios():
+    """Pin both f-shell Slater-integral ratios used by the conversion."""
+    F0, F2, F4, F6 = UdJH_to_F0F2F4F6(5.0, 1.0)
+    assert np.isclose(F0, 5.0)
+    assert np.isclose(F4 / F2, 451.0 / 675.0)
+    assert np.isclose(F6 / F2, 1001.0 / 2025.0)

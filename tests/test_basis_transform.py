@@ -147,3 +147,78 @@ def test_tmat_c2r_round_trip_operator():
     Tr2c = tmat_r2c('d')
     op_prime = cb_op(cb_op(op, Tc2r), Tr2c)
     assert np.allclose(op_prime, op)
+
+
+# --- Independent regression oracles ---
+
+def test_tmat_c2r_p_known_coefficients():
+    """Pin the p-shell spherical-to-real convention, including phases."""
+    s2 = np.sqrt(2.0)
+    expected = np.array([
+        [1 / s2, 1j / s2, 0],
+        [0, 0, 1],
+        [-1 / s2, 1j / s2, 0],
+    ], dtype=complex)
+    assert np.allclose(tmat_c2r('p'), expected)
+
+
+def test_tmat_c2r_d_known_coefficients():
+    """Pin d-orbital ordering and phases, which unitarity alone cannot detect."""
+    s2 = np.sqrt(2.0)
+    expected = np.zeros((5, 5), dtype=complex)
+    expected[2, 0] = 1
+    expected[1, 1], expected[3, 1] = 1 / s2, -1 / s2
+    expected[1, 2], expected[3, 2] = 1j / s2, 1j / s2
+    expected[0, 3], expected[4, 3] = 1 / s2, 1 / s2
+    expected[0, 4], expected[4, 4] = 1j / s2, -1j / s2
+    assert np.allclose(tmat_c2r('d'), expected)
+
+
+def test_tmat_r2cub_f_known_coefficients():
+    """Pin representative f cubic-harmonic coefficients."""
+    T = tmat_r2cub_f()
+    assert np.isclose(T[1, 0], -np.sqrt(6.0) / 4)
+    assert np.isclose(T[5, 0], np.sqrt(10.0) / 4)
+    assert np.isclose(T[0, 2], 1.0)
+    assert np.isclose(T[4, 6], 1.0)
+
+
+def test_tmat_c2j_l1_known_clebsch_gordan_coefficients():
+    """Pin representative Clebsch-Gordan coefficients and basis ordering."""
+    T = tmat_c2j(1)
+    assert np.isclose(T[0, 0], -np.sqrt(2.0 / 3.0))
+    assert np.isclose(T[3, 0], np.sqrt(1.0 / 3.0))
+    assert np.isclose(T[1, 2], 1.0)
+    assert np.isclose(T[4, 5], 1.0)
+
+
+def test_cb_op_matches_independent_matrix_formula_with_distinct_transforms():
+    """Use an explicit oracle rather than another call to cb_op."""
+    op = np.array([[1 + 2j, 2 - 1j], [3 + 0.5j, -4j]])
+    TL = np.array([[0, 1], [1, 0]], dtype=complex)
+    TR = np.array([[1, 0], [0, 1j]], dtype=complex)
+    expected = TL.conj().T @ op @ TR
+    assert np.allclose(cb_op(op, TL, TR), expected)
+    assert np.allclose(cb_op2(op, TL, TR), expected)
+
+
+def test_cb_op_batch_matches_independent_matrix_formula():
+    """Batch behavior is checked against NumPy, not scalar cb_op calls."""
+    ops = np.array([
+        [[1, 2j], [3, 4]],
+        [[-1j, 2], [0.5, 3j]],
+    ], dtype=complex)
+    T = np.array([[1, 1], [1, -1]], dtype=complex) / np.sqrt(2)
+    expected = np.stack([T.conj().T @ op @ T for op in ops])
+    assert np.allclose(cb_op(ops, T), expected)
+
+
+def test_transform_utensor_nonidentity_matches_einsum_oracle():
+    """A nonidentity rank-4 transform catches a no-op implementation."""
+    umat = np.zeros((2, 2, 2, 2), dtype=complex)
+    umat[0, 1, 1, 0] = 2.0 + 0.5j
+    umat[1, 0, 0, 1] = -1.0j
+    T = np.array([[1, 1], [1j, -1j]], dtype=complex) / np.sqrt(2)
+    expected = np.einsum('ai,bj,abcd,ck,dl->ijkl',
+                         T.conj(), T.conj(), umat, T, T)
+    assert np.allclose(transform_utensor(umat, T), expected)

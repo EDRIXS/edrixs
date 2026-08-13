@@ -211,3 +211,46 @@ def test_cf_tetragonal_d_reduces_to_cubic_when_distortion_zero():
     cf_tet = edrixs.cf_tetragonal_d(ten_dq, 0.0, 0.0)
     cf_cub = edrixs.cf_cubic_d(ten_dq)
     assert np.allclose(cf_tet, cf_cub)
+
+
+# --- Independent regression oracles ---
+
+def test_euler_to_rmat_known_quarter_turn_about_z():
+    """A nonzero known rotation catches an implementation that always returns I."""
+    expected = np.array([[0.0, -1.0, 0.0],
+                         [1.0, 0.0, 0.0],
+                         [0.0, 0.0, 1.0]])
+    assert np.allclose(edrixs.euler_to_rmat(np.pi / 2, 0.0, 0.0), expected)
+
+
+def test_dmat_spinor_known_quarter_turn_about_z():
+    """Pin the spinor phase convention for a simple nonzero rotation."""
+    phase = np.exp(-1j * np.pi / 4)
+    expected = np.diag([phase, np.conj(phase)])
+    assert np.allclose(edrixs.dmat_spinor(np.pi / 2, 0.0, 0.0), expected)
+
+
+def test_zx_to_rmat_nontrivial_axes_and_normalization():
+    """Nonstandard nonunit axes catch an identity-only implementation."""
+    expected = np.array([[1.0, 0.0, 0.0],
+                         [0.0, 0.0, 1.0],
+                         [0.0, -1.0, 0.0]])
+    assert np.allclose(edrixs.zx_to_rmat([0, 2, 0], [3, 0, 0]), expected)
+
+
+@pytest.mark.parametrize("name", ["get_lx", "get_ly", "get_lz"])
+def test_orbital_operator_spin_embedding_matches_spinless_blocks(name):
+    """ispin=True must duplicate the actual operator, not merely have the right shape."""
+    op = getattr(edrixs, name)(2)
+    op_spin = getattr(edrixs, name)(2, ispin=True)
+    assert np.allclose(op_spin[0::2, 0::2], op)
+    assert np.allclose(op_spin[1::2, 1::2], op)
+    assert np.allclose(op_spin[0::2, 1::2], 0)
+    assert np.allclose(op_spin[1::2, 0::2], 0)
+
+
+def test_cf_tetragonal_d_nonzero_distortion_spectrum():
+    """A fixed distorted case catches implementations that ignore d1 and d3."""
+    evals = np.sort(np.linalg.eigvalsh(edrixs.cf_tetragonal_d(2.0, 0.7, -0.4)))
+    expected = np.sort([-1.3] * 4 + [-0.6] * 2 + [1.4] * 2 + [1.8] * 2)
+    assert np.allclose(evals, expected)

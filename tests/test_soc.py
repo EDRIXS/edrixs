@@ -113,3 +113,30 @@ def test_soc_f_eigenvalues():
     #       = (8/4 - 48/4)/2... wait: (35/4 - 48/4 - 3/4)/2 = (-16/4)/2 = -2
     expected = np.sort([-2 * soc] * 6 + [3 * soc / 2] * 8)
     assert np.allclose(evals, expected, atol=1e-10)
+
+
+# --- Independent regression oracles ---
+
+@pytest.mark.parametrize("case,ll", [('p', 1), ('d', 2), ('f', 3)])
+def test_soc_matches_L_dot_S_in_repository_basis(case, ll):
+    """Pin SOC eigenvectors/basis convention, not only its eigenvalue spectrum."""
+    import edrixs
+    soc = 0.37
+    expected = soc * (
+        edrixs.get_lx(ll, ispin=True) @ edrixs.get_sx(ll)
+        + edrixs.get_ly(ll, ispin=True) @ edrixs.get_sy(ll)
+        + edrixs.get_lz(ll, ispin=True) @ edrixs.get_sz(ll)
+    )
+    assert np.allclose(atom_hsoc(case, soc), expected)
+
+
+def test_t2g_soc_matches_negative_effective_L_dot_S():
+    """Pin the T-P-equivalence sign and basis convention for t2g."""
+    import edrixs
+    soc = 0.29
+    expected = -soc * (
+        edrixs.get_lx(1, ispin=True) @ edrixs.get_sx(1)
+        + edrixs.get_ly(1, ispin=True) @ edrixs.get_sy(1)
+        + edrixs.get_lz(1, ispin=True) @ edrixs.get_sz(1)
+    )
+    assert np.allclose(atom_hsoc('t2g', soc), expected)

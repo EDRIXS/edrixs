@@ -172,3 +172,43 @@ def test_umat_slater_low_level_zero_fk():
     fk = {(0, 1, 1, 1, 1): 0.0, (2, 1, 1, 1, 1): 0.0, (4, 1, 1, 1, 1): 0.0}
     umat = umat_slater([2], fk)
     assert np.allclose(umat, 0)
+
+
+# --- Independent regression oracles ---
+
+def test_gaunt_s_shell_exact_value():
+    """The simplest Gaunt coefficient is exactly one, so all-zero output must fail."""
+    g = get_gaunt(0, 0)
+    assert g.shape == (1, 1, 1)
+    assert np.isclose(g[0, 0, 0], 1.0)
+
+
+def test_gaunt_p_shell_k0_is_identity():
+    """For k=0 and equal l, C(l,l) is delta_m,m'."""
+    assert np.allclose(get_gaunt(1, 1)[0], np.eye(3))
+
+
+def test_umat_slater_s_shell_exact_opposite_spin_element():
+    """Pin a nonzero low-level Slater matrix element with an analytic value."""
+    f0 = 4.0
+    umat = get_umat_slater('s', f0)
+    assert np.isclose(umat[0, 1, 1, 0], f0 / 2.0)
+    assert np.isclose(umat[1, 0, 0, 1], f0 / 2.0)
+
+
+def test_umat_slater_d_shell_pure_F0_exact_element():
+    """Pure F0 gives a simple nonzero d-shell element independent of F2/F4."""
+    f0 = 5.0
+    umat = get_umat_slater('d', f0, 0.0, 0.0)
+    assert np.isclose(umat[0, 1, 1, 0], f0 / 2.0)
+
+
+def test_umat_kanamori_ge_selected_matrix_elements():
+    """Pin density, spin-flip and pair-hopping terms of the general interaction."""
+    U1, U2, J, Jx, Jp = 3.0, 2.5, 0.5, 0.4, 0.3
+    umat = get_umat_kanamori_ge(4, U1, U2, J, Jx, Jp)
+    assert np.isclose(umat[0, 1, 1, 0], U1)
+    assert np.isclose(umat[0, 2, 2, 0], U2 - J)
+    assert np.isclose(umat[0, 3, 3, 0], U2)
+    assert np.isclose(umat[0, 3, 2, 1], -Jx)
+    assert np.isclose(umat[0, 1, 3, 2], Jp)
