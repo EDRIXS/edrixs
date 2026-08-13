@@ -5,6 +5,7 @@ from .fit_hyb import *
 from .fock_basis import *
 from .iostream import *
 from .manybody_operator import *
+from .models import *
 from .photon_transition import *
 from .plot_spectrum import *
 from .rixs_utils import *

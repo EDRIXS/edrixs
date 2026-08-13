@@ -1,30 +1,28 @@
-__all__ = [
-    'setup_1v1c', 'ops', 'ed_krylov_scipy', 'xas_krylov_scipy',
-    'rixs_krylov_scipy',
-    'setup_2v1c', 'setup_siam',
-    'ed_1v1c_py', 'xas_1v1c_py', 'rixs_1v1c_py',
-    'ed_1v1c_fort', 'xas_1v1c_fort', 'rixs_1v1c_fort',
-    'ed_2v1c_fort', 'xas_2v1c_fort', 'rixs_2v1c_fort',
-    'ed_siam_fort', 'xas_siam_fort', 'rixs_siam_fort'
-]
+"""Backend-neutral solver interface and deprecated legacy workflows.
+
+Physical model construction lives in :mod:`edrixs.models`. Numerical operator
+construction and spectral solvers are implemented in ``*_backend.py`` modules.
+"""
+
+from __future__ import annotations
+
+import warnings
 
 import numpy as np
 import scipy
-from scipy.sparse.linalg import aslinearoperator, lobpcg
-import multiprocessing as mp
-import warnings
-from concurrent.futures import ProcessPoolExecutor, as_completed
 
 from .iostream import (
     write_tensor, write_emat, write_umat, write_config, read_poles_from_file
 )
 from .angular_momentum import (
-    get_sx, get_sy, get_sz, get_lx, get_ly, get_lz, rmat_to_euler, get_wigner_dmat
+    get_sx, get_sy, get_sz, get_lx, get_ly, get_lz,
+    rmat_to_euler, get_wigner_dmat,
 )
 from .photon_transition import (
-    get_trans_oper, quadrupole_polvec, dipole_polvec_xas, dipole_polvec_rixs, unit_wavevector
+    get_trans_oper, quadrupole_polvec, dipole_polvec_xas,
+    dipole_polvec_rixs, unit_wavevector,
 )
-from .coulomb_utensor import get_umat_slater, get_umat_slater_3shells
+from .coulomb_utensor import get_umat_slater
 from .manybody_operator import two_fermion, four_fermion
 from .fock_basis import get_fock_bin_by_N, write_fock_dec_by_N
 from .basis_transform import cb_op2, tmat_r2c, cb_op
@@ -32,1271 +30,277 @@ from .utils import info_atomic_shell, slater_integrals_name, boltz_dist
 from .rixs_utils import scattering_mat
 from .plot_spectrum import get_spectra_from_poles, merge_pole_dicts
 from .soc import atom_hsoc
-from .manybody_operator_csr import (
-    two_fermion_csr, four_fermion_csr_auto, get_fock_basis_int
-)
-
+from .petsc_backend import petsc_backend
+from .scipy_backend import scipy_backend
 from ._solvers_helpers import (
-    _apply_linear_combination,
-    _available_cpu_count,
-    _check_adjoint_action,
     _ed_1or2_valence_1core,
-    _embed_impurity_core_umat,
-    _embed_impurity_core_umat_sparse,
-    _expand_broadening,
-    _init_rixs_worker,
-    _operator_for_process_pool,
-    _pole_dict_from_records,
+    _infer_backend,
     _rixs_1or2_valence_1core,
-    _rixs_krylov_one_contribution_scipy,
-    _rixs_polarization_vectors,
-    _rixs_pool_job,
-    _rotated_transition_blocks,
-    _umat_dense_to_sparse,
-    _valence_zeeman_matrix,
     _xas_1or2_valence_1core,
-    _xas_poles_from_start_vectors,
 )
 
+__all__ = [
+    # Backend-neutral staged interface.
+    'build_op', 'get_ops', 'ed', 'xas', 'rixs',
 
-def setup_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
-               v_noccu=1, slater=None, ext_B=None, on_which='spin',
-               v_cfmat=None, v_othermat=None, loc_axis=None, verbose=0,
-               sparse_U=False, tol=1E-10):
+    # Legacy dense-Python interface.
+    'ed_1v1c_py', 'xas_1v1c_py', 'rixs_1v1c_py',
+
+    # Legacy Fortran interface.
+    'ed_1v1c_fort', 'xas_1v1c_fort', 'rixs_1v1c_fort',
+    'ed_2v1c_fort', 'xas_2v1c_fort', 'rixs_2v1c_fort',
+    'ed_siam_fort', 'xas_siam_fort', 'rixs_siam_fort',
+]
+
+
+# -----------------------------------------------------------------------------
+# Backend-neutral staged interface
+# -----------------------------------------------------------------------------
+
+
+def build_op(emat, umat, lb, rb=None, *, backend='scipy', backend_kws=None):
     """
-    Set up orbital-space data and Fock bases for a 1v1c problem.
-
-    This routine defines the physical one-valence-shell/one-core-shell problem
-    independently of the numerical backend. It constructs the one-body orbital
-    matrices, Coulomb tensors, Fock bases, and orbital-space transition
-    matrices, but it does not build many-body Hamiltonians and does not
-    diagonalize anything.
+    Build a many-body operator with the selected backend.
 
     Parameters
     ----------
-    shell_name : tuple of str
-        Names of the valence and core shells.
-
-    shell_level, v_soc, c_soc, v_noccu, slater, ext_B, on_which,
-    v_cfmat, v_othermat, loc_axis, verbose
-        Same physical model parameters as ed_1v1c_py.
-
-    sparse_U : bool, optional
-        If False, return dense rank-4 Coulomb tensors. If True, return each
-        Coulomb tensor as a sparse matrix with shape (ntot*ntot, ntot*ntot),
-        using the flattened convention
-        row = lorb * ntot + korb and col = jorb * ntot + iorb.
-
-    tol : float, optional
-        Threshold used when converting dense Coulomb tensors to sparse format.
+    emat : array-like or None
+        Coefficients of the one-body part. Pass ``None`` when the operator has
+        no one-body contribution.
+    umat : array-like, sparse matrix, or None
+        Coefficients of the two-body part. Pass ``None`` when the operator has
+        no two-body contribution.
+    lb : FockBasis
+        Basis for the output (left) many-body space.
+    rb : FockBasis or None, optional
+        Basis for the input (right) many-body space. When omitted, ``lb`` is
+        used for both sides.
+    backend : str, optional
+        Backend name. The default is ``'scipy'``.
+    backend_kws : mapping, optional
+        Backend-specific construction options. For the SciPy backend this
+        includes ``tol``.
 
     Returns
     -------
-    emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
-        Backend-independent problem definition. trans_mat has shape
-        (npol, ntot, ntot).
+    operator
+        Many-body operator in the representation owned by ``backend``.
     """
-    print("edrixs >>> Setting up 1v1c problem ...")
-
-    v_name_options = ['s', 'p', 't2g', 'd', 'f']
-    c_name_options = ['s', 'p', 'p12', 'p32', 't2g', 'd', 'd32', 'd52',
-                      'f', 'f52', 'f72']
-
-    v_name = shell_name[0].strip()
-    c_name = shell_name[1].strip()
-
-    if v_name not in v_name_options:
-        raise Exception("NOT supported type of valence shell: ", v_name)
-    if c_name not in c_name_options:
-        raise Exception("NOT supported type of core shell: ", c_name)
-
-    info_shell = info_atomic_shell()
-
-    v_orbl = info_shell[v_name][0]
-    v_norb = info_shell[v_name][1]
-    c_norb = info_shell[c_name][1]
-    ntot = v_norb + c_norb
-
-    emat_i = np.zeros((ntot, ntot), dtype=complex)
-    emat_n = np.zeros((ntot, ntot), dtype=complex)
-
-    # Coulomb interaction.
-    slater_name = slater_integrals_name((v_name, c_name), ('v', 'c'))
-    nslat = len(slater_name)
-
-    slater_i = np.zeros(nslat, dtype=float)
-    slater_n = np.zeros(nslat, dtype=float)
-
-    if slater is not None:
-        if nslat > len(slater[0]):
-            slater_i[0:len(slater[0])] = slater[0]
-        else:
-            slater_i[:] = slater[0][0:nslat]
-
-        if nslat > len(slater[1]):
-            slater_n[0:len(slater[1])] = slater[1]
-        else:
-            slater_n[:] = slater[1][0:nslat]
-
-    print()
-    print("    Summary of Slater integrals:")
-    print("    ------------------------------")
-    print("    Terms,   Initial Hamiltonian,  Intermediate Hamiltonian")
-    for i in range(nslat):
-        print("    ", slater_name[i], ":  {:20.10f}{:20.10f}".format(
-            slater_i[i], slater_n[i]
-        ))
-    print()
-
-    case = v_name + c_name
-    umat_i = get_umat_slater(case, *slater_i)
-    umat_n = get_umat_slater(case, *slater_n)
-
-    if verbose > 0:
-        write_umat(umat_i, 'coulomb_i.in')
-        write_umat(umat_n, 'coulomb_n.in')
-
-    if sparse_U:
-        umat_i = _umat_dense_to_sparse(umat_i, tol=tol)
-        umat_n = _umat_dense_to_sparse(umat_n, tol=tol)
-
-    # Spin-orbit coupling.
-    if v_soc is not None:
-        emat_i[0:v_norb, 0:v_norb] += atom_hsoc(v_name, v_soc[0])
-        emat_n[0:v_norb, 0:v_norb] += atom_hsoc(v_name, v_soc[1])
-
-    # For split core shells such as p12/p32, d32/d52, f52/f72, the SOC is
-    # already encoded by the shell choice.
-    if c_name in ['p', 'd', 'f']:
-        emat_n[v_norb:ntot, v_norb:ntot] += atom_hsoc(c_name, c_soc)
-
-    # Crystal field and additional one-body terms.
-    if v_cfmat is not None:
-        emat_i[0:v_norb, 0:v_norb] += np.asarray(v_cfmat)
-        emat_n[0:v_norb, 0:v_norb] += np.asarray(v_cfmat)
-
-    if v_othermat is not None:
-        emat_i[0:v_norb, 0:v_norb] += np.asarray(v_othermat)
-        emat_n[0:v_norb, 0:v_norb] += np.asarray(v_othermat)
-
-    # Shell levels.
-    if shell_level is not None:
-        emat_i[0:v_norb, 0:v_norb] += np.eye(v_norb) * shell_level[0]
-        emat_i[v_norb:ntot, v_norb:ntot] += np.eye(c_norb) * shell_level[1]
-
-        emat_n[0:v_norb, 0:v_norb] += np.eye(v_norb) * shell_level[0]
-        emat_n[v_norb:ntot, v_norb:ntot] += np.eye(c_norb) * shell_level[1]
-
-    # External field on valence shell.
-    if v_name == 't2g':
-        lx, ly, lz = get_lx(1, True), get_ly(1, True), get_lz(1, True)
-        sx, sy, sz = get_sx(1), get_sy(1), get_sz(1)
-        lx, ly, lz = -lx, -ly, -lz
-    else:
-        lx, ly, lz = get_lx(v_orbl, True), get_ly(v_orbl, True), get_lz(v_orbl, True)
-        sx, sy, sz = get_sx(v_orbl), get_sy(v_orbl), get_sz(v_orbl)
-
-    if ext_B is not None:
-        if on_which.strip() == 'spin':
-            zeeman = ext_B[0] * (2 * sx) + ext_B[1] * (2 * sy) + ext_B[2] * (2 * sz)
-        elif on_which.strip() == 'orbital':
-            zeeman = ext_B[0] * lx + ext_B[1] * ly + ext_B[2] * lz
-        elif on_which.strip() == 'both':
-            zeeman = (
-                ext_B[0] * (lx + 2 * sx)
-                + ext_B[1] * (ly + 2 * sy)
-                + ext_B[2] * (lz + 2 * sz)
+    match backend:
+        case 'scipy':
+            build_op_backend = scipy_backend.build_op_scipy
+        case 'dense':
+            build_op_backend = scipy_backend.build_op_dense
+        case 'petsc':
+            build_op_backend = petsc_backend.build_op_petsc
+        case _:
+            raise ValueError(
+                "Unknown backend {!r}; expected 'scipy', 'dense', or "
+                "'petsc'".format(backend)
             )
-        else:
-            raise Exception("Unknown value of on_which", on_which)
 
-        emat_i[0:v_norb, 0:v_norb] += zeeman
-        emat_n[0:v_norb, 0:v_norb] += zeeman
-
-    if verbose > 0:
-        write_emat(emat_i, 'hopping_i.in')
-        write_emat(emat_n, 'hopping_n.in')
-
-    # Fock bases.
-    basis_i = get_fock_basis_int(v_norb, v_noccu, c_norb, c_norb)
-    basis_n = get_fock_basis_int(v_norb, v_noccu + 1, c_norb, c_norb - 1)
-
-    print("edrixs >>> Dimension of the initial Hamiltonian: ", len(basis_i))
-    print("edrixs >>> Dimension of the intermediate Hamiltonian: ", len(basis_n))
-
-    # Transition operators in local coordinates, rotated to global coordinates.
-    if loc_axis is not None:
-        local_axis = np.asarray(loc_axis)
-    else:
-        local_axis = np.eye(3)
-
-    tmp = get_trans_oper(case)
-    npol, n, m = tmp.shape
-    tmp_g = np.zeros((npol, n, m), dtype=complex)
-
-    if npol == 3:
-        for i in range(3):
-            for j in range(3):
-                tmp_g[i] += local_axis[i, j] * tmp[j]
-    elif npol == 5:
-        alpha, beta, gamma = rmat_to_euler(local_axis)
-        wignerD = get_wigner_dmat(4, alpha, beta, gamma)
-        rotmat = np.dot(
-            np.dot(tmat_r2c('d'), wignerD),
-            np.conj(np.transpose(tmat_r2c('d')))
-        )
-        for i in range(5):
-            for j in range(5):
-                tmp_g[i] += rotmat[i, j] * tmp[j]
-    else:
-        raise Exception("Have NOT implemented this case: ", npol)
-
-    trans_mat = np.zeros((npol, ntot, ntot), dtype=complex)
-    for i in range(npol):
-        trans_mat[i, 0:v_norb, v_norb:ntot] = tmp_g[i]
-
-    print("edrixs >>> 1v1c setup Done !")
-
-    return emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
+    return build_op_backend(
+        emat,
+        umat,
+        lb,
+        rb,
+        backend_kws=backend_kws,
+    )
 
 
-def setup_2v1c(
-    shell_name, *, shell_level=None,
-    v1_soc=None, v2_soc=None, c_soc=0, v_tot_noccu=1, slater=None,
-    v1_ext_B=None, v2_ext_B=None, v1_on_which='spin',
-    v2_on_which='spin', v1_cfmat=None, v2_cfmat=None,
-    v1_othermat=None, v2_othermat=None, hopping_v1v2=None,
-    trans_to_which=1, loc_axis=None, verbose=0, sparse_U=False, tol=1E-10
+def get_ops(
+    emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat, *,
+    backend='scipy', backend_kws=None,
 ):
     """
-    Set up orbital-space data and Fock bases for a 2v1c problem.
-
-    This is the backend-neutral setup analogue of the 2-valence-shell,
-    1-core-shell Fortran ED/RIXS input construction.  It does not build
-    many-body Hamiltonians and does not diagonalize anything. If sparse_U=True,
-    the returned Coulomb tensors are sparse flattened matrices rather than
-    dense rank-4 arrays.
-
-    Returns
-    -------
-    emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
-        These can be passed directly to ops(..., backend='scipy') or
-        ops(..., backend='dense').
-    """
-    print("edrixs >>> Setting up 2v1c problem ...")
-
-    v_name_options = ['s', 'p', 't2g', 'd', 'f']
-    c_name_options = [
-        's', 'p', 'p12', 'p32', 't2g', 'd', 'd32', 'd52',
-        'f', 'f52', 'f72'
-    ]
-
-    v1_name = shell_name[0].strip()
-    v2_name = shell_name[1].strip()
-    c_name = shell_name[2].strip()
-
-    if v1_name not in v_name_options:
-        raise Exception("NOT supported type of valence shell: ", v1_name)
-    if v2_name not in v_name_options:
-        raise Exception("NOT supported type of valence shell: ", v2_name)
-    if c_name not in c_name_options:
-        raise Exception("NOT supported type of core shell: ", c_name)
-
-    info_shell = info_atomic_shell()
-
-    v1_orbl = info_shell[v1_name][0]
-    v2_orbl = info_shell[v2_name][0]
-
-    v1_norb = info_shell[v1_name][1]
-    v2_norb = info_shell[v2_name][1]
-    c_norb = info_shell[c_name][1]
-
-    v1v2_norb = v1_norb + v2_norb
-    ntot = v1v2_norb + c_norb
-
-    slater_name = slater_integrals_name(
-        (v1_name, v2_name, c_name), ('v1', 'v2', 'c1')
-    )
-    nslat = len(slater_name)
-
-    slater_i = np.zeros(nslat, dtype=float)
-    slater_n = np.zeros(nslat, dtype=float)
-
-    if slater is not None:
-        if nslat > len(slater[0]):
-            slater_i[0:len(slater[0])] = slater[0]
-        else:
-            slater_i[:] = slater[0][0:nslat]
-
-        if nslat > len(slater[1]):
-            slater_n[0:len(slater[1])] = slater[1]
-        else:
-            slater_n[:] = slater[1][0:nslat]
-
-    print()
-    print("    Summary of Slater integrals:")
-    print("    ------------------------------")
-    print("    Terms,   Initial Hamiltonian,  Intermediate Hamiltonian")
-    for i in range(nslat):
-        print("    ", slater_name[i], ":  {:20.10f}{:20.10f}".format(
-            slater_i[i], slater_n[i]
-        ))
-    print()
-
-    umat_i = get_umat_slater_3shells(
-        (v1_name, v2_name, c_name), *slater_i
-    )
-    umat_n = get_umat_slater_3shells(
-        (v1_name, v2_name, c_name), *slater_n
-    )
-
-    if verbose > 0:
-        write_umat(umat_i, 'coulomb_i.in')
-        write_umat(umat_n, 'coulomb_n.in')
-
-    if sparse_U:
-        umat_i = _umat_dense_to_sparse(umat_i, tol=tol)
-        umat_n = _umat_dense_to_sparse(umat_n, tol=tol)
-
-    emat_i = np.zeros((ntot, ntot), dtype=complex)
-    emat_n = np.zeros((ntot, ntot), dtype=complex)
-
-    # Spin-orbit coupling.
-    if v1_soc is not None and v1_name in ['p', 'd', 't2g', 'f']:
-        emat_i[0:v1_norb, 0:v1_norb] += atom_hsoc(v1_name, v1_soc[0])
-        emat_n[0:v1_norb, 0:v1_norb] += atom_hsoc(v1_name, v1_soc[1])
-
-    if v2_soc is not None and v2_name in ['p', 'd', 't2g', 'f']:
-        emat_i[v1_norb:v1v2_norb, v1_norb:v1v2_norb] += atom_hsoc(
-            v2_name, v2_soc[0]
-        )
-        emat_n[v1_norb:v1v2_norb, v1_norb:v1v2_norb] += atom_hsoc(
-            v2_name, v2_soc[1]
-        )
-
-    if c_name in ['p', 'd', 'f']:
-        emat_n[v1v2_norb:ntot, v1v2_norb:ntot] += atom_hsoc(
-            c_name, c_soc
-        )
-
-    # Crystal fields.
-    if v1_cfmat is not None:
-        emat_i[0:v1_norb, 0:v1_norb] += np.asarray(v1_cfmat)
-        emat_n[0:v1_norb, 0:v1_norb] += np.asarray(v1_cfmat)
-
-    if v2_cfmat is not None:
-        emat_i[v1_norb:v1v2_norb, v1_norb:v1v2_norb] += np.asarray(
-            v2_cfmat
-        )
-        emat_n[v1_norb:v1v2_norb, v1_norb:v1v2_norb] += np.asarray(
-            v2_cfmat
-        )
-
-    # Other one-body terms.
-    if v1_othermat is not None:
-        emat_i[0:v1_norb, 0:v1_norb] += np.asarray(v1_othermat)
-        emat_n[0:v1_norb, 0:v1_norb] += np.asarray(v1_othermat)
-
-    if v2_othermat is not None:
-        emat_i[v1_norb:v1v2_norb, v1_norb:v1v2_norb] += np.asarray(
-            v2_othermat
-        )
-        emat_n[v1_norb:v1v2_norb, v1_norb:v1v2_norb] += np.asarray(
-            v2_othermat
-        )
-
-    # Shell levels.  Since the setup/ops route keeps the core orbitals in the
-    # Fock basis, the filled core contribution is represented explicitly.
-    if shell_level is not None:
-        emat_i[0:v1_norb, 0:v1_norb] += np.eye(v1_norb) * shell_level[0]
-        emat_n[0:v1_norb, 0:v1_norb] += np.eye(v1_norb) * shell_level[0]
-
-        emat_i[v1_norb:v1v2_norb, v1_norb:v1v2_norb] += (
-            np.eye(v2_norb) * shell_level[1]
-        )
-        emat_n[v1_norb:v1v2_norb, v1_norb:v1v2_norb] += (
-            np.eye(v2_norb) * shell_level[1]
-        )
-
-        emat_i[v1v2_norb:ntot, v1v2_norb:ntot] += (
-            np.eye(c_norb) * shell_level[2]
-        )
-        emat_n[v1v2_norb:ntot, v1v2_norb:ntot] += (
-            np.eye(c_norb) * shell_level[2]
-        )
-
-    # Zeeman fields.
-    for name, lval, ext_B, which, i1, i2 in [
-        (v1_name, v1_orbl, v1_ext_B, v1_on_which, 0, v1_norb),
-        (
-            v2_name, v2_orbl, v2_ext_B, v2_on_which,
-            v1_norb, v1v2_norb
-        )
-    ]:
-        if ext_B is None:
-            continue
-
-        zeeman = _valence_zeeman_matrix(name, lval, ext_B, which)
-        emat_i[i1:i2, i1:i2] += zeeman
-        emat_n[i1:i2, i1:i2] += zeeman
-
-    # Hopping between the two valence shells.
-    if hopping_v1v2 is not None:
-        hopping_v1v2 = np.asarray(hopping_v1v2)
-        emat_i[0:v1_norb, v1_norb:v1v2_norb] += hopping_v1v2
-        emat_i[v1_norb:v1v2_norb, 0:v1_norb] += np.conj(
-            np.transpose(hopping_v1v2)
-        )
-
-        emat_n[0:v1_norb, v1_norb:v1v2_norb] += hopping_v1v2
-        emat_n[v1_norb:v1v2_norb, 0:v1_norb] += np.conj(
-            np.transpose(hopping_v1v2)
-        )
-
-    if verbose > 0:
-        write_emat(emat_i, 'hopping_i.in')
-        write_emat(emat_n, 'hopping_n.in')
-
-    basis_i = get_fock_basis_int(
-        v1v2_norb, v_tot_noccu, c_norb, c_norb
-    )
-    basis_n = get_fock_basis_int(
-        v1v2_norb, v_tot_noccu + 1, c_norb, c_norb - 1
-    )
-
-    print("edrixs >>> Dimension of the initial Hamiltonian: ", len(basis_i))
-    print("edrixs >>> Dimension of the intermediate Hamiltonian: ", len(basis_n))
-
-    if trans_to_which == 1:
-        case = v1_name + c_name
-        tmp_g = _rotated_transition_blocks(case, loc_axis)
-        trans_mat = np.zeros((tmp_g.shape[0], ntot, ntot), dtype=complex)
-        trans_mat[:, 0:v1_norb, v1v2_norb:ntot] = tmp_g
-    elif trans_to_which == 2:
-        case = v2_name + c_name
-        tmp_g = _rotated_transition_blocks(case, loc_axis)
-        trans_mat = np.zeros((tmp_g.shape[0], ntot, ntot), dtype=complex)
-        trans_mat[:, v1_norb:v1v2_norb, v1v2_norb:ntot] = tmp_g
-    else:
-        raise Exception("Unknown trans_to_which: ", trans_to_which)
-
-    print("edrixs >>> 2v1c setup Done !")
-
-    return emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
-
-
-def setup_siam(
-    shell_name, nbath, *, siam_type=0, v_noccu=1, static_core_pot=0,
-    c_level=0, c_soc=0, trans_c2n=None, imp_mat=None, imp_mat_n=None,
-    bath_level=None, bath_level_n=None, hyb=None, hyb_n=None,
-    hopping=None, hopping_n=None, slater=None, ext_B=None,
-    on_which='spin', loc_axis=None, verbose=0, sparse_U=False, tol=1E-10
-):
-    """
-    Set up orbital-space data and Fock bases for a SIAM problem.
-
-    This is the backend-neutral setup analogue of ed_siam_fort. It does not
-    search over occupancies, does not build many-body Hamiltonians, and does not
-    diagonalize anything. The occupancy is the supplied v_noccu. If
-    sparse_U=True, the impurity+core Coulomb tensor is embedded directly into
-    the full SIAM orbital space as a sparse flattened matrix.
-
-    Returns
-    -------
-    emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
-        These can be passed directly to ops(..., backend='scipy') or
-        ops(..., backend='dense').
-    """
-    print("edrixs >>> Setting up SIAM problem ...")
-
-    v_name_options = ['s', 'p', 't2g', 'd', 'f']
-    c_name_options = [
-        's', 'p', 'p12', 'p32', 't2g', 'd', 'd32', 'd52',
-        'f', 'f52', 'f72'
-    ]
-
-    v_name = shell_name[0].strip()
-    c_name = shell_name[1].strip()
-
-    if v_name not in v_name_options:
-        raise Exception("NOT supported type of valence shell: ", v_name)
-    if c_name not in c_name_options:
-        raise Exception("NOT supported type of core shell: ", c_name)
-
-    info_shell = info_atomic_shell()
-
-    v_orbl = info_shell[v_name][0]
-    v_norb = info_shell[v_name][1]
-    c_norb = info_shell[c_name][1]
-
-    ntot_v = v_norb * (nbath + 1)
-    ntot = ntot_v + c_norb
-
-    slater_name = slater_integrals_name((v_name, c_name), ('v', 'c'))
-    nslat = len(slater_name)
-
-    slater_i = np.zeros(nslat, dtype=float)
-    slater_n = np.zeros(nslat, dtype=float)
-
-    if slater is not None:
-        if nslat > len(slater[0]):
-            slater_i[0:len(slater[0])] = slater[0]
-        else:
-            slater_i[:] = slater[0][0:nslat]
-
-        if nslat > len(slater[1]):
-            slater_n[0:len(slater[1])] = slater[1]
-        else:
-            slater_n[:] = slater[1][0:nslat]
-
-    print()
-    print("    Summary of Slater integrals:")
-    print("    ------------------------------")
-    print("    Terms,   Initial Hamiltonian,  Intermediate Hamiltonian")
-    for i in range(nslat):
-        print("    ", slater_name[i], ":  {:20.10f}{:20.10f}".format(
-            slater_i[i], slater_n[i]
-        ))
-    print()
-
-    umat_tmp_i = get_umat_slater(v_name + c_name, *slater_i)
-    umat_tmp_n = get_umat_slater(v_name + c_name, *slater_n)
-
-    if sparse_U:
-        umat_i = _embed_impurity_core_umat_sparse(
-            umat_tmp_i, v_norb, c_norb, ntot_v, tol=tol
-        )
-        umat_n = _embed_impurity_core_umat_sparse(
-            umat_tmp_n, v_norb, c_norb, ntot_v, tol=tol
-        )
-    else:
-        umat_i = _embed_impurity_core_umat(
-            umat_tmp_i, v_norb, c_norb, ntot_v
-        )
-        umat_n = _embed_impurity_core_umat(
-            umat_tmp_n, v_norb, c_norb, ntot_v
-        )
-
-    if verbose > 0:
-        write_umat(umat_i, 'coulomb_i.in')
-        write_umat(umat_n, 'coulomb_n.in')
-
-    emat_i = np.zeros((ntot, ntot), dtype=complex)
-    emat_n = np.zeros((ntot, ntot), dtype=complex)
-
-    if siam_type == 1:
-        if hopping is not None:
-            emat_i[0:ntot_v, 0:ntot_v] += np.asarray(hopping)
-
-        if hopping_n is not None:
-            emat_n[0:ntot_v, 0:ntot_v] += np.asarray(hopping_n)
-        elif hopping is not None:
-            emat_n[0:ntot_v, 0:ntot_v] += np.asarray(hopping)
-
-    elif siam_type == 0:
-        if imp_mat is not None:
-            emat_i[0:v_norb, 0:v_norb] += np.asarray(imp_mat)
-
-        if imp_mat_n is not None:
-            emat_n[0:v_norb, 0:v_norb] += np.asarray(imp_mat_n)
-        elif imp_mat is not None:
-            emat_n[0:v_norb, 0:v_norb] += np.asarray(imp_mat)
-
-        if bath_level is not None:
-            for i in range(nbath):
-                for j in range(v_norb):
-                    idx = (i + 1) * v_norb + j
-                    emat_i[idx, idx] += bath_level[i, j]
-
-        if bath_level_n is not None:
-            for i in range(nbath):
-                for j in range(v_norb):
-                    idx = (i + 1) * v_norb + j
-                    emat_n[idx, idx] += bath_level_n[i, j]
-        elif bath_level is not None:
-            for i in range(nbath):
-                for j in range(v_norb):
-                    idx = (i + 1) * v_norb + j
-                    emat_n[idx, idx] += bath_level[i, j]
-
-        if hyb is not None:
-            for i in range(nbath):
-                for j in range(v_norb):
-                    idx1 = j
-                    idx2 = (i + 1) * v_norb + j
-                    emat_i[idx1, idx2] += hyb[i, j]
-                    emat_i[idx2, idx1] += np.conj(hyb[i, j])
-
-        if hyb_n is not None:
-            for i in range(nbath):
-                for j in range(v_norb):
-                    idx1 = j
-                    idx2 = (i + 1) * v_norb + j
-                    emat_n[idx1, idx2] += hyb_n[i, j]
-                    emat_n[idx2, idx1] += np.conj(hyb_n[i, j])
-        elif hyb is not None:
-            for i in range(nbath):
-                for j in range(v_norb):
-                    idx1 = j
-                    idx2 = (i + 1) * v_norb + j
-                    emat_n[idx1, idx2] += hyb[i, j]
-                    emat_n[idx2, idx1] += np.conj(hyb[i, j])
-
-    else:
-        raise Exception("Unknown siam_type: ", siam_type)
-
-    if c_name in ['p', 'd', 'f']:
-        emat_n[ntot_v:ntot, ntot_v:ntot] += atom_hsoc(c_name, c_soc)
-
-    # Static core-hole potential on the impurity in the intermediate state.
-    emat_n[0:v_norb, 0:v_norb] -= np.eye(v_norb) * static_core_pot
-
-    if trans_c2n is None:
-        trans_c2n = np.eye(v_norb, dtype=complex)
-    else:
-        trans_c2n = np.asarray(trans_c2n)
-
-    tmat = np.eye(ntot, dtype=complex)
-    for i in range(nbath + 1):
-        off = i * v_norb
-        tmat[off:off + v_norb, off:off + v_norb] = np.conj(
-            np.transpose(trans_c2n)
-        )
-
-    emat_i[:, :] = cb_op(emat_i, tmat)
-    emat_n[:, :] = cb_op(emat_n, tmat)
-
-    if ext_B is not None:
-        zeeman = _valence_zeeman_matrix(v_name, v_orbl, ext_B, on_which)
-        emat_i[0:v_norb, 0:v_norb] += zeeman
-        emat_n[0:v_norb, 0:v_norb] += zeeman
-
-    # Since the setup/ops route keeps the core orbitals in the Fock basis, the
-    # filled-core contribution is represented explicitly.
-    emat_i[ntot_v:ntot, ntot_v:ntot] += np.eye(c_norb) * c_level
-    emat_n[ntot_v:ntot, ntot_v:ntot] += np.eye(c_norb) * c_level
-
-    if verbose > 0:
-        write_emat(emat_i, 'hopping_i.in')
-        write_emat(emat_n, 'hopping_n.in')
-
-    basis_i = get_fock_basis_int(ntot_v, v_noccu, c_norb, c_norb)
-    basis_n = get_fock_basis_int(ntot_v, v_noccu + 1, c_norb, c_norb - 1)
-
-    print("edrixs >>> Dimension of the initial Hamiltonian: ", len(basis_i))
-    print("edrixs >>> Dimension of the intermediate Hamiltonian: ", len(basis_n))
-
-    tmp_g = _rotated_transition_blocks(v_name + c_name, loc_axis)
-    trans_mat = np.zeros((tmp_g.shape[0], ntot, ntot), dtype=complex)
-    trans_mat[:, 0:v_norb, ntot_v:ntot] = tmp_g
-
-    print("edrixs >>> SIAM setup Done !")
-
-    return emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
-
-
-def ops(emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
-        *, backend='scipy', tol=1E-10):
-    """
-    Build many-body Hamiltonians and transition operators for a backend.
+    Build initial/intermediate Hamiltonians and transition operators.
 
     Parameters
     ----------
     emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
-        Problem definition returned by setup_1v1c or a future setup_* routine.
-
+        Backend-neutral problem definition returned by :mod:`edrixs.models`
+        model functions.
     backend : {'scipy', 'dense'}, optional
-        Backend used for the returned many-body operators.
-
-        - 'scipy': return SciPy LinearOperator objects backed by CSR matrices.
-        - 'dense': return dense NumPy arrays. The dense backend currently
-          builds CSR matrices first and then converts them to dense arrays.
-
-    tol : float, optional
-        Threshold for ignoring small matrix/tensor elements.
+        Backend used for the returned operators. The default is ``'scipy'``.
+    backend_kws : mapping, optional
+        Backend-specific operator-construction options. For the SciPy and
+        dense compatibility backends this includes ``tol``.
 
     Returns
     -------
     hmat_i, hmat_n, trans_ops
-        Many-body initial/final Hamiltonian, intermediate Hamiltonian, and
-        transition operators for the selected backend.
+        Initial/final Hamiltonian, intermediate Hamiltonian, and transition
+        operators for the selected backend.
     """
-    if backend not in ('scipy', 'dense'):
-        raise ValueError("backend must be either 'scipy' or 'dense'")
+    hmat_i = build_op(
+        emat_i, umat_i, basis_i, backend=backend,
+        backend_kws=backend_kws,
+    )
+    hmat_n = build_op(
+        emat_n, umat_n, basis_n, backend=backend,
+        backend_kws=backend_kws,
+    )
 
-    print("edrixs >>> Building many-body operators with backend='{}' ...".format(backend))
-
-    hmat_i_sp = two_fermion_csr(emat_i, basis_i, basis_i, tol=tol)
-    hmat_i_sp = hmat_i_sp + four_fermion_csr_auto(umat_i, basis_i, tol=tol)
-
-    hmat_n_sp = two_fermion_csr(emat_n, basis_n, basis_n, tol=tol)
-    hmat_n_sp = hmat_n_sp + four_fermion_csr_auto(umat_n, basis_n, tol=tol)
-
-    trans_ops_sp = [
-        two_fermion_csr(trans_mat[i], basis_n, basis_i, tol=tol).tocsr()
-        for i in range(trans_mat.shape[0])
-    ]
-
-    hmat_i_sp = hmat_i_sp.tocsr()
-    hmat_n_sp = hmat_n_sp.tocsr()
-
-    print("edrixs >>> Many-body operator construction Done !")
-
-    if backend == 'scipy':
-        return (
-            aslinearoperator(hmat_i_sp),
-            aslinearoperator(hmat_n_sp),
-            [aslinearoperator(T) for T in trans_ops_sp],
+    trans_mat = np.asarray(trans_mat)
+    if trans_mat.ndim != 3:
+        raise ValueError("trans_mat must be a three-dimensional array")
+    trans_ops = [
+        build_op(
+            component,
+            None,
+            basis_n,
+            basis_i,
+            backend=backend,
+            backend_kws=backend_kws,
         )
+        for component in trans_mat
+    ]
+    return hmat_i, hmat_n, trans_ops
 
-    return hmat_i_sp.toarray(), hmat_n_sp.toarray(), [T.toarray() for T in trans_ops_sp]
 
-
-def ed_krylov_scipy(hmat_i, num_gs=1, blocksize=None, *,
-                    tol=1e-10, maxiter=200,
-                    seed=None, initial_guess=None, suppress_lobpcg_warnings=True):
+def ed(hmat_i, num_evals=1, *, backend=None, backend_kws=None):
     """
-    Compute the lowest retained initial-state eigenpairs using SciPy LOBPCG.
-
-    This routine is intended to prepare the low-energy initial states used by
-    rixs_krylov_scipy. It diagonalizes only the initial/final Hamiltonian
-    hmat_i and returns the lowest num_gs eigenpairs.
+    Compute low-energy initial states through a numerical backend.
 
     Parameters
     ----------
-    hmat_i : sparse matrix or scipy.sparse.linalg.LinearOperator
-        Initial/final Hamiltonian. It must be square and Hermitian.
-
-    num_gs : int, optional
-        Number of lowest-energy initial states to retain and return.
-
-    blocksize : int or None, optional
-        Number of eigenpairs requested internally from LOBPCG. If None, it is
-        set to num_gs. If larger than num_gs, extra eigenpairs are computed
-        and then discarded. This can help when low-energy degeneracies are
-        expected or when a larger block improves convergence.
-
-    tol : float, optional
-        LOBPCG convergence tolerance.
-
-    maxiter : int, optional
-        Maximum number of LOBPCG iterations.
-
-    seed : int or None, optional
-        Random seed used to construct the initial block if initial_guess is not
-        provided.
-
-    initial_guess : ndarray or None, optional
-        Initial approximation block X for LOBPCG. If provided, it must have
-        shape ``(dim_i, blocksize)``.
+    hmat_i : backend-owned operator
+        Initial/final Hamiltonian.
+    num_evals : int, optional
+        Number of lowest eigenpairs to return.
+    backend : str or None, optional
+        Backend name. When omitted, infer it from ``hmat_i``.
+    backend_kws : mapping, optional
+        Backend-specific eigensolver options.
 
     Returns
     -------
-    eval_i : ndarray
-        Lowest retained eigenvalues, shape ``(num_gs,)``.
-
-    evec_i : ndarray
-        Corresponding eigenvectors, shape ``(dim_i, num_gs)``.
+    eigenvalues, eigenvectors
+        Lowest retained eigenpairs.
     """
-    hmat_i = aslinearoperator(hmat_i)
-
-    if hmat_i.shape[0] != hmat_i.shape[1]:
-        raise ValueError("hmat_i must be square")
-
-    num_gs = int(num_gs)
-    if num_gs < 1:
-        raise ValueError("num_gs must be a positive integer")
-
-    dim_i = hmat_i.shape[0]
-
-    if blocksize is None:
-        blocksize = num_gs
-
-    blocksize = int(blocksize)
-
-    if blocksize < num_gs:
-        raise ValueError("blocksize must be greater than or equal to num_gs")
-
-    if blocksize > dim_i:
-        raise ValueError("blocksize cannot exceed hmat_i.shape[0]")
-
-    if initial_guess is None:
-        rng = np.random.default_rng(seed)
-        X = rng.normal(size=(dim_i, blocksize))
-    else:
-        X = np.asarray(initial_guess)
-        if X.shape != (dim_i, blocksize):
+    backend_name = backend if backend is not None else _infer_backend(hmat_i)
+    match backend_name:
+        case 'scipy':
+            ed_backend = scipy_backend.ed_scipy
+        case 'dense':
+            ed_backend = scipy_backend.ed_dense
+        case 'petsc':
+            ed_backend = petsc_backend.ed_petsc
+        case _:
             raise ValueError(
-                "initial_guess must have shape {}, got {}".format(
-                    (dim_i, blocksize), X.shape
-                )
+                "Unknown backend {!r}; expected 'scipy', 'dense', or "
+                "'petsc'".format(backend_name)
             )
 
-    if suppress_lobpcg_warnings:
-        with warnings.catch_warnings():
-            warnings.filterwarnings(
-                "ignore",
-                category=UserWarning,
-                message=r"Exited at iteration .*",
-            )
-            warnings.filterwarnings(
-                "ignore",
-                category=UserWarning,
-                message=r"Exited postprocessing .*",
-            )
-
-            evals, evecs = lobpcg(
-                hmat_i,
-                X,
-                largest=False,
-                tol=tol,
-                maxiter=maxiter,
-            )
-    else:
-        evals, evecs = lobpcg(
-            hmat_i,
-            X,
-            largest=False,
-            tol=tol,
-            maxiter=maxiter,
-        )
-
-    order = np.argsort(evals)
-
-    eval_i = np.asarray(evals)[order[:num_gs]]
-    evec_i = np.asarray(evecs)[:, order[:num_gs]]
-
-    return eval_i, evec_i
+    return ed_backend(
+        hmat_i,
+        num_evals=num_evals,
+        backend_kws=backend_kws,
+    )
 
 
-def xas_krylov_scipy(
-    eval_i, evec_i, hmat_n, trans_op, ominc, *,
-    gamma_c=0.1, thin=1.0, phi=0.0, pol_type=None,
-    temperature=1.0, scatter_axis=None, nkryl=200,
-):
+def xas(eval_i, evec_i, hmat_n, trans_op, ominc, *,
+        gamma_c=0.1, thin=1.0, phi=0.0, pol_type=None,
+        temperature=1.0, scatter_axis=None,
+        backend=None, backend_kws=None):
     """
-    Calculate XAS spectra with a SciPy Lanczos continued-fraction solver.
+    Calculate X-ray absorption spectra through a numerical backend.
 
-    ``eval_i`` and ``evec_i`` are the retained initial states, normally
-    returned by :func:`ed_krylov_scipy`.  For every retained initial state the
-    transition operator is applied in the original Fock basis, and a Lanczos
-    tridiagonalization of the intermediate Hamiltonian generates the pole
-    representation consumed by :func:`get_spectra_from_poles`.
-
-    Parameters
-    ----------
-    eval_i : 1d array
-        Energies of the retained initial states.
-
-    evec_i : 2d array
-        Retained initial-state eigenvectors. Column ``i`` corresponds to
-        ``eval_i[i]``.
-
-    hmat_n : sparse matrix or scipy.sparse.linalg.LinearOperator
-        Intermediate-state Hamiltonian.
-
-    trans_op : sequence
-        Transition operators mapping the initial Hilbert space to the
-        intermediate Hilbert space. The sequence length must be 3 for a
-        dipole transition or 5 for a quadrupole transition.
-
-    ominc : 1d array
-        Incident photon-energy grid.
-
-    gamma_c : float or 1d array, optional
-        Core-hole lifetime broadening. It can be scalar or have the same shape
-        as ``ominc``.
-
-    thin, phi : float, optional
-        Incoming angle and azimuthal angle, in radians.
-
-    pol_type : sequence of tuple, optional
-        Incoming polarizations. Each entry is ``(kind, alpha)`` where ``kind``
-        is ``'linear'``, ``'left'``, ``'right'``, or ``'isotropic'``. The
-        default is isotropic polarization.
-
-    temperature : float, optional
-        Temperature in kelvin used for the Boltzmann weights of ``eval_i``.
-
-    scatter_axis : (3, 3) array, optional
-        Scattering coordinate axes. The default is the identity matrix.
-
-    nkryl : int, optional
-        Maximum number of intermediate-state Lanczos iterations.
-
-    Returns
-    -------
-    xas : 2d ndarray
-        Spectrum with shape ``(len(ominc), len(pol_type))``.
+    Backend-neutral physical arguments are passed directly. Numerical
+    controls such as the SciPy Lanczos dimension belong in ``backend_kws``.
+    When ``backend`` is omitted, it is inferred from ``hmat_n`` and the
+    transition operators.
     """
-    print("edrixs >>> Running Krylov XAS ...")
-
-    eval_i = np.asarray(eval_i, dtype=float)
-    evec_i = np.asarray(evec_i, dtype=complex)
-    ominc = np.asarray(ominc, dtype=float)
-    hmat_n = aslinearoperator(hmat_n)
-    trans_op = [aslinearoperator(T) for T in trans_op]
-
-    if eval_i.ndim != 1:
-        raise ValueError("eval_i must be a one-dimensional array")
-    if evec_i.ndim != 2:
-        raise ValueError("evec_i must be a two-dimensional array")
-    if evec_i.shape[1] != len(eval_i):
-        raise ValueError("evec_i columns must correspond to eval_i")
-    if hmat_n.shape[0] != hmat_n.shape[1]:
-        raise ValueError("hmat_n must be square")
-
-    dim_i = evec_i.shape[0]
-    dim_n = hmat_n.shape[0]
-    ntrans = len(trans_op)
-
-    if ntrans not in (3, 5):
-        raise ValueError(
-            "len(trans_op) must be 3 for dipole or 5 for quadrupole transitions"
-        )
-
-    for i, T in enumerate(trans_op):
-        if T.shape != (dim_n, dim_i):
+    backend_name = (
+        backend if backend is not None else _infer_backend(hmat_n, *trans_op)
+    )
+    match backend_name:
+        case 'scipy':
+            xas_backend = scipy_backend.xas_scipy
+        case 'dense':
+            xas_backend = scipy_backend.xas_dense
+        case 'petsc':
+            xas_backend = petsc_backend.xas_petsc
+        case _:
             raise ValueError(
-                "trans_op[{}] has shape {}, expected {}".format(
-                    i, T.shape, (dim_n, dim_i)
-                )
+                "Unknown backend {!r}; expected 'scipy', 'dense', or "
+                "'petsc'".format(backend_name)
             )
 
-    if pol_type is None:
-        pol_type = [('isotropic', 0.0)]
-
-    if scatter_axis is None:
-        scatter_axis = np.eye(3)
-    else:
-        scatter_axis = np.asarray(scatter_axis, dtype=float)
-
-    if scatter_axis.shape != (3, 3):
-        raise ValueError("scatter_axis must have shape (3, 3)")
-
-    nkryl = int(nkryl)
-    if nkryl < 1:
-        raise ValueError("nkryl must be a positive integer")
-
-    gamma_core = _expand_broadening(gamma_c, len(ominc), "gamma_c")
-    xas = np.zeros((len(ominc), len(pol_type)), dtype=float)
-    kvec = unit_wavevector(thin, phi, scatter_axis, direction='in')
-
-    for ipol, (kind, alpha) in enumerate(pol_type):
-        kind = kind.strip().lower()
-
-        if kind == 'isotropic':
-            # EDRIXS convention: average independent transition components.
-            for icomp in range(ntrans):
-                starts = [
-                    trans_op[icomp] @ evec_i[:, istate]
-                    for istate in range(len(eval_i))
-                ]
-                poles = _xas_poles_from_start_vectors(
-                    eval_i, starts, hmat_n, nkryl=nkryl
-                )
-                xas[:, ipol] += get_spectra_from_poles(
-                    poles, ominc, gamma_core, temperature
-                ) / ntrans
-            continue
-
-        if kind not in ('linear', 'left', 'right'):
-            raise ValueError("Unknown XAS polarization type: {}".format(kind))
-
-        dipole_vec = dipole_polvec_xas(
-            thin, phi, alpha, scatter_axis, kind
-        )
-        if ntrans == 3:
-            polvec = np.asarray(dipole_vec, dtype=complex)
-        else:
-            polvec = quadrupole_polvec(dipole_vec, kvec)
-
-        starts = [
-            _apply_linear_combination(trans_op, polvec, evec_i[:, istate])
-            for istate in range(len(eval_i))
-        ]
-        poles = _xas_poles_from_start_vectors(
-            eval_i, starts, hmat_n, nkryl=nkryl
-        )
-        xas[:, ipol] = get_spectra_from_poles(
-            poles, ominc, gamma_core, temperature
-        )
-
-    print("edrixs >>> Krylov XAS Done !")
-    return xas
+    return xas_backend(
+        eval_i, evec_i, hmat_n, trans_op, ominc,
+        gamma_c=gamma_c,
+        thin=thin,
+        phi=phi,
+        pol_type=pol_type,
+        temperature=temperature,
+        scatter_axis=scatter_axis,
+        backend_kws=backend_kws,
+    )
 
 
-def rixs_krylov_scipy(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
-                      gamma_c=0.1, gamma_f=0.01, thin=1.0, thout=1.0, phi=0.0,
-                      pol_type=None, temperature=1.0, scatter_axis=None,
-                      skip_gs=False, nkryl=200, linsys_tol=1e-9,
-                      linsys_maxiter=50000, linsys_restart=200,
-                      return_poles=False, workers=None, blas_threads=1,
-                      mp_start_method=None):
+def rixs(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
+         gamma_c=0.1, gamma_f=0.01, thin=1.0, thout=1.0, phi=0.0,
+         pol_type=None, temperature=1.0, scatter_axis=None,
+         skip_gs=False, return_poles=False, backend=None, backend_kws=None):
     """
-    Calculate RIXS spectra with a SciPy Krylov correction-vector solver.
+    Calculate resonant inelastic X-ray scattering spectra through a backend.
 
-    Parallel execution uses one :class:`ProcessPoolExecutor` job for every
-    ``(incident energy, polarization, retained initial state)`` triple.  Jobs
-    are dynamically scheduled onto the worker pool.  By default, the number of
-    workers is the number of CPUs available to the process, capped by the
-    number of jobs. Set ``workers=1`` to use the original serial path.
+    Backend-neutral physical arguments are passed directly. Numerical
+    controls such as SciPy Lanczos and GMRES settings belong in
+    ``backend_kws``. When ``backend`` is omitted, it is inferred from the
+    Hamiltonians and transition operators.
 
-    Every worker is limited to ``blas_threads`` native BLAS/OpenMP threads.
-    The default of one avoids nested parallelism and the excessive
-    ``sched_yield`` traffic that can otherwise occur when many process jobs
-    each activate a multithreaded BLAS runtime.
-
-    Parameters
-    ----------
-    eval_i : 1d array
-        Energies of the retained initial states.
-
-    evec_i : 2d array
-        Retained initial-state eigenvectors in the basis of ``hmat_i``.
-        Column ``i`` corresponds to ``eval_i[i]``.
-
-    hmat_i, hmat_n : sparse matrix or LinearOperator
-        Initial/final and intermediate Hamiltonians.
-
-    trans_op : sequence
-        Transition operators mapping the initial/final Hilbert space to the
-        intermediate Hilbert space. The sequence length must be 3 or 5.
-
-    ominc, eloss : 1d arrays
-        Incident-energy and energy-loss grids.
-
-    workers : int or None, optional
-        Number of worker processes. ``None`` uses all CPUs available to the
-        process. The actual count is capped by the number of independent jobs.
-        ``workers=1`` selects serial execution.
-
-    blas_threads : int, optional
-        Native BLAS/OpenMP threads allowed in each worker. Keep this at one
-        when using more than one process.
-
-    mp_start_method : {'fork', 'spawn', 'forkserver'} or None, optional
-        Multiprocessing start method. ``None`` uses the platform default.
-        Calling scripts must protect their entry point with
-        ``if __name__ == '__main__':`` for spawn-based methods.
-
-    Returns
-    -------
-    rixs : 3d ndarray
-        RIXS spectra with shape ``(len(ominc), len(eloss), len(pol_type))``.
-
-    poles : list, optional
-        Returned only when ``return_poles`` is true. Nested list of pole
-        dictionaries with shape ``(len(ominc), len(pol_type))``.
+    If ``skip_gs`` is true, transitions into the retained initial-state
+    subspace are omitted from the final-state spectrum, matching the legacy
+    ``skip_gs`` behavior.
     """
-    print("edrixs >>> Running Krylov RIXS ... ")
-
-    eval_i = np.asarray(eval_i, dtype=float)
-    evec_i = np.asarray(evec_i, dtype=complex)
-    ominc = np.asarray(ominc, dtype=float)
-    eloss = np.asarray(eloss, dtype=float)
-
-    hmat_i = aslinearoperator(hmat_i)
-    hmat_n = aslinearoperator(hmat_n)
-    trans_op = [aslinearoperator(T) for T in trans_op]
-
-    if hmat_i.shape[0] != hmat_i.shape[1]:
-        raise ValueError("hmat_i must be square")
-    if hmat_n.shape[0] != hmat_n.shape[1]:
-        raise ValueError("hmat_n must be square")
-    if eval_i.ndim != 1:
-        raise ValueError("eval_i must be a one-dimensional array")
-    if evec_i.ndim != 2:
-        raise ValueError("evec_i must be a two-dimensional array")
-    if len(eval_i) != evec_i.shape[1]:
-        raise ValueError("len(eval_i) must equal evec_i.shape[1]")
-    if evec_i.shape[0] != hmat_i.shape[0]:
-        raise ValueError("evec_i.shape[0] must equal hmat_i.shape[0]")
-
-    dim_i = hmat_i.shape[0]
-    dim_n = hmat_n.shape[0]
-    ntrans = len(trans_op)
-
-    if ntrans not in (3, 5):
-        raise ValueError(
-            "len(trans_op) must be 3 for dipole or 5 for quadrupole transitions"
-        )
-
-    for i, T in enumerate(trans_op):
-        if T.shape != (dim_n, dim_i):
+    backend_name = (
+        backend
+        if backend is not None
+        else _infer_backend(hmat_i, hmat_n, *trans_op)
+    )
+    match backend_name:
+        case 'scipy':
+            rixs_backend = scipy_backend.rixs_scipy
+        case 'dense':
+            rixs_backend = scipy_backend.rixs_dense
+        case 'petsc':
+            rixs_backend = petsc_backend.rixs_petsc
+        case _:
             raise ValueError(
-                "trans_op[{}] has shape {}, expected {}".format(
-                    i, T.shape, (dim_n, dim_i)
-                )
-            )
-        _check_adjoint_action(T, "trans_op[{}]".format(i))
-
-    if pol_type is None:
-        pol_type = [('linear', 0, 'linear', 0)]
-
-    if scatter_axis is None:
-        scatter_axis = np.eye(3)
-    else:
-        scatter_axis = np.asarray(scatter_axis, dtype=float)
-
-    if scatter_axis.shape != (3, 3):
-        raise ValueError("scatter_axis must have shape (3, 3)")
-
-    nkryl = int(nkryl)
-    linsys_maxiter = int(linsys_maxiter)
-    linsys_restart = int(linsys_restart)
-    blas_threads = int(blas_threads)
-
-    if nkryl < 1:
-        raise ValueError("nkryl must be a positive integer")
-    if linsys_maxiter < 1:
-        raise ValueError("linsys_maxiter must be a positive integer")
-    if linsys_restart < 1:
-        raise ValueError("linsys_restart must be a positive integer")
-    if blas_threads < 1:
-        raise ValueError("blas_threads must be a positive integer")
-
-    n_ominc = len(ominc)
-    n_eloss = len(eloss)
-    n_init = len(eval_i)
-    n_pol = len(pol_type)
-
-    gamma_core = _expand_broadening(gamma_c, n_ominc, "gamma_c")
-    gamma_final = _expand_broadening(gamma_f, n_eloss, "gamma_f")
-
-    polarizations = []
-    for it, alpha, jt, beta in pol_type:
-        polarizations.append(
-            _rixs_polarization_vectors(
-                ntrans, thin, thout, phi, it, alpha, jt, beta, scatter_axis
-            )
-        )
-
-    records = [
-        [
-            [None for _ in range(n_init)]
-            for _ in range(n_pol)
-        ]
-        for _ in range(n_ominc)
-    ]
-
-    jobs = [
-        (iom, ipol, istate)
-        for iom in range(n_ominc)
-        for ipol in range(n_pol)
-        for istate in range(n_init)
-    ]
-
-    if workers is None:
-        workers = _available_cpu_count()
-    workers = int(workers)
-    if workers < 1:
-        raise ValueError("workers must be None or a positive integer")
-    workers = min(workers, max(1, len(jobs)))
-
-    if workers == 1 or len(jobs) <= 1:
-        trans_op_H = [T.H for T in trans_op]
-        for iom, ipol, istate in jobs:
-            polvec_i, polvec_f = polarizations[ipol]
-            rhs = _apply_linear_combination(
-                trans_op, polvec_i, evec_i[:, istate]
-            )
-            records[iom][ipol][istate] = (
-                _rixs_krylov_one_contribution_scipy(
-                    hmat_i=hmat_i,
-                    hmat_n=hmat_n,
-                    trans_op_H=trans_op_H,
-                    polvec_f=polvec_f,
-                    eval_i=eval_i,
-                    evec_i=evec_i,
-                    istate=istate,
-                    omega=ominc[iom],
-                    gamma_c=gamma_core[iom],
-                    rhs=rhs,
-                    skip_gs=skip_gs,
-                    nkryl=nkryl,
-                    linsys_tol=linsys_tol,
-                    linsys_maxiter=linsys_maxiter,
-                    linsys_restart=linsys_restart,
-                )
-            )
-    else:
-        pool_hmat_i = _operator_for_process_pool(hmat_i, 'hmat_i')
-        pool_hmat_n = _operator_for_process_pool(hmat_n, 'hmat_n')
-        pool_trans_op = [
-            _operator_for_process_pool(T, 'trans_op[{}]'.format(i))
-            for i, T in enumerate(trans_op)
-        ]
-
-        if mp_start_method is None:
-            mp_context = mp.get_context()
-        else:
-            mp_context = mp.get_context(mp_start_method)
-
-        print(
-            "edrixs >>> RIXS process pool: {} workers, {} jobs, "
-            "{} BLAS thread(s)/worker".format(
-                workers, len(jobs), blas_threads
-            )
-        )
-
-        with ProcessPoolExecutor(
-            max_workers=workers,
-            mp_context=mp_context,
-            initializer=_init_rixs_worker,
-            initargs=(
-                pool_hmat_i,
-                pool_hmat_n,
-                pool_trans_op,
-                eval_i,
-                evec_i,
-                ominc,
-                gamma_core,
-                polarizations,
-                skip_gs,
-                nkryl,
-                linsys_tol,
-                linsys_maxiter,
-                linsys_restart,
-                blas_threads,
-            ),
-        ) as executor:
-            future_to_job = {
-                executor.submit(_rixs_pool_job, job): job
-                for job in jobs
-            }
-
-            for future in as_completed(future_to_job):
-                iom, ipol, istate = future_to_job[future]
-                try:
-                    _, _, _, rec = future.result()
-                except Exception as exc:
-                    for pending in future_to_job:
-                        pending.cancel()
-                    raise RuntimeError(
-                        "Parallel RIXS job failed for incident index {}, "
-                        "polarization index {}, initial-state index {}".format(
-                            iom, ipol, istate
-                        )
-                    ) from exc
-                records[iom][ipol][istate] = rec
-
-    rixs = np.zeros((n_ominc, n_eloss, n_pol), dtype=float)
-    poles_all = [[None for _ in range(n_pol)] for _ in range(n_ominc)]
-
-    for iom in range(n_ominc):
-        for ipol in range(n_pol):
-            poles_dict = _pole_dict_from_records(records[iom][ipol])
-            poles_all[iom][ipol] = poles_dict
-            rixs[iom, :, ipol] = get_spectra_from_poles(
-                poles_dict, eloss, gamma_final, temperature
+                "Unknown backend {!r}; expected 'scipy', 'dense', or "
+                "'petsc'".format(backend_name)
             )
 
-    print("edrixs >>> Krylov RIXS Done !")
+    return rixs_backend(
+        eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss,
+        gamma_c=gamma_c,
+        gamma_f=gamma_f,
+        thin=thin,
+        thout=thout,
+        phi=phi,
+        pol_type=pol_type,
+        temperature=temperature,
+        scatter_axis=scatter_axis,
+        skip_gs=skip_gs,
+        return_poles=return_poles,
+        backend_kws=backend_kws,
+    )
 
-    if return_poles:
-        return rixs, poles_all
-    return rixs
+
+def _warn_legacy(name, replacement):
+    """Emit the standard warning for a deprecated legacy solver workflow."""
+    warnings.warn(
+        "{} is deprecated; use {} instead.".format(name, replacement),
+        DeprecationWarning,
+        stacklevel=3,
+    )
+
+
+# -----------------------------------------------------------------------------
+# Legacy dense-Python and Fortran workflows
+# -----------------------------------------------------------------------------
 
 
 def ed_1v1c_py(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
@@ -1393,6 +397,10 @@ def ed_1v1c_py(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
         The matrices of transition operators in the eigenvector basis.
         Their components are defined with respect to the global :math:`xyz`-axis.
     """
+    _warn_legacy(
+        'ed_1v1c_py',
+        'edrixs.models.model_1v1c + edrixs.solvers.get_ops/ed',
+    )
     print("edrixs >>> Running ED ...")
     v_name_options = ['s', 'p', 't2g', 'd', 'f']
     c_name_options = ['s', 'p', 'p12', 'p32', 't2g', 'd', 'd32', 'd52', 'f', 'f52', 'f72']
@@ -1633,6 +641,10 @@ def xas_1v1c_py(eval_i, eval_n, trans_op, ominc, *, gamma_c=0.1, thin=1.0, phi=0
         The calculated XAS spectra. The 1st dimension is for the incident energy, and the
         2nd dimension is for different polarizations.
     """
+    _warn_legacy(
+        'xas_1v1c_py',
+        'edrixs.models.model_1v1c + edrixs.solvers.get_ops/ed/xas',
+    )
 
     print("edrixs >>> Running XAS ...")
     n_om = len(ominc)
@@ -1692,7 +704,8 @@ def xas_1v1c_py(eval_i, eval_n, trans_op, ominc, *, gamma_c=0.1, thin=1.0, phi=0
 
 def rixs_1v1c_py(eval_i, eval_n, trans_op, ominc, eloss, *,
                  gamma_c=0.1, gamma_f=0.01, thin=1.0, thout=1.0, phi=0.0,
-                 pol_type=None, gs_list=None, temperature=1.0, scatter_axis=None, skip_gs=False):
+                 pol_type=None, gs_list=None, temperature=1.0, scatter_axis=None,
+                 skip_gs=False):
     """
     Calculate RIXS for the case of one valence shell plus one core shell with Python solver.
 
@@ -1754,8 +767,8 @@ def rixs_1v1c_py(eval_i, eval_n, trans_op, ominc, eloss, *,
 
         It will be an identity matrix if not provided.
     skip_gs: bool
-        If True, transitions to the ground state(s) (forming the elastic peak) are omitted from
-        the calculation.
+        If True, transitions to the ground state(s) (forming the elastic peak)
+        are omitted from the calculation.
 
     Returns
     -------
@@ -1764,6 +777,10 @@ def rixs_1v1c_py(eval_i, eval_n, trans_op, ominc, eloss, *,
         the 2nd dimension is for the energy loss and the 3rd dimension is for
         different polarizations.
     """
+    _warn_legacy(
+        'rixs_1v1c_py',
+        'edrixs.models.model_1v1c + edrixs.solvers.get_ops/ed/rixs',
+    )
 
     print("edrixs >>> Running RIXS ... ")
     n_ominc = len(ominc)
@@ -1962,6 +979,10 @@ def ed_1v1c_fort(comm, shell_name, *, shell_level=None,
     denmat: 2d complex array, shape=(nvector, v_norb, v_norb))
         The density matrix in the eigenstates.
     """
+    _warn_legacy(
+        'ed_1v1c_fort',
+        'edrixs.models.model_1v1c + edrixs.solvers.get_ops/ed',
+    )
     v_name_options = ['s', 'p', 't2g', 'd', 'f']
     c_name_options = ['s', 'p', 'p12', 'p32', 't2g', 'd', 'd32', 'd52', 'f', 'f52', 'f72']
     v_name = shell_name[0].strip()
@@ -1987,6 +1008,232 @@ def ed_1v1c_fort(comm, shell_name, *, shell_level=None,
     )
 
     return eval_i, denmat
+
+
+def xas_1v1c_fort(comm, shell_name, ominc, *, gamma_c=0.1,
+                  v_noccu=1, thin=1.0, phi=0, pol_type=None,
+                  num_gs=1, nkryl=200, temperature=1.0,
+                  loc_axis=None, scatter_axis=None):
+    """
+    Calculate XAS for the case with one valence shells plus one core shell with Fortran solver.
+
+    Parameters
+    ----------
+    comm: MPI_comm
+        MPI communicator.
+    shell_name: tuple of two strings
+        Names of valence and core shells. The 1st (2nd) string in the tuple is for the
+        valence (core) shell.
+
+        - The 1st string can only be 's', 'p', 't2g', 'd', 'f',
+
+        - The 2nd string can be 's', 'p', 'p12', 'p32', 'd', 'd32', 'd52',
+          'f', 'f52', 'f72'.
+
+        For example: shell_name=('d', 'p32') may indicate a :math:`L_3` edge transition from
+        core :math:`2p_{3/2}` shell to valence :math:`3d` shell for Ni.
+    ominc: 1d float array
+        Incident energy of photon.
+    gamma_c: a float number or a 1d float array with the same shape as ominc.
+        The core-hole life-time broadening factor. It can be a constant value
+        or incident energy dependent.
+    v_noccu: int
+        Total occupancy of valence shells.
+    thin: float number
+        The incident angle of photon (in radian).
+    phi: float number
+        Azimuthal angle (in radian), defined with respect to the
+        :math:`x`-axis of the local scattering axis: scatter_axis[:,0].
+    pol_type: list of tuples
+        Type of polarization, options can be:
+
+        - ('linear', alpha), linear polarization, where alpha is the angle between the
+          polarization vector and the scattering plane in radians.
+
+        - ('left', 0), left circular polarization.
+
+        - ('right', 0), right circular polarization.
+
+        - ('isotropic', 0). isotropic polarization.
+
+        It will set pol_type=[('isotropic', 0)] if not provided.
+    num_gs: int
+        Number of initial states used in XAS calculations.
+    nkryl: int
+        Maximum number of poles obtained.
+    temperature: float number
+        Temperature (in K) for boltzmann distribution.
+    loc_axis: 3*3 float array
+        The local axis with respect to which local orbitals are defined.
+
+        - x: local_axis[:,0],
+
+        - y: local_axis[:,1],
+
+        - z: local_axis[:,2].
+
+        It will be an identity matrix if not provided.
+    scatter_axis: 3*3 float array
+        The local axis defining the scattering geometry. The scattering plane is defined in
+        the local :math:`zx`-plane.
+
+        - local :math:`x`-axis: scatter_axis[:,0]
+
+        - local :math:`y`-axis: scatter_axis[:,1]
+
+        - local :math:`z`-axis: scatter_axis[:,2]
+
+        It will be set to an identity matrix if not provided.
+
+    Returns
+    -------
+    xas: 2d array, shape=(len(ominc), len(pol_type))
+        The calculated XAS spectra. The first dimension is for ominc, and the second dimension
+        if for different polarizations.
+    poles: list of dict, shape=(len(pol_type), )
+        The calculated XAS poles for different polarizations.
+    """
+    _warn_legacy(
+        'xas_1v1c_fort',
+        'edrixs.models.model_1v1c + edrixs.solvers.get_ops/ed/xas',
+    )
+    v_name_options = ['s', 'p', 't2g', 'd', 'f']
+    c_name_options = ['s', 'p', 'p12', 'p32', 't2g', 'd', 'd32', 'd52', 'f', 'f52', 'f72']
+
+    v_name = shell_name[0].strip()
+    c_name = shell_name[1].strip()
+    if v_name not in v_name_options:
+        raise Exception("NOT supported type of valence shell: ", v_name)
+    if c_name not in c_name_options:
+        raise Exception("NOT supported type of core shell: ", c_name)
+
+    names = (v_name, 'empty', c_name)
+
+    xas, poles = _xas_1or2_valence_1core(
+        comm, names, ominc, gamma_c=gamma_c, v_tot_noccu=v_noccu,
+        trans_to_which=1, thin=thin, phi=phi, pol_type=pol_type,
+        num_gs=num_gs, nkryl=nkryl, temperature=temperature,
+        loc_axis=loc_axis, scatter_axis=scatter_axis
+    )
+
+    return xas, poles
+
+
+def rixs_1v1c_fort(comm, shell_name, ominc, eloss, *, gamma_c=0.1, gamma_f=0.1,
+                   v_noccu=1, thin=1.0, thout=1.0, phi=0, pol_type=None,
+                   num_gs=1, nkryl=200, linsys_max=500, linsys_tol=1e-8,
+                   temperature=1.0, loc_axis=None, scatter_axis=None):
+    """
+    Calculate RIXS for the case with one valence shell plus one core shell with Fortran solver.
+
+    Parameters
+    ----------
+    comm: MPI_comm
+        MPI communicator.
+    shell_name: tuple of two strings
+        Names of valence and core shells. The 1st (2nd) string in the tuple is for the
+        valence (core) shell.
+
+        - The 1st string can only be 's', 'p', 't2g', 'd', 'f',
+
+        - The 2nd string can be 's', 'p', 'p12', 'p32', 'd', 'd32', 'd52',
+          'f', 'f52', 'f72'.
+
+        For example: shell_name=('d', 'p32') may indicate a :math:`L_3` edge transition from
+        core :math:`2p_{3/2}` shell to valence :math:`3d` shell for Ni.
+    ominc: 1d float array
+        Incident energy of photon.
+    eloss: 1d float array
+        Energy loss.
+    gamma_c: a float number or a 1d float array with same shape as ominc.
+        The core-hole life-time broadening factor. It can be a constant value
+        or incident energy dependent.
+    gamma_f: a float number or a 1d float array with same shape as eloss.
+        The final states life-time broadening factor. It can be a constant value
+        or energy loss dependent.
+    v_noccu: int
+        Total occupancy of valence shells.
+    thin: float number
+        The incident angle of photon (in radian).
+    thout: float number
+        The scattered angle of photon (in radian).
+    phi: float number
+        Azimuthal angle (in radian), defined with respect to the
+        :math:`x`-axis of scattering axis: scatter_axis[:,0].
+    pol_type: list of 4-elements-tuples
+        Type of polarizations. It has the following form:
+
+        (str1, alpha, str2, beta)
+
+        where, str1 (str2) can be 'linear', 'left', 'right', and alpha (beta) is
+        the angle (in radians) between the linear polarization vector and the scattering plane.
+
+        It will set pol_type=[('linear', 0, 'linear', 0)] if not provided.
+    num_gs: int
+        Number of initial states used in RIXS calculations.
+    nkryl: int
+        Maximum number of poles obtained.
+    linsys_max: int
+        Maximum iterations of solving linear equations.
+    linsys_tol: float
+        Convergence for solving linear equations.
+    temperature: float number
+        Temperature (in K) for boltzmann distribution.
+    loc_axis: 3*3 float array
+        The local axis with respect to which local orbitals are defined.
+
+        - x: local_axis[:,0],
+
+        - y: local_axis[:,1],
+
+        - z: local_axis[:,2].
+
+        It will be an identity matrix if not provided.
+    scatter_axis: 3*3 float array
+        The local axis defining the scattering geometry. The scattering plane is defined in
+        the local :math:`zx`-plane.
+
+        - local :math:`x`-axis: scatter_axis[:,0]
+
+        - local :math:`y`-axis: scatter_axis[:,1]
+
+        - local :math:`z`-axis: scatter_axis[:,2]
+
+        It will be set to an identity matrix if not provided.
+
+    Returns
+    -------
+    rixs: 3d float array, shape=(len(ominc), len(eloss), len(pol_type))
+        The calculated RIXS spectra. The 1st dimension is for the incident energy,
+        the 2nd dimension is for the energy loss and the 3rd dimension is for
+        different polarizations.
+    poles: 2d list of dict, shape=(len(ominc), len(pol_type))
+        The calculated RIXS poles. The 1st dimension is for incident energy, and the
+        2nd dimension is for different polarizations.
+    """
+    _warn_legacy(
+        'rixs_1v1c_fort',
+        'edrixs.models.model_1v1c + edrixs.solvers.get_ops/ed/rixs',
+    )
+    v_name_options = ['s', 'p', 't2g', 'd', 'f']
+    c_name_options = ['s', 'p', 'p12', 'p32', 't2g', 'd', 'd32', 'd52', 'f', 'f52', 'f72']
+    v_name = shell_name[0].strip()
+    c_name = shell_name[1].strip()
+    if v_name not in v_name_options:
+        raise Exception("NOT supported type of valence shell: ", v_name)
+    if c_name not in c_name_options:
+        raise Exception("NOT supported type of core shell: ", c_name)
+
+    names = (v_name, 'empty', c_name)
+    rixs, poles = _rixs_1or2_valence_1core(
+        comm, names, ominc, eloss, gamma_c=gamma_c, gamma_f=gamma_f,
+        v_tot_noccu=v_noccu, trans_to_which=1, thin=thin,
+        thout=thout, phi=phi, pol_type=pol_type, num_gs=num_gs, nkryl=nkryl,
+        linsys_max=linsys_max, linsys_tol=linsys_tol, temperature=temperature,
+        loc_axis=loc_axis, scatter_axis=loc_axis
+    )
+
+    return rixs, poles
 
 
 def ed_2v1c_fort(comm, shell_name, *, shell_level=None,
@@ -2141,6 +1388,10 @@ def ed_2v1c_fort(comm, shell_name, *, shell_level=None,
     denmat: 2d complex array, shape=(nvector, v1v2_norb, v1v2_norb))
         The density matrix in the eigenstates.
     """
+    _warn_legacy(
+        'ed_2v1c_fort',
+        'edrixs.models.model_2v1c + edrixs.solvers.get_ops/ed',
+    )
     v_name_options = ['s', 'p', 't2g', 'd', 'f']
     c_name_options = ['s', 'p', 'p12', 'p32', 't2g', 'd', 'd32', 'd52', 'f', 'f52', 'f72']
     v1_name = shell_name[0].strip()
@@ -2163,111 +1414,6 @@ def ed_2v1c_fort(comm, shell_name, *, shell_level=None,
         min_ndim=min_ndim
     )
     return eval_i, denmat
-
-
-def xas_1v1c_fort(comm, shell_name, ominc, *, gamma_c=0.1,
-                  v_noccu=1, thin=1.0, phi=0, pol_type=None,
-                  num_gs=1, nkryl=200, temperature=1.0,
-                  loc_axis=None, scatter_axis=None):
-    """
-    Calculate XAS for the case with one valence shells plus one core shell with Fortran solver.
-
-    Parameters
-    ----------
-    comm: MPI_comm
-        MPI communicator.
-    shell_name: tuple of two strings
-        Names of valence and core shells. The 1st (2nd) string in the tuple is for the
-        valence (core) shell.
-
-        - The 1st string can only be 's', 'p', 't2g', 'd', 'f',
-
-        - The 2nd string can be 's', 'p', 'p12', 'p32', 'd', 'd32', 'd52',
-          'f', 'f52', 'f72'.
-
-        For example: shell_name=('d', 'p32') may indicate a :math:`L_3` edge transition from
-        core :math:`2p_{3/2}` shell to valence :math:`3d` shell for Ni.
-    ominc: 1d float array
-        Incident energy of photon.
-    gamma_c: a float number or a 1d float array with the same shape as ominc.
-        The core-hole life-time broadening factor. It can be a constant value
-        or incident energy dependent.
-    v_noccu: int
-        Total occupancy of valence shells.
-    thin: float number
-        The incident angle of photon (in radian).
-    phi: float number
-        Azimuthal angle (in radian), defined with respect to the
-        :math:`x`-axis of the local scattering axis: scatter_axis[:,0].
-    pol_type: list of tuples
-        Type of polarization, options can be:
-
-        - ('linear', alpha), linear polarization, where alpha is the angle between the
-          polarization vector and the scattering plane in radians.
-
-        - ('left', 0), left circular polarization.
-
-        - ('right', 0), right circular polarization.
-
-        - ('isotropic', 0). isotropic polarization.
-
-        It will set pol_type=[('isotropic', 0)] if not provided.
-    num_gs: int
-        Number of initial states used in XAS calculations.
-    nkryl: int
-        Maximum number of poles obtained.
-    temperature: float number
-        Temperature (in K) for boltzmann distribution.
-    loc_axis: 3*3 float array
-        The local axis with respect to which local orbitals are defined.
-
-        - x: local_axis[:,0],
-
-        - y: local_axis[:,1],
-
-        - z: local_axis[:,2].
-
-        It will be an identity matrix if not provided.
-    scatter_axis: 3*3 float array
-        The local axis defining the scattering geometry. The scattering plane is defined in
-        the local :math:`zx`-plane.
-
-        - local :math:`x`-axis: scatter_axis[:,0]
-
-        - local :math:`y`-axis: scatter_axis[:,1]
-
-        - local :math:`z`-axis: scatter_axis[:,2]
-
-        It will be set to an identity matrix if not provided.
-
-    Returns
-    -------
-    xas: 2d array, shape=(len(ominc), len(pol_type))
-        The calculated XAS spectra. The first dimension is for ominc, and the second dimension
-        if for different polarizations.
-    poles: list of dict, shape=(len(pol_type), )
-        The calculated XAS poles for different polarizations.
-    """
-    v_name_options = ['s', 'p', 't2g', 'd', 'f']
-    c_name_options = ['s', 'p', 'p12', 'p32', 't2g', 'd', 'd32', 'd52', 'f', 'f52', 'f72']
-
-    v_name = shell_name[0].strip()
-    c_name = shell_name[1].strip()
-    if v_name not in v_name_options:
-        raise Exception("NOT supported type of valence shell: ", v_name)
-    if c_name not in c_name_options:
-        raise Exception("NOT supported type of core shell: ", c_name)
-
-    names = (v_name, 'empty', c_name)
-
-    xas, poles = _xas_1or2_valence_1core(
-        comm, names, ominc, gamma_c=gamma_c, v_tot_noccu=v_noccu,
-        trans_to_which=1, thin=thin, phi=phi, pol_type=pol_type,
-        num_gs=num_gs, nkryl=nkryl, temperature=temperature,
-        loc_axis=loc_axis, scatter_axis=scatter_axis
-    )
-
-    return xas, poles
 
 
 def xas_2v1c_fort(comm, shell_name, ominc, *, gamma_c=0.1,
@@ -2359,6 +1505,10 @@ def xas_2v1c_fort(comm, shell_name, ominc, *, gamma_c=0.1,
     poles: list of dict, shape=(len(pol_type), )
         The calculated XAS poles for different polarizations.
     """
+    _warn_legacy(
+        'xas_2v1c_fort',
+        'edrixs.models.model_2v1c + edrixs.solvers.get_ops/ed/xas',
+    )
     v_name_options = ['s', 'p', 't2g', 'd', 'f']
     c_name_options = ['s', 'p', 'p12', 'p32', 't2g', 'd', 'd32', 'd52', 'f', 'f52', 'f72']
 
@@ -2380,119 +1530,6 @@ def xas_2v1c_fort(comm, shell_name, ominc, *, gamma_c=0.1,
     )
 
     return xas, poles
-
-
-def rixs_1v1c_fort(comm, shell_name, ominc, eloss, *, gamma_c=0.1, gamma_f=0.1,
-                   v_noccu=1, thin=1.0, thout=1.0, phi=0, pol_type=None,
-                   num_gs=1, nkryl=200, linsys_max=500, linsys_tol=1e-8,
-                   temperature=1.0, loc_axis=None, scatter_axis=None):
-    """
-    Calculate RIXS for the case with one valence shell plus one core shell with Fortran solver.
-
-    Parameters
-    ----------
-    comm: MPI_comm
-        MPI communicator.
-    shell_name: tuple of two strings
-        Names of valence and core shells. The 1st (2nd) string in the tuple is for the
-        valence (core) shell.
-
-        - The 1st string can only be 's', 'p', 't2g', 'd', 'f',
-
-        - The 2nd string can be 's', 'p', 'p12', 'p32', 'd', 'd32', 'd52',
-          'f', 'f52', 'f72'.
-
-        For example: shell_name=('d', 'p32') may indicate a :math:`L_3` edge transition from
-        core :math:`2p_{3/2}` shell to valence :math:`3d` shell for Ni.
-    ominc: 1d float array
-        Incident energy of photon.
-    eloss: 1d float array
-        Energy loss.
-    gamma_c: a float number or a 1d float array with same shape as ominc.
-        The core-hole life-time broadening factor. It can be a constant value
-        or incident energy dependent.
-    gamma_f: a float number or a 1d float array with same shape as eloss.
-        The final states life-time broadening factor. It can be a constant value
-        or energy loss dependent.
-    v_noccu: int
-        Total occupancy of valence shells.
-    thin: float number
-        The incident angle of photon (in radian).
-    thout: float number
-        The scattered angle of photon (in radian).
-    phi: float number
-        Azimuthal angle (in radian), defined with respect to the
-        :math:`x`-axis of scattering axis: scatter_axis[:,0].
-    pol_type: list of 4-elements-tuples
-        Type of polarizations. It has the following form:
-
-        (str1, alpha, str2, beta)
-
-        where, str1 (str2) can be 'linear', 'left', 'right', and alpha (beta) is
-        the angle (in radians) between the linear polarization vector and the scattering plane.
-
-        It will set pol_type=[('linear', 0, 'linear', 0)] if not provided.
-    num_gs: int
-        Number of initial states used in RIXS calculations.
-    nkryl: int
-        Maximum number of poles obtained.
-    linsys_max: int
-        Maximum iterations of solving linear equations.
-    linsys_tol: float
-        Convergence for solving linear equations.
-    temperature: float number
-        Temperature (in K) for boltzmann distribution.
-    loc_axis: 3*3 float array
-        The local axis with respect to which local orbitals are defined.
-
-        - x: local_axis[:,0],
-
-        - y: local_axis[:,1],
-
-        - z: local_axis[:,2].
-
-        It will be an identity matrix if not provided.
-    scatter_axis: 3*3 float array
-        The local axis defining the scattering geometry. The scattering plane is defined in
-        the local :math:`zx`-plane.
-
-        - local :math:`x`-axis: scatter_axis[:,0]
-
-        - local :math:`y`-axis: scatter_axis[:,1]
-
-        - local :math:`z`-axis: scatter_axis[:,2]
-
-        It will be set to an identity matrix if not provided.
-
-    Returns
-    -------
-    rixs: 3d float array, shape=(len(ominc), len(eloss), len(pol_type))
-        The calculated RIXS spectra. The 1st dimension is for the incident energy,
-        the 2nd dimension is for the energy loss and the 3rd dimension is for
-        different polarizations.
-    poles: 2d list of dict, shape=(len(ominc), len(pol_type))
-        The calculated RIXS poles. The 1st dimension is for incident energy, and the
-        2nd dimension is for different polarizations.
-    """
-    v_name_options = ['s', 'p', 't2g', 'd', 'f']
-    c_name_options = ['s', 'p', 'p12', 'p32', 't2g', 'd', 'd32', 'd52', 'f', 'f52', 'f72']
-    v_name = shell_name[0].strip()
-    c_name = shell_name[1].strip()
-    if v_name not in v_name_options:
-        raise Exception("NOT supported type of valence shell: ", v_name)
-    if c_name not in c_name_options:
-        raise Exception("NOT supported type of core shell: ", c_name)
-
-    names = (v_name, 'empty', c_name)
-    rixs, poles = _rixs_1or2_valence_1core(
-        comm, names, ominc, eloss, gamma_c=gamma_c, gamma_f=gamma_f,
-        v_tot_noccu=v_noccu, trans_to_which=1, thin=thin,
-        thout=thout, phi=phi, pol_type=pol_type, num_gs=num_gs, nkryl=nkryl,
-        linsys_max=linsys_max, linsys_tol=linsys_tol, temperature=temperature,
-        loc_axis=loc_axis, scatter_axis=loc_axis
-    )
-
-    return rixs, poles
 
 
 def rixs_2v1c_fort(comm, shell_name, ominc, eloss, *, gamma_c=0.1, gamma_f=0.1,
@@ -2593,6 +1630,10 @@ def rixs_2v1c_fort(comm, shell_name, ominc, eloss, *, gamma_c=0.1, gamma_f=0.1,
         The calculated RIXS poles. The 1st dimension is for incident energy, and the
         2nd dimension is for different polarizations.
     """
+    _warn_legacy(
+        'rixs_2v1c_fort',
+        'edrixs.models.model_2v1c + edrixs.solvers.get_ops/ed/rixs',
+    )
     v_name_options = ['s', 'p', 't2g', 'd', 'f']
     c_name_options = ['s', 'p', 'p12', 'p32', 't2g', 'd', 'd32', 'd52', 'f', 'f52', 'f72']
     v1_name = shell_name[0].strip()
@@ -2757,6 +1798,10 @@ def ed_siam_fort(comm, shell_name, nbath, *, siam_type=0, v_noccu=1, static_core
     noccu_gs: int
         Occupancy of the ground state.
     """
+    _warn_legacy(
+        'ed_siam_fort',
+        'edrixs.models.model_siam + edrixs.solvers.get_ops/ed',
+    )
     from .fedrixs import ed_fsolver
 
     rank = comm.Get_rank()
@@ -3150,6 +2195,10 @@ def xas_siam_fort(comm, shell_name, nbath, ominc, *, gamma_c=0.1,
     poles: list of dict, shape=(len(pol_type), )
         The calculated XAS poles for different polarizations.
     """
+    _warn_legacy(
+        'xas_siam_fort',
+        'edrixs.models.model_siam + edrixs.solvers.get_ops/ed/xas',
+    )
     from .fedrixs import xas_fsolver
 
     rank = comm.Get_rank()
@@ -3369,6 +2418,10 @@ def rixs_siam_fort(comm, shell_name, nbath, ominc, eloss, *, gamma_c=0.1, gamma_
         The calculated RIXS poles. The 1st dimension is for incident energy, and the
         2nd dimension is for different polarizations.
     """
+    _warn_legacy(
+        'rixs_siam_fort',
+        'edrixs.models.model_siam + edrixs.solvers.get_ops/ed/rixs',
+    )
     from .fedrixs import rixs_fsolver
 
     rank = comm.Get_rank()

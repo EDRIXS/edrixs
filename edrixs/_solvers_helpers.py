@@ -2,10 +2,6 @@
 
 import numpy as np
 import scipy.sparse as sp
-from scipy.sparse.linalg import LinearOperator, aslinearoperator, gmres
-import inspect
-import os
-import pickle
 
 from .iostream import write_emat, write_umat, write_config, read_poles_from_file
 from .angular_momentum import (
@@ -20,7 +16,34 @@ from .basis_transform import tmat_r2c
 from .utils import info_atomic_shell, slater_integrals_name
 from .plot_spectrum import get_spectra_from_poles, merge_pole_dicts
 from .soc import atom_hsoc
-from .krylov import lanczos_tridiagonal
+
+
+def _infer_backend(*operators):
+    """Infer which backend owns every supplied operator."""
+    from .petsc_backend import petsc_backend
+    from .scipy_backend import scipy_backend
+
+    owned_by_scipy = bool(operators) and all(
+        scipy_backend.owns_operator_scipy(operator) for operator in operators
+    )
+    owned_by_petsc = bool(operators) and all(
+        petsc_backend.owns_operator_petsc(operator) for operator in operators
+    )
+
+    match owned_by_scipy, owned_by_petsc:
+        case True, False:
+            return 'scipy'
+        case False, True:
+            return 'petsc'
+        case False, False:
+            raise TypeError(
+                "Could not infer a backend from the supplied operators; "
+                "pass backend='scipy' or backend='petsc' explicitly"
+            )
+        case True, True:
+            raise TypeError(
+                "Backend inference is ambiguous; pass backend explicitly"
+            )
 
 
 def _rotated_transition_blocks(case, loc_axis=None):
@@ -183,285 +206,6 @@ def _embed_impurity_core_umat(umat_tmp, v_norb, c_norb, ntot_v):
     return umat
 
 
-def _xas_poles_from_start_vectors(eval_i, start_vectors, hmat_n, *, nkryl):
-    """Build an EDRIXS-compatible XAS pole dictionary."""
-    poles = {
-        'eigval': [],
-        'npoles': [],
-        'norm': [],
-        'alpha': [],
-        'beta': [],
-    }
-
-    effective_nkryl = min(int(nkryl), hmat_n.shape[0])
-
-    for energy, start in zip(eval_i, start_vectors):
-        start = np.asarray(start, dtype=complex)
-        if np.linalg.norm(start) == 0:
-            alpha = np.array([0.0], dtype=float)
-            beta = np.array([], dtype=float)
-            norm = 0.0
-        else:
-            alpha, beta, norm = lanczos_tridiagonal(
-                hmat_n, start, m=effective_nkryl
-            )
-
-        poles['eigval'].append(float(energy))
-        poles['npoles'].append(len(alpha))
-        poles['norm'].append(float(np.real(norm)))
-        poles['alpha'].append(np.asarray(alpha))
-        poles['beta'].append(np.asarray(beta))
-
-    return poles
-
-
-_RIXS_WORKER_STATE = None
-
-_RIXS_THREADPOOL_LIMITER = None
-
-
-def _available_cpu_count():
-    """Return the CPU count available to this process, respecting affinity."""
-    process_cpu_count = getattr(os, 'process_cpu_count', None)
-    if process_cpu_count is not None:
-        count = process_cpu_count()
-        if count is not None:
-            return max(1, int(count))
-
-    try:
-        return max(1, len(os.sched_getaffinity(0)))
-    except (AttributeError, OSError):
-        return max(1, int(os.cpu_count() or 1))
-
-
-def _limit_worker_native_threads(nthreads):
-    """Limit BLAS/OpenMP pools inside a process-pool worker."""
-    global _RIXS_THREADPOOL_LIMITER
-
-    nthreads = int(nthreads)
-    for name in (
-        'OMP_NUM_THREADS',
-        'OPENBLAS_NUM_THREADS',
-        'MKL_NUM_THREADS',
-        'BLIS_NUM_THREADS',
-        'VECLIB_MAXIMUM_THREADS',
-        'NUMEXPR_NUM_THREADS',
-    ):
-        os.environ[name] = str(nthreads)
-
-    # threadpoolctl is optional. When present, it can change the thread count
-    # of libraries that were already loaded before a fork. The environment
-    # variables above remain the fallback for spawn/forkserver workers.
-    try:
-        from threadpoolctl import threadpool_limits
-    except ImportError:
-        _RIXS_THREADPOOL_LIMITER = None
-    else:
-        _RIXS_THREADPOOL_LIMITER = threadpool_limits(limits=nthreads)
-
-
-def _operator_for_process_pool(op, name):
-    """Return a picklable matrix/operator suitable for a worker initializer."""
-    if sp.issparse(op) or isinstance(op, np.ndarray):
-        candidate = op
-    else:
-        candidate = getattr(op, 'A', op)
-
-    try:
-        pickle.dumps(candidate, protocol=pickle.HIGHEST_PROTOCOL)
-    except Exception as exc:
-        raise TypeError(
-            "{} is not serializable for process-based parallel RIXS. "
-            "Use a SciPy sparse matrix, a NumPy array, a MatrixLinearOperator, "
-            "or set workers=1.".format(name)
-        ) from exc
-
-    return candidate
-
-
-def _init_rixs_worker(hmat_i, hmat_n, trans_op, eval_i, evec_i,
-                      ominc, gamma_core, polarizations, skip_gs, nkryl,
-                      linsys_tol, linsys_maxiter, linsys_restart,
-                      blas_threads):
-    """Initialize immutable solver state once in every process-pool worker."""
-    global _RIXS_WORKER_STATE
-
-    _limit_worker_native_threads(blas_threads)
-
-    trans_op = [aslinearoperator(T) for T in trans_op]
-    _RIXS_WORKER_STATE = {
-        'hmat_i': aslinearoperator(hmat_i),
-        'hmat_n': aslinearoperator(hmat_n),
-        'trans_op': trans_op,
-        'trans_op_H': [T.H for T in trans_op],
-        'eval_i': np.asarray(eval_i, dtype=float),
-        'evec_i': np.asarray(evec_i, dtype=complex),
-        'ominc': np.asarray(ominc, dtype=float),
-        'gamma_core': np.asarray(gamma_core, dtype=float),
-        'polarizations': polarizations,
-        'skip_gs': bool(skip_gs),
-        'nkryl': int(nkryl),
-        'linsys_tol': float(linsys_tol),
-        'linsys_maxiter': int(linsys_maxiter),
-        'linsys_restart': int(linsys_restart),
-    }
-
-
-def _rixs_pool_job(job):
-    """Compute one ``(incident energy, polarization, initial state)`` job."""
-    iom, ipol, istate = job
-    state = _RIXS_WORKER_STATE
-
-    if state is None:
-        raise RuntimeError("RIXS worker was not initialized")
-
-    polvec_i, polvec_f = state['polarizations'][ipol]
-    rhs = _apply_linear_combination(
-        state['trans_op'], polvec_i, state['evec_i'][:, istate]
-    )
-
-    rec = _rixs_krylov_one_contribution_scipy(
-        hmat_i=state['hmat_i'],
-        hmat_n=state['hmat_n'],
-        trans_op_H=state['trans_op_H'],
-        polvec_f=polvec_f,
-        eval_i=state['eval_i'],
-        evec_i=state['evec_i'],
-        istate=istate,
-        omega=state['ominc'][iom],
-        gamma_c=state['gamma_core'][iom],
-        rhs=rhs,
-        skip_gs=state['skip_gs'],
-        nkryl=state['nkryl'],
-        linsys_tol=state['linsys_tol'],
-        linsys_maxiter=state['linsys_maxiter'],
-        linsys_restart=state['linsys_restart'],
-    )
-
-    return iom, ipol, istate, rec
-
-
-def _pole_dict_from_records(records):
-    """Merge ordered per-initial-state records into one pole dictionary."""
-    keys = ('npoles', 'eigval', 'norm', 'alpha', 'beta')
-    return {
-        key: [record[key] for record in records]
-        for key in keys
-    }
-
-
-def _rixs_krylov_one_contribution_scipy(*, hmat_i, hmat_n, trans_op_H, polvec_f,
-                                        eval_i, evec_i, istate, omega, gamma_c,
-                                        rhs, skip_gs, nkryl, linsys_tol,
-                                        linsys_maxiter, linsys_restart):
-    """Compute one kept-initial-state contribution to one RIXS pole dictionary."""
-    Ei = eval_i[istate]
-
-    if np.linalg.norm(rhs) == 0:
-        alpha = np.array([0.0], dtype=float)
-        beta = np.array([], dtype=float)
-        return {
-            'eigval': Ei,
-            'npoles': 1,
-            'norm': 0.0,
-            'alpha': alpha,
-            'beta': beta
-        }
-
-    z = omega + Ei + 1j * gamma_c
-
-    A = LinearOperator(
-        shape=hmat_n.shape,
-        matvec=lambda x, z=z: z * x - hmat_n @ x,
-        dtype=np.complex128
-    )
-
-    x, info = _gmres_scipy_compat(
-        A, rhs, tol=linsys_tol, restart=linsys_restart, maxiter=linsys_maxiter
-    )
-
-    if info != 0:
-        raise RuntimeError(
-            "GMRES did not converge for istate={}, omega={}; info={}".format(
-                istate, omega, info
-            )
-        )
-
-    phi_vec = _apply_linear_combination(trans_op_H, np.conj(polvec_f), x)
-
-    if skip_gs:
-        for j in range(len(eval_i)):
-            gj = evec_i[:, j]
-            phi_vec = phi_vec - gj * np.vdot(gj, phi_vec)
-
-    if np.linalg.norm(phi_vec) == 0:
-        alpha = np.array([0.0], dtype=float)
-        beta = np.array([], dtype=float)
-        norm = 0.0
-    else:
-        alpha, beta, norm = lanczos_tridiagonal(hmat_i, phi_vec, m=nkryl)
-
-    return {
-        'eigval': Ei,
-        'npoles': len(alpha),
-        'norm': norm,
-        'alpha': alpha,
-        'beta': beta
-    }
-
-
-def _rixs_polarization_vectors(ntrans, thin, thout, phi, it, alpha, jt, beta, scatter_axis):
-    """Return incoming and outgoing polarization vectors in transition-operator space."""
-    ei, ef = dipole_polvec_rixs(thin, thout, phi, alpha, beta, scatter_axis, (it, jt))
-
-    if it.lower() == 'isotropic':
-        ei = np.ones(3, dtype=complex) / np.sqrt(3.0)
-    if jt.lower() == 'isotropic':
-        ef = np.ones(3, dtype=complex) / np.sqrt(3.0)
-
-    polvec_i = np.zeros(ntrans, dtype=complex)
-    polvec_f = np.zeros(ntrans, dtype=complex)
-
-    if ntrans == 3:
-        polvec_i[:] = ei
-        polvec_f[:] = ef
-    elif ntrans == 5:
-        ki = unit_wavevector(thin, phi, scatter_axis, direction='in')
-        kf = unit_wavevector(thout, phi, scatter_axis, direction='out')
-        polvec_i[:] = quadrupole_polvec(ei, ki)
-        polvec_f[:] = quadrupole_polvec(ef, kf)
-    else:
-        raise ValueError("ntrans must be 3 or 5")
-
-    return polvec_i, polvec_f
-
-
-def _apply_linear_combination(ops, coeffs, vec):
-    """Apply sum_i coeffs[i] ops[i] to vec without constructing the summed operator."""
-    out = None
-    for coeff, op in zip(coeffs, ops):
-        if coeff == 0:
-            continue
-        term = coeff * (op @ vec)
-        out = term if out is None else out + term
-
-    if out is None:
-        return np.zeros(ops[0].shape[0], dtype=complex)
-    return out
-
-
-def _check_adjoint_action(op, name):
-    """Require op.H @ x to work."""
-    try:
-        test_vec = np.zeros(op.shape[0], dtype=complex)
-        _ = op.H @ test_vec
-    except Exception as exc:
-        raise TypeError(
-            "{} must provide an adjoint action. For a custom LinearOperator, "
-            "define rmatvec or _adjoint.".format(name)
-        ) from exc
-
-
 def _expand_broadening(gamma, n, name):
     """Return gamma as a length-n float array."""
     out = np.empty(n, dtype=float)
@@ -473,16 +217,6 @@ def _expand_broadening(gamma, n, name):
             raise ValueError("{} must be scalar or have shape ({},)".format(name, n))
         out[:] = gamma
     return out
-
-
-def _gmres_scipy_compat(A, b, *, tol, restart, maxiter):
-    """Call scipy.sparse.linalg.gmres with either old or new SciPy tolerance names."""
-    sig = inspect.signature(gmres)
-
-    if "rtol" in sig.parameters:
-        return gmres(A, b, rtol=tol, atol=0.0, restart=restart, maxiter=maxiter)
-
-    return gmres(A, b, tol=tol, restart=restart, maxiter=maxiter)
 
 
 def _ed_1or2_valence_1core(

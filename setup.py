@@ -117,6 +117,7 @@ setup(
         ]
     },
     install_requires=requirements,
+    python_requires=">=3.10",
     license="GPL-3.0-or-later",
     classifiers=[
         "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",

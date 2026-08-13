@@ -1,0 +1,894 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  urlcolor=blue,
+  citecolor=blue
+}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  columns=fullflexible,
+  keepspaces=true,
+  frame=single,
+  breaklines=true,
+  showstringspaces=false
+}
+
+\title{EDRIXS SciPy Backend: Implementation Note}
+\author{}
+
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+\section{Purpose and scope}
+
+This note documents the SciPy implementation of the staged EDRIXS solver interface.  It is intended to be self-contained: a reader should be able to understand what the SciPy backend implements, how the main numerical objects are represented, and how the ED, XAS, and RIXS calculations are assembled without first reading the source code.
+
+The SciPy backend is also the current reference implementation for other backends.  A new backend such as PETSc does not need to reproduce the same numerical algorithms or storage formats, but it should reproduce the same operator meanings, public input/output conventions, and spectroscopy semantics.
+
+The relevant source files are
+
+\begin{lstlisting}
+edrixs/solvers.py
+edrixs/scipy_backend/scipy_backend.py
+edrixs/fock_basis.py
+edrixs/krylov.py
+edrixs/_solvers_helpers.py
+\end{lstlisting}
+
+The principal SciPy entry points are
+
+\begin{lstlisting}
+build_op_scipy
+ed_scipy
+xas_scipy
+rixs_scipy
+\end{lstlisting}
+
+with the numerical implementations
+
+\begin{lstlisting}
+ed_krylov_scipy
+xas_krylov_scipy
+rixs_krylov_scipy
+\end{lstlisting}
+
+in the same backend module.
+
+\section{Where the SciPy backend fits in EDRIXS}
+
+The staged interface separates model definition from numerical representation and solution.  A typical call chain is
+
+\begin{lstlisting}
+models.py
+    model_1v1c / model_2v1c / model_siam
+        |
+        v
+solvers.py
+    get_ops -> build_op
+    ed
+    xas
+    rixs
+        |
+        v
+scipy_backend/scipy_backend.py
+    build_op_scipy
+    ed_scipy
+    xas_scipy
+    rixs_scipy
+\end{lstlisting}
+
+The model layer produces backend-independent orbital-space information.  For example, a model returns
+
+\begin{lstlisting}
+emat_i, umat_i, basis_i,
+emat_n, umat_n, basis_n,
+trans_mat
+\end{lstlisting}
+
+where the suffixes \texttt{i} and \texttt{n} denote the initial/final and intermediate sectors, respectively.  The SciPy backend is responsible for converting these objects into many-body operators and then solving the requested spectroscopy problem.
+
+\subsection{Backend dispatch}
+
+The public wrappers in \texttt{solvers.py} do not call SciPy-specific functions directly by name.  They resolve a backend and then dispatch to the corresponding backend entry point.  Thus
+
+\begin{lstlisting}
+ed(..., backend="scipy")   -> ed_scipy(...)
+xas(..., backend="scipy") -> xas_scipy(...)
+rixs(..., backend="scipy") -> rixs_scipy(...)
+\end{lstlisting}
+
+The backend may also be inferred from already constructed operators.  The SciPy recognizer
+
+\begin{lstlisting}
+owns_operator_scipy(operator)
+\end{lstlisting}
+
+returns true for NumPy arrays, SciPy sparse matrices, and SciPy \texttt{LinearOperator} objects.
+
+\subsection{The role of \texttt{backend\_kws}}
+
+Backend-specific numerical controls are deliberately grouped in one dictionary rather than exposed as backend-specific keywords in the public solver API.  For example,
+
+\begin{lstlisting}[language=Python]
+eval_i, evec_i = ed(
+    hmat_i,
+    num_evals=10,
+    backend="scipy",
+    backend_kws={
+        "blocksize": 20,
+        "tol": 1e-10,
+        "maxiter": 1000,
+    },
+)
+\end{lstlisting}
+
+The public wrapper passes a copy of this dictionary to \texttt{ed\_scipy}.  The backend adapter then expands the dictionary into the arguments of \texttt{ed\_krylov\_scipy}.  XAS and RIXS work in the same way.
+
+This separation is important: physical arguments belong in the common interface; algorithm-specific controls belong in \texttt{backend\_kws}.
+
+\section{Fock-basis representation}
+
+\subsection{Integer encoding}
+
+Many-body basis states are represented by the shared \texttt{FockBasis} class in \texttt{fock\_basis.py}.  A basis state is encoded as an integer bit pattern.  Orbital zero is stored as the most significant bit.
+
+For a basis with \(N_{\mathrm{orb}}\) spin-orbitals, the bit for orbital \(i\) is
+
+\begin{equation}
+  b_i = 2^{N_{\mathrm{orb}}-1-i}.
+\end{equation}
+
+A set bit means that the corresponding spin-orbital is occupied.  \texttt{FockBasis.decode(j)} returns the integer state stored at many-body basis position \(j\), while \texttt{FockBasis.encode(state)} returns the matrix index of an integer-encoded state.
+
+The SciPy operator builder uses these operations directly.  This basis convention is therefore part of the meaning of the many-body operators even though the \texttt{FockBasis} class itself is backend independent.
+
+\subsection{Fermionic signs}
+
+When applying creation or annihilation operators, the SciPy backend computes the usual fermionic parity from the number of occupied orbitals preceding the acted-on orbital.  If \(n_{<i}\) is the number of occupied orbitals before orbital \(i\), the sign is
+
+\begin{equation}
+  (-1)^{n_{<i}}.
+\end{equation}
+
+The helper \texttt{\_count\_occupied\_before} implements this count using bit operations on the integer-encoded Fock state.
+
+\section{Many-body operator construction}
+
+\subsection{General contract}
+
+The public constructor is
+
+\begin{lstlisting}[language=Python]
+build_op(emat, umat, lb, rb=None, backend="scipy", backend_kws=None)
+\end{lstlisting}
+
+which dispatches to
+
+\begin{lstlisting}[language=Python]
+build_op_scipy(emat, umat, lb, rb=None, backend_kws=None)
+\end{lstlisting}
+
+for the SciPy backend.
+
+This function constructs a \emph{general many-body Fock-space operator}; it is not restricted to Hamiltonians.  The operator maps states in the right basis \texttt{rb} to states in the left basis \texttt{lb}.  If \texttt{rb} is omitted, it defaults to \texttt{lb}.
+
+The resulting matrix has shape
+
+\begin{equation}
+  \bigl(\lvert \mathrm{lb}\rvert,\,\lvert \mathrm{rb}\rvert\bigr).
+\end{equation}
+
+This matters for photon transition operators, which generally map between different Hilbert spaces and are therefore not required to be square.
+
+\subsection{Two-fermion contribution}
+
+The matrix \texttt{emat} defines the two-fermion part
+
+\begin{equation}
+  \hat O_2 = \sum_{ij} e_{ij}\, c_i^\dagger c_j.
+\end{equation}
+
+The SciPy routine \texttt{two\_fermion\_csr} loops over non-negligible \(e_{ij}\) and over basis states in \texttt{right\_basis}.  It
+
+\begin{enumerate}[label=\arabic*.]
+  \item checks that orbital \(j\) is occupied;
+  \item annihilates the electron at \(j\), including the fermionic sign;
+  \item checks that orbital \(i\) is empty;
+  \item creates an electron at \(i\), including the second fermionic sign;
+  \item looks up the resulting state in the left basis;
+  \item adds the resulting matrix element to a sparse COO accumulator.
+\end{enumerate}
+
+The result is converted to CSR format.
+
+\subsection{Four-fermion contribution}
+
+For dense Coulomb data, the rank-four tensor is interpreted as
+
+\begin{equation}
+  \hat O_4 = \sum_{lkji}
+  U_{lkji}\,
+  c_l^\dagger c_k^\dagger c_j c_i.
+\end{equation}
+
+The SciPy implementation applies the operators from right to left: annihilate \(i\), annihilate \(j\), create \(k\), create \(l\), accumulating the fermionic sign at each operation.
+
+The backend also accepts a flattened sparse representation of the four-index tensor.  The flattening convention is
+
+\begin{align}
+  \mathrm{row} &= l\,N_{\mathrm{orb}} + k,\\
+  \mathrm{col} &= j\,N_{\mathrm{orb}} + i,
+\end{align}
+
+so that sparse matrix element \((\mathrm{row},\mathrm{col})\) corresponds to \(U_{lkji}\).
+
+The helper \texttt{four\_fermion\_csr\_auto} chooses automatically between dense and sparse input representations.
+
+\subsection{Assembly in \texttt{build\_op\_scipy}}
+
+\texttt{build\_op\_scipy} begins from a zero CSR matrix and adds the requested contributions independently:
+
+\begin{lstlisting}[language=Python]
+operator = zero_matrix(shape=(len(lb), len(rb)))
+
+if emat is not None:
+    operator += two_fermion_csr(...)
+
+if umat is not None:
+    operator += four_fermion_csr_auto(...)
+\end{lstlisting}
+
+Therefore all of the following are valid:
+
+\begin{center}
+\begin{tabular}{lll}
+\toprule
+\texttt{emat} & \texttt{umat} & Meaning \\
+\midrule
+present & present & general interacting operator / Hamiltonian \\
+present & \texttt{None} & two-fermion operator, including photon transitions \\
+\texttt{None} & present & four-fermion-only operator \\
+\texttt{None} & \texttt{None} & zero operator \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The only current SciPy-specific construction option is
+
+\begin{lstlisting}
+backend_kws={"tol": value}
+\end{lstlisting}
+
+with default \(10^{-10}\).  Coefficients with magnitude not exceeding this threshold are ignored during construction.  Unknown construction options raise an error.
+
+\subsection{Hamiltonians and photon transition operators}
+
+The public \texttt{get\_ops} function uses \texttt{build\_op} for all many-body operators.
+
+The initial and intermediate Hamiltonians are constructed as
+
+\begin{lstlisting}[language=Python]
+hmat_i = build_op(emat_i, umat_i, basis_i, ...)
+hmat_n = build_op(emat_n, umat_n, basis_n, ...)
+\end{lstlisting}
+
+with the same basis on the left and right.
+
+Each component of the photon transition operator is constructed as
+
+\begin{lstlisting}[language=Python]
+build_op(
+    component,
+    None,
+    basis_n,
+    basis_i,
+    backend="scipy",
+)
+\end{lstlisting}
+
+and therefore has shape
+
+\begin{equation}
+  (\dim \mathcal H_n,\,\dim \mathcal H_i).
+\end{equation}
+
+There is no separate transition-operator construction API in the staged implementation.
+
+\section{Backend adapters}
+
+The public SciPy entry points
+
+\begin{lstlisting}
+ed_scipy
+xas_scipy
+rixs_scipy
+\end{lstlisting}
+
+are deliberately thin.  Their main jobs are to receive the common physical arguments, validate/copy \texttt{backend\_kws}, and call the corresponding numerical implementation.
+
+Conceptually,
+
+\begin{lstlisting}
+ed_scipy   -> ed_krylov_scipy
+xas_scipy  -> xas_krylov_scipy
+rixs_scipy -> rixs_krylov_scipy
+\end{lstlisting}
+
+This is useful when comparing SciPy with another backend: the adapter signatures define the backend contract, while the lower-level routines document one concrete numerical realization of that contract.
+
+\section{Ground-state diagonalization}
+
+\subsection{Public and backend interfaces}
+
+The public call is
+
+\begin{lstlisting}[language=Python]
+ed(hmat_i, num_evals=1, backend="scipy", backend_kws=None)
+\end{lstlisting}
+
+which dispatches to
+
+\begin{lstlisting}[language=Python]
+ed_scipy(hmat_i, num_evals=1, backend_kws=None).
+\end{lstlisting}
+
+\texttt{ed\_scipy} maps \texttt{num\_evals} to the retained-state count used by \texttt{ed\_krylov\_scipy}.
+
+\subsection{LOBPCG implementation}
+
+The current numerical solver is SciPy's LOBPCG routine.  The internal signature is
+
+\begin{lstlisting}[language=Python]
+ed_krylov_scipy(
+    hmat_i,
+    num_gs=1,
+    blocksize=None,
+    *,
+    tol=1e-10,
+    maxiter=200,
+    seed=None,
+    initial_guess=None,
+    suppress_lobpcg_warnings=True,
+)
+\end{lstlisting}
+
+The Hamiltonian is converted to a SciPy \texttt{LinearOperator}; it must be square.  If \texttt{blocksize} is not provided, it is set equal to the requested number of retained states.  A block larger than the retained count is allowed.  This is useful, for example, when low-energy degeneracies make a larger eigensolver block desirable.
+
+If the caller does not provide \texttt{initial\_guess}, the routine constructs a random real initial block using \texttt{numpy.random.default\_rng(seed)}.  If an initial guess is provided, it must have shape
+
+\begin{equation}
+  (\dim\mathcal H_i,\,\mathrm{blocksize}).
+\end{equation}
+
+LOBPCG is called with \texttt{largest=False}.  The returned eigenpairs are explicitly sorted by increasing eigenvalue.  Only the first \texttt{num\_gs} states are retained if a larger block was solved.
+
+The output convention is
+
+\begin{align}
+  \texttt{eval\_i.shape} &= (N_{\mathrm{eval}},),\\
+  \texttt{evec\_i.shape} &= (\dim\mathcal H_i,N_{\mathrm{eval}}),
+\end{align}
+
+with eigenvectors stored as columns.
+
+\subsection{SciPy ED backend keywords}
+
+The current SciPy ED controls supplied through \texttt{backend\_kws} are
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Keyword & Default \\
+\midrule
+\texttt{blocksize} & \texttt{None} (use retained-state count) \\
+\texttt{tol} & \(10^{-10}\) \\
+\texttt{maxiter} & 200 \\
+\texttt{seed} & \texttt{None} \\
+\texttt{initial\_guess} & \texttt{None} \\
+\texttt{suppress\_lobpcg\_warnings} & \texttt{True} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+These are SciPy implementation controls, not common EDRIXS physical parameters.
+
+\section{Lanczos utilities used by spectroscopy}
+
+The shared \texttt{krylov.py} module provides the Lanczos tridiagonalization used by the SciPy XAS and final-state RIXS calculations.
+
+Given a Hermitian operator \(H\) and a nonzero seed vector \(|v_0\rangle\), \texttt{lanczos\_tridiagonal} constructs the Krylov space
+
+\begin{equation}
+  \mathcal K_m(H,v_0)=\operatorname{span}\{v_0,Hv_0,H^2v_0,\ldots\}
+\end{equation}
+
+and produces the tridiagonal matrix
+
+\begin{equation}
+  T = \begin{pmatrix}
+  \alpha_0 & \beta_0 \\
+  \beta_0 & \alpha_1 & \beta_1 \\
+  & \ddots & \ddots & \ddots
+  \end{pmatrix}.
+\end{equation}
+
+The routine returns
+
+\begin{lstlisting}
+alpha, beta, norm
+\end{lstlisting}
+
+where \texttt{norm} is \(\lVert v_0\rVert^2\), the squared norm of the original unnormalized seed.
+
+The central projected-resolvent convention is
+
+\begin{equation}
+  G(z)=\langle v_0 |(zI-H)^{-1}|v_0\rangle,
+\end{equation}
+
+approximated from the Lanczos tridiagonal representation as
+
+\begin{equation}
+  G(z) \simeq \lVert v_0\rVert^2
+  \left[(zI-T)^{-1}\right]_{00}.
+\end{equation}
+
+The corresponding broadened spectral function is
+
+\begin{equation}
+  A(\omega)=-\frac{1}{\pi}\operatorname{Im}
+  G(\omega+E_0+i\eta).
+\end{equation}
+
+The current Lanczos implementation uses the standard three-term recurrence and does not perform explicit reorthogonalization.
+
+\section{X-ray absorption spectroscopy (XAS)}
+
+\subsection{Backend interface}
+
+The SciPy backend entry point is
+
+\begin{lstlisting}[language=Python]
+xas_scipy(
+    eval_i, evec_i, hmat_n, trans_op, ominc,
+    gamma_c=0.1,
+    thin=1.0,
+    phi=0.0,
+    pol_type=None,
+    temperature=1.0,
+    scatter_axis=None,
+    backend_kws=None,
+)
+\end{lstlisting}
+
+It forwards the physical arguments to \texttt{xas\_krylov\_scipy} and expands the SciPy-specific backend dictionary.  The only current SciPy XAS numerical keyword is
+
+\begin{equation}
+  \texttt{nkryl}=200
+\end{equation}
+
+by default.
+
+\subsection{Input conventions}
+
+The retained initial states satisfy
+
+\begin{align}
+  \texttt{eval\_i.shape} &= (N_i,),\\
+  \texttt{evec\_i.shape} &= (\dim\mathcal H_i,N_i).
+\end{align}
+
+The intermediate Hamiltonian \texttt{hmat\_n} must be square.  Each photon transition operator must have shape
+
+\begin{equation}
+  (\dim\mathcal H_n,\dim\mathcal H_i).
+\end{equation}
+
+The number of transition components must be either 3 (dipole) or 5 (quadrupole).
+
+\subsection{Physical calculation}
+
+For one retained initial state \(|i\rangle\), define a polarization-dependent transition operator
+
+\begin{equation}
+  T_{\epsilon}=\sum_a \epsilon_a T_a,
+\end{equation}
+
+where \(T_a\) are the three dipole or five quadrupole transition components and \(\epsilon_a\) is the corresponding polarization vector in transition-operator space.
+
+The starting vector is
+
+\begin{equation}
+  |b_i\rangle=T_{\epsilon}|i\rangle.
+\end{equation}
+
+The SciPy implementation performs a Lanczos tridiagonalization of \(H_n\) starting from \(|b_i\rangle\).  The resulting pole data are stored in the keys
+
+\begin{lstlisting}
+eigval
+npoles
+norm
+alpha
+beta
+\end{lstlisting}
+
+for each retained initial state.
+
+The final spectral function is generated by \texttt{get\_spectra\_from\_poles}, which applies the core-hole broadening and thermal weights of the retained initial states.
+
+\subsection{Polarization handling}
+
+For linear, left-circular, or right-circular polarization, the code first constructs the physical dipole polarization vector.  For a five-component quadrupole transition, this is combined with the photon wavevector to obtain the corresponding quadrupole polarization components.
+
+For isotropic XAS, the SciPy implementation does not construct one coherent sum of all transition components.  Instead, it evaluates the spectrum from each transition component separately and averages the resulting spectra over the number of components.
+
+If \texttt{pol\_type} is omitted, the SciPy XAS default is isotropic polarization.
+
+\subsection{Broadening and output}
+
+\texttt{gamma\_c} may be either a scalar or a one-dimensional array of length \texttt{len(ominc)}.  Scalars are expanded to the incident-energy grid.
+
+The returned XAS array has shape
+
+\begin{equation}
+  \bigl(\mathrm{len}(\texttt{ominc}),\,
+  \mathrm{len}(\texttt{pol\_type})\bigr).
+\end{equation}
+
+\section{Resonant inelastic X-ray scattering (RIXS)}
+
+\subsection{Backend interface}
+
+The SciPy backend entry point is
+
+\begin{lstlisting}[language=Python]
+rixs_scipy(
+    eval_i, evec_i,
+    hmat_i, hmat_n,
+    trans_op,
+    ominc, eloss,
+    gamma_c=0.1,
+    gamma_f=0.01,
+    thin=1.0,
+    thout=1.0,
+    phi=0.0,
+    pol_type=None,
+    temperature=1.0,
+    scatter_axis=None,
+    skip_gs=False,
+    return_poles=False,
+    backend_kws=None,
+)
+\end{lstlisting}
+
+The SciPy numerical implementation is \texttt{rixs\_krylov\_scipy}.
+
+\subsection{Overall decomposition}
+
+The RIXS code is separated into three stages:
+
+\begin{lstlisting}
+_prepare_rixs
+_compute_rixs_records
+_assemble_rixs
+\end{lstlisting}
+
+The calculation flow is
+
+\begin{lstlisting}
+rixs_scipy
+    |
+    v
+rixs_krylov_scipy
+    |
+    +-- _prepare_rixs
+    |
+    +-- _compute_rixs_records
+    |       |
+    |       +-- _rixs_krylov_one_contribution_scipy
+    |
+    +-- _assemble_rixs
+\end{lstlisting}
+
+This decomposition separates reusable problem setup, the independent physical contributions, and final spectral assembly.
+
+\subsection{Preparation}
+
+\texttt{\_prepare\_rixs} converts the Hamiltonians and transition operators to SciPy \texttt{LinearOperator} form and validates the dimensions.
+
+The required operator shapes are
+
+\begin{align}
+  H_i &: (\dim\mathcal H_i,\dim\mathcal H_i),\\
+  H_n &: (\dim\mathcal H_n,\dim\mathcal H_n),\\
+  T_a &: (\dim\mathcal H_n,\dim\mathcal H_i).
+\end{align}
+
+The transition operators must also provide an adjoint action, because RIXS needs \(T_a^\dagger\).
+
+The routine expands
+
+\begin{itemize}
+  \item \texttt{gamma\_c} over the incident-energy grid;
+  \item \texttt{gamma\_f} over the energy-loss grid;
+  \item the incoming and outgoing polarization specifications into vectors in the 3- or 5-component transition-operator space.
+\end{itemize}
+
+If \texttt{skip\_gs=True}, the retained initial-state eigenvectors are stored as the subspace that must later be excluded from the final-state response.
+
+\subsection{One independent contribution}
+
+One RIXS contribution is labeled by
+
+\begin{equation}
+  (\omega_{\mathrm{in}},\,p,\,i),
+\end{equation}
+
+where \(\omega_{\mathrm{in}}\) is one incident energy, \(p\) is one incoming/outgoing polarization pair, and \(i\) is one retained initial state.
+
+For initial state \(|i\rangle\), the incoming transition creates the intermediate-state right-hand side
+
+\begin{equation}
+  |b_i\rangle=T_{\mathrm{in}}|i\rangle.
+\end{equation}
+
+The correction vector \(|x_i\rangle\) satisfies
+
+\begin{equation}
+  \left[
+  \omega_{\mathrm{in}} + E_i + i\Gamma_c - H_n
+  \right]|x_i\rangle
+  = |b_i\rangle.
+\end{equation}
+
+The SciPy backend represents the shifted matrix as a \texttt{LinearOperator} and solves this linear system with GMRES.
+
+The outgoing transition then produces a vector in the initial/final Hilbert space,
+
+\begin{equation}
+  |f_i\rangle = T_{\mathrm{out}}^\dagger |x_i\rangle.
+\end{equation}
+
+A final-state Lanczos calculation of \(H_i\), seeded by \(|f_i\rangle\), generates the poles used for the energy-loss spectrum.
+
+\subsection{GMRES implementation and controls}
+
+The current SciPy-specific RIXS controls are
+
+\begin{center}
+\begin{tabular}{ll}
+\toprule
+Keyword & Default \\
+\midrule
+\texttt{nkryl} & 200 \\
+\texttt{linsys\_tol} & \(10^{-9}\) \\
+\texttt{linsys\_maxiter} & 50000 \\
+\texttt{linsys\_restart} & 200 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+They are passed through \texttt{backend\_kws}.
+
+The compatibility helper \texttt{\_gmres\_scipy\_compat} accommodates old and new SciPy GMRES signatures.  With a modern SciPy signature it calls
+
+\begin{lstlisting}[language=Python]
+gmres(
+    operator,
+    rhs,
+    rtol=tol,
+    atol=0.0,
+    restart=restart,
+    maxiter=maxiter,
+)
+\end{lstlisting}
+
+and with an older SciPy signature it uses \texttt{tol=tol}.  A nonzero GMRES return code is treated as failure and raises \texttt{RuntimeError}.
+
+\subsection{Implementation of \texttt{skip\_gs}}
+
+The meaning of \texttt{skip\_gs} is that transitions into the retained initial-state subspace are excluded from the final-state RIXS spectrum.
+
+In the SciPy implementation, after the outgoing transition has formed \(|f_i\rangle\), the code projects out the subspace spanned by the retained columns of \texttt{evec\_i}:
+
+\begin{equation}
+  |f_i\rangle
+  \leftarrow
+  |f_i\rangle
+  - V_i V_i^\dagger |f_i\rangle,
+\end{equation}
+
+where
+
+\begin{equation}
+  V_i = \begin{bmatrix}|i_1\rangle & |i_2\rangle & \cdots\end{bmatrix}
+\end{equation}
+
+contains the retained initial-state eigenvectors.
+
+In code this is
+
+\begin{lstlisting}[language=Python]
+final_vector = final_vector - excluded_vectors @ (
+    excluded_vectors.conj().T @ final_vector
+)
+\end{lstlisting}
+
+when \texttt{excluded\_vectors} is not \texttt{None}.  The projection happens \emph{before} the final-state Lanczos calculation, so the excluded subspace carries zero spectral weight.
+
+This is a concrete SciPy implementation of the public \texttt{skip\_gs} semantics.  Another backend must reproduce the same physical operation using its own vector and matrix representation.
+
+\subsection{Serial contribution loop}
+
+\texttt{\_compute\_rixs\_records} currently evaluates the contributions with ordinary nested loops over
+
+\begin{lstlisting}
+incident energy
+    polarization pair
+        retained initial state
+\end{lstlisting}
+
+For each combination it constructs the incoming right-hand side and calls \texttt{\_rixs\_krylov\_one\_contribution\_scipy}.
+
+There are no public threading, process-pool, worker-count, or multiprocessing-start-method controls in the SciPy RIXS backend.  Parallelism can instead be introduced above this level by making independent RIXS calls, for example with an incident-energy array of length one.  SciPy itself may of course use lower-level native parallelism in linked numerical libraries.
+
+\subsection{Pole records and assembly}
+
+Each contribution returns a record containing
+
+\begin{lstlisting}
+eigval
+npoles
+norm
+alpha
+beta
+\end{lstlisting}
+
+where \texttt{alpha}, \texttt{beta}, and \texttt{norm} are the final-state Lanczos data.
+
+The records are stored with logical ordering
+
+\begin{lstlisting}
+incident energy -> polarization -> retained initial state
+\end{lstlisting}
+
+and \texttt{\_assemble\_rixs} converts each group of retained-state records into an energy-loss spectrum using \texttt{get\_spectra\_from\_poles}.
+
+The final spectrum has shape
+
+\begin{equation}
+  \bigl(
+  \mathrm{len}(\texttt{ominc}),\,
+  \mathrm{len}(\texttt{eloss}),\,
+  \mathrm{len}(\texttt{pol\_type})
+  \bigr).
+\end{equation}
+
+If \texttt{return\_poles=False}, only this array is returned.  If \texttt{return\_poles=True}, the return value is
+
+\begin{lstlisting}[language=Python]
+(spectrum, poles_all)
+\end{lstlisting}
+
+where \texttt{poles\_all} is indexed first by incident energy and then by polarization.
+
+\section{Dense compatibility path}
+
+The name \texttt{dense} is currently a compatibility path rather than an independent dense numerical backend.
+
+\texttt{build\_op\_dense} constructs the operator through the SciPy CSR implementation and converts the result to a NumPy array.  The dense solver entry points are aliases:
+
+\begin{lstlisting}[language=Python]
+ed_dense   = ed_scipy
+xas_dense  = xas_scipy
+rixs_dense = rixs_scipy
+\end{lstlisting}
+
+Thus the SciPy implementation currently services both explicit SciPy operators and the dense compatibility mode.
+
+\section{Behavior that defines the reference implementation}
+
+For another backend, the following are the important externally visible SciPy conventions to reproduce:
+
+\begin{itemize}
+  \item \texttt{build\_op} constructs a general many-body Fock-space operator, not only a Hamiltonian.
+  \item The operator maps \texttt{rb} to \texttt{lb} and may be rectangular.
+  \item Photon transition operators have shape \((\dim\mathcal H_n,\dim\mathcal H_i)\).
+  \item Both 3-component dipole and 5-component quadrupole transitions are supported.
+  \item ED returns lowest eigenvalues in ascending order with eigenvectors stored by column.
+  \item XAS returns shape \((N_{\omega},N_{\mathrm{pol}})\).
+  \item RIXS returns shape \((N_{\omega_{\mathrm{in}}},N_{\mathrm{loss}},N_{\mathrm{pol}})\).
+  \item Scalar or energy-dependent broadenings are accepted where supported by the public interface.
+  \item Thermal weighting is applied consistently when spectra are assembled from retained initial states.
+  \item \texttt{skip\_gs=True} removes the retained initial-state subspace from the final-state RIXS response.
+  \item \texttt{return\_poles=True} returns the spectrum together with the nested pole data.
+  \item Backend-specific numerical controls enter through a dictionary \texttt{backend\_kws}.
+\end{itemize}
+
+The following are specifically SciPy implementation choices and need not be copied literally by another backend:
+
+\begin{itemize}
+  \item CSR matrix storage;
+  \item LOBPCG for ED;
+  \item SciPy GMRES for the RIXS correction vector;
+  \item the exact private helper decomposition;
+  \item the SciPy-specific names and defaults inside \texttt{backend\_kws};
+  \item NumPy/SciPy vector storage.
+\end{itemize}
+
+\section{Compact algorithm summary}
+
+\subsection{Operator construction}
+
+\begin{lstlisting}
+for each nonzero orbital-space coefficient:
+    for each right-basis Fock state:
+        apply annihilation/creation operators with fermionic signs
+        if resulting state is in left basis:
+            accumulate matrix element
+return CSR operator
+\end{lstlisting}
+
+\subsection{ED}
+
+\begin{lstlisting}
+convert H_i to LinearOperator
+construct/validate initial LOBPCG block
+solve for low eigenpairs
+sort by eigenvalue
+return requested lowest states
+\end{lstlisting}
+
+\subsection{XAS}
+
+\begin{lstlisting}
+for each polarization:
+    form polarization-weighted transition action
+    for each retained initial state:
+        start = T_in |i>
+        Lanczos(H_n, start)
+        store poles
+    broaden and thermally weight poles on ominc grid
+return spectrum
+\end{lstlisting}
+
+\subsection{RIXS}
+
+\begin{lstlisting}
+prepare operators, broadenings, polarizations, skip_gs subspace
+for each incident energy:
+    for each polarization pair:
+        for each retained initial state:
+            rhs = T_in |i>
+            solve (omega + E_i + i Gamma_c - H_n) x = rhs
+            final = T_out^dagger x
+            if skip_gs:
+                project final out of retained initial-state subspace
+            Lanczos(H_i, final)
+            store pole record
+assemble records into broadened energy-loss spectra
+return spectrum, and optionally poles
+\end{lstlisting}
+
+\section{Conclusion}
+
+The SciPy backend implements the complete staged EDRIXS workflow using a clear separation between backend-neutral physical inputs and SciPy-specific numerical machinery.  Its operator builder translates orbital-space two- and four-fermion terms into sparse many-body operators; ED uses LOBPCG; XAS uses Lanczos pole expansions in the intermediate Hilbert space; and RIXS combines an intermediate correction-vector solve with a final-state Lanczos expansion.  The public physical semantics are carried through the thin backend adapters, while method-specific controls remain isolated in \texttt{backend\_kws}.
+
+For future backends, the SciPy code should therefore be read in two ways: as an exact reference for the EDRIXS behavior and data conventions, and as only one possible realization of the underlying numerical algorithms.
+
+\end{document}

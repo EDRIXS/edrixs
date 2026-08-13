@@ -61,7 +61,7 @@ where ``VIRTUAL_ENV`` should be replaced by the directory where you wish to inst
 
 Alternatively create and activate a conda environment for edrixs::
 
-    conda create --name edrixs_env python=3.8
+    conda create --name edrixs_env python=3.10
     conda activate edrixs_env
 
 We will assume ``python`` and ``pip`` are pointing to the activated environment from now on.

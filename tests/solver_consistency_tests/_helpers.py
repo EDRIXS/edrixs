@@ -4,18 +4,25 @@ import numpy as np
 import scipy.sparse as sp
 from numpy.testing import assert_allclose
 
-from edrixs.solvers import ops
+from edrixs.solvers import get_ops
 
 
 def exact_1v1c_reference_data(problem):
-    """Diagonalize the tiny dense model used as a final-spectrum reference."""
-    hmat_i, hmat_n, transitions = ops(*problem, backend="dense")
-    eval_i, evec_i = np.linalg.eigh(hmat_i)
-    eval_n, evec_n = np.linalg.eigh(hmat_n)
+    """Return SciPy operators plus exact dense eigenbasis reference data."""
+    hmat_i_dense, hmat_n_dense, transitions_dense = get_ops(
+        *problem,
+        backend="dense",
+    )
+    hmat_i, hmat_n, transitions = get_ops(
+        *problem,
+        backend="scipy",
+    )
+    eval_i, evec_i = np.linalg.eigh(hmat_i_dense)
+    eval_n, evec_n = np.linalg.eigh(hmat_n_dense)
     transitions_eigenbasis = np.stack(
         [
             evec_n.conj().T @ transition @ evec_i
-            for transition in transitions
+            for transition in transitions_dense
         ]
     )
     return (
@@ -48,10 +55,10 @@ def assert_problem_sparse_dense_equivalent(dense, sparse):
         )
 
 
-def assert_dense_and_scipy_ops_match(dense_problem, sparse_problem, seed=0):
+def assert_dense_and_scipy_get_ops_match(dense_problem, sparse_problem, seed=0):
     """Compare dense and SciPy operator actions produced from the same model."""
-    hmat_i, hmat_n, transitions = ops(*dense_problem, backend="dense")
-    hmat_i_sp, hmat_n_sp, transitions_sp = ops(
+    hmat_i, hmat_n, transitions = get_ops(*dense_problem, backend="dense")
+    hmat_i_sp, hmat_n_sp, transitions_sp = get_ops(
         *sparse_problem,
         backend="scipy",
     )
@@ -65,14 +72,22 @@ def assert_dense_and_scipy_ops_match(dense_problem, sparse_problem, seed=0):
     )
 
     assert_allclose(hmat_i_sp @ vec_i, hmat_i @ vec_i, atol=2e-12)
-    assert_allclose(hmat_i_sp.H @ vec_i, hmat_i.conj().T @ vec_i, atol=2e-12)
+    assert_allclose(
+        hmat_i_sp.conj().T @ vec_i,
+        hmat_i.conj().T @ vec_i,
+        atol=2e-12,
+    )
     assert_allclose(hmat_n_sp @ vec_n, hmat_n @ vec_n, atol=2e-12)
-    assert_allclose(hmat_n_sp.H @ vec_n, hmat_n.conj().T @ vec_n, atol=2e-12)
+    assert_allclose(
+        hmat_n_sp.conj().T @ vec_n,
+        hmat_n.conj().T @ vec_n,
+        atol=2e-12,
+    )
 
     for transition_sp, transition in zip(transitions_sp, transitions):
         assert_allclose(transition_sp @ vec_i, transition @ vec_i, atol=2e-12)
         assert_allclose(
-            transition_sp.H @ vec_n,
+            transition_sp.conj().T @ vec_n,
             transition.conj().T @ vec_n,
             atol=2e-12,
         )

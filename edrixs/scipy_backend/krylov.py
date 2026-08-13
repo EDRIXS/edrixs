@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-"""Small Krylov/Lanczos utilities.
+"""SciPy-based Krylov/Lanczos utilities.
 
 This module provides low-level routines for evaluating projected resolvents
-and spectral functions from a Lanczos tridiagonal representation.  The
-functions are intentionally independent of any specific spectroscopy solver:
-high-level EDRIXS routines can build problem-specific seed vectors and then use
-these utilities to evaluate the corresponding dynamical response.
+and spectral functions from a Lanczos tridiagonal representation. The
+functions are independent of any specific spectroscopy solver, but use
+SciPy's linear-operator and banded-solver interfaces. High-level SciPy backend
+routines can build problem-specific seed vectors and then use these utilities
+to evaluate the corresponding dynamical response.
 
 The central convention used here is
 
