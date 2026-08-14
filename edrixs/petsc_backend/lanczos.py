@@ -1,7 +1,6 @@
 import numpy as np
 from scipy.sparse.linalg import aslinearoperator
-from petsc4py import PETSc
-from slepc4py import SLEPc
+
 
 def lanczos_tridiagonal_scipy(H, v0, m):
     r"""
@@ -12,7 +11,7 @@ def lanczos_tridiagonal_scipy(H, v0, m):
 
     The Lanczos algorithm constructs an orthonormal Krylov basis
     :math:`\{ v_0, v_1, \ldots, v_{m-1} \}` defined by
-    
+
     .. math::
 
         \mathcal{K}_m(H, v_0) =
@@ -49,11 +48,10 @@ def lanczos_tridiagonal_scipy(H, v0, m):
     """
     H = aslinearoperator(H)
     norm_psi = np.linalg.norm(v0)
-    n = H.shape[0]
     v = v0 / norm_psi
-    
+
     alphas = np.zeros(m, dtype=float)
-    betas  = np.zeros(m-1, dtype=float)
+    betas = np.zeros(m-1, dtype=float)
 
     w = H @ v
     alphas[0] = np.vdot(v, w).real
@@ -85,7 +83,7 @@ def lanczos_tridiagonal(H, v, nkryl):
 
     The Lanczos algorithm constructs an orthonormal Krylov basis
     :math:`\{ v_0, v_1, \ldots, v_{m-1} \}` defined by
-    
+
     .. math::
 
         \mathcal{K}_m(H, v_0) =
@@ -120,19 +118,19 @@ def lanczos_tridiagonal(H, v, nkryl):
         Real off-diagonal coefficients :math:`\beta_j`.  The length may be
         smaller than :math:`m-1` if a lucky breakdown occurs.
     norm**2: float
-        normalization factor. 
+        normalization factor.
     """
     norm = v.normalize()
-    
+
     alphas = np.zeros(nkryl, dtype=float)
-    betas  = np.zeros(nkryl - 1, dtype=float)
-    
+    betas = np.zeros(nkryl - 1, dtype=float)
+
     w = H.createVecLeft()
     H.mult(v, w)
     alphas[0] = v.dot(w).real
-    
+
     w.axpy(-alphas[0], v)
-    
+
     neff = 1
     for j in range(1, nkryl):
         beta = w.norm()

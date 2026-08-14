@@ -5,8 +5,6 @@ from typing import List, Tuple
 
 from numba import njit
 from petsc4py import PETSc
-from scipy.sparse import coo_matrix
-
 
 
 @dataclass(slots=True)
@@ -69,7 +67,6 @@ class FockBinByN:
         )
 
 
-
 def hash_decoder(r: int, N: int, M: int) -> int:
     b = 0
     j = M
@@ -122,7 +119,6 @@ def min_max_decode(shapes):
         b_min |= sub_min << running
         b_max |= sub_max << running
     return b_min, b_max
-
 
 
 @njit(cache=True, inline="always")
@@ -191,7 +187,6 @@ def hash_encoder_jit(b, N, M):
     return r
 
 
-
 @njit(cache=True, inline="always")
 def bit_at_orb_u64(b, orb, norb):
     bitpos = np.uint64(norb - 1 - orb)
@@ -215,7 +210,6 @@ def sign_count_u64(b, orb, norb):
     bitpos = np.uint64(norb - 1 - orb)
     prefix = b >> (bitpos + np.uint64(1))
     return 1 if (popcount_u64(prefix) % 2 == 0) else -1
-
 
 
 @njit(cache=True)
@@ -266,7 +260,6 @@ def encode_basis_py(b, norbs, noccus, offsets, strides, min_decode, max_decode):
     strides = np.asarray(strides, dtype=np.int64)
     return int(encode_basis_jit(np.uint64(b), norbs, noccus, offsets, strides,
                                 np.uint64(min_decode), np.uint64(max_decode)))
-
 
 
 @njit(cache=True)
@@ -356,20 +349,25 @@ def build_H_entries_lr(
                 cols.append(icfg)
                 vals.append(u * s1 * s2 * s3 * s4)
 
-    return np.asarray(rows, dtype=np.int32), np.asarray(cols, dtype=np.int32), np.asarray(vals, dtype=np.complex128)
+    return (
+        np.asarray(rows, dtype=np.int32),
+        np.asarray(cols, dtype=np.int32),
+        np.asarray(vals, dtype=np.complex128),
+    )
+
 
 def assemble_petsc_from_entries(comm, nl, nr, rows, cols, vals, nnz_guess_per_row=16):
     H = PETSc.Mat().create(comm=comm)
     H.setSizes(((None, nl), (None, nr)))
     H.setType(PETSc.Mat.Type.AIJ)
-    #H.setType("aijcusparse")
-    #H.setVecType(PETSc.Vec.Type.CUDA)
+    # H.setType("aijcusparse")
+    # H.setVecType(PETSc.Vec.Type.CUDA)
     H.setPreallocationNNZ(nnz_guess_per_row)
     H.setOption(PETSc.Mat.Option.NEW_NONZERO_ALLOCATION_ERR, False)
     H.setUp()
 
     print(f"H type in has script: {H.getType()}", flush=True)
-    
+
     if rows.size:
         order = np.argsort(rows, kind="mergesort")
         rows = rows[order]
@@ -384,14 +382,12 @@ def assemble_petsc_from_entries(comm, nl, nr, rows, cols, vals, nnz_guess_per_ro
                 end += 1
             H.setValues(r, cols[start:end], vals[start:end], addv=PETSc.InsertMode.ADD_VALUES)
             start = end
-    
-
 
     H.assemblyBegin()
     H.assemblyEnd()
     H_gpu = H.convert("aijcusparse")
     return H_gpu
-    #return H
+    # return H
 
 
 def get_H(comm, emat, umat, lb, rb=None, tol_e=1e-10, tol_u=1e-10, nnz_guess_per_row=None):
