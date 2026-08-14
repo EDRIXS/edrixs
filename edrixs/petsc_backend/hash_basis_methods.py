@@ -3,14 +3,22 @@ from math import comb, prod
 from dataclasses import dataclass, field
 from typing import List, Tuple
 
-from numba import njit
+try:
+    from numba import njit
+except ImportError as exc:
+    raise ImportError(
+        "The PETSc operator builder requires numba for JIT-compiled "
+        "combinadic Fock-space construction"
+    ) from exc
+
 from petsc4py import PETSc
 
 
 @dataclass(slots=True)
 class FockBinByN:
     shapes: List[Tuple[int, int]]
-    norbs: List[int] = field(init=False)
+    shell_norbs: List[int] = field(init=False)
+    norbs: int = field(init=False)
     noccus: List[int] = field(init=False)
     sizes: List[int] = field(init=False)
     num_subspaces: int = field(init=False)
@@ -22,16 +30,17 @@ class FockBinByN:
     max_decode: int = field(init=False)
 
     def __post_init__(self) -> None:
-        self.norbs = [int(norb) for (norb, _) in self.shapes]
+        self.shell_norbs = [int(norb) for (norb, _) in self.shapes]
+        self.norbs = sum(self.shell_norbs)
         self.noccus = [int(nocc) for (_, nocc) in self.shapes]
         self.sizes = [comb(norb, nocc) for (norb, nocc) in self.shapes]
-        self.num_subspaces = len(self.norbs)
-        self.num_orbitals = sum(self.norbs)
+        self.num_subspaces = len(self.shell_norbs)
+        self.num_orbitals = self.norbs
         self.dim = prod(self.sizes)
 
         running = self.num_orbitals
         offsets = []
-        for N in self.norbs:
+        for N in self.shell_norbs:
             running -= N
             offsets.append(running)
         self.offsets = tuple(offsets)
@@ -45,19 +54,33 @@ class FockBinByN:
             stride *= self.sizes[n]
         self.strides = tuple(strides)
 
+    def __len__(self) -> int:
+        return self.dim
+
     def encode(self, b: int) -> int:
-        return encode_basis_py(b, self.norbs, self.noccus, self.offsets, self.strides,
-                               self.min_decode, self.max_decode)
+        index = encode_basis_py(
+            b, self.shell_norbs, self.noccus, self.offsets, self.strides,
+            self.min_decode, self.max_decode
+        )
+        if index < 0:
+            raise KeyError(int(b))
+        return index
 
     def decode(self, index: int) -> int:
-        return decode_basis_py(index, self.norbs, self.noccus, self.offsets, self.sizes)
+        if index < 0:
+            index += self.dim
+        if index < 0 or index >= self.dim:
+            raise IndexError(index)
+        return decode_basis_py(
+            index, self.shell_norbs, self.noccus, self.offsets, self.sizes
+        )
 
     def jit_args(self):
         """
         Small metadata only. No full state table.
         """
         return (
-            np.asarray(self.norbs, dtype=np.int64),
+            np.asarray(self.shell_norbs, dtype=np.int64),
             np.asarray(self.noccus, dtype=np.int64),
             np.asarray(self.offsets, dtype=np.int64),
             np.asarray(self.sizes, dtype=np.int64),
@@ -65,6 +88,14 @@ class FockBinByN:
             np.int64(self.min_decode),
             np.int64(self.max_decode),
         )
+
+
+def get_fock_basis_petsc(*args):
+    """Build the PETSc combinadic Fock-basis implementation."""
+    if len(args) % 2 != 0:
+        print("Error: number of arguments is not even")
+        return None
+    return FockBinByN(list(zip(args[0::2], args[1::2])))
 
 
 def hash_decoder(r: int, N: int, M: int) -> int:
@@ -356,7 +387,8 @@ def build_H_entries_lr(
     )
 
 
-def assemble_petsc_from_entries(comm, nl, nr, rows, cols, vals, nnz_guess_per_row=16):
+def assemble_petsc_from_entries(
+        comm, nl, nr, rows, cols, vals, nnz_guess_per_row=16, mat_type=None):
     H = PETSc.Mat().create(comm=comm)
     H.setSizes(((None, nl), (None, nr)))
     H.setType(PETSc.Mat.Type.AIJ)
@@ -365,8 +397,6 @@ def assemble_petsc_from_entries(comm, nl, nr, rows, cols, vals, nnz_guess_per_ro
     H.setPreallocationNNZ(nnz_guess_per_row)
     H.setOption(PETSc.Mat.Option.NEW_NONZERO_ALLOCATION_ERR, False)
     H.setUp()
-
-    print(f"H type in has script: {H.getType()}", flush=True)
 
     if rows.size:
         order = np.argsort(rows, kind="mergesort")
@@ -385,60 +415,6 @@ def assemble_petsc_from_entries(comm, nl, nr, rows, cols, vals, nnz_guess_per_ro
 
     H.assemblyBegin()
     H.assemblyEnd()
-    H_gpu = H.convert("aijcusparse")
-    return H_gpu
-    # return H
-
-
-def get_H(comm, emat, umat, lb, rb=None, tol_e=1e-10, tol_u=1e-10, nnz_guess_per_row=None):
-    """Assemble H = sum_ij emat_ij f_i^dagger f_j + sum_lkji umat_lkji f_l^dagger f_k^dagger f_j f_i.
-
-    For rectangular operators, rb is the column basis and lb is the row basis.
-    For square operators, omit rb and lb is used on both sides.
-    """
-    if rb is None:
-        rb = lb
-
-    nl, nr = lb.dim, rb.dim
-    H = PETSc.Mat().create(comm=comm)
-    H.setSizes(((None, nl), (None, nr)))
-    H.setType(PETSc.Mat.Type.AIJ)
-
-    if nnz_guess_per_row is None:
-        ne = int(np.count_nonzero(np.abs(emat) > tol_e)) if emat is not None else 0
-        nu = int(np.count_nonzero(np.abs(umat) > tol_u)) if umat is not None else 0
-        nnz_guess_per_row = max(8, min(nr, 16 + ne + 2 * min(nu, 32)))
-
-    H.setPreallocationNNZ(nnz_guess_per_row)
-    H.setOption(PETSc.Mat.Option.NEW_NONZERO_ALLOCATION_ERR, False)
-    H.setUp()
-
-    cstart, cend = H.getOwnershipRangeColumn()
-    print(f"cstart = {cstart}, cend = {cend}")
-
-    rb_meta = rb.jit_args()
-    lb_meta = lb.jit_args()
-
-    if emat is not None:
-        a1, a2 = np.nonzero(np.abs(emat) > tol_e)
-        e_terms = np.stack((a1, a2), axis=-1).astype(np.int64)
-        e_vals = emat[a1, a2].astype(np.complex128)
-    else:
-        e_terms = np.empty((0, 2), dtype=np.int64)
-        e_vals = np.empty((0,), dtype=np.complex128)
-
-    if umat is not None:
-        a1, a2, a3, a4 = np.nonzero(np.abs(umat) > tol_u)
-        u_terms = np.stack((a1, a2, a3, a4), axis=-1).astype(np.int64)
-        u_vals = umat[a1, a2, a3, a4].astype(np.complex128)
-    else:
-        u_terms = np.empty((0, 4), dtype=np.int64)
-        u_vals = np.empty((0,), dtype=np.complex128)
-
-    rows, cols, vals = build_H_entries_lr(
-        rb_meta[0], rb_meta[1], rb_meta[2], rb_meta[3], rb_meta[4], rb_meta[5], rb_meta[6],
-        lb_meta[0], lb_meta[1], lb_meta[2], lb_meta[3], lb_meta[4], lb_meta[5], lb_meta[6],
-        e_terms, e_vals, u_terms, u_vals, cstart, cend,
-    )
-
-    return assemble_petsc_from_entries(comm, nl, nr, rows, cols, vals, nnz_guess_per_row)
+    if mat_type is not None:
+        H = H.convert(mat_type)
+    return H

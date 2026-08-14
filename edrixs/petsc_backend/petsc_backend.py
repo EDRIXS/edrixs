@@ -98,9 +98,9 @@ def build_op_petsc(emat, umat, lb, rb=None, *, backend_kws=None):
         One-body coefficients. ``None`` skips the one-body term.
     umat : 4d complex array or None
         Two-body Coulomb tensor. ``None`` skips the two-body term.
-    lb : FockBinByN
+    lb : FockBasis
         Left (row) many-body basis.
-    rb : FockBinByN, optional
+    rb : FockBasis, optional
         Right (column) many-body basis. Defaults to ``lb``.
     backend_kws : mapping, optional
         Extra options. Recognized keys:
@@ -109,6 +109,8 @@ def build_op_petsc(emat, umat, lb, rb=None, *, backend_kws=None):
         - ``tol_e`` : threshold for retaining ``emat`` entries.
         - ``tol_u`` : threshold for retaining ``umat`` entries.
         - ``nnz_guess_per_row`` : preallocation hint.
+        - ``mat_type`` : optional PETSc matrix type to convert to after
+          assembly, e.g. ``'aijcusparse'``.
 
     Returns
     -------
@@ -116,20 +118,75 @@ def build_op_petsc(emat, umat, lb, rb=None, *, backend_kws=None):
         The assembled many-body operator.
     """
     PETSc = _petsc_module()
-    from .hash_basis_methods import get_H
+    from .hash_basis_methods import (
+        assemble_petsc_from_entries,
+        build_H_entries_lr,
+    )
 
     kws = _backend_kws(backend_kws)
     comm = kws.pop('comm', PETSc.COMM_WORLD)
-    get_H_kws = {}
-    for key in ('tol_e', 'tol_u', 'nnz_guess_per_row'):
-        if key in kws:
-            get_H_kws[key] = kws.pop(key)
+    tol_e = kws.pop('tol_e', 1e-10)
+    tol_u = kws.pop('tol_u', 1e-10)
+    nnz_guess_per_row = kws.pop('nnz_guess_per_row', None)
+    mat_type = kws.pop('mat_type', None)
     if kws:
         raise TypeError(
             "Unknown PETSc operator-construction options: {}".format(sorted(kws))
         )
 
-    return get_H(comm, emat, umat, lb, rb=rb, **get_H_kws)
+    if rb is None:
+        rb = lb
+
+    nl, nr = len(lb), len(rb)
+    if lb.norbs != rb.norbs:
+        raise ValueError("left and right Fock bases must have the same norbs")
+
+    hmat = PETSc.Mat().create(comm=comm)
+    hmat.setSizes(((None, nl), (None, nr)))
+    hmat.setType(PETSc.Mat.Type.AIJ)
+
+    if nnz_guess_per_row is None:
+        ne = int(np.count_nonzero(np.abs(emat) > tol_e)) if emat is not None else 0
+        nu = int(np.count_nonzero(np.abs(umat) > tol_u)) if umat is not None else 0
+        nnz_guess_per_row = max(8, min(nr, 16 + ne + 2 * min(nu, 32)))
+
+    hmat.setPreallocationNNZ(nnz_guess_per_row)
+    hmat.setOption(PETSc.Mat.Option.NEW_NONZERO_ALLOCATION_ERR, False)
+    hmat.setUp()
+
+    cstart, cend = hmat.getOwnershipRangeColumn()
+
+    rb_meta = rb.jit_args()
+    lb_meta = lb.jit_args()
+
+    if emat is not None:
+        a1, a2 = np.nonzero(np.abs(emat) > tol_e)
+        e_terms = np.stack((a1, a2), axis=-1).astype(np.int64)
+        e_vals = emat[a1, a2].astype(np.complex128)
+    else:
+        e_terms = np.empty((0, 2), dtype=np.int64)
+        e_vals = np.empty((0,), dtype=np.complex128)
+
+    if umat is not None:
+        a1, a2, a3, a4 = np.nonzero(np.abs(umat) > tol_u)
+        u_terms = np.stack((a1, a2, a3, a4), axis=-1).astype(np.int64)
+        u_vals = umat[a1, a2, a3, a4].astype(np.complex128)
+    else:
+        u_terms = np.empty((0, 4), dtype=np.int64)
+        u_vals = np.empty((0,), dtype=np.complex128)
+
+    rows, cols, vals = build_H_entries_lr(
+        rb_meta[0], rb_meta[1], rb_meta[2], rb_meta[3],
+        rb_meta[4], rb_meta[5], rb_meta[6],
+        lb_meta[0], lb_meta[1], lb_meta[2], lb_meta[3],
+        lb_meta[4], lb_meta[5], lb_meta[6],
+        e_terms, e_vals, u_terms, u_vals, cstart, cend,
+    )
+
+    return assemble_petsc_from_entries(
+        comm, nl, nr, rows, cols, vals,
+        nnz_guess_per_row, mat_type=mat_type,
+    )
 
 
 # -----------------------------------------------------------------------------
@@ -385,8 +442,6 @@ def xas_petsc(eval_i, evec_i, hmat_n, trans_op, ominc, *,
     -------
     xas : 2d ndarray
         Spectrum with shape ``(len(ominc), len(pol_type))``.
-    poles : list of dict
-        Per-polarization pole dictionaries.
     """
     _petsc_module()
     from .lanczos import lanczos_tridiagonal
@@ -470,7 +525,7 @@ def xas_petsc(eval_i, evec_i, hmat_n, trans_op, ominc, *,
         else:
             raise ValueError("Unknown XAS polarization type: {}".format(pt))
 
-    return xas, poles
+    return xas
 
 
 def rixs_petsc(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
