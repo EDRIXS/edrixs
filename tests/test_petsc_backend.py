@@ -89,33 +89,41 @@ def test_public_symbols_are_exported():
 
 
 @pytest.fixture
-def diagonal_petsc_mat():
-    """Build a small real diagonal PETSc Hermitian matrix."""
+def complex_hermitian_petsc_mat():
+    """Build a reproducible dense complex Hermitian PETSc matrix."""
     from petsc4py import PETSc
 
-    diagonal = np.array([-3.0, -1.0, 0.5, 2.0, 4.0, 7.0], dtype=float)
+    size = 6
+    rng = np.random.default_rng(12345)
+    dense = rng.standard_normal((size, size))
+    dense = dense + 1j * rng.standard_normal((size, size))
+    hermitian = (dense + dense.conj().T) / 2
+
     mat = PETSc.Mat().createAIJ(
-        (len(diagonal), len(diagonal)), comm=PETSc.COMM_WORLD
+        (size, size), comm=PETSc.COMM_WORLD
     )
     mat.setUp()
     start, end = mat.getOwnershipRange()
+    columns = np.arange(size, dtype=PETSc.IntType)
     for row in range(start, end):
-        mat.setValue(row, row, diagonal[row])
+        mat.setValues(row, columns, hermitian[row])
     mat.assemblyBegin()
     mat.assemblyEnd()
-    return mat, diagonal
+    return mat, np.linalg.eigvalsh(hermitian)
 
 
 @requires_petsc
-def test_ed_petsc_returns_lowest_sorted_eigenpairs(diagonal_petsc_mat):
+def test_ed_petsc_returns_lowest_sorted_eigenpairs(
+    complex_hermitian_petsc_mat,
+):
     """SLEPc returns the requested number of lowest eigenpairs, in order."""
-    mat, diagonal = diagonal_petsc_mat
+    mat, expected_eigenvalues = complex_hermitian_petsc_mat
 
     evals, evecs = backend.ed_petsc(mat, num_evals=3)
 
     assert len(evals) == 3
     assert len(evecs) == 3
-    np.testing.assert_allclose(evals, np.sort(diagonal)[:3], atol=1e-8)
+    np.testing.assert_allclose(evals, expected_eigenvalues[:3], atol=1e-8)
 
     # Each returned pair must satisfy H v = lambda v.
     residual = mat.getVecLeft()
@@ -126,8 +134,8 @@ def test_ed_petsc_returns_lowest_sorted_eigenpairs(diagonal_petsc_mat):
 
 
 @requires_petsc
-def test_ed_petsc_rejects_too_many_requested(diagonal_petsc_mat):
+def test_ed_petsc_rejects_too_many_requested(complex_hermitian_petsc_mat):
     """Requesting more eigenpairs than converge must raise."""
-    mat, diagonal = diagonal_petsc_mat
+    mat, expected_eigenvalues = complex_hermitian_petsc_mat
     with pytest.raises((RuntimeError, ValueError)):
-        backend.ed_petsc(mat, num_evals=len(diagonal) + 5)
+        backend.ed_petsc(mat, num_evals=len(expected_eigenvalues) + 5)
