@@ -1,7 +1,10 @@
 # List required packages in this file, one per line.
-numpy<2
+numpy
 scipy
 sympy
 matplotlib
 sphinx
 mpi4py
+petsc4py
+slepc4py
+numba
