@@ -5,6 +5,3 @@ sympy
 matplotlib
 sphinx
 mpi4py
-petsc4py
-slepc4py
-numba
