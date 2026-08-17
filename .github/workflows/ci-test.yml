@@ -67,7 +67,11 @@ jobs:
             python=${{ matrix.python-version }}
             arpack=*=mpi_openmpi*
             gfortran
-            openmpi=4
+            openmpi=5
+            petsc=*=complex_*
+            petsc4py
+            slepc=*=complex_*
+            slepc4py
 
       # - name: Set up Python ${{ matrix.python-version }}
       #   # if: matrix.host-os != 'macos-latest'
