@@ -83,7 +83,50 @@ def _not_implemented(operation):
 # -----------------------------------------------------------------------------
 
 
-def build_op_petsc(emat, umat, lb, rb=None, *, backend_kws=None):
+def _assemble_petsc_from_entries(
+        comm, nl, nr, rows, cols, vals, nnz_guess_per_row=16, mat_type=None):
+    """Assemble row/column/value triplets into a distributed PETSc matrix."""
+    PETSc = _petsc_module()
+
+    hmat = PETSc.Mat().create(comm=comm)
+    hmat.setSizes(((None, nl), (None, nr)))
+    hmat.setType(PETSc.Mat.Type.AIJ)
+    hmat.setPreallocationNNZ(nnz_guess_per_row)
+    hmat.setOption(PETSc.Mat.Option.NEW_NONZERO_ALLOCATION_ERR, False)
+    hmat.setUp()
+
+    if rows.size:
+        # PETSc may be configured with 32- or 64-bit indices. Convert the
+        # backend-neutral NumPy indices at the PETSc boundary so setValues()
+        # always receives the exact PetscInt dtype used by this installation.
+        rows = np.asarray(rows, dtype=PETSc.IntType)
+        cols = np.asarray(cols, dtype=PETSc.IntType)
+        vals = np.asarray(vals, dtype=PETSc.ScalarType)
+
+        order = np.argsort(rows, kind='mergesort')
+        rows = rows[order]
+        cols = cols[order]
+        vals = vals[order]
+
+        start = 0
+        while start < rows.size:
+            row = int(rows[start])
+            end = start + 1
+            while end < rows.size and rows[end] == rows[start]:
+                end += 1
+            hmat.setValues(
+                row, cols[start:end], vals[start:end], addv=PETSc.InsertMode.ADD_VALUES
+            )
+            start = end
+
+    hmat.assemblyBegin()
+    hmat.assemblyEnd()
+    if mat_type is not None:
+        hmat = hmat.convert(mat_type)
+    return hmat
+
+
+def build_op_petsc(emat, umat, lb, rb=None, *, use_numba=False, backend_kws=None):
     """Build a distributed PETSc many-body operator.
 
     Assemble ``H = sum_ij emat_ij f_i^dagger f_j
@@ -102,6 +145,8 @@ def build_op_petsc(emat, umat, lb, rb=None, *, backend_kws=None):
         Left (row) many-body basis.
     rb : FockBasis, optional
         Right (column) many-body basis. Defaults to ``lb``.
+    use_numba : bool, optional
+        JIT-compile matrix-entry construction. The default is False.
     backend_kws : mapping, optional
         Extra options. Recognized keys:
 
@@ -118,10 +163,7 @@ def build_op_petsc(emat, umat, lb, rb=None, *, backend_kws=None):
         The assembled many-body operator.
     """
     PETSc = _petsc_module()
-    from .hash_basis_methods import (
-        assemble_petsc_from_entries,
-        build_H_entries_lr,
-    )
+    from .._operator_builder import build_operator_entries
 
     kws = _backend_kws(backend_kws)
     comm = kws.pop('comm', PETSc.COMM_WORLD)
@@ -141,49 +183,31 @@ def build_op_petsc(emat, umat, lb, rb=None, *, backend_kws=None):
     if lb.norbs != rb.norbs:
         raise ValueError("left and right Fock bases must have the same norbs")
 
-    hmat = PETSc.Mat().create(comm=comm)
-    hmat.setSizes(((None, nl), (None, nr)))
-    hmat.setType(PETSc.Mat.Type.AIJ)
+    ownership_mat = PETSc.Mat().create(comm=comm)
+    ownership_mat.setSizes(((None, nl), (None, nr)))
+    ownership_mat.setType(PETSc.Mat.Type.AIJ)
 
     if nnz_guess_per_row is None:
         ne = int(np.count_nonzero(np.abs(emat) > tol_e)) if emat is not None else 0
-        nu = int(np.count_nonzero(np.abs(umat) > tol_u)) if umat is not None else 0
+        if umat is None:
+            nu = 0
+        elif hasattr(umat, 'data') and hasattr(umat, 'tocoo'):
+            nu = int(np.count_nonzero(np.abs(umat.data) > tol_u))
+        else:
+            nu = int(np.count_nonzero(np.abs(umat) > tol_u))
         nnz_guess_per_row = max(8, min(nr, 16 + ne + 2 * min(nu, 32)))
 
-    hmat.setPreallocationNNZ(nnz_guess_per_row)
-    hmat.setOption(PETSc.Mat.Option.NEW_NONZERO_ALLOCATION_ERR, False)
-    hmat.setUp()
+    ownership_mat.setPreallocationNNZ(nnz_guess_per_row)
+    ownership_mat.setUp()
+    cstart, cend = ownership_mat.getOwnershipRangeColumn()
 
-    cstart, cend = hmat.getOwnershipRangeColumn()
-
-    rb_meta = rb.jit_args()
-    lb_meta = lb.jit_args()
-
-    if emat is not None:
-        a1, a2 = np.nonzero(np.abs(emat) > tol_e)
-        e_terms = np.stack((a1, a2), axis=-1).astype(np.int64)
-        e_vals = emat[a1, a2].astype(np.complex128)
-    else:
-        e_terms = np.empty((0, 2), dtype=np.int64)
-        e_vals = np.empty((0,), dtype=np.complex128)
-
-    if umat is not None:
-        a1, a2, a3, a4 = np.nonzero(np.abs(umat) > tol_u)
-        u_terms = np.stack((a1, a2, a3, a4), axis=-1).astype(np.int64)
-        u_vals = umat[a1, a2, a3, a4].astype(np.complex128)
-    else:
-        u_terms = np.empty((0, 4), dtype=np.int64)
-        u_vals = np.empty((0,), dtype=np.complex128)
-
-    rows, cols, vals = build_H_entries_lr(
-        rb_meta[0], rb_meta[1], rb_meta[2], rb_meta[3],
-        rb_meta[4], rb_meta[5], rb_meta[6],
-        lb_meta[0], lb_meta[1], lb_meta[2], lb_meta[3],
-        lb_meta[4], lb_meta[5], lb_meta[6],
-        e_terms, e_vals, u_terms, u_vals, cstart, cend,
+    rows, cols, vals = build_operator_entries(
+        emat, umat, lb, rb, tol_e=tol_e, tol_u=tol_u,
+        cstart=cstart, cend=cend, use_numba=use_numba,
     )
+    ownership_mat.destroy()
 
-    return assemble_petsc_from_entries(
+    return _assemble_petsc_from_entries(
         comm, nl, nr, rows, cols, vals,
         nnz_guess_per_row, mat_type=mat_type,
     )

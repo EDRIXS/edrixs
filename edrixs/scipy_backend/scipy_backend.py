@@ -287,8 +287,10 @@ def four_fermion_csr_auto(umat, basis, right_basis=None, tol=1e-10):
     )
 
 
-def build_op_scipy(emat, umat, lb, rb=None, *, backend_kws=None):
+def build_op_scipy(emat, umat, lb, rb=None, *, use_numba=False, backend_kws=None):
     """Build and return a SciPy CSR many-body operator."""
+    from .._operator_builder import build_operator_entries
+
     kws = _backend_kws(backend_kws)
     tol = kws.pop('tol', 1e-10)
     if kws:
@@ -298,28 +300,20 @@ def build_op_scipy(emat, umat, lb, rb=None, *, backend_kws=None):
 
     if rb is None:
         rb = lb
-    if lb.norbs != rb.norbs:
-        raise ValueError("left and right Fock bases must have the same norbs")
-
-    operator = sp.csr_matrix(
-        (len(lb), len(rb)),
-        dtype=np.complex128,
+    rows, cols, data = build_operator_entries(
+        emat, umat, lb, rb, tol_e=tol, tol_u=tol, use_numba=use_numba
     )
-    if emat is not None:
-        operator = operator + two_fermion_csr(
-            emat, lb, rb, tol=tol
-        )
-    if umat is not None:
-        operator = operator + four_fermion_csr_auto(
-            umat, lb, right_basis=rb, tol=tol
-        )
-    return operator.tocsr()
+    return sp.coo_matrix(
+        (data, (rows, cols)),
+        shape=(len(lb), len(rb)),
+        dtype=np.complex128,
+    ).tocsr()
 
 
-def build_op_dense(emat, umat, lb, rb=None, *, backend_kws=None):
+def build_op_dense(emat, umat, lb, rb=None, *, use_numba=False, backend_kws=None):
     """Compatibility dense constructor implemented through SciPy CSR."""
     return build_op_scipy(
-        emat, umat, lb, rb, backend_kws=backend_kws
+        emat, umat, lb, rb, use_numba=use_numba, backend_kws=backend_kws
     ).toarray()
 
 
