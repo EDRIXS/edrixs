@@ -17,6 +17,7 @@ HAS_NUMBA = importlib.util.find_spec("numba") is not None
 HAS_PETSC = importlib.util.find_spec("petsc4py") is not None
 
 
+# Full public construction matrix: backend x basis representation x JIT choice.
 ALL_ROUTES = [
     pytest.param(
         backend,
@@ -31,6 +32,7 @@ ALL_ROUTES = [
 
 
 def _small_1v1c_problem():
+    """Return a small nontrivial model shared by all route comparisons."""
     return model_1v1c(
         ("p", "s"),
         shell_level=(0.2, -4.0),
@@ -43,6 +45,7 @@ def _small_1v1c_problem():
 
 
 def _to_dense(operator):
+    """Convert small SciPy/NumPy/PETSc operators to a common dense reference."""
     if sp.issparse(operator):
         return operator.toarray()
     if isinstance(operator, np.ndarray):
@@ -58,14 +61,16 @@ def _to_dense(operator):
 
 
 def _route_kwargs(backend):
+    """Keep PETSc tests sequential and force multiple bounded assembly chunks."""
     if backend == "petsc":
         from petsc4py import PETSc
 
-        return {"backend_kws": {"comm": PETSc.COMM_SELF}}
+        return {"backend_kws": {"comm": PETSc.COMM_SELF, "assembly_chunk_cols": 2}}
     return {}
 
 
 def _skip_unavailable(backend, use_numba):
+    """Skip only optional routes whose explicitly requested dependency is absent."""
     if use_numba and not HAS_NUMBA:
         pytest.skip("numba is required for the requested JIT route")
     if backend == "petsc" and not HAS_PETSC:
@@ -101,7 +106,13 @@ def test_all_model_functions_return_compact_basis_metadata():
 def test_model_to_get_ops_all_eight_routes_are_numerically_consistent(
     backend, basis_method, use_numba
 ):
-    """SciPy/PETSc × combinadic/explicit × vanilla/Numba must agree."""
+    """Compare all eight public operator-construction routes numerically.
+
+    The explicit, non-Numba SciPy route is the common reference. Every other
+    SciPy/PETSc x combinadic/explicit x vanilla/Numba route must produce the
+    same initial Hamiltonian, intermediate Hamiltonian, and transition
+    operators from the same compact model metadata.
+    """
     _skip_unavailable(backend, use_numba)
     problem = _small_1v1c_problem()
 

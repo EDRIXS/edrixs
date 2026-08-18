@@ -1,4 +1,4 @@
-"""Shared many-body matrix-entry construction for staged numerical backends."""
+"""Backend-independent kernels for many-body operator matrix entries."""
 
 from __future__ import annotations
 
@@ -417,7 +417,17 @@ def _get_numba_kernels():
     return _NUMBA_KERNELS
 
 
-def _build_entries_numba(lb, rb, e_terms, e_vals, u_terms, u_vals, cstart, cend):
+def _prepare_entries_kernel(
+        lb, rb, e_terms, e_vals, u_terms, u_vals, *, use_numba=False):
+    """Prepare a reusable entry kernel for backend-selected column ranges."""
+    if not use_numba:
+        def build_range(cstart, cend):
+            return _build_entries_python(
+                lb, rb, e_terms, e_vals, u_terms, u_vals, cstart, cend
+            )
+
+        return build_range
+
     if lb.norbs > 64 or rb.norbs > 64:
         raise ValueError("Numba operator construction supports at most 64 orbitals")
 
@@ -426,11 +436,15 @@ def _build_entries_numba(lb, rb, e_terms, e_vals, u_terms, u_vals, cstart, cend)
     if isinstance(lb, FockBinByN) and isinstance(rb, FockBinByN):
         rb_meta = rb.jit_args()
         lb_meta = lb.jit_args()
-        return build_combinadic(
-            rb_meta[0], rb_meta[1], rb_meta[2], rb_meta[3], rb_meta[4],
-            lb_meta[0], lb_meta[1], lb_meta[2], lb_meta[3], lb_meta[4],
-            e_terms, e_vals, u_terms, u_vals, cstart, cend,
-        )
+
+        def build_range(cstart, cend):
+            return build_combinadic(
+                rb_meta[0], rb_meta[1], rb_meta[2], rb_meta[3], rb_meta[4],
+                lb_meta[0], lb_meta[1], lb_meta[2], lb_meta[3], lb_meta[4],
+                e_terms, e_vals, u_terms, u_vals, cstart, cend,
+            )
+
+        return build_range
 
     if isinstance(lb, FockBasis) and isinstance(rb, FockBasis):
         try:
@@ -445,34 +459,57 @@ def _build_entries_numba(lb, rb, e_terms, e_vals, u_terms, u_vals, cstart, cend)
         lb_lookup = Dict.empty(key_type=types.uint64, value_type=types.int64)
         for index, state in enumerate(lb.basis_int):
             lb_lookup[np.uint64(state)] = np.int64(index)
-        return build_explicit(
-            rb_states, lb_lookup, rb.norbs,
-            e_terms, e_vals, u_terms, u_vals, cstart, cend,
-        )
+
+        def build_range(cstart, cend):
+            return build_explicit(
+                rb_states, lb_lookup, rb.norbs,
+                e_terms, e_vals, u_terms, u_vals, cstart, cend,
+            )
+
+        return build_range
 
     raise TypeError(
         "Numba construction requires matching explicit or combinadic basis representations"
     )
 
 
-def build_operator_entries(
+def prepare_operator_entry_kernel(
         emat, umat, lb, rb=None, *, tol_e=1e-10, tol_u=1e-10,
-        cstart=0, cend=None, use_numba=False):
-    """Return row/column/value triplets for one- and two-body operators."""
+        use_numba=False):
+    """Prepare a reusable kernel that generates entries for requested columns.
+
+    The caller owns the work decomposition and matrix assembly policy. Calling
+    the returned function as ``build_range(cstart, cend)`` produces only the
+    contributions for that column interval.
+    """
     if rb is None:
         rb = lb
     if lb.norbs != rb.norbs:
         raise ValueError("left and right Fock bases must have the same norbs")
-    if cend is None:
-        cend = len(rb)
 
     e_terms, e_vals, u_terms, u_vals = _operator_terms(
         emat, umat, rb.norbs, tol_e, tol_u
     )
-    if use_numba:
-        return _build_entries_numba(
-            lb, rb, e_terms, e_vals, u_terms, u_vals, cstart, cend
-        )
-    return _build_entries_python(
-        lb, rb, e_terms, e_vals, u_terms, u_vals, cstart, cend
+    return _prepare_entries_kernel(
+        lb, rb, e_terms, e_vals, u_terms, u_vals, use_numba=use_numba
     )
+
+
+def build_operator_entries(
+        emat, umat, lb, rb=None, *, tol_e=1e-10, tol_u=1e-10,
+        cstart=0, cend=None, use_numba=False):
+    """Return entries for one requested column range.
+
+    This compatibility wrapper leaves the work-range choice with the caller;
+    backends that need repeated bounded ranges should prepare the reusable
+    builder with :func:`prepare_operator_entry_kernel` instead.
+    """
+    if rb is None:
+        rb = lb
+    if cend is None:
+        cend = len(rb)
+
+    build_range = prepare_operator_entry_kernel(
+        emat, umat, lb, rb, tol_e=tol_e, tol_u=tol_u, use_numba=use_numba
+    )
+    return build_range(cstart, cend)

@@ -289,7 +289,7 @@ def four_fermion_csr_auto(umat, basis, right_basis=None, tol=1e-10):
 
 def build_op_scipy(emat, umat, lb, rb=None, *, use_numba=False, backend_kws=None):
     """Build and return a SciPy CSR many-body operator."""
-    from .._operator_builder import build_operator_entries
+    from .hash_basis_methods import build_op_scipy_matrix
 
     kws = _backend_kws(backend_kws)
     tol = kws.pop('tol', 1e-10)
@@ -298,16 +298,9 @@ def build_op_scipy(emat, umat, lb, rb=None, *, use_numba=False, backend_kws=None
             sorted(kws)
         ))
 
-    if rb is None:
-        rb = lb
-    rows, cols, data = build_operator_entries(
-        emat, umat, lb, rb, tol_e=tol, tol_u=tol, use_numba=use_numba
+    return build_op_scipy_matrix(
+        emat, umat, lb, rb, tol=tol, use_numba=use_numba
     )
-    return sp.coo_matrix(
-        (data, (rows, cols)),
-        shape=(len(lb), len(rb)),
-        dtype=np.complex128,
-    ).tocsr()
 
 
 def build_op_dense(emat, umat, lb, rb=None, *, use_numba=False, backend_kws=None):

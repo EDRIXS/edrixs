@@ -83,49 +83,6 @@ def _not_implemented(operation):
 # -----------------------------------------------------------------------------
 
 
-def _assemble_petsc_from_entries(
-        comm, nl, nr, rows, cols, vals, nnz_guess_per_row=16, mat_type=None):
-    """Assemble row/column/value triplets into a distributed PETSc matrix."""
-    PETSc = _petsc_module()
-
-    hmat = PETSc.Mat().create(comm=comm)
-    hmat.setSizes(((None, nl), (None, nr)))
-    hmat.setType(PETSc.Mat.Type.AIJ)
-    hmat.setPreallocationNNZ(nnz_guess_per_row)
-    hmat.setOption(PETSc.Mat.Option.NEW_NONZERO_ALLOCATION_ERR, False)
-    hmat.setUp()
-
-    if rows.size:
-        # PETSc may be configured with 32- or 64-bit indices. Convert the
-        # backend-neutral NumPy indices at the PETSc boundary so setValues()
-        # always receives the exact PetscInt dtype used by this installation.
-        rows = np.asarray(rows, dtype=PETSc.IntType)
-        cols = np.asarray(cols, dtype=PETSc.IntType)
-        vals = np.asarray(vals, dtype=PETSc.ScalarType)
-
-        order = np.argsort(rows, kind='mergesort')
-        rows = rows[order]
-        cols = cols[order]
-        vals = vals[order]
-
-        start = 0
-        while start < rows.size:
-            row = int(rows[start])
-            end = start + 1
-            while end < rows.size and rows[end] == rows[start]:
-                end += 1
-            hmat.setValues(
-                row, cols[start:end], vals[start:end], addv=PETSc.InsertMode.ADD_VALUES
-            )
-            start = end
-
-    hmat.assemblyBegin()
-    hmat.assemblyEnd()
-    if mat_type is not None:
-        hmat = hmat.convert(mat_type)
-    return hmat
-
-
 def build_op_petsc(emat, umat, lb, rb=None, *, use_numba=False, backend_kws=None):
     """Build a distributed PETSc many-body operator.
 
@@ -156,6 +113,8 @@ def build_op_petsc(emat, umat, lb, rb=None, *, use_numba=False, backend_kws=None
         - ``nnz_guess_per_row`` : preallocation hint.
         - ``mat_type`` : optional PETSc matrix type to convert to after
           assembly, e.g. ``'aijcusparse'``.
+        - ``assembly_chunk_cols`` : number of owned basis columns generated
+          before entries are flushed into PETSc (default ``4096``).
 
     Returns
     -------
@@ -163,7 +122,7 @@ def build_op_petsc(emat, umat, lb, rb=None, *, use_numba=False, backend_kws=None
         The assembled many-body operator.
     """
     PETSc = _petsc_module()
-    from .._operator_builder import build_operator_entries
+    from .hash_basis_methods import build_op_petsc_matrix
 
     kws = _backend_kws(backend_kws)
     comm = kws.pop('comm', PETSc.COMM_WORLD)
@@ -171,45 +130,21 @@ def build_op_petsc(emat, umat, lb, rb=None, *, use_numba=False, backend_kws=None
     tol_u = kws.pop('tol_u', 1e-10)
     nnz_guess_per_row = kws.pop('nnz_guess_per_row', None)
     mat_type = kws.pop('mat_type', None)
+    assembly_chunk_cols = kws.pop('assembly_chunk_cols', 4096)
     if kws:
         raise TypeError(
             "Unknown PETSc operator-construction options: {}".format(sorted(kws))
         )
 
-    if rb is None:
-        rb = lb
-
-    nl, nr = len(lb), len(rb)
-    if lb.norbs != rb.norbs:
-        raise ValueError("left and right Fock bases must have the same norbs")
-
-    ownership_mat = PETSc.Mat().create(comm=comm)
-    ownership_mat.setSizes(((None, nl), (None, nr)))
-    ownership_mat.setType(PETSc.Mat.Type.AIJ)
-
-    if nnz_guess_per_row is None:
-        ne = int(np.count_nonzero(np.abs(emat) > tol_e)) if emat is not None else 0
-        if umat is None:
-            nu = 0
-        elif hasattr(umat, 'data') and hasattr(umat, 'tocoo'):
-            nu = int(np.count_nonzero(np.abs(umat.data) > tol_u))
-        else:
-            nu = int(np.count_nonzero(np.abs(umat) > tol_u))
-        nnz_guess_per_row = max(8, min(nr, 16 + ne + 2 * min(nu, 32)))
-
-    ownership_mat.setPreallocationNNZ(nnz_guess_per_row)
-    ownership_mat.setUp()
-    cstart, cend = ownership_mat.getOwnershipRangeColumn()
-
-    rows, cols, vals = build_operator_entries(
-        emat, umat, lb, rb, tol_e=tol_e, tol_u=tol_u,
-        cstart=cstart, cend=cend, use_numba=use_numba,
-    )
-    ownership_mat.destroy()
-
-    return _assemble_petsc_from_entries(
-        comm, nl, nr, rows, cols, vals,
-        nnz_guess_per_row, mat_type=mat_type,
+    return build_op_petsc_matrix(
+        emat, umat, lb, rb,
+        comm=comm,
+        tol_e=tol_e,
+        tol_u=tol_u,
+        nnz_guess_per_row=nnz_guess_per_row,
+        mat_type=mat_type,
+        assembly_chunk_cols=assembly_chunk_cols,
+        use_numba=use_numba,
     )
 
 
