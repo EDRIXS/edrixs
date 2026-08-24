@@ -4,6 +4,7 @@ import numpy as np
 import scipy.sparse as sp
 from numpy.testing import assert_allclose
 
+from edrixs.fock_basis import FockBasisSpec
 from edrixs.solvers import get_ops
 
 
@@ -40,8 +41,10 @@ def assert_problem_sparse_dense_equivalent(dense, sparse):
     """Compare backend-neutral setup outputs in dense and sparse-U forms."""
     assert_allclose(dense[0], sparse[0])
     assert_allclose(dense[3], sparse[3])
-    assert dense[2].basis_int == sparse[2].basis_int
-    assert dense[5].basis_int == sparse[5].basis_int
+    assert isinstance(dense[2], FockBasisSpec)
+    assert isinstance(dense[5], FockBasisSpec)
+    assert dense[2] == sparse[2]
+    assert dense[5] == sparse[5]
     assert_allclose(dense[6], sparse[6])
 
     for dense_u, sparse_u in ((dense[1], sparse[1]), (dense[4], sparse[4])):

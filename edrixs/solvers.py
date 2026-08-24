@@ -24,7 +24,7 @@ from .photon_transition import (
 )
 from .coulomb_utensor import get_umat_slater
 from .manybody_operator import two_fermion, four_fermion
-from .fock_basis import get_fock_bin_by_N, write_fock_dec_by_N
+from .fock_basis import build_fock_basis, get_fock_bin_by_N, write_fock_dec_by_N
 from .basis_transform import cb_op2, tmat_r2c, cb_op
 from .utils import info_atomic_shell, slater_integrals_name, boltz_dist
 from .rixs_utils import scattering_mat
@@ -58,7 +58,8 @@ __all__ = [
 # -----------------------------------------------------------------------------
 
 
-def build_op(emat, umat, lb, rb=None, *, backend='scipy', backend_kws=None):
+def build_op(emat, umat, lb, rb=None, *, backend='scipy',
+             basis_method='combinadic', use_numba=False, backend_kws=None):
     """
     Build a many-body operator with the selected backend.
 
@@ -70,13 +71,19 @@ def build_op(emat, umat, lb, rb=None, *, backend='scipy', backend_kws=None):
     umat : array-like, sparse matrix, or None
         Coefficients of the two-body part. Pass ``None`` when the operator has
         no two-body contribution.
-    lb : FockBasis
-        Basis for the output (left) many-body space.
-    rb : FockBasis or None, optional
-        Basis for the input (right) many-body space. When omitted, ``lb`` is
+    lb : FockBasisSpec or FockBasis
+        Basis metadata or realized basis for the output (left) many-body space.
+    rb : FockBasisSpec, FockBasis, or None, optional
+        Basis metadata or realized basis for the input (right) many-body space.
+        When omitted, ``lb`` is
         used for both sides.
     backend : str, optional
         Backend name. The default is ``'scipy'``.
+    basis_method : {'combinadic', 'explicit'}, optional
+        Representation used when ``lb``/``rb`` are compact basis specifications.
+        The default is the implicit combinadic representation.
+    use_numba : bool, optional
+        JIT-compile matrix-entry construction. The default is False.
     backend_kws : mapping, optional
         Backend-specific construction options. For the SciPy backend this
         includes ``tol``.
@@ -99,18 +106,24 @@ def build_op(emat, umat, lb, rb=None, *, backend='scipy', backend_kws=None):
                 "'petsc'".format(backend)
             )
 
+    lb = build_fock_basis(lb, method=basis_method)
+    if rb is not None:
+        rb = build_fock_basis(rb, method=basis_method)
+
     return build_op_backend(
         emat,
         umat,
         lb,
         rb,
+        use_numba=use_numba,
         backend_kws=backend_kws,
     )
 
 
 def get_ops(
     emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat, *,
-    backend='scipy', backend_kws=None,
+    backend='scipy', basis_method='combinadic', use_numba=False,
+    backend_kws=None,
 ):
     """
     Build initial/intermediate Hamiltonians and transition operators.
@@ -120,8 +133,13 @@ def get_ops(
     emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
         Backend-neutral problem definition returned by :mod:`edrixs.models`
         model functions.
-    backend : {'scipy', 'dense'}, optional
+    backend : {'scipy', 'dense', 'petsc'}, optional
         Backend used for the returned operators. The default is ``'scipy'``.
+    basis_method : {'combinadic', 'explicit'}, optional
+        Basis representation constructed from the model metadata. The default
+        is ``'combinadic'``.
+    use_numba : bool, optional
+        JIT-compile matrix-entry construction. The default is False.
     backend_kws : mapping, optional
         Backend-specific operator-construction options. For the SciPy and
         dense compatibility backends this includes ``tol``.
@@ -132,13 +150,16 @@ def get_ops(
         Initial/final Hamiltonian, intermediate Hamiltonian, and transition
         operators for the selected backend.
     """
+    basis_i = build_fock_basis(basis_i, method=basis_method)
+    basis_n = build_fock_basis(basis_n, method=basis_method)
+
     hmat_i = build_op(
         emat_i, umat_i, basis_i, backend=backend,
-        backend_kws=backend_kws,
+        use_numba=use_numba, backend_kws=backend_kws,
     )
     hmat_n = build_op(
         emat_n, umat_n, basis_n, backend=backend,
-        backend_kws=backend_kws,
+        use_numba=use_numba, backend_kws=backend_kws,
     )
 
     trans_mat = np.asarray(trans_mat)
@@ -151,7 +172,7 @@ def get_ops(
             basis_n,
             basis_i,
             backend=backend,
-            backend_kws=backend_kws,
+            use_numba=use_numba, backend_kws=backend_kws,
         )
         for component in trans_mat
     ]
