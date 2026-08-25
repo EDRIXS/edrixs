@@ -3,16 +3,46 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 import itertools
+from math import comb, prod
+
 import numpy as np
 
 __all__ = [
-    'FockBasis', 'get_fock_basis_int',
+    'FockBasisSpec', 'FockBasis', 'FockBinByN',
+    'build_fock_basis', 'get_fock_basis_int', 'get_fock_basis_combinadic',
     'fock_bin', 'get_fock_bin_by_N', 'get_fock_half_N',
     'get_fock_full_N', 'get_fock_basis_by_NLz', 'get_fock_basis_by_NSz',
     'get_fock_basis_by_NJz', 'get_fock_basis_by_N_abelian',
     'get_fock_basis_by_N_LzSz', 'write_fock_dec_by_N',
 ]
+
+
+@dataclass(frozen=True, slots=True)
+class FockBasisSpec:
+    """Compact description of fixed occupancies in one or more orbital shells."""
+
+    shapes: tuple[tuple[int, int], ...]
+
+    def __post_init__(self):
+        shapes = tuple((int(norb), int(nocc)) for norb, nocc in self.shapes)
+        object.__setattr__(self, 'shapes', shapes)
+
+    @classmethod
+    def from_args(cls, *args):
+        """Build a specification from ``(norbs, nocc)`` pairs."""
+        if len(args) % 2 != 0:
+            raise ValueError("number of basis arguments must be even")
+        return cls(tuple(zip(args[0::2], args[1::2])))
+
+    @property
+    def norbs(self):
+        """Total number of spin-orbitals."""
+        return sum(norb for norb, _ in self.shapes)
+
+    def __len__(self):
+        return prod(comb(norb, nocc) for norb, nocc in self.shapes)
 
 
 class FockBasis:
@@ -28,11 +58,15 @@ class FockBasis:
         Integer encodings of the basis states in matrix-index order.
     norbs : int
         Number of spin-orbitals represented by each state.
+    spec : FockBasisSpec or None, optional
+        Structured sector description when the basis was generated from fixed
+        shell occupancies. Arbitrary explicit bases may leave this as ``None``.
     """
 
-    def __init__(self, basis_int, norbs):
+    def __init__(self, basis_int, norbs, spec=None):
         self.basis_int = [int(value) for value in basis_int]
         self.norbs = int(norbs)
+        self.spec = spec
         self.lookup = {value: index for index, value in enumerate(self.basis_int)}
 
     def __len__(self):
@@ -47,30 +81,211 @@ class FockBasis:
         return self.basis_int[position]
 
 
+@dataclass(slots=True)
+class FockBinByN:
+    """Implicit combinadic basis for a complete fixed-occupancy sector."""
+
+    shapes: tuple[tuple[int, int], ...]
+    spec: FockBasisSpec = field(init=False)
+    shell_norbs: tuple[int, ...] = field(init=False)
+    norbs: int = field(init=False)
+    noccus: tuple[int, ...] = field(init=False)
+    sizes: tuple[int, ...] = field(init=False)
+    num_subspaces: int = field(init=False)
+    num_orbitals: int = field(init=False)
+    dim: int = field(init=False)
+    offsets: tuple[int, ...] = field(init=False)
+    strides: tuple[int, ...] = field(init=False)
+    min_decode: int = field(init=False)
+    max_decode: int = field(init=False)
+
+    def __post_init__(self):
+        self.spec = FockBasisSpec(tuple(self.shapes))
+        self.shapes = self.spec.shapes
+        self.shell_norbs = tuple(norb for norb, _ in self.shapes)
+        self.norbs = self.spec.norbs
+        self.noccus = tuple(nocc for _, nocc in self.shapes)
+        self.sizes = tuple(comb(norb, nocc) for norb, nocc in self.shapes)
+        self.num_subspaces = len(self.shapes)
+        self.num_orbitals = self.norbs
+        self.dim = prod(self.sizes)
+
+        running = self.norbs
+        offsets = []
+        for norb in self.shell_norbs:
+            running -= norb
+            offsets.append(running)
+        self.offsets = tuple(offsets)
+
+        # The first shell varies fastest, matching get_fock_bin_by_N.
+        stride = 1
+        strides = []
+        for size in self.sizes:
+            strides.append(stride)
+            stride *= size
+        self.strides = tuple(strides)
+        self.min_decode, self.max_decode = _min_max_decode(self.shapes)
+
+    @classmethod
+    def from_spec(cls, spec):
+        """Build an implicit basis from a :class:`FockBasisSpec`."""
+        return cls(spec.shapes)
+
+    def __len__(self):
+        return self.dim
+
+    def encode(self, state):
+        """Return the canonical EDRIXS index of ``state``."""
+        index = _encode_combinadic(
+            int(state), self.shell_norbs, self.noccus, self.offsets,
+            self.sizes, self.strides,
+        )
+        if index < 0:
+            raise KeyError(int(state))
+        return index
+
+    def decode(self, index):
+        """Return the integer-encoded state at the canonical EDRIXS index."""
+        if index < 0:
+            index += self.dim
+        if index < 0 or index >= self.dim:
+            raise IndexError(index)
+        return _decode_combinadic(
+            int(index), self.shell_norbs, self.noccus, self.offsets, self.sizes
+        )
+
+    def jit_args(self):
+        """Return compact numeric metadata for an explicitly requested JIT path."""
+        return (
+            np.asarray(self.shell_norbs, dtype=np.int64),
+            np.asarray(self.noccus, dtype=np.int64),
+            np.asarray(self.offsets, dtype=np.int64),
+            np.asarray(self.sizes, dtype=np.int64),
+            np.asarray(self.strides, dtype=np.int64),
+            np.uint64(self.min_decode),
+            np.uint64(self.max_decode),
+        )
+
+
+def _hash_decoder(rank, norb, nocc):
+    """Decode a conventional colex combinadic rank inside one shell."""
+    if nocc == 0:
+        return 0
+    state = 0
+    j = nocc
+    i = norb - 1
+    c = comb(i, j)
+    while i >= 0 and j > 0:
+        if c <= rank:
+            state |= 1 << i
+            rank -= c
+            old_i, old_j = i, j
+            i -= 1
+            j -= 1
+            if j == 0 or i < 0:
+                break
+            c = (c * old_j) // old_i
+        else:
+            if i == 0:
+                break
+            c = (c * (i - j)) // i
+            i -= 1
+    return state
+
+
+def _hash_encoder(state, norb):
+    """Encode one shell into its conventional colex combinadic rank."""
+    state = int(state) & ((1 << norb) - 1)
+    rank = 0
+    k = 1
+    while state:
+        lsb = state & -state
+        pos = lsb.bit_length() - 1
+        rank += comb(pos, k)
+        k += 1
+        state ^= lsb
+    return rank
+
+
+def _decode_combinadic(index, norbs, noccus, offsets, sizes):
+    """Decode using the historical EDRIXS shell and state ordering."""
+    state = 0
+    for norb, nocc, offset, size in zip(norbs, noccus, offsets, sizes):
+        shell_rank = index % size
+        index //= size
+        colex_rank = size - 1 - shell_rank
+        state |= _hash_decoder(colex_rank, norb, nocc) << offset
+    return state
+
+
+def _encode_combinadic(state, norbs, noccus, offsets, sizes, strides):
+    """Encode using the historical EDRIXS shell and state ordering."""
+    index = 0
+    for norb, nocc, offset, size, stride in zip(
+            norbs, noccus, offsets, sizes, strides):
+        mask = (1 << norb) - 1
+        shell_state = (state >> offset) & mask
+        if shell_state.bit_count() != nocc:
+            return -1
+        shell_rank = size - 1 - _hash_encoder(shell_state, norb)
+        index += shell_rank * stride
+    return index
+
+
+def _min_max_decode(shapes):
+    total_norb = sum(norb for norb, _ in shapes)
+    state_min = 0
+    state_max = 0
+    running = total_norb
+    for norb, nocc in shapes:
+        running -= norb
+        shell_min = (1 << nocc) - 1
+        shell_max = shell_min << (norb - nocc)
+        state_min |= shell_min << running
+        state_max |= shell_max << running
+    return state_min, state_max
+
+
 def get_fock_basis_int(*args):
     """
-    Build an integer-encoded :class:`FockBasis` for fixed shell occupancies.
+    Build an explicit :class:`FockBasis` for fixed shell occupancies.
 
-    Parameters
-    ----------
-    args : ints
-        ``(number_of_orbitals, occupancy)`` pairs, with the same shell ordering
-        convention as :func:`get_fock_bin_by_N`.
-
-    Returns
-    -------
-    FockBasis or None
-        Integer-encoded basis, or ``None`` when an odd number of arguments is
-        supplied.
+    The state ordering is the historical EDRIXS ordering produced by
+    :func:`get_fock_bin_by_N`.
     """
-    basis_binary = get_fock_bin_by_N(*args)
-    if basis_binary is None:
+    if len(args) % 2 != 0:
+        print("Error: number of arguments is not even")
         return None
+    spec = FockBasisSpec.from_args(*args)
+    basis_binary = get_fock_bin_by_N(*args)
     basis_int = np.asarray(
         [int(''.join(map(str, row)), 2) for row in basis_binary],
         dtype=object,
     )
-    return FockBasis(basis_int, sum(args[0::2]))
+    return FockBasis(basis_int, spec.norbs, spec=spec)
+
+
+def get_fock_basis_combinadic(*args):
+    """Build an implicit combinadic basis for fixed shell occupancies."""
+    if len(args) % 2 != 0:
+        print("Error: number of arguments is not even")
+        return None
+    return FockBinByN.from_spec(FockBasisSpec.from_args(*args))
+
+
+def build_fock_basis(basis, method='combinadic'):
+    """Realize a compact basis specification with the requested representation."""
+    if isinstance(basis, (FockBasis, FockBinByN)):
+        return basis
+    if not isinstance(basis, FockBasisSpec):
+        raise TypeError("basis must be a FockBasisSpec or a realized Fock basis")
+
+    if method == 'combinadic':
+        return FockBinByN.from_spec(basis)
+    if method == 'explicit':
+        args = tuple(value for shape in basis.shapes for value in shape)
+        return get_fock_basis_int(*args)
+    raise ValueError("basis method must be 'combinadic' or 'explicit'")
 
 
 def fock_bin(n, k):

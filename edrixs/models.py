@@ -1,8 +1,8 @@
 """Backend-independent physical model construction for EDRIXS.
 
 The model functions in this module describe orbital-space Hamiltonians,
-interactions, Fock bases, and photon-transition matrices without constructing
-backend-owned many-body operators.
+interactions, Fock-basis specifications, and photon-transition matrices without
+constructing backend-owned many-body operators.
 """
 
 from __future__ import annotations
@@ -13,7 +13,7 @@ from .angular_momentum import get_lx, get_ly, get_lz, get_sx, get_sy, get_sz
 from .angular_momentum import get_wigner_dmat, rmat_to_euler
 from .basis_transform import cb_op, tmat_r2c
 from .coulomb_utensor import get_umat_slater, get_umat_slater_3shells
-from .fock_basis import get_fock_basis_int
+from .fock_basis import FockBasisSpec
 from .iostream import write_emat, write_umat
 from .photon_transition import get_trans_oper
 from .soc import atom_hsoc
@@ -34,12 +34,12 @@ def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
                v_cfmat=None, v_othermat=None, loc_axis=None, verbose=0,
                sparse_U=False, tol=1E-10):
     """
-    Set up orbital-space data and Fock bases for a 1v1c problem.
+    Set up orbital-space data and Fock-basis metadata for a 1v1c problem.
 
     This routine defines the physical one-valence-shell/one-core-shell problem
     independently of the numerical backend. It constructs the one-body orbital
-    matrices, Coulomb tensors, Fock bases, and orbital-space transition
-    matrices, but it does not build many-body Hamiltonians and does not
+    matrices, Coulomb tensors, Fock-basis specifications, and orbital-space
+    transition matrices, but it does not build many-body Hamiltonians and does not
     diagonalize anything.
 
     Parameters
@@ -63,8 +63,8 @@ def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
     Returns
     -------
     emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
-        Backend-independent problem definition. trans_mat has shape
-        (npol, ntot, ntot).
+        Backend-independent problem definition. ``basis_i`` and ``basis_n`` are
+        compact Fock-basis specifications; trans_mat has shape (npol, ntot, ntot).
     """
     print("edrixs >>> Setting up 1v1c problem ...")
 
@@ -187,9 +187,9 @@ def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
         write_emat(emat_i, 'hopping_i.in')
         write_emat(emat_n, 'hopping_n.in')
 
-    # Fock bases.
-    basis_i = get_fock_basis_int(v_norb, v_noccu, c_norb, c_norb)
-    basis_n = get_fock_basis_int(v_norb, v_noccu + 1, c_norb, c_norb - 1)
+    # Fock-basis metadata.
+    basis_i = FockBasisSpec.from_args(v_norb, v_noccu, c_norb, c_norb)
+    basis_n = FockBasisSpec.from_args(v_norb, v_noccu + 1, c_norb, c_norb - 1)
 
     print("edrixs >>> Dimension of the initial Hamiltonian: ", len(basis_i))
     print("edrixs >>> Dimension of the intermediate Hamiltonian: ", len(basis_n))
@@ -239,7 +239,7 @@ def model_2v1c(
     trans_to_which=1, loc_axis=None, verbose=0, sparse_U=False, tol=1E-10
 ):
     """
-    Set up orbital-space data and Fock bases for a 2v1c problem.
+    Set up orbital-space data and Fock-basis metadata for a 2v1c problem.
 
     This is the backend-neutral setup analogue of the 2-valence-shell,
     1-core-shell Fortran ED/RIXS input construction.  It does not build
@@ -250,8 +250,7 @@ def model_2v1c(
     Returns
     -------
     emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
-        These can be passed directly to get_ops(..., backend='scipy') or
-        get_ops(..., backend='dense').
+        These can be passed directly to ``get_ops`` with the SciPy or dense backend.
     """
     print("edrixs >>> Setting up 2v1c problem ...")
 
@@ -427,10 +426,10 @@ def model_2v1c(
         write_emat(emat_i, 'hopping_i.in')
         write_emat(emat_n, 'hopping_n.in')
 
-    basis_i = get_fock_basis_int(
+    basis_i = FockBasisSpec.from_args(
         v1v2_norb, v_tot_noccu, c_norb, c_norb
     )
-    basis_n = get_fock_basis_int(
+    basis_n = FockBasisSpec.from_args(
         v1v2_norb, v_tot_noccu + 1, c_norb, c_norb - 1
     )
 
@@ -463,7 +462,7 @@ def model_siam(
     on_which='spin', loc_axis=None, verbose=0, sparse_U=False, tol=1E-10
 ):
     """
-    Set up orbital-space data and Fock bases for a SIAM problem.
+    Set up orbital-space data and Fock-basis metadata for a SIAM problem.
 
     This is the backend-neutral setup analogue of ed_siam_fort. It does not
     search over occupancies, does not build many-body Hamiltonians, and does not
@@ -474,8 +473,7 @@ def model_siam(
     Returns
     -------
     emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
-        These can be passed directly to get_ops(..., backend='scipy') or
-        get_ops(..., backend='dense').
+        These can be passed directly to ``get_ops`` with the SciPy or dense backend.
     """
     print("edrixs >>> Setting up SIAM problem ...")
 
@@ -650,8 +648,8 @@ def model_siam(
         write_emat(emat_i, 'hopping_i.in')
         write_emat(emat_n, 'hopping_n.in')
 
-    basis_i = get_fock_basis_int(ntot_v, v_noccu, c_norb, c_norb)
-    basis_n = get_fock_basis_int(ntot_v, v_noccu + 1, c_norb, c_norb - 1)
+    basis_i = FockBasisSpec.from_args(ntot_v, v_noccu, c_norb, c_norb)
+    basis_n = FockBasisSpec.from_args(ntot_v, v_noccu + 1, c_norb, c_norb - 1)
 
     print("edrixs >>> Dimension of the initial Hamiltonian: ", len(basis_i))
     print("edrixs >>> Dimension of the intermediate Hamiltonian: ", len(basis_n))

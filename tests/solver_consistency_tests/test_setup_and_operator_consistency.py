@@ -1,7 +1,7 @@
 """Consistency checks for model definition and many-body operator construction.
 
 These checks follow the command chain from ``model_*`` through ``get_ops`` but stop
-before any eigensolver or spectral solver.  They compare alternative dense and
+before any eigensolver or spectral solver. They compare alternative dense and
 SciPy sparse representations of the same physical model.
 """
 
@@ -10,6 +10,7 @@ import pytest
 import scipy.sparse as sp
 from numpy.testing import assert_allclose
 
+from edrixs.fock_basis import FockBasisSpec
 from edrixs.models import model_1v1c, model_2v1c, model_siam
 from edrixs.solvers import get_ops
 
@@ -25,12 +26,7 @@ pytestmark = pytest.mark.integration
 
 @pytest.mark.parametrize("trans_to_which", [1, 2])
 def test_model_2v1c_sparse_dense_and_get_ops_equivalence(trans_to_which):
-    """Compare both representations through the 2v1c model-to-``get_ops`` chain.
-
-    The check builds one model with dense and flattened sparse interactions,
-    verifies the same orbital data and transition target, and confirms that
-    dense and SciPy many-body operators act identically before spectroscopy.
-    """
+    """Compare both representations through the 2v1c model-to-``get_ops`` chain."""
     hopping = np.array(
         [
             [0.04 + 0.02j, -0.07j],
@@ -77,12 +73,7 @@ def test_model_2v1c_sparse_dense_and_get_ops_equivalence(trans_to_which):
 
 @pytest.mark.parametrize("siam_type", [0, 1])
 def test_model_siam_sparse_dense_and_get_ops_equivalence(siam_type):
-    """Compare both representations through the SIAM model-to-``get_ops`` chain.
-
-    The check covers both supported SIAM input forms, confirms identical dense
-    and sparse model data and operator actions, and verifies that the photon
-    transition reaches the impurity but not bath orbitals.
-    """
+    """Compare both representations through the SIAM model-to-``get_ops`` chain."""
     kwargs = siam_kwargs(siam_type)
     dense = model_siam(**kwargs, sparse_U=False)
     sparse = model_siam(**kwargs, sparse_U=True)
@@ -100,12 +91,7 @@ def test_model_siam_sparse_dense_and_get_ops_equivalence(siam_type):
 
 
 def test_model_siam_static_core_potential_only_shifts_intermediate_impurity():
-    """Check the SIAM core-hole term before operator construction and spectra.
-
-    The static core potential should leave the initial orbital Hamiltonian
-    unchanged and shift only the impurity block of the intermediate model that
-    later enters XAS and the RIXS correction-vector solve.
-    """
+    """The static core potential only shifts the intermediate impurity block."""
     base = model_siam(
         ("s", "p"),
         1,
@@ -130,12 +116,7 @@ def test_model_siam_static_core_potential_only_shifts_intermediate_impurity():
 
 
 def test_model_1v1c_sparse_u_matches_dense_u(small_1v1c_kwargs):
-    """Compare dense and sparse interaction outputs from ``model_1v1c``.
-
-    This check verifies the first stage of the 1v1c SciPy path: model definition
-    must be unchanged when Coulomb tensors are stored sparsely for the later
-    ``get_ops(..., backend="scipy")`` construction.
-    """
+    """Dense and sparse-U model outputs must retain identical basis metadata."""
     dense = model_1v1c(**small_1v1c_kwargs, sparse_U=False)
     sparse = model_1v1c(**small_1v1c_kwargs, sparse_U=True)
 
@@ -147,20 +128,17 @@ def test_model_1v1c_sparse_u_matches_dense_u(small_1v1c_kwargs):
             dense_u.reshape(norbs * norbs, norbs * norbs),
         )
 
-    assert dense[2].basis_int == sparse[2].basis_int
-    assert dense[5].basis_int == sparse[5].basis_int
+    assert isinstance(dense[2], FockBasisSpec)
+    assert isinstance(dense[5], FockBasisSpec)
+    assert dense[2] == sparse[2]
+    assert dense[5] == sparse[5]
     assert_allclose(dense[0], sparse[0])
     assert_allclose(dense[3], sparse[3])
     assert_allclose(dense[6], sparse[6])
 
 
 def test_ops_scipy_backend_matches_dense_operator_action(small_1v1c_problem):
-    """Compare dense and SciPy operators at the setup-to-solver boundary.
-
-    Starting from one backend-neutral 1v1c model, this check confirms that the
-    two ``get_ops`` backends produce Hamiltonian and transition actions that agree
-    before either representation is used by ED, XAS, or RIXS.
-    """
+    """Compare dense and SciPy operators at the setup-to-solver boundary."""
     hmat_i_sp, hmat_n_sp, trans_sp = get_ops(
         *small_1v1c_problem,
         backend="scipy",

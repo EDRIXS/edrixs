@@ -48,7 +48,8 @@ def _not_implemented(operation):
     )
 
 
-def build_op_petsc(emat, umat, lb, rb=None, *, backend_kws=None):
+def build_op_petsc(
+        emat, umat, lb, rb=None, *, use_numba=False, backend_kws=None):
     """Build a PETSc many-body operator (stub)."""
     _petsc_module()
     _not_implemented('build_op_petsc')
