@@ -83,7 +83,7 @@ def _not_implemented(operation):
 # -----------------------------------------------------------------------------
 
 
-def build_op_petsc(emat, umat, lb, rb=None, *, backend_kws=None):
+def build_op_petsc(emat, umat, lb, rb=None, *, use_numba=False, backend_kws=None):
     """Build a distributed PETSc many-body operator.
 
     Assemble ``H = sum_ij emat_ij f_i^dagger f_j
@@ -102,6 +102,8 @@ def build_op_petsc(emat, umat, lb, rb=None, *, backend_kws=None):
         Left (row) many-body basis.
     rb : FockBasis, optional
         Right (column) many-body basis. Defaults to ``lb``.
+    use_numba : bool, optional
+        JIT-compile matrix-entry construction. The default is False.
     backend_kws : mapping, optional
         Extra options. Recognized keys:
 
@@ -111,6 +113,8 @@ def build_op_petsc(emat, umat, lb, rb=None, *, backend_kws=None):
         - ``nnz_guess_per_row`` : preallocation hint.
         - ``mat_type`` : optional PETSc matrix type to convert to after
           assembly, e.g. ``'aijcusparse'``.
+        - ``assembly_chunk_cols`` : number of owned basis columns generated
+          before entries are flushed into PETSc (default ``4096``).
 
     Returns
     -------
@@ -118,10 +122,7 @@ def build_op_petsc(emat, umat, lb, rb=None, *, backend_kws=None):
         The assembled many-body operator.
     """
     PETSc = _petsc_module()
-    from .hash_basis_methods import (
-        assemble_petsc_from_entries,
-        build_H_entries_lr,
-    )
+    from .hash_basis_methods import build_op_petsc_matrix
 
     kws = _backend_kws(backend_kws)
     comm = kws.pop('comm', PETSc.COMM_WORLD)
@@ -129,63 +130,21 @@ def build_op_petsc(emat, umat, lb, rb=None, *, backend_kws=None):
     tol_u = kws.pop('tol_u', 1e-10)
     nnz_guess_per_row = kws.pop('nnz_guess_per_row', None)
     mat_type = kws.pop('mat_type', None)
+    assembly_chunk_cols = kws.pop('assembly_chunk_cols', 4096)
     if kws:
         raise TypeError(
             "Unknown PETSc operator-construction options: {}".format(sorted(kws))
         )
 
-    if rb is None:
-        rb = lb
-
-    nl, nr = len(lb), len(rb)
-    if lb.norbs != rb.norbs:
-        raise ValueError("left and right Fock bases must have the same norbs")
-
-    hmat = PETSc.Mat().create(comm=comm)
-    hmat.setSizes(((None, nl), (None, nr)))
-    hmat.setType(PETSc.Mat.Type.AIJ)
-
-    if nnz_guess_per_row is None:
-        ne = int(np.count_nonzero(np.abs(emat) > tol_e)) if emat is not None else 0
-        nu = int(np.count_nonzero(np.abs(umat) > tol_u)) if umat is not None else 0
-        nnz_guess_per_row = max(8, min(nr, 16 + ne + 2 * min(nu, 32)))
-
-    hmat.setPreallocationNNZ(nnz_guess_per_row)
-    hmat.setOption(PETSc.Mat.Option.NEW_NONZERO_ALLOCATION_ERR, False)
-    hmat.setUp()
-
-    cstart, cend = hmat.getOwnershipRangeColumn()
-
-    rb_meta = rb.jit_args()
-    lb_meta = lb.jit_args()
-
-    if emat is not None:
-        a1, a2 = np.nonzero(np.abs(emat) > tol_e)
-        e_terms = np.stack((a1, a2), axis=-1).astype(np.int64)
-        e_vals = emat[a1, a2].astype(np.complex128)
-    else:
-        e_terms = np.empty((0, 2), dtype=np.int64)
-        e_vals = np.empty((0,), dtype=np.complex128)
-
-    if umat is not None:
-        a1, a2, a3, a4 = np.nonzero(np.abs(umat) > tol_u)
-        u_terms = np.stack((a1, a2, a3, a4), axis=-1).astype(np.int64)
-        u_vals = umat[a1, a2, a3, a4].astype(np.complex128)
-    else:
-        u_terms = np.empty((0, 4), dtype=np.int64)
-        u_vals = np.empty((0,), dtype=np.complex128)
-
-    rows, cols, vals = build_H_entries_lr(
-        rb_meta[0], rb_meta[1], rb_meta[2], rb_meta[3],
-        rb_meta[4], rb_meta[5], rb_meta[6],
-        lb_meta[0], lb_meta[1], lb_meta[2], lb_meta[3],
-        lb_meta[4], lb_meta[5], lb_meta[6],
-        e_terms, e_vals, u_terms, u_vals, cstart, cend,
-    )
-
-    return assemble_petsc_from_entries(
-        comm, nl, nr, rows, cols, vals,
-        nnz_guess_per_row, mat_type=mat_type,
+    return build_op_petsc_matrix(
+        emat, umat, lb, rb,
+        comm=comm,
+        tol_e=tol_e,
+        tol_u=tol_u,
+        nnz_guess_per_row=nnz_guess_per_row,
+        mat_type=mat_type,
+        assembly_chunk_cols=assembly_chunk_cols,
+        use_numba=use_numba,
     )
 
 
