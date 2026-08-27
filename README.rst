@@ -38,7 +38,7 @@ For Linux users we suggest installing with anaconda.
 
   .. code-block:: bash
 
-     $ conda create --name edrixs_env python=3.10
+     $ conda create --name edrixs_env python=3.14
      $ conda activate edrixs_env
      $ conda install -c conda-forge edrixs
 
