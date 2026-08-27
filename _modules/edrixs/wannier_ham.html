@@ -81,7 +81,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for edrixs.wannier_ham</h1><div class="highlight"><pre>
-<span></span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;HR&#39;</span><span class="p">,</span> <span class="s1">&#39;KVec&#39;</span><span class="p">,</span> <span class="s1">&#39;SymKVec&#39;</span><span class="p">,</span> <span class="s1">&#39;UniKVec&#39;</span><span class="p">]</span>
+<span></span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'HR'</span><span class="p">,</span> <span class="s1">'KVec'</span><span class="p">,</span> <span class="s1">'SymKVec'</span><span class="p">,</span> <span class="s1">'UniKVec'</span><span class="p">]</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
@@ -89,7 +89,7 @@
 <div class="viewcode-block" id="HR">
 <a class="viewcode-back" href="../../reference/wannier_ham.html#edrixs.wannier_ham.HR">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">HR</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Class for post-process of the Wannier90 tight-binding (TB) Hamiltonian in real space.</span>
 
 <span class="sd">    Parameters</span>
@@ -106,7 +106,7 @@
 <span class="sd">        Degenerancy of :math:`r` points.</span>
 <span class="sd">    hr: complex array</span>
 <span class="sd">        Hamiltonian :math:`H(r)` from Wannier90.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nwann</span><span class="p">,</span> <span class="n">nrpt</span><span class="p">,</span> <span class="n">irpt0</span><span class="p">,</span> <span class="n">rpts</span><span class="p">,</span> <span class="n">deg_rpt</span><span class="p">,</span> <span class="n">hr</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nwann</span> <span class="o">=</span> <span class="n">nwann</span>
@@ -119,22 +119,22 @@
 <div class="viewcode-block" id="HR.from_file">
 <a class="viewcode-back" href="../../reference/wannier_ham.html#edrixs.wannier_ham.HR.from_file">[docs]</a>
     <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">from_file</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="s1">&#39;wannier90_hr.dat&#39;</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generate a TB Hamiltonian from Wannier90 output file &quot;case_hr.dat&quot;.</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_file</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="s1">'wannier90_hr.dat'</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""</span>
+<span class="sd">        Generate a TB Hamiltonian from Wannier90 output file "case_hr.dat".</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        fname: str</span>
-<span class="sd">            The file that contains the Wannier90 output file: &quot;case_hr.dat&quot;.</span>
+<span class="sd">            The file that contains the Wannier90 output file: "case_hr.dat".</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        HR: HR object</span>
 <span class="sd">            A HR object.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="c1"># skip the header (1 line)</span>
             <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
             <span class="n">nwann</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
@@ -166,7 +166,7 @@
 <a class="viewcode-back" href="../../reference/wannier_ham.html#edrixs.wannier_ham.HR.copy_hr">[docs]</a>
     <span class="nd">@staticmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">copy_hr</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Copy instance of HR.</span>
 
 <span class="sd">        Parameters</span>
@@ -178,7 +178,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        HR: HR object</span>
 <span class="sd">            Return a new HR object.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">return</span> <span class="n">HR</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">nwann</span><span class="p">,</span>
                   <span class="n">other</span><span class="o">.</span><span class="n">nrpt</span><span class="p">,</span>
@@ -191,7 +191,7 @@
 <div class="viewcode-block" id="HR.get_hr0">
 <a class="viewcode-back" href="../../reference/wannier_ham.html#edrixs.wannier_ham.HR.get_hr0">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_hr0</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ispin</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Return the on-site term :math:`H(r=0)`.</span>
 
 <span class="sd">        Parameters</span>
@@ -203,7 +203,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        hr: 2d complex array</span>
 <span class="sd">            The on-site Hamiltonian.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="k">if</span> <span class="n">ispin</span><span class="p">:</span>
             <span class="n">norbs</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">nwann</span>
@@ -218,7 +218,7 @@
 <div class="viewcode-block" id="HR.get_hr">
 <a class="viewcode-back" href="../../reference/wannier_ham.html#edrixs.wannier_ham.HR.get_hr">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_hr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ispin</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Return the Hamiltonian of :math:`H(r)`.</span>
 
 <span class="sd">        Parameters</span>
@@ -230,7 +230,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        hr: 3d complex array</span>
 <span class="sd">            The Hamiltonian :math:`H(r)`.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="c1"># with spin, spin order: up dn up dn up dn</span>
         <span class="k">if</span> <span class="n">ispin</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -256,22 +256,22 @@
 <div class="viewcode-block" id="KVec">
 <a class="viewcode-back" href="../../reference/wannier_ham.html#edrixs.wannier_ham.KVec">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">KVec</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Define :math:`k` points in BZ, high symmetry line or uniform grid.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    kpt_type: str</span>
-<span class="sd">        The type of :math:`k` points, &#39;uni&#39; or &#39;sym&#39;.</span>
+<span class="sd">        The type of :math:`k` points, 'uni' or 'sym'.</span>
 <span class="sd">    kbase: :math:`3 \\times 3` float array</span>
 <span class="sd">        The basis vectors of the primitive reciprocal space.</span>
 <span class="sd">    nkpt: int</span>
 <span class="sd">        Number of :math:`k` points.</span>
 <span class="sd">    kvec: float array</span>
 <span class="sd">        The :math:`k` points.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kpt_type</span><span class="o">=</span><span class="s1">&#39;uni&#39;</span><span class="p">,</span> <span class="n">kbase</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nkpt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kvec</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kpt_type</span><span class="o">=</span><span class="s1">'uni'</span><span class="p">,</span> <span class="n">kbase</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">nkpt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kvec</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nkpt</span> <span class="o">=</span> <span class="n">nkpt</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">kbase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">kbase</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">kvec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">kvec</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -280,14 +280,14 @@
 <div class="viewcode-block" id="KVec.set_base">
 <a class="viewcode-back" href="../../reference/wannier_ham.html#edrixs.wannier_ham.KVec.set_base">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">set_base</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kbase</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Set the basis of the primitive reciprocal.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        kbase: :math:`3 \\times 3` float array</span>
 <span class="sd">            The basis with respect to the global axis.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">kbase</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">kbase</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span></div>
 
@@ -295,17 +295,17 @@
 <div class="viewcode-block" id="KVec.kvec_from_file">
 <a class="viewcode-back" href="../../reference/wannier_ham.html#edrixs.wannier_ham.KVec.kvec_from_file">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">kvec_from_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Read :math:`k` points from file.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        fname: str</span>
 <span class="sd">            File name.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">tmp</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">line</span> <span class="o">!=</span> <span class="p">[]:</span>
@@ -319,7 +319,7 @@
 <div class="viewcode-block" id="SymKVec">
 <a class="viewcode-back" href="../../reference/wannier_ham.html#edrixs.wannier_ham.SymKVec">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">SymKVec</span><span class="p">(</span><span class="n">KVec</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Class for defining :math:`k` points in high symmetry line, derived from :class:`KVec`.</span>
 
 <span class="sd">    Parameters</span>
@@ -330,19 +330,19 @@
 <span class="sd">        Starting and end :math:`k` points along high symmetry lines.</span>
 <span class="sd">    klen: float array</span>
 <span class="sd">        Length of segments of :math:`k` points line.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kbase</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hsymkpt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">klen</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">klen</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">klen</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hsymkpt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">hsymkpt</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-        <span class="n">KVec</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;sym&#39;</span><span class="p">,</span> <span class="n">kbase</span><span class="p">)</span>
+        <span class="n">KVec</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">'sym'</span><span class="p">,</span> <span class="n">kbase</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SymKVec.get_klen">
 <a class="viewcode-back" href="../../reference/wannier_ham.html#edrixs.wannier_ham.SymKVec.get_klen">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_klen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Return length of :math:`k` points segments.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">klen</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nkpt</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">klen</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -362,7 +362,7 @@
 <div class="viewcode-block" id="SymKVec.from_hsymkpt">
 <a class="viewcode-back" href="../../reference/wannier_ham.html#edrixs.wannier_ham.SymKVec.from_hsymkpt">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_hsymkpt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nkpt_per_path</span><span class="o">=</span><span class="mi">20</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Given starting and end :math:`k` points of each segment,</span>
 <span class="sd">        and the number of points per each segment,</span>
 <span class="sd">        return the high symmetry :math:`k` points.</span>
@@ -371,7 +371,7 @@
 <span class="sd">        ----------</span>
 <span class="sd">        nkpt_per_path: int</span>
 <span class="sd">            Number of :math:`k` points per each segment.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">nkpt</span> <span class="o">=</span> <span class="n">nkpt_per_path</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hsymkpt</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">kvec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">nkpt</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -387,14 +387,14 @@
 <div class="viewcode-block" id="SymKVec.from_hsymkpt_uni">
 <a class="viewcode-back" href="../../reference/wannier_ham.html#edrixs.wannier_ham.SymKVec.from_hsymkpt_uni">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_hsymkpt_uni</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Given a step, return high symmetry :math:`k` points.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        step: float</span>
 <span class="sd">            Step size.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">kvec</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hsym_dis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hsymkpt</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -417,25 +417,25 @@
 <div class="viewcode-block" id="UniKVec">
 <a class="viewcode-back" href="../../reference/wannier_ham.html#edrixs.wannier_ham.UniKVec">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">UniKVec</span><span class="p">(</span><span class="n">KVec</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Class for defining uniform :math:`k` points grid, derived from :class:`KVec`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    grid: 3-elements tuple</span>
 <span class="sd">        Three numbers defining a uniform grid, for example: :math:`11 \\times 11 \\times 11`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">grid</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">grid</span> <span class="o">=</span> <span class="n">grid</span>
-        <span class="n">KVec</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;uni&#39;</span><span class="p">)</span>
+        <span class="n">KVec</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">'uni'</span><span class="p">)</span>
 
 <div class="viewcode-block" id="UniKVec.from_grid">
 <a class="viewcode-back" href="../../reference/wannier_ham.html#edrixs.wannier_ham.UniKVec.from_grid">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">from_grid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Return uniform :math:`k` points.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">        """</span>
 
         <span class="n">delta</span> <span class="o">=</span> <span class="mf">0.001</span>
         <span class="n">nx</span><span class="p">,</span> <span class="n">ny</span><span class="p">,</span> <span class="n">nz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">grid</span>

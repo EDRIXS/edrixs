@@ -212,7 +212,7 @@ However, they can also be compiled from source easily. In the following, we will
 <span class="n">tar</span> <span class="o">-</span><span class="n">xzf</span> <span class="mf">3.6.3</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
 <span class="n">cd</span> <span class="n">arpack</span><span class="o">-</span><span class="n">ng</span><span class="o">-</span><span class="mf">3.6.3</span>
 <span class="o">./</span><span class="n">bootstrap</span>
-<span class="o">./</span><span class="n">configure</span> <span class="o">--</span><span class="n">enable</span><span class="o">-</span><span class="n">mpi</span> <span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">blas</span><span class="o">=</span><span class="s2">&quot;-L/usr/local/lib/ -lopenblas&quot;</span> <span class="n">FC</span><span class="o">=</span><span class="n">gfortran</span> <span class="n">F77</span><span class="o">=</span><span class="n">gfortran</span> <span class="n">MPIFC</span><span class="o">=</span><span class="n">mpif90</span> <span class="n">MPIF77</span><span class="o">=</span><span class="n">mpif90</span>
+<span class="o">./</span><span class="n">configure</span> <span class="o">--</span><span class="n">enable</span><span class="o">-</span><span class="n">mpi</span> <span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">blas</span><span class="o">=</span><span class="s2">"-L/usr/local/lib/ -lopenblas"</span> <span class="n">FC</span><span class="o">=</span><span class="n">gfortran</span> <span class="n">F77</span><span class="o">=</span><span class="n">gfortran</span> <span class="n">MPIFC</span><span class="o">=</span><span class="n">mpif90</span> <span class="n">MPIF77</span><span class="o">=</span><span class="n">mpif90</span>
 <span class="n">make</span>
 <span class="n">sudo</span> <span class="n">make</span> <span class="n">install</span>
 </pre></div>
@@ -248,12 +248,12 @@ However, they can also be compiled from source easily. In the following, we will
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="nn">mpi4py</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">mpi4py</span><span class="o">.</span><span class="n">get_config</span><span class="p">()</span>
-<span class="p">{</span><span class="s1">&#39;mpicc&#39;</span><span class="p">:</span> <span class="s1">&#39;/usr/local/bin/mpicc&#39;</span><span class="p">,</span>
- <span class="s1">&#39;mpicxx&#39;</span><span class="p">:</span> <span class="s1">&#39;/usr/local/bin/mpicxx&#39;</span><span class="p">,</span>
- <span class="s1">&#39;include_dirs&#39;</span><span class="p">:</span> <span class="s1">&#39;/usr/local/include&#39;</span><span class="p">,</span>
- <span class="s1">&#39;libraries&#39;</span><span class="p">:</span> <span class="s1">&#39;mpi&#39;</span><span class="p">,</span>
- <span class="s1">&#39;library_dirs&#39;</span><span class="p">:</span> <span class="s1">&#39;/usr/local/lib&#39;</span><span class="p">,</span>
- <span class="s1">&#39;runtime_library_dirs&#39;</span><span class="p">:</span> <span class="s1">&#39;/usr/local/lib&#39;</span><span class="p">}</span>
+<span class="p">{</span><span class="s1">'mpicc'</span><span class="p">:</span> <span class="s1">'/usr/local/bin/mpicc'</span><span class="p">,</span>
+ <span class="s1">'mpicxx'</span><span class="p">:</span> <span class="s1">'/usr/local/bin/mpicxx'</span><span class="p">,</span>
+ <span class="s1">'include_dirs'</span><span class="p">:</span> <span class="s1">'/usr/local/include'</span><span class="p">,</span>
+ <span class="s1">'libraries'</span><span class="p">:</span> <span class="s1">'mpi'</span><span class="p">,</span>
+ <span class="s1">'library_dirs'</span><span class="p">:</span> <span class="s1">'/usr/local/lib'</span><span class="p">,</span>
+ <span class="s1">'runtime_library_dirs'</span><span class="p">:</span> <span class="s1">'/usr/local/lib'</span><span class="p">}</span>
 </pre></div>
 </div>
 <p>Now, we are ready to build edrixs:</p>

@@ -81,8 +81,8 @@
            <div itemprop="articleBody">
              
   <h1>Source code for edrixs.coulomb_utensor</h1><div class="highlight"><pre>
-<span></span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;get_gaunt&#39;</span><span class="p">,</span> <span class="s1">&#39;umat_slater&#39;</span><span class="p">,</span> <span class="s1">&#39;get_umat_kanamori_ge&#39;</span><span class="p">,</span> <span class="s1">&#39;get_F0&#39;</span><span class="p">,</span>
-           <span class="s1">&#39;get_umat_slater&#39;</span><span class="p">,</span> <span class="s1">&#39;get_umat_kanamori&#39;</span><span class="p">,</span> <span class="s1">&#39;get_umat_slater_3shells&#39;</span><span class="p">]</span>
+<span></span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'get_gaunt'</span><span class="p">,</span> <span class="s1">'umat_slater'</span><span class="p">,</span> <span class="s1">'get_umat_kanamori_ge'</span><span class="p">,</span> <span class="s1">'get_F0'</span><span class="p">,</span>
+           <span class="s1">'get_umat_slater'</span><span class="p">,</span> <span class="s1">'get_umat_kanamori'</span><span class="p">,</span> <span class="s1">'get_umat_slater_3shells'</span><span class="p">]</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">sympy.physics.wigner</span><span class="w"> </span><span class="kn">import</span> <span class="n">gaunt</span>
@@ -93,7 +93,7 @@
 <div class="viewcode-block" id="get_gaunt">
 <a class="viewcode-back" href="../../reference/coulomb_utensor.html#edrixs.coulomb_utensor.get_gaunt">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_gaunt</span><span class="p">(</span><span class="n">l1</span><span class="p">,</span> <span class="n">l2</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Calculate the Gaunt coefficents :math:`C_{l_1,l_2}(k,m_1,m_2)`</span>
 
 <span class="sd">    .. math::</span>
@@ -149,7 +149,7 @@
 
 <span class="sd">    &gt;&gt;&gt; g = edrixs.get_gaunt(1, 2)</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="kn">from</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="kn">import</span> <span class="n">N</span>
     <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">l1</span> <span class="o">+</span> <span class="n">l2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">l1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">l2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -167,7 +167,7 @@
 <div class="viewcode-block" id="umat_slater">
 <a class="viewcode-back" href="../../reference/coulomb_utensor.html#edrixs.coulomb_utensor.umat_slater">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">umat_slater</span><span class="p">(</span><span class="n">l_list</span><span class="p">,</span> <span class="n">fk</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Calculate the Coulomb interaction tensor defined via</span>
 
 <span class="sd">    .. math::</span>
@@ -267,7 +267,7 @@
 <span class="sd">    coulomb_utensor.get_umat_slater</span>
 <span class="sd">    coulomb_utensor.get_umat_kanamori</span>
 <span class="sd">    coulomb_utensor.get_umat_kanamori_ge</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">k_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">l_list</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
     <span class="n">ck</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">orb_label</span> <span class="o">=</span> <span class="p">[]</span>
@@ -321,7 +321,7 @@
 <div class="viewcode-block" id="get_umat_kanamori_ge">
 <a class="viewcode-back" href="../../reference/coulomb_utensor.html#edrixs.coulomb_utensor.get_umat_kanamori_ge">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_umat_kanamori_ge</span><span class="p">(</span><span class="n">norbs</span><span class="p">,</span> <span class="n">U1</span><span class="p">,</span> <span class="n">U2</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">Jx</span><span class="p">,</span> <span class="n">Jp</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Calculate the Coulomb interaction tensor for a Kanamori-type interaction.</span>
 <span class="sd">    For the general case, it is parameterized by :math:`U_1, U_2, J, J_x, J_p`.</span>
 
@@ -334,11 +334,11 @@
 <span class="sd">    U2: float</span>
 <span class="sd">        Hubbard :math:`U` for electrons residing on different orbitals.</span>
 <span class="sd">    J: float</span>
-<span class="sd">        Hund&#39;s coupling for density-density interaction.</span>
+<span class="sd">        Hund's coupling for density-density interaction.</span>
 <span class="sd">    Jx: float</span>
-<span class="sd">        Hund&#39;s coupling for spin flip.</span>
+<span class="sd">        Hund's coupling for spin flip.</span>
 <span class="sd">    Jp: float</span>
-<span class="sd">        Hund&#39;s coupling for pair-hopping.</span>
+<span class="sd">        Hund's coupling for pair-hopping.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -355,7 +355,7 @@
 <span class="sd">    coulomb_utensor.get_umat_slater</span>
 <span class="sd">    coulomb_utensor.umat_slater</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">umat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">norbs</span><span class="p">,</span> <span class="n">norbs</span><span class="p">,</span> <span class="n">norbs</span><span class="p">,</span> <span class="n">norbs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">alpha</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">norbs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
@@ -403,69 +403,69 @@
 
 <span class="k">def</span><span class="w"> </span><span class="nf">get_F0</span><span class="p">(</span><span class="n">case</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
     <span class="n">case</span> <span class="o">=</span> <span class="n">case</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;s&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">'s'</span><span class="p">:</span>
         <span class="k">return</span> <span class="mf">0.0</span>
 
-    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;p&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">'p'</span><span class="p">:</span>
         <span class="n">F2</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">25.0</span> <span class="o">*</span> <span class="n">F2</span>
 
-    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;d&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">'d'</span><span class="p">:</span>
         <span class="n">F2</span><span class="p">,</span> <span class="n">F4</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
         <span class="k">return</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">63.0</span> <span class="o">*</span> <span class="n">F2</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">63.0</span> <span class="o">*</span> <span class="n">F4</span>
 
-    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;f&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">'f'</span><span class="p">:</span>
         <span class="n">F2</span><span class="p">,</span> <span class="n">F4</span><span class="p">,</span> <span class="n">F6</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
         <span class="k">return</span> <span class="mf">4.0</span> <span class="o">/</span> <span class="mf">195.0</span> <span class="o">*</span> <span class="n">F2</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">143.0</span> <span class="o">*</span> <span class="n">F4</span> <span class="o">+</span> <span class="mf">100.0</span> <span class="o">/</span> <span class="mf">5577.0</span> <span class="o">*</span> <span class="n">F6</span>
 
-    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;ss&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">'ss'</span><span class="p">:</span>
         <span class="n">G0</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">G0</span>
 
-    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;sp&#39;</span> <span class="ow">or</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;ps&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">'sp'</span> <span class="ow">or</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">'ps'</span><span class="p">:</span>
         <span class="n">G1</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="n">G1</span>
 
-    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;sd&#39;</span> <span class="ow">or</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;ds&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">'sd'</span> <span class="ow">or</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">'ds'</span><span class="p">:</span>
         <span class="n">G2</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">10.0</span> <span class="o">*</span> <span class="n">G2</span>
 
-    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;sf&#39;</span> <span class="ow">or</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;fs&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">'sf'</span> <span class="ow">or</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">'fs'</span><span class="p">:</span>
         <span class="n">G3</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">14.0</span> <span class="o">*</span> <span class="n">G3</span>
 
-    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;pp&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">'pp'</span><span class="p">:</span>
         <span class="n">G0</span><span class="p">,</span> <span class="n">G2</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
         <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">6.0</span> <span class="o">*</span> <span class="n">G0</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">15.0</span> <span class="o">*</span> <span class="n">G2</span>
 
-    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;pd&#39;</span> <span class="ow">or</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;dp&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">'pd'</span> <span class="ow">or</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">'dp'</span><span class="p">:</span>
         <span class="n">G1</span><span class="p">,</span> <span class="n">G3</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
         <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">15.0</span> <span class="o">*</span> <span class="n">G1</span> <span class="o">+</span> <span class="mf">3.0</span> <span class="o">/</span> <span class="mf">70.0</span> <span class="o">*</span> <span class="n">G3</span>
 
-    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;pf&#39;</span> <span class="ow">or</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;fp&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">'pf'</span> <span class="ow">or</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">'fp'</span><span class="p">:</span>
         <span class="n">G2</span><span class="p">,</span> <span class="n">G4</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
         <span class="k">return</span> <span class="mf">3.0</span> <span class="o">/</span> <span class="mf">70.0</span> <span class="o">*</span> <span class="n">G2</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">63.0</span> <span class="o">*</span> <span class="n">G4</span>
 
-    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;dd&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">'dd'</span><span class="p">:</span>
         <span class="n">G0</span><span class="p">,</span> <span class="n">G2</span><span class="p">,</span> <span class="n">G4</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
         <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">10.0</span> <span class="o">*</span> <span class="n">G0</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">35.0</span> <span class="o">*</span> <span class="n">G2</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">35.0</span> <span class="o">*</span> <span class="n">G4</span>
 
-    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;df&#39;</span> <span class="ow">or</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;fd&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">'df'</span> <span class="ow">or</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">'fd'</span><span class="p">:</span>
         <span class="n">G1</span><span class="p">,</span> <span class="n">G3</span><span class="p">,</span> <span class="n">G5</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
         <span class="k">return</span> <span class="mf">3.0</span> <span class="o">/</span> <span class="mf">70.0</span> <span class="o">*</span> <span class="n">G1</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">105.0</span> <span class="o">*</span> <span class="n">G3</span> <span class="o">+</span> <span class="mf">5.0</span> <span class="o">/</span> <span class="mf">231.0</span> <span class="o">*</span> <span class="n">G5</span>
 
-    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">&#39;ff&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">case</span> <span class="o">==</span> <span class="s1">'ff'</span><span class="p">:</span>
         <span class="n">G0</span><span class="p">,</span> <span class="n">G2</span><span class="p">,</span> <span class="n">G4</span><span class="p">,</span> <span class="n">G6</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span>
         <span class="k">return</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">14.0</span> <span class="o">*</span> <span class="n">G0</span> <span class="o">+</span> <span class="mf">2.0</span> <span class="o">/</span> <span class="mf">105.0</span> <span class="o">*</span> <span class="n">G2</span> <span class="o">+</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">77.0</span> <span class="o">*</span> <span class="n">G4</span> <span class="o">+</span> <span class="mf">50.0</span> <span class="o">/</span> <span class="mf">3003.0</span> <span class="o">*</span> <span class="n">G6</span>
 
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;error in get_F0():  Unknown case name:&quot;</span><span class="p">,</span> <span class="n">case</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"error in get_F0():  Unknown case name:"</span><span class="p">,</span> <span class="n">case</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="get_umat_slater">
 <a class="viewcode-back" href="../../reference/coulomb_utensor.html#edrixs.coulomb_utensor.get_umat_slater">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_umat_slater</span><span class="p">(</span><span class="n">case</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Convenient adapter function to return the Coulomb interaction tensor for common case.</span>
 
 <span class="sd">    Parameters</span>
@@ -475,17 +475,17 @@
 
 <span class="sd">        For single shell:</span>
 
-<span class="sd">        - &#39;s&#39;:    single :math:`s`-shell (:math:`l=0`)</span>
-<span class="sd">        - &#39;p&#39;:    single :math:`p`-shell (:math:`l=1`)</span>
-<span class="sd">        - &#39;p12&#39;:  single :math:`p_{1/2}`-shell (:math:`l=1`)</span>
-<span class="sd">        - &#39;p32&#39;:  single :math:`p_{3/2}`-shell (:math:`l=1`)</span>
-<span class="sd">        - &#39;t2g&#39;:  single :math:`t_{2g}`-shell (:math:`l_{\\text{eff}}=1`)</span>
-<span class="sd">        - &#39;d&#39;:    single :math:`d`-shell (:math:`l=2`)</span>
-<span class="sd">        - &#39;d32&#39;:  single :math:`d_{3/2}`-shell (:math:`l=2`)</span>
-<span class="sd">        - &#39;d52&#39;:  single :math:`d_{5/2}`-shell (:math:`l=2`)</span>
-<span class="sd">        - &#39;f&#39;:    single :math:`f`-shell (:math:`l=3`)</span>
-<span class="sd">        - &#39;f52&#39;:  single :math:`f_{5/2}`-shell (:math:`l=3`)</span>
-<span class="sd">        - &#39;f72&#39;:  single :math:`f_{7/2}`-shell (:math:`l=3`)</span>
+<span class="sd">        - 's':    single :math:`s`-shell (:math:`l=0`)</span>
+<span class="sd">        - 'p':    single :math:`p`-shell (:math:`l=1`)</span>
+<span class="sd">        - 'p12':  single :math:`p_{1/2}`-shell (:math:`l=1`)</span>
+<span class="sd">        - 'p32':  single :math:`p_{3/2}`-shell (:math:`l=1`)</span>
+<span class="sd">        - 't2g':  single :math:`t_{2g}`-shell (:math:`l_{\\text{eff}}=1`)</span>
+<span class="sd">        - 'd':    single :math:`d`-shell (:math:`l=2`)</span>
+<span class="sd">        - 'd32':  single :math:`d_{3/2}`-shell (:math:`l=2`)</span>
+<span class="sd">        - 'd52':  single :math:`d_{5/2}`-shell (:math:`l=2`)</span>
+<span class="sd">        - 'f':    single :math:`f`-shell (:math:`l=3`)</span>
+<span class="sd">        - 'f52':  single :math:`f_{5/2}`-shell (:math:`l=3`)</span>
+<span class="sd">        - 'f72':  single :math:`f_{7/2}`-shell (:math:`l=3`)</span>
 
 <span class="sd">        For two shells:</span>
 
@@ -493,14 +493,14 @@
 
 <span class="sd">        where, str1 and str2 are strings and they can be any of</span>
 
-<span class="sd">        [&#39;s&#39;, &#39;p&#39;, &#39;p12&#39;, &#39;p32&#39;, &#39;t2g&#39;, &#39;d&#39;, &#39;d32&#39;, &#39;d52&#39;, &#39;f&#39;, &#39;f52&#39;, &#39;f72&#39;]</span>
+<span class="sd">        ['s', 'p', 'p12', 'p32', 't2g', 'd', 'd32', 'd52', 'f', 'f52', 'f72']</span>
 
 <span class="sd">        For examples,</span>
 
-<span class="sd">        - &#39;dp&#39;:     1st :math:`d`-shell and 2nd :math:`p`-shell</span>
-<span class="sd">        - &#39;dp12&#39;:   1st :math:`d`-shell and 2nd :math:`p_{1/2}`-shell</span>
-<span class="sd">        - &#39;f52p32&#39;: 1st :math:`f_{5/2}`-shell and 2nd :math:`p_{3/2}`-shell</span>
-<span class="sd">        - &#39;t2gp&#39;:   1st :math:`t_{2g}`-shell and 2nd :math:`p`-shell</span>
+<span class="sd">        - 'dp':     1st :math:`d`-shell and 2nd :math:`p`-shell</span>
+<span class="sd">        - 'dp12':   1st :math:`d`-shell and 2nd :math:`p_{1/2}`-shell</span>
+<span class="sd">        - 'f52p32': 1st :math:`f_{5/2}`-shell and 2nd :math:`p_{3/2}`-shell</span>
+<span class="sd">        - 't2gp':   1st :math:`t_{2g}`-shell and 2nd :math:`p`-shell</span>
 
 <span class="sd">    *args: floats</span>
 <span class="sd">        Variable length argument list. Slater integrals.</span>
@@ -517,88 +517,88 @@
 <span class="sd">        where, 1 (2) means 1st (2nd)-shell, and X=0, 2, 4, ... or X=1, 3, 5 ...,</span>
 <span class="sd">        and X should be in ascending order. The following are possible cases:</span>
 
-<span class="sd">        - &#39;s&#39;:</span>
+<span class="sd">        - 's':</span>
 
 <span class="sd">        args = [F0]</span>
 
-<span class="sd">        - &#39;p&#39;, &#39;p12&#39;, &#39;p32&#39;:</span>
+<span class="sd">        - 'p', 'p12', 'p32':</span>
 
 <span class="sd">        args = [F0, F2]</span>
 
-<span class="sd">        - &#39;d&#39;, &#39;d32&#39;, &#39;d52&#39;, &#39;t2g&#39;:</span>
+<span class="sd">        - 'd', 'd32', 'd52', 't2g':</span>
 
 <span class="sd">        args = [F0, F2, F4]</span>
 
-<span class="sd">        - &#39;f&#39;, &#39;f52&#39;, &#39;f72&#39;:</span>
+<span class="sd">        - 'f', 'f52', 'f72':</span>
 
 <span class="sd">        args = [F0, F2, F4, F6]</span>
 
-<span class="sd">        - &#39;ss&#39;:</span>
+<span class="sd">        - 'ss':</span>
 
 <span class="sd">        args = [F0_11, F0_12, G0_12, F0_22]</span>
 
-<span class="sd">        - &#39;ps&#39;, &#39;p12s&#39;, &#39;p32s&#39;:</span>
+<span class="sd">        - 'ps', 'p12s', 'p32s':</span>
 
 <span class="sd">        args = [F0_11, F2_11, F0_12, G1_12, F0_22]</span>
 
-<span class="sd">        - &#39;ds&#39;, &#39;d32s&#39;, &#39;d52s&#39;, &#39;t2gs&#39;:</span>
+<span class="sd">        - 'ds', 'd32s', 'd52s', 't2gs':</span>
 
 <span class="sd">        args = [F0_11, F2_11, F4_11, F0_12, G2_12, F0_22]</span>
 
-<span class="sd">        - &#39;fs&#39;, &#39;f52s&#39;, &#39;f72s&#39;:</span>
+<span class="sd">        - 'fs', 'f52s', 'f72s':</span>
 
 <span class="sd">        args = [F0_11, F2_11, F4_11, F6_11, F0_12, G3_12, F0_22]</span>
 
-<span class="sd">        - &#39;sp&#39;, &#39;sp12&#39;, &#39;sp32&#39;:</span>
+<span class="sd">        - 'sp', 'sp12', 'sp32':</span>
 
 <span class="sd">        args = [F0_11, F0_12, G1_12, F0_22, F2_22]</span>
 
-<span class="sd">        - &#39;pp&#39;, &#39;pp12&#39;, &#39;pp32&#39;, &#39;p12p&#39;, &#39;p12p12&#39;, &#39;p12p32&#39;, &#39;p32p&#39;, &#39;p32p12&#39;, &#39;p32p32&#39;:</span>
+<span class="sd">        - 'pp', 'pp12', 'pp32', 'p12p', 'p12p12', 'p12p32', 'p32p', 'p32p12', 'p32p32':</span>
 
 <span class="sd">        args = [F0_11, F2_11, F0_12, F2_12, G0_12, G2_12, F0_22, F2_22]</span>
 
-<span class="sd">        - &#39;dp&#39;, &#39;dp12&#39;, &#39;dp32&#39;, &#39;d32p&#39;, &#39;d32p12&#39;, &#39;d32p32&#39;, &#39;d52p&#39;, &#39;d52p12&#39;, &#39;d52p32&#39;,</span>
-<span class="sd">          &#39;t2gp&#39;, &#39;t2gp12&#39;, t2gp32&#39;:</span>
+<span class="sd">        - 'dp', 'dp12', 'dp32', 'd32p', 'd32p12', 'd32p32', 'd52p', 'd52p12', 'd52p32',</span>
+<span class="sd">          't2gp', 't2gp12', t2gp32':</span>
 
 <span class="sd">        args = [F0_11, F2_11, F4_11, F0_12, F2_12, G1_12, G3_12, F0_22, F2_22]</span>
 
-<span class="sd">        - &#39;fp&#39;, &#39;fp12&#39;, &#39;fp32&#39;, &#39;f52p&#39;, &#39;f52p12&#39;, &#39;f52p32&#39;, &#39;f72p&#39;, &#39;f72p12&#39;, &#39;f72p32&#39;:</span>
+<span class="sd">        - 'fp', 'fp12', 'fp32', 'f52p', 'f52p12', 'f52p32', 'f72p', 'f72p12', 'f72p32':</span>
 
 <span class="sd">        args = [F0_11, F2_11, F4_11, F6_11, F0_12, F2_12, G2_12, G4_12, F0_22, F2_22]</span>
 
-<span class="sd">        - &#39;sd&#39;, &#39;sd32&#39;, &#39;sd52&#39;:</span>
+<span class="sd">        - 'sd', 'sd32', 'sd52':</span>
 
 <span class="sd">        args = [F0_11, F0_12, G2_12, F0_22, F2_22, F4_22]</span>
 
-<span class="sd">        - &#39;pd&#39;, &#39;pd32&#39;, &#39;pd52&#39;, &#39;p12d&#39;, &#39;p12d32&#39;, &#39;p12d52&#39;, &#39;p32d&#39;, &#39;p32d32&#39;, &#39;p32d52&#39;:</span>
+<span class="sd">        - 'pd', 'pd32', 'pd52', 'p12d', 'p12d32', 'p12d52', 'p32d', 'p32d32', 'p32d52':</span>
 
 <span class="sd">        args = [F0_11, F2_11, F0_12, F2_12, G1_12, G3_12, F0_22, F2_22, F4_22]</span>
 
-<span class="sd">        - &#39;dd&#39;, &#39;dd32&#39;, &#39;dd52&#39;, &#39;d32d&#39;, &#39;d32d32&#39;, &#39;d32d52&#39;, &#39;d52d&#39;, &#39;d52d32&#39;, &#39;d52d52&#39;,</span>
-<span class="sd">          &#39;t2gd&#39;, &#39;t2gd32&#39;, &#39;t2gd52&#39;:</span>
+<span class="sd">        - 'dd', 'dd32', 'dd52', 'd32d', 'd32d32', 'd32d52', 'd52d', 'd52d32', 'd52d52',</span>
+<span class="sd">          't2gd', 't2gd32', 't2gd52':</span>
 
 <span class="sd">        args = [F0_11, F2_11, F4_11, F0_12, F2_12, F4_12, G0_12, G2_12, G4_12, F0_22, F2_22, F4_22]</span>
 
-<span class="sd">        - &#39;fd&#39;, &#39;fd32&#39;, &#39;fd52&#39;, &#39;f52d&#39;, &#39;f52d32&#39;, &#39;f52d52&#39;, &#39;f72d&#39;, &#39;f72d32&#39;, &#39;f72d52&#39;:</span>
+<span class="sd">        - 'fd', 'fd32', 'fd52', 'f52d', 'f52d32', 'f52d52', 'f72d', 'f72d32', 'f72d52':</span>
 
 <span class="sd">        args = [F0_11, F2_11, F4_11, F6_11, F0_12, F2_12, F4_12, G1_12, G3_12, G5_12,</span>
 <span class="sd">        F0_22, F2_22, F4_22]</span>
 
-<span class="sd">        - &#39;sf&#39;, &#39;sf52&#39;, &#39;sf72&#39;:</span>
+<span class="sd">        - 'sf', 'sf52', 'sf72':</span>
 
 <span class="sd">        args = [F0_11, F0_12, G3_12, F0_22, F2_22, F4_22, F6_22]</span>
 
-<span class="sd">        - &#39;pf&#39;, &#39;pf52&#39;, &#39;pf72&#39;, &#39;p12f&#39;, &#39;p12f52&#39;, &#39;p12f72&#39;, &#39;p32f&#39;, &#39;p32f52&#39;, &#39;p32f72&#39;:</span>
+<span class="sd">        - 'pf', 'pf52', 'pf72', 'p12f', 'p12f52', 'p12f72', 'p32f', 'p32f52', 'p32f72':</span>
 
 <span class="sd">        args = [F0_11, F2_11, F0_12, F2_12, G2_12, G4_12, F0_22, F2_22, F4_22, F6_22]</span>
 
-<span class="sd">        - &#39;df&#39;, &#39;df52&#39;, &#39;df72&#39;, &#39;d32f&#39;, &#39;d32f52&#39;, &#39;d32f72&#39;, &#39;d52f&#39;, &#39;d52f52&#39;, &#39;d52f72&#39;,</span>
-<span class="sd">          &#39;t2gf&#39;, &#39;t2gf52&#39;, &#39;t2gf72&#39;:</span>
+<span class="sd">        - 'df', 'df52', 'df72', 'd32f', 'd32f52', 'd32f72', 'd52f', 'd52f52', 'd52f72',</span>
+<span class="sd">          't2gf', 't2gf52', 't2gf72':</span>
 
 <span class="sd">        args = [F0_11, F2_11, F4_11, F0_12, F2_12, F4_12, G1_12, G3_12, G5_12,</span>
 <span class="sd">        F0_22, F2_22, F4_22, F6_22]</span>
 
-<span class="sd">        - &#39;ff&#39;, &#39;ff52&#39;, &#39;ff72&#39;, &#39;f52f&#39;, &#39;f52f52&#39;, &#39;f52f72&#39;, &#39;f72f&#39;, &#39;f72f52&#39;, &#39;f72f72&#39;:</span>
+<span class="sd">        - 'ff', 'ff52', 'ff72', 'f52f', 'f52f52', 'f52f72', 'f72f', 'f72f52', 'f72f72':</span>
 
 <span class="sd">        args = [F0_11, F2_11, F4_11, F6_11, F0_12, F2_12, F4_12, F6_12,</span>
 <span class="sd">        G0_12, G2_12, G4_12, G6_12, F0_22, F2_22, F4_22, F6_22]</span>
@@ -615,10 +615,10 @@
 <span class="sd">    &gt;&gt;&gt; F0_dp, F2_dp, G1_dp, G3_dp = 2.0, 1.0, 0.2, 0.1</span>
 <span class="sd">    &gt;&gt;&gt; F0_pp, F2_pp = 0.0, 0.0</span>
 <span class="sd">    &gt;&gt;&gt; slater = [F0_dd, F2_dd, F4_dd, F0_dp, F2_dp, G1_dp, G3_dp, F0_pp, F2_pp]</span>
-<span class="sd">    &gt;&gt;&gt; umat_d = edrixs.get_umat_slater(&#39;d&#39;, F0_dd, F2_dd, F4_dd)</span>
-<span class="sd">    &gt;&gt;&gt; umat_dp = edrixs.get_umat_slater(&#39;dp&#39;, *slater)</span>
-<span class="sd">    &gt;&gt;&gt; umat_t2gp = edrixs.get_umat_slater(&#39;t2gp&#39;, *slater)</span>
-<span class="sd">    &gt;&gt;&gt; umat_dp32 = edrixs.get_umat_slater(&#39;dp32&#39;, *slater)</span>
+<span class="sd">    &gt;&gt;&gt; umat_d = edrixs.get_umat_slater('d', F0_dd, F2_dd, F4_dd)</span>
+<span class="sd">    &gt;&gt;&gt; umat_dp = edrixs.get_umat_slater('dp', *slater)</span>
+<span class="sd">    &gt;&gt;&gt; umat_t2gp = edrixs.get_umat_slater('t2gp', *slater)</span>
+<span class="sd">    &gt;&gt;&gt; umat_dp32 = edrixs.get_umat_slater('dp32', *slater)</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -626,14 +626,14 @@
 <span class="sd">    coulomb_utensor.get_umat_kanamori</span>
 <span class="sd">    coulomb_utensor.get_umat_kanamori_ge</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">info</span> <span class="o">=</span> <span class="n">info_atomic_shell</span><span class="p">()</span>
     <span class="n">shells</span> <span class="o">=</span> <span class="n">case_to_shell_name</span><span class="p">(</span><span class="n">case</span><span class="p">)</span>
     <span class="n">nslat</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">slater_integrals_name</span><span class="p">(</span><span class="n">shells</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">nslat</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Number of Slater integrals&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="s2">&quot; is not equal to &quot;</span><span class="p">,</span> <span class="n">nslat</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"Number of Slater integrals"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="s2">" is not equal to "</span><span class="p">,</span> <span class="n">nslat</span><span class="p">)</span>
 
-    <span class="n">special_shell</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;t2g&#39;</span><span class="p">,</span> <span class="s1">&#39;p12&#39;</span><span class="p">,</span> <span class="s1">&#39;p32&#39;</span><span class="p">,</span> <span class="s1">&#39;d32&#39;</span><span class="p">,</span> <span class="s1">&#39;d52&#39;</span><span class="p">,</span> <span class="s1">&#39;f52&#39;</span><span class="p">,</span> <span class="s1">&#39;f72&#39;</span><span class="p">]</span>
+    <span class="n">special_shell</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'t2g'</span><span class="p">,</span> <span class="s1">'p12'</span><span class="p">,</span> <span class="s1">'p32'</span><span class="p">,</span> <span class="s1">'d32'</span><span class="p">,</span> <span class="s1">'d52'</span><span class="p">,</span> <span class="s1">'f52'</span><span class="p">,</span> <span class="s1">'f72'</span><span class="p">]</span>
     <span class="n">orb_indx</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">special_shell</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span>
         <span class="n">special_shell</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
@@ -655,16 +655,16 @@
         <span class="n">umat</span> <span class="o">=</span> <span class="n">umat_slater</span><span class="p">(</span><span class="n">l_list</span><span class="p">,</span> <span class="n">fk</span><span class="p">)</span>
         <span class="c1"># truncate to a sub-shell if necessary</span>
         <span class="k">if</span> <span class="n">shells</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">special_shell</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">shells</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;t2g&#39;</span><span class="p">:</span>
-                <span class="n">tmat</span> <span class="o">=</span> <span class="n">tmat_c2r</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">shells</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'t2g'</span><span class="p">:</span>
+                <span class="n">tmat</span> <span class="o">=</span> <span class="n">tmat_c2r</span><span class="p">(</span><span class="s1">'d'</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">tmat</span> <span class="o">=</span> <span class="n">tmat_c2j</span><span class="p">(</span><span class="n">orbl</span><span class="p">)</span>
             <span class="n">umat</span> <span class="o">=</span> <span class="n">transform_utensor</span><span class="p">(</span><span class="n">umat</span><span class="p">,</span> <span class="n">tmat</span><span class="p">)</span>
             <span class="n">indx</span> <span class="o">=</span> <span class="n">orb_indx</span><span class="p">[</span><span class="n">shells</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
             <span class="n">umat_tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">indx</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">indx</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">indx</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">indx</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
             <span class="n">umat_tmp</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">umat</span><span class="p">[</span><span class="n">indx</span><span class="p">][:,</span> <span class="n">indx</span><span class="p">][:,</span> <span class="p">:,</span> <span class="n">indx</span><span class="p">][:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">indx</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">shells</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;t2g&#39;</span><span class="p">:</span>
-                <span class="n">umat_tmp</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">transform_utensor</span><span class="p">(</span><span class="n">umat_tmp</span><span class="p">,</span> <span class="n">tmat_r2c</span><span class="p">(</span><span class="s1">&#39;t2g&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">shells</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'t2g'</span><span class="p">:</span>
+                <span class="n">umat_tmp</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">transform_utensor</span><span class="p">(</span><span class="n">umat_tmp</span><span class="p">,</span> <span class="n">tmat_r2c</span><span class="p">(</span><span class="s1">'t2g'</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
             <span class="n">umat</span> <span class="o">=</span> <span class="n">umat_tmp</span>
     <span class="c1"># two shells</span>
     <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">shells</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
@@ -695,16 +695,16 @@
             <span class="n">tmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">ntot</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
             <span class="n">indx1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n1</span><span class="p">))</span>
             <span class="k">if</span> <span class="n">name1</span> <span class="ow">in</span> <span class="n">special_shell</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">name1</span> <span class="o">==</span> <span class="s1">&#39;t2g&#39;</span><span class="p">:</span>
-                    <span class="n">tmat</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">n1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">n1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmat_c2r</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">name1</span> <span class="o">==</span> <span class="s1">'t2g'</span><span class="p">:</span>
+                    <span class="n">tmat</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">n1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">n1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmat_c2r</span><span class="p">(</span><span class="s1">'d'</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">tmat</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">n1</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">n1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmat_c2j</span><span class="p">(</span><span class="n">l1</span><span class="p">)</span>
                 <span class="n">indx1</span> <span class="o">=</span> <span class="n">orb_indx</span><span class="p">[</span><span class="n">name1</span><span class="p">]</span>
 
             <span class="n">indx2</span> <span class="o">=</span> <span class="p">[</span><span class="n">n1</span> <span class="o">+</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n2</span><span class="p">)]</span>
             <span class="k">if</span> <span class="n">name2</span> <span class="ow">in</span> <span class="n">special_shell</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">name2</span> <span class="o">==</span> <span class="s1">&#39;t2g&#39;</span><span class="p">:</span>
-                    <span class="n">tmat</span><span class="p">[</span><span class="n">n1</span><span class="p">:</span><span class="n">ntot</span><span class="p">,</span> <span class="n">n1</span><span class="p">:</span><span class="n">ntot</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmat_c2r</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">name2</span> <span class="o">==</span> <span class="s1">'t2g'</span><span class="p">:</span>
+                    <span class="n">tmat</span><span class="p">[</span><span class="n">n1</span><span class="p">:</span><span class="n">ntot</span><span class="p">,</span> <span class="n">n1</span><span class="p">:</span><span class="n">ntot</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmat_c2r</span><span class="p">(</span><span class="s1">'d'</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">tmat</span><span class="p">[</span><span class="n">n1</span><span class="p">:</span><span class="n">ntot</span><span class="p">,</span> <span class="n">n1</span><span class="p">:</span><span class="n">ntot</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmat_c2j</span><span class="p">(</span><span class="n">l2</span><span class="p">)</span>
                 <span class="n">indx2</span> <span class="o">=</span> <span class="p">[</span><span class="n">n1</span> <span class="o">+</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">orb_indx</span><span class="p">[</span><span class="n">name2</span><span class="p">]]</span>
@@ -713,16 +713,16 @@
             <span class="n">umat</span> <span class="o">=</span> <span class="n">transform_utensor</span><span class="p">(</span><span class="n">umat</span><span class="p">,</span> <span class="n">tmat</span><span class="p">)</span>
             <span class="n">umat_tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">indx</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">indx</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">indx</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">indx</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
             <span class="n">umat_tmp</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">umat</span><span class="p">[</span><span class="n">indx</span><span class="p">][:,</span> <span class="n">indx</span><span class="p">][:,</span> <span class="p">:,</span> <span class="n">indx</span><span class="p">][:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="n">indx</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">name1</span> <span class="o">==</span> <span class="s1">&#39;t2g&#39;</span> <span class="ow">or</span> <span class="n">name2</span> <span class="o">==</span> <span class="s1">&#39;t2g&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">name1</span> <span class="o">==</span> <span class="s1">'t2g'</span> <span class="ow">or</span> <span class="n">name2</span> <span class="o">==</span> <span class="s1">'t2g'</span><span class="p">:</span>
                 <span class="n">tmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">indx</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">name1</span> <span class="o">==</span> <span class="s1">&#39;t2g&#39;</span><span class="p">:</span>
-                    <span class="n">tmat</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmat_r2c</span><span class="p">(</span><span class="s1">&#39;t2g&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">name2</span> <span class="o">==</span> <span class="s1">&#39;t2g&#39;</span><span class="p">:</span>
-                    <span class="n">tmat</span><span class="p">[</span><span class="o">-</span><span class="mi">6</span><span class="p">:,</span> <span class="o">-</span><span class="mi">6</span><span class="p">:]</span> <span class="o">=</span> <span class="n">tmat_r2c</span><span class="p">(</span><span class="s1">&#39;t2g&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">name1</span> <span class="o">==</span> <span class="s1">'t2g'</span><span class="p">:</span>
+                    <span class="n">tmat</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmat_r2c</span><span class="p">(</span><span class="s1">'t2g'</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">name2</span> <span class="o">==</span> <span class="s1">'t2g'</span><span class="p">:</span>
+                    <span class="n">tmat</span><span class="p">[</span><span class="o">-</span><span class="mi">6</span><span class="p">:,</span> <span class="o">-</span><span class="mi">6</span><span class="p">:]</span> <span class="o">=</span> <span class="n">tmat_r2c</span><span class="p">(</span><span class="s1">'t2g'</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
                 <span class="n">umat_tmp</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">transform_utensor</span><span class="p">(</span><span class="n">umat_tmp</span><span class="p">,</span> <span class="n">tmat</span><span class="p">)</span>
             <span class="n">umat</span> <span class="o">=</span> <span class="n">umat_tmp</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Not implemented for this case: &quot;</span><span class="p">,</span> <span class="n">shells</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"Not implemented for this case: "</span><span class="p">,</span> <span class="n">shells</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">umat</span></div>
 
@@ -731,7 +731,7 @@
 <div class="viewcode-block" id="get_umat_slater_3shells">
 <a class="viewcode-back" href="../../reference/coulomb_utensor.html#edrixs.coulomb_utensor.get_umat_slater_3shells">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_umat_slater_3shells</span><span class="p">(</span><span class="n">shell_name</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Given three shells, build the slater type of Coulomb tensors among</span>
 <span class="sd">    the three shells.</span>
 
@@ -751,7 +751,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    umat: 4d complex array</span>
 <span class="sd">        Rank-4 Coulomb tensors.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">v1_name</span> <span class="o">=</span> <span class="n">shell_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
     <span class="n">v2_name</span> <span class="o">=</span> <span class="n">shell_name</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
@@ -789,7 +789,7 @@
     <span class="n">indx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">it</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">it</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Number of Slater integrals&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="s2">&quot; is not equal to &quot;</span><span class="p">,</span> <span class="n">it</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"Number of Slater integrals"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="s2">" is not equal to "</span><span class="p">,</span> <span class="n">it</span><span class="p">)</span>
 
     <span class="n">umat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ntot</span><span class="p">,</span> <span class="n">ntot</span><span class="p">,</span> <span class="n">ntot</span><span class="p">,</span> <span class="n">ntot</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
 
@@ -830,7 +830,7 @@
 <div class="viewcode-block" id="get_umat_kanamori">
 <a class="viewcode-back" href="../../reference/coulomb_utensor.html#edrixs.coulomb_utensor.get_umat_kanamori">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_umat_kanamori</span><span class="p">(</span><span class="n">norbs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">J</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Calculate the Coulomb interaction tensor for a Kanamori-type interaction.</span>
 <span class="sd">    For the :math:`t2g`-shell case, it is parameterized by :math:`U, J`.</span>
 
@@ -841,7 +841,7 @@
 <span class="sd">    U: float</span>
 <span class="sd">        Hubbard :math:`U` for electrons residing on the same orbital with opposite spin.</span>
 <span class="sd">    J: float</span>
-<span class="sd">        Hund&#39;s coupling.</span>
+<span class="sd">        Hund's coupling.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -858,7 +858,7 @@
 <span class="sd">    coulomb_utensor.get_umat_slater</span>
 <span class="sd">    coulomb_utensor.umat_slater</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">return</span> <span class="n">get_umat_kanamori_ge</span><span class="p">(</span><span class="n">norbs</span><span class="p">,</span> <span class="n">U</span><span class="p">,</span> <span class="n">U</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">J</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">J</span><span class="p">,</span> <span class="n">J</span><span class="p">)</span></div>
 

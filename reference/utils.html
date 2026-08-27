@@ -469,10 +469,10 @@ for <span class="math notranslate nohighlight">\(t2g\)</span>-orbitals.</p>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">edrixs</span><span class="o">.</span><span class="n">case_to_shell_name</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
-<span class="go">(&#39;d&#39;,)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">edrixs</span><span class="o">.</span><span class="n">case_to_shell_name</span><span class="p">(</span><span class="s1">&#39;t2gp32&#39;</span><span class="p">)</span>
-<span class="go">(&#39;t2g&#39;, &#39;p32&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">edrixs</span><span class="o">.</span><span class="n">case_to_shell_name</span><span class="p">(</span><span class="s1">'d'</span><span class="p">)</span>
+<span class="go">('d',)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">edrixs</span><span class="o">.</span><span class="n">case_to_shell_name</span><span class="p">(</span><span class="s1">'t2gp32'</span><span class="p">)</span>
+<span class="go">('t2g', 'p32')</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -567,21 +567,21 @@ the 3rd one is for the core shell</p></li>
 <dd class="field-even"><dl>
 <dt>res:  dict</dt><dd><p>Atomic data. A dict likes this if edge is None:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">res</span><span class="o">=</span><span class="p">{</span>
-    <span class="s1">&#39;slater_i&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="n">name</span> <span class="n">of</span> <span class="n">slater</span> <span class="n">integrals</span><span class="p">,</span> <span class="n">vaule</span> <span class="n">of</span> <span class="n">slater</span> <span class="n">integrals</span><span class="p">),</span> <span class="p">(),</span> <span class="o">...</span><span class="p">],</span>
-    <span class="s1">&#39;v_soc&#39;</span><span class="p">:</span> <span class="p">[</span><span class="nb">list</span> <span class="n">of</span> <span class="n">SOC</span> <span class="k">for</span> <span class="n">each</span> <span class="n">atomic</span> <span class="n">shell</span> <span class="ow">in</span> <span class="n">v_name</span><span class="p">],</span>
+    <span class="s1">'slater_i'</span><span class="p">:</span> <span class="p">[(</span><span class="n">name</span> <span class="n">of</span> <span class="n">slater</span> <span class="n">integrals</span><span class="p">,</span> <span class="n">vaule</span> <span class="n">of</span> <span class="n">slater</span> <span class="n">integrals</span><span class="p">),</span> <span class="p">(),</span> <span class="o">...</span><span class="p">],</span>
+    <span class="s1">'v_soc'</span><span class="p">:</span> <span class="p">[</span><span class="nb">list</span> <span class="n">of</span> <span class="n">SOC</span> <span class="k">for</span> <span class="n">each</span> <span class="n">atomic</span> <span class="n">shell</span> <span class="ow">in</span> <span class="n">v_name</span><span class="p">],</span>
 <span class="p">}</span>
 </pre></div>
 </div>
 <p>otherwise,</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">res</span><span class="o">=</span><span class="p">{</span>
-    <span class="s1">&#39;slater_i&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="n">name</span> <span class="n">of</span> <span class="n">slater</span> <span class="n">integrals</span><span class="p">,</span> <span class="n">value</span> <span class="n">of</span> <span class="n">slater</span> <span class="n">integrals</span><span class="p">),</span> <span class="p">(),</span> <span class="o">...</span><span class="p">],</span>
-    <span class="s1">&#39;slater_n&#39;</span><span class="p">:</span> <span class="p">[(</span><span class="n">name</span> <span class="n">of</span> <span class="n">slater</span> <span class="n">integrals</span><span class="p">,</span> <span class="n">value</span> <span class="n">of</span> <span class="n">slater</span> <span class="n">integrals</span><span class="p">),</span> <span class="p">(),</span> <span class="o">...</span><span class="p">],</span>
-    <span class="s1">&#39;v_soc&#39;</span><span class="p">:</span> <span class="p">[</span><span class="nb">list</span> <span class="n">of</span> <span class="n">SOC</span> <span class="k">for</span> <span class="n">each</span> <span class="n">atomic</span> <span class="n">shell</span> <span class="ow">in</span> <span class="n">v_name</span><span class="p">],</span>
-    <span class="s1">&#39;c_soc&#39;</span><span class="p">:</span> <span class="n">SOC</span> <span class="n">of</span> <span class="n">core</span> <span class="n">shell</span><span class="p">,</span>
-    <span class="s1">&#39;edge_ene&#39;</span><span class="p">:</span> <span class="p">[</span><span class="nb">list</span> <span class="n">of</span> <span class="n">edge</span> <span class="n">energy</span><span class="p">,</span> <span class="mi">2</span> <span class="n">elements</span> <span class="k">if</span> <span class="n">edge</span> <span class="ow">is</span> <span class="nb">any</span> <span class="n">of</span>
-    <span class="s2">&quot;L23, M23, M45, N23, N45, N67, O23, O45, P23&quot;</span><span class="p">,</span> <span class="n">othewise</span> <span class="n">only</span> <span class="mi">1</span> <span class="n">element</span><span class="p">],</span>
-    <span class="s1">&#39;gamma_c&#39;</span><span class="p">:</span> <span class="p">[</span><span class="nb">list</span> <span class="n">of</span> <span class="n">core</span> <span class="n">hole</span> <span class="n">life</span><span class="o">-</span><span class="n">time</span> <span class="n">broadening</span><span class="p">,</span> <span class="mi">2</span> <span class="n">elements</span> <span class="k">if</span> <span class="n">edge</span> <span class="ow">is</span> <span class="nb">any</span> <span class="n">of</span>
-    <span class="s2">&quot;L23, M23, M45, N23, N45, N67, O23, O45, P23&quot;</span><span class="p">,</span> <span class="n">othewise</span> <span class="n">only</span> <span class="mi">1</span> <span class="n">element</span><span class="p">],</span>
+    <span class="s1">'slater_i'</span><span class="p">:</span> <span class="p">[(</span><span class="n">name</span> <span class="n">of</span> <span class="n">slater</span> <span class="n">integrals</span><span class="p">,</span> <span class="n">value</span> <span class="n">of</span> <span class="n">slater</span> <span class="n">integrals</span><span class="p">),</span> <span class="p">(),</span> <span class="o">...</span><span class="p">],</span>
+    <span class="s1">'slater_n'</span><span class="p">:</span> <span class="p">[(</span><span class="n">name</span> <span class="n">of</span> <span class="n">slater</span> <span class="n">integrals</span><span class="p">,</span> <span class="n">value</span> <span class="n">of</span> <span class="n">slater</span> <span class="n">integrals</span><span class="p">),</span> <span class="p">(),</span> <span class="o">...</span><span class="p">],</span>
+    <span class="s1">'v_soc'</span><span class="p">:</span> <span class="p">[</span><span class="nb">list</span> <span class="n">of</span> <span class="n">SOC</span> <span class="k">for</span> <span class="n">each</span> <span class="n">atomic</span> <span class="n">shell</span> <span class="ow">in</span> <span class="n">v_name</span><span class="p">],</span>
+    <span class="s1">'c_soc'</span><span class="p">:</span> <span class="n">SOC</span> <span class="n">of</span> <span class="n">core</span> <span class="n">shell</span><span class="p">,</span>
+    <span class="s1">'edge_ene'</span><span class="p">:</span> <span class="p">[</span><span class="nb">list</span> <span class="n">of</span> <span class="n">edge</span> <span class="n">energy</span><span class="p">,</span> <span class="mi">2</span> <span class="n">elements</span> <span class="k">if</span> <span class="n">edge</span> <span class="ow">is</span> <span class="nb">any</span> <span class="n">of</span>
+    <span class="s2">"L23, M23, M45, N23, N45, N67, O23, O45, P23"</span><span class="p">,</span> <span class="n">othewise</span> <span class="n">only</span> <span class="mi">1</span> <span class="n">element</span><span class="p">],</span>
+    <span class="s1">'gamma_c'</span><span class="p">:</span> <span class="p">[</span><span class="nb">list</span> <span class="n">of</span> <span class="n">core</span> <span class="n">hole</span> <span class="n">life</span><span class="o">-</span><span class="n">time</span> <span class="n">broadening</span><span class="p">,</span> <span class="mi">2</span> <span class="n">elements</span> <span class="k">if</span> <span class="n">edge</span> <span class="ow">is</span> <span class="nb">any</span> <span class="n">of</span>
+    <span class="s2">"L23, M23, M45, N23, N45, N67, O23, O45, P23"</span><span class="p">,</span> <span class="n">othewise</span> <span class="n">only</span> <span class="mi">1</span> <span class="n">element</span><span class="p">],</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -591,77 +591,77 @@ the 3rd one is for the core shell</p></li>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_atom_data</span><span class="p">(</span><span class="s1">&#39;Ni&#39;</span><span class="p">,</span> <span class="n">v_name</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">,</span> <span class="n">v_noccu</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_atom_data</span><span class="p">(</span><span class="s1">'Ni'</span><span class="p">,</span> <span class="n">v_name</span><span class="o">=</span><span class="s1">'3d'</span><span class="p">,</span> <span class="n">v_noccu</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res</span>
-<span class="go">{&#39;slater_i&#39;: [(&#39;F0_11&#39;, 0.0), (&#39;F2_11&#39;, 13.886), (&#39;F4_11&#39;, 8.67)],</span>
-<span class="go"> &#39;v_soc_i&#39;: [0.112]}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">name</span><span class="p">,</span> <span class="n">slater</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;slater_i&#39;</span><span class="p">])]</span>
+<span class="go">{'slater_i': [('F0_11', 0.0), ('F2_11', 13.886), ('F4_11', 8.67)],</span>
+<span class="go"> 'v_soc_i': [0.112]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">name</span><span class="p">,</span> <span class="n">slater</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">[</span><span class="s1">'slater_i'</span><span class="p">])]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">name</span>
-<span class="go">[&#39;F0_11&#39;, &#39;F2_11&#39;, &#39;F4_11&#39;]</span>
+<span class="go">['F0_11', 'F2_11', 'F4_11']</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">slater</span>
 <span class="go">[0.0, 13.886, 8.67]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">slater</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="mf">0.8</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">slater</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">slater</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_F0</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="n">slater</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">slater</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slater</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_F0</span><span class="p">(</span><span class="s1">'d'</span><span class="p">,</span> <span class="n">slater</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">slater</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">slater</span>
 <span class="go">[0.5728507936507936, 11.1088, 6.936]</span>
 </pre></div>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span><span class="o">=</span><span class="n">edrixs</span><span class="o">.</span><span class="n">get_atom_data</span><span class="p">(</span><span class="s1">&#39;Ni&#39;</span><span class="p">,</span> <span class="n">v_name</span><span class="o">=</span><span class="s1">&#39;3d&#39;</span><span class="p">,</span> <span class="n">v_noccu</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">edge</span><span class="o">=</span><span class="s1">&#39;L3&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span><span class="o">=</span><span class="n">edrixs</span><span class="o">.</span><span class="n">get_atom_data</span><span class="p">(</span><span class="s1">'Ni'</span><span class="p">,</span> <span class="n">v_name</span><span class="o">=</span><span class="s1">'3d'</span><span class="p">,</span> <span class="n">v_noccu</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">edge</span><span class="o">=</span><span class="s1">'L3'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="p">(</span><span class="s1">'d'</span><span class="p">,</span> <span class="s1">'p'</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res</span>
-<span class="go">{&#39;slater_i&#39;: [(&#39;F0_dd&#39;, 0.0), (&#39;F2_dd&#39;, 12.234), (&#39;F4_dd&#39;, 7.598)],</span>
-<span class="go"> &#39;v_soc_i&#39;: [0.083],</span>
-<span class="go"> &#39;slater_n&#39;: [(&#39;F0_dd&#39;, 0.0), (&#39;F2_dd&#39;, 12.234), (&#39;F4_dd&#39;, 7.598),</span>
-<span class="go">  (&#39;F0_dp&#39;, 0.0), (&#39;F2_dp&#39;, 7.721), (&#39;G1_dp&#39;, 5.787), (&#39;G3_dp&#39;, 3.291),</span>
-<span class="go">  (&#39;F0_pp&#39;, 0.0), (&#39;F2_pp&#39;, 0.0)],</span>
-<span class="go"> &#39;v_soc_n&#39;: [0.102],</span>
-<span class="go"> &#39;c_soc&#39;: 11.507,</span>
-<span class="go"> &#39;edge_ene&#39;: [852.7],</span>
-<span class="go"> &#39;gamma_c&#39;: [0.275]}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">name_i</span><span class="p">,</span> <span class="n">slater_i</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;slater_i&#39;</span><span class="p">])]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">name_n</span><span class="p">,</span> <span class="n">slater_n</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;slater_n&#39;</span><span class="p">])]</span>
+<span class="go">{'slater_i': [('F0_dd', 0.0), ('F2_dd', 12.234), ('F4_dd', 7.598)],</span>
+<span class="go"> 'v_soc_i': [0.083],</span>
+<span class="go"> 'slater_n': [('F0_dd', 0.0), ('F2_dd', 12.234), ('F4_dd', 7.598),</span>
+<span class="go">  ('F0_dp', 0.0), ('F2_dp', 7.721), ('G1_dp', 5.787), ('G3_dp', 3.291),</span>
+<span class="go">  ('F0_pp', 0.0), ('F2_pp', 0.0)],</span>
+<span class="go"> 'v_soc_n': [0.102],</span>
+<span class="go"> 'c_soc': 11.507,</span>
+<span class="go"> 'edge_ene': [852.7],</span>
+<span class="go"> 'gamma_c': [0.275]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">name_i</span><span class="p">,</span> <span class="n">slater_i</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">[</span><span class="s1">'slater_i'</span><span class="p">])]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">name_n</span><span class="p">,</span> <span class="n">slater_n</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">res</span><span class="p">[</span><span class="s1">'slater_n'</span><span class="p">])]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">name_i</span>
-<span class="go">[&#39;F0_dd&#39;, &#39;F2_dd&#39;, &#39;F4_dd&#39;]</span>
+<span class="go">['F0_dd', 'F2_dd', 'F4_dd']</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">slater_i</span>
 <span class="go">[0.0, 12.234, 7.598]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">name_n</span>
-<span class="go">[&#39;F0_dd&#39;, &#39;F2_dd&#39;, &#39;F4_dd&#39;, &#39;F0_dp&#39;, &#39;F2_dp&#39;, &#39;G1_dp&#39;, &#39;G3_dp&#39;, &#39;F0_pp&#39;, &#39;F2_pp&#39;]</span>
+<span class="go">['F0_dd', 'F2_dd', 'F4_dd', 'F0_dp', 'F2_dp', 'G1_dp', 'G3_dp', 'F0_pp', 'F2_pp']</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">slater_n</span>
 <span class="go">[0.0, 12.234, 7.598, 0.0, 7.721, 5.787, 3.291, 0.0, 0.0]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">slater_n</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_F0</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="n">slater_n</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">slater_n</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">slater_n</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_F0</span><span class="p">(</span><span class="s1">&#39;dp&#39;</span><span class="p">,</span> <span class="n">slater_n</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">slater_n</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slater_n</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_F0</span><span class="p">(</span><span class="s1">'d'</span><span class="p">,</span> <span class="n">slater_n</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">slater_n</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slater_n</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_F0</span><span class="p">(</span><span class="s1">'dp'</span><span class="p">,</span> <span class="n">slater_n</span><span class="p">[</span><span class="mi">5</span><span class="p">],</span> <span class="n">slater_n</span><span class="p">[</span><span class="mi">6</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">slater_n</span>
 <span class="go">[0.6295873015873016, 12.234, 7.598, 0.5268428571428572, 7.721, 5.787, 3.291, 0.0, 0.0]</span>
 </pre></div>
 </div>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span><span class="o">=</span><span class="n">edrixs</span><span class="o">.</span><span class="n">get_atom_data</span><span class="p">(</span><span class="s1">&#39;Ni&#39;</span><span class="p">,</span> <span class="n">v_name</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;3d&#39;</span><span class="p">,</span> <span class="s1">&#39;4p&#39;</span><span class="p">),</span> <span class="n">v_noccu</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-<span class="gp">... </span>    <span class="n">edge</span><span class="o">=</span><span class="s1">&#39;K&#39;</span><span class="p">,</span> <span class="n">trans_to_which</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;s&#39;</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">res</span><span class="o">=</span><span class="n">edrixs</span><span class="o">.</span><span class="n">get_atom_data</span><span class="p">(</span><span class="s1">'Ni'</span><span class="p">,</span> <span class="n">v_name</span><span class="o">=</span><span class="p">(</span><span class="s1">'3d'</span><span class="p">,</span> <span class="s1">'4p'</span><span class="p">),</span> <span class="n">v_noccu</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="n">edge</span><span class="o">=</span><span class="s1">'K'</span><span class="p">,</span> <span class="n">trans_to_which</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="p">(</span><span class="s1">'d'</span><span class="p">,</span> <span class="s1">'p'</span><span class="p">,</span> <span class="s1">'s'</span><span class="p">))</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">res</span>
-<span class="go">{&#39;slater_i&#39;: [(&#39;F0_dd&#39;, 0.0), (&#39;F2_dd&#39;, 12.234), (&#39;F4_dd&#39;, 7.598),</span>
-<span class="go">  (&#39;F0_dp&#39;, 0.0), (&#39;F2_dp&#39;, 0.0), (&#39;G1_dp&#39;, 0.0), (&#39;G3_dp&#39;, 0.0),</span>
-<span class="go">  (&#39;F0_pp&#39;, 0.0), (&#39;F2_pp&#39;, 0.0)],</span>
-<span class="go"> &#39;v_soc_i&#39;: [0.083, 0.0],</span>
-<span class="go"> &#39;slater_n&#39;: [(&#39;F0_dd&#39;, 0.0), (&#39;F2_dd&#39;, 13.851), (&#39;F4_dd&#39;, 8.643),</span>
-<span class="go">  (&#39;F0_dp&#39;, 0.0), (&#39;F2_dp&#39;, 2.299), (&#39;G1_dp&#39;, 0.828), (&#39;G3_dp&#39;, 0.713),</span>
-<span class="go">  (&#39;F0_pp&#39;, 0.0), (&#39;F2_pp&#39;, 0.0),</span>
-<span class="go">  (&#39;F0_ds&#39;, 0.0), (&#39;G2_ds&#39;, 0.079),</span>
-<span class="go">  (&#39;F0_ps&#39;, 0.0), (&#39;G1_ps&#39;, 0.194),</span>
-<span class="go">  (&#39;F0_ss&#39;, 0.0)],</span>
-<span class="go"> &#39;v_soc_n&#39;: [0.113, 0.093],</span>
-<span class="go"> &#39;c_soc&#39;: 0.0,</span>
-<span class="go"> &#39;edge_ene&#39;: [8333.0],</span>
-<span class="go"> &#39;gamma_c&#39;: [0.81]}</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">slat_i</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;slater_i&#39;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">slat_n</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;slater_n&#39;</span><span class="p">])</span>
+<span class="go">{'slater_i': [('F0_dd', 0.0), ('F2_dd', 12.234), ('F4_dd', 7.598),</span>
+<span class="go">  ('F0_dp', 0.0), ('F2_dp', 0.0), ('G1_dp', 0.0), ('G3_dp', 0.0),</span>
+<span class="go">  ('F0_pp', 0.0), ('F2_pp', 0.0)],</span>
+<span class="go"> 'v_soc_i': [0.083, 0.0],</span>
+<span class="go"> 'slater_n': [('F0_dd', 0.0), ('F2_dd', 13.851), ('F4_dd', 8.643),</span>
+<span class="go">  ('F0_dp', 0.0), ('F2_dp', 2.299), ('G1_dp', 0.828), ('G3_dp', 0.713),</span>
+<span class="go">  ('F0_pp', 0.0), ('F2_pp', 0.0),</span>
+<span class="go">  ('F0_ds', 0.0), ('G2_ds', 0.079),</span>
+<span class="go">  ('F0_ps', 0.0), ('G1_ps', 0.194),</span>
+<span class="go">  ('F0_ss', 0.0)],</span>
+<span class="go"> 'v_soc_n': [0.113, 0.093],</span>
+<span class="go"> 'c_soc': 0.0,</span>
+<span class="go"> 'edge_ene': [8333.0],</span>
+<span class="go"> 'gamma_c': [0.81]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slat_i</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="s1">'slater_i'</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">slat_n</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="s1">'slater_n'</span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">slat_i</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-<span class="go">[&#39;F0_dd&#39;, &#39;F2_dd&#39;, &#39;F4_dd&#39;, &#39;F0_dp&#39;, &#39;F2_dp&#39;, &#39;G1_dp&#39;, &#39;G3_dp&#39;, &#39;F0_pp&#39;, &#39;F2_pp&#39;]</span>
+<span class="go">['F0_dd', 'F2_dd', 'F4_dd', 'F0_dp', 'F2_dp', 'G1_dp', 'G3_dp', 'F0_pp', 'F2_pp']</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">slat_i</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 <span class="go">[0.0, 12.234, 7.598, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">slat_n</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-<span class="go">[&#39;F0_dd&#39;, &#39;F2_dd&#39;, &#39;F4_dd&#39;, &#39;F0_dp&#39;, &#39;F2_dp&#39;, &#39;G1_dp&#39;, &#39;G3_dp&#39;, &#39;F0_pp&#39;, &#39;F2_pp&#39;,</span>
-<span class="go"> &#39;F0_ds&#39;, &#39;G2_ds&#39;, &#39;F0_ps&#39;, &#39;G1_ps&#39;, &#39;F0_ss&#39;]</span>
+<span class="go">['F0_dd', 'F2_dd', 'F4_dd', 'F0_dp', 'F2_dp', 'G1_dp', 'G3_dp', 'F0_pp', 'F2_pp',</span>
+<span class="go"> 'F0_ds', 'G2_ds', 'F0_ps', 'G1_ps', 'F0_ss']</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">slat_n</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 <span class="go">[0.0, 13.851, 8.643, 0.0, 2.299, 0.828, 0.713, 0.0, 0.0,</span>
 <span class="go"> 0.0, 0.079, 0.0, 0.194, 0.0]</span>

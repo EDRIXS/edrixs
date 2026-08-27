@@ -81,10 +81,10 @@
            <div itemprop="articleBody">
              
   <h1>Source code for edrixs.angular_momentum</h1><div class="highlight"><pre>
-<span></span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;get_ladd&#39;</span><span class="p">,</span> <span class="s1">&#39;get_lminus&#39;</span><span class="p">,</span> <span class="s1">&#39;get_lx&#39;</span><span class="p">,</span> <span class="s1">&#39;get_ly&#39;</span><span class="p">,</span> <span class="s1">&#39;get_lz&#39;</span><span class="p">,</span> <span class="s1">&#39;get_orb_momentum&#39;</span><span class="p">,</span>
-           <span class="s1">&#39;get_pauli&#39;</span><span class="p">,</span> <span class="s1">&#39;get_sx&#39;</span><span class="p">,</span> <span class="s1">&#39;get_sy&#39;</span><span class="p">,</span> <span class="s1">&#39;get_sz&#39;</span><span class="p">,</span> <span class="s1">&#39;get_spin_momentum&#39;</span><span class="p">,</span> <span class="s1">&#39;euler_to_rmat&#39;</span><span class="p">,</span>
-           <span class="s1">&#39;rmat_to_euler&#39;</span><span class="p">,</span> <span class="s1">&#39;where_is_angle&#39;</span><span class="p">,</span> <span class="s1">&#39;dmat_spinor&#39;</span><span class="p">,</span> <span class="s1">&#39;zx_to_rmat&#39;</span><span class="p">,</span> <span class="s1">&#39;get_wigner_dmat&#39;</span><span class="p">,</span>
-           <span class="s1">&#39;cf_cubic_d&#39;</span><span class="p">,</span> <span class="s1">&#39;cf_tetragonal_d&#39;</span><span class="p">,</span> <span class="s1">&#39;cf_square_planar_d&#39;</span><span class="p">,</span> <span class="s1">&#39;cf_trigonal_t2g&#39;</span><span class="p">]</span>
+<span></span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'get_ladd'</span><span class="p">,</span> <span class="s1">'get_lminus'</span><span class="p">,</span> <span class="s1">'get_lx'</span><span class="p">,</span> <span class="s1">'get_ly'</span><span class="p">,</span> <span class="s1">'get_lz'</span><span class="p">,</span> <span class="s1">'get_orb_momentum'</span><span class="p">,</span>
+           <span class="s1">'get_pauli'</span><span class="p">,</span> <span class="s1">'get_sx'</span><span class="p">,</span> <span class="s1">'get_sy'</span><span class="p">,</span> <span class="s1">'get_sz'</span><span class="p">,</span> <span class="s1">'get_spin_momentum'</span><span class="p">,</span> <span class="s1">'euler_to_rmat'</span><span class="p">,</span>
+           <span class="s1">'rmat_to_euler'</span><span class="p">,</span> <span class="s1">'where_is_angle'</span><span class="p">,</span> <span class="s1">'dmat_spinor'</span><span class="p">,</span> <span class="s1">'zx_to_rmat'</span><span class="p">,</span> <span class="s1">'get_wigner_dmat'</span><span class="p">,</span>
+           <span class="s1">'cf_cubic_d'</span><span class="p">,</span> <span class="s1">'cf_tetragonal_d'</span><span class="p">,</span> <span class="s1">'cf_square_planar_d'</span><span class="p">,</span> <span class="s1">'cf_trigonal_t2g'</span><span class="p">]</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.basis_transform</span><span class="w"> </span><span class="kn">import</span> <span class="n">cb_op</span><span class="p">,</span> <span class="n">tmat_r2c</span>
@@ -93,7 +93,7 @@
 <div class="viewcode-block" id="get_ladd">
 <a class="viewcode-back" href="../../reference/angular_momentum.html#edrixs.angular_momentum.get_ladd">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_ladd</span><span class="p">(</span><span class="n">ll</span><span class="p">,</span> <span class="n">ispin</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get the matrix form of the raising operator :math:`l^+` in the</span>
 <span class="sd">    complex spherical harmonics basis</span>
 
@@ -116,7 +116,7 @@
 <span class="sd">        If ispin=True, the dimension will be :math:`2(2ll+1) \\times 2(2ll+1)`,</span>
 
 <span class="sd">        otherwise, it will be :math:`(2ll+1) \\times (2ll+1)`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">norbs</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">ll</span> <span class="o">+</span> <span class="mi">1</span>
     <span class="n">ladd</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">norbs</span><span class="p">,</span> <span class="n">norbs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
@@ -136,7 +136,7 @@
 <div class="viewcode-block" id="get_lminus">
 <a class="viewcode-back" href="../../reference/angular_momentum.html#edrixs.angular_momentum.get_lminus">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_lminus</span><span class="p">(</span><span class="n">ll</span><span class="p">,</span> <span class="n">ispin</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get the matrix form of the lowering operator :math:`l^-` in the</span>
 <span class="sd">    complex spherical harmonics basis</span>
 
@@ -159,7 +159,7 @@
 <span class="sd">        If ispin=True, the dimension will be :math:`2(2ll+1) \\times 2(2ll+1)`,</span>
 
 <span class="sd">        otherwise, it will be :math:`(2ll+1) \\times (2ll+1)`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">norbs</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">ll</span> <span class="o">+</span> <span class="mi">1</span>
     <span class="n">lminus</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">norbs</span><span class="p">,</span> <span class="n">norbs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
@@ -179,7 +179,7 @@
 <div class="viewcode-block" id="get_lx">
 <a class="viewcode-back" href="../../reference/angular_momentum.html#edrixs.angular_momentum.get_lx">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_lx</span><span class="p">(</span><span class="n">ll</span><span class="p">,</span> <span class="n">ispin</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get the matrix form of the orbital angular momentum</span>
 <span class="sd">    operator :math:`l_x` in the complex spherical harmonics basis,</span>
 
@@ -202,7 +202,7 @@
 <span class="sd">        If ispin=True, the dimension will be :math:`2(2ll+1) \\times 2(2ll+1)`,</span>
 
 <span class="sd">        otherwise, it will be :math:`(2ll+1) \\times (2ll+1)`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">if</span> <span class="n">ispin</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">get_ladd</span><span class="p">(</span><span class="n">ll</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="n">get_lminus</span><span class="p">(</span><span class="n">ll</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span> <span class="o">/</span> <span class="mf">2.0</span>
@@ -214,7 +214,7 @@
 <div class="viewcode-block" id="get_ly">
 <a class="viewcode-back" href="../../reference/angular_momentum.html#edrixs.angular_momentum.get_ly">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_ly</span><span class="p">(</span><span class="n">ll</span><span class="p">,</span> <span class="n">ispin</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get the matrix form of the orbital angular momentum</span>
 <span class="sd">    operator :math:`l_y` in the complex spherical harmonics basis,</span>
 
@@ -237,7 +237,7 @@
 <span class="sd">        If ispin=True, the dimension will be :math:`2(2ll+1) \\times 2(2ll+1)`,</span>
 
 <span class="sd">        otherwise, it will be :math:`(2ll+1) \\times (2ll+1)`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">if</span> <span class="n">ispin</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">get_ladd</span><span class="p">(</span><span class="n">ll</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-</span> <span class="n">get_lminus</span><span class="p">(</span><span class="n">ll</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span><span class="n">j</span>
@@ -249,7 +249,7 @@
 <div class="viewcode-block" id="get_lz">
 <a class="viewcode-back" href="../../reference/angular_momentum.html#edrixs.angular_momentum.get_lz">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_lz</span><span class="p">(</span><span class="n">ll</span><span class="p">,</span> <span class="n">ispin</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get the matrix form of the orbital angular momentum</span>
 <span class="sd">    operator :math:`l_z` in the complex spherical harmonics basis.</span>
 
@@ -268,7 +268,7 @@
 <span class="sd">        If ispin=True, the dimension will be :math:`2(2ll+1) \\times 2(2ll+1)`,</span>
 
 <span class="sd">        otherwise, it will be :math:`(2ll+1) \\times (2ll+1)`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">norbs</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">ll</span> <span class="o">+</span> <span class="mi">1</span>
     <span class="n">lz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">norbs</span><span class="p">,</span> <span class="n">norbs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="n">ll</span><span class="p">,</span> <span class="n">ll</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
@@ -286,7 +286,7 @@
 <div class="viewcode-block" id="get_orb_momentum">
 <a class="viewcode-back" href="../../reference/angular_momentum.html#edrixs.angular_momentum.get_orb_momentum">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_orb_momentum</span><span class="p">(</span><span class="n">ll</span><span class="p">,</span> <span class="n">ispin</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get the matrix form of the orbital angular momentum</span>
 <span class="sd">    operator :math:`l_x, l_y, l_z` in the complex spherical harmonics basis.</span>
 
@@ -311,7 +311,7 @@
 <span class="sd">        If ispin=True, the dimension will be :math:`3 \\times 2(2ll+1) \\times 2(2ll+1)`,</span>
 
 <span class="sd">        otherwise, it will be :math:`3 \\times (2ll+1) \\times (2ll+1)`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">norbs</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">ll</span> <span class="o">+</span> <span class="mi">1</span>
     <span class="k">if</span> <span class="n">ispin</span><span class="p">:</span>
         <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">norbs</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">norbs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
@@ -328,7 +328,7 @@
 <div class="viewcode-block" id="get_pauli">
 <a class="viewcode-back" href="../../reference/angular_momentum.html#edrixs.angular_momentum.get_pauli">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_pauli</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get the Pauli matrix</span>
 
 <span class="sd">    Returns</span>
@@ -340,7 +340,7 @@
 <span class="sd">        - sigma[1] is :math:`\\sigma_y`,</span>
 
 <span class="sd">        - sigma[2] is :math:`\\sigma_z`,</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
     <span class="n">sigma</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
@@ -357,7 +357,7 @@
 <div class="viewcode-block" id="get_sx">
 <a class="viewcode-back" href="../../reference/angular_momentum.html#edrixs.angular_momentum.get_sx">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_sx</span><span class="p">(</span><span class="n">ll</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get the matrix form of spin angular momentum operator :math:`s_x` in the</span>
 <span class="sd">    complex spherical harmonics basis.</span>
 
@@ -374,7 +374,7 @@
 
 <span class="sd">        Orbital order is: \\|-ll,up\\&gt;, \\|-ll,down\\&gt;, ...,</span>
 <span class="sd">        \\|+ll, up\\&gt;, \\|+ll,down\\&gt;.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">norbs</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">ll</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">sx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">norbs</span><span class="p">,</span> <span class="n">norbs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
@@ -389,7 +389,7 @@
 <div class="viewcode-block" id="get_sy">
 <a class="viewcode-back" href="../../reference/angular_momentum.html#edrixs.angular_momentum.get_sy">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_sy</span><span class="p">(</span><span class="n">ll</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get the matrix form of spin angular momentum operator :math:`s_y` in the</span>
 <span class="sd">    complex spherical harmonics basis.</span>
 
@@ -406,7 +406,7 @@
 
 <span class="sd">        Orbital order is: \\|-ll,up\\&gt;, \\|-ll,down\\&gt;, ...,</span>
 <span class="sd">        \\|+ll, up\\&gt;, \\|+ll,down\\&gt;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">norbs</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">ll</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">sy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">norbs</span><span class="p">,</span> <span class="n">norbs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
@@ -421,7 +421,7 @@
 <div class="viewcode-block" id="get_sz">
 <a class="viewcode-back" href="../../reference/angular_momentum.html#edrixs.angular_momentum.get_sz">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_sz</span><span class="p">(</span><span class="n">ll</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get the matrix form of spin angular momentum operator :math:`s_z` in the</span>
 <span class="sd">    complex spherical harmonics basis.</span>
 
@@ -438,7 +438,7 @@
 
 <span class="sd">        Orbital order is: \\|-ll,up\\&gt;, \\|-ll,down\\&gt;, ...,</span>
 <span class="sd">        \\|+ll, up\\&gt;, \\|+ll,down\\&gt;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">norbs</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">ll</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">sz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">norbs</span><span class="p">,</span> <span class="n">norbs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
@@ -453,7 +453,7 @@
 <div class="viewcode-block" id="get_spin_momentum">
 <a class="viewcode-back" href="../../reference/angular_momentum.html#edrixs.angular_momentum.get_spin_momentum">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_spin_momentum</span><span class="p">(</span><span class="n">ll</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get the matrix form of the spin angular momentum</span>
 <span class="sd">    operator :math:`s_x, s_y, s_z` in the complex spherical harmonics basis.</span>
 
@@ -477,7 +477,7 @@
 
 <span class="sd">        Orbital order is: \\|-ll,up\\&gt;, \\|-ll,down\\&gt;, ...,</span>
 <span class="sd">        \\|+ll, up\\&gt;, \\|+ll,down\\&gt;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">norbs</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">ll</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
     <span class="n">res</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="n">norbs</span><span class="p">,</span> <span class="n">norbs</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
     <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_sx</span><span class="p">(</span><span class="n">ll</span><span class="p">)</span>
@@ -491,7 +491,7 @@
 <div class="viewcode-block" id="euler_to_rmat">
 <a class="viewcode-back" href="../../reference/angular_momentum.html#edrixs.angular_momentum.euler_to_rmat">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">euler_to_rmat</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Given Euler angle: :math:`\\alpha, \\beta, \\gamma`,</span>
 <span class="sd">    generate the :math:`3 \\times 3` rotational matrix :math:`R`.</span>
 
@@ -508,7 +508,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    rmat: 2d float array</span>
 <span class="sd">        The :math:`3 \\times 3` rotational matrix.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">rmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">rmat</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span>
@@ -527,7 +527,7 @@
 <div class="viewcode-block" id="rmat_to_euler">
 <a class="viewcode-back" href="../../reference/angular_momentum.html#edrixs.angular_momentum.rmat_to_euler">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">rmat_to_euler</span><span class="p">(</span><span class="n">rmat</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Given the :math:`3 \\times 3` rotational matrix :math:`R`, return the Euler</span>
 <span class="sd">    angles: :math:`\\alpha, \\beta, \\gamma`.</span>
 
@@ -545,7 +545,7 @@
 <span class="sd">    gamma: float</span>
 <span class="sd">        Euler angle :math:`\\gamma` in radian, [0, :math:`2\\pi`]</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">rmat</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
         <span class="n">beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">rmat</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
@@ -571,7 +571,7 @@
 <div class="viewcode-block" id="where_is_angle">
 <a class="viewcode-back" href="../../reference/angular_momentum.html#edrixs.angular_momentum.where_is_angle">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">where_is_angle</span><span class="p">(</span><span class="n">sina</span><span class="p">,</span> <span class="n">cosa</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Given sine and cosine of an angle :math:`\\alpha`, return the</span>
 <span class="sd">    angle :math:`\\alpha` range from [0, :math:`2\\pi`].</span>
 
@@ -586,7 +586,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    alpha: float</span>
 <span class="sd">        The angle :math:`\\alpha` in radian [0, :math:`2\\pi`].</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">if</span> <span class="n">cosa</span> <span class="o">&gt;</span> <span class="mf">1.0</span><span class="p">:</span>
         <span class="n">cosa</span> <span class="o">=</span> <span class="mf">1.0</span>
@@ -602,7 +602,7 @@
 <div class="viewcode-block" id="dmat_spinor">
 <a class="viewcode-back" href="../../reference/angular_momentum.html#edrixs.angular_momentum.dmat_spinor">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">dmat_spinor</span><span class="p">(</span><span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Given three Euler angle: :math:`\\alpha, \\beta, \\gamma`,</span>
 <span class="sd">    return the transformation</span>
 <span class="sd">    matrix for :math:`\\frac{1}{2}`-spinor.</span>
@@ -620,7 +620,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    dmat:  2d complex array</span>
 <span class="sd">        The :math:`2 \\times 2` transformation matrix.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">dmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">complex128</span><span class="p">)</span>
     <span class="n">dmat</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">alpha</span> <span class="o">+</span> <span class="n">gamma</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="mi">1</span><span class="n">j</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">beta</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
@@ -634,7 +634,7 @@
 <div class="viewcode-block" id="zx_to_rmat">
 <a class="viewcode-back" href="../../reference/angular_momentum.html#edrixs.angular_momentum.zx_to_rmat">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">zx_to_rmat</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Given :math:`z` vector and :math:`x` vector, calculate :math:`y` vector</span>
 <span class="sd">    which satisfies the right-hand Cartesian coordinate and normalize them to</span>
 <span class="sd">    unit if needed, and then return the :math:`3 \\times 3`</span>
@@ -651,7 +651,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    rmat: 2d float array</span>
 <span class="sd">        The :math:`3 \\times 3` rotational matrix :math:`R`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">z</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
@@ -671,7 +671,7 @@
 <div class="viewcode-block" id="get_wigner_dmat">
 <a class="viewcode-back" href="../../reference/angular_momentum.html#edrixs.angular_momentum.get_wigner_dmat">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_wigner_dmat</span><span class="p">(</span><span class="n">quant_2j</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Given quantum number and Euler angles, return the Wigner-D matrix.</span>
 
 <span class="sd">    Parameters</span>
@@ -705,7 +705,7 @@
 <span class="sd">    array([[-0.190816-0.220931j,  0.347398+0.541041j, -0.294663-0.643849j],</span>
 <span class="sd">           [ 0.636536-0.090736j, -0.416147+0.j      , -0.636536-0.090736j],</span>
 <span class="sd">           [-0.294663+0.643849j, -0.347398+0.541041j, -0.190816+0.220931j]])</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="kn">from</span><span class="w"> </span><span class="nn">sympy.physics.quantum.spin</span><span class="w"> </span><span class="kn">import</span> <span class="n">Rotation</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">sympy</span><span class="w"> </span><span class="kn">import</span> <span class="n">N</span><span class="p">,</span> <span class="n">S</span>
@@ -731,7 +731,7 @@
 <div class="viewcode-block" id="cf_cubic_d">
 <a class="viewcode-back" href="../../reference/angular_momentum.html#edrixs.angular_momentum.cf_cubic_d">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">cf_cubic_d</span><span class="p">(</span><span class="n">ten_dq</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Given 10Dq, return cubic crystal field matrix for d orbitals</span>
 <span class="sd">    in the complex harmonics basis.</span>
 
@@ -744,7 +744,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    cf: 2d complex array, shape=(10, 10)</span>
 <span class="sd">        The matrix form of crystal field Hamiltonian in complex harmonics basis.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
     <span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.6</span> <span class="o">*</span> <span class="n">ten_dq</span>  <span class="c1"># dz2</span>
@@ -756,7 +756,7 @@
     <span class="n">cf</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
     <span class="n">cf</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
 
-    <span class="n">cf</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">cb_op</span><span class="p">(</span><span class="n">cf</span><span class="p">,</span> <span class="n">tmat_r2c</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+    <span class="n">cf</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">cb_op</span><span class="p">(</span><span class="n">cf</span><span class="p">,</span> <span class="n">tmat_r2c</span><span class="p">(</span><span class="s1">'d'</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">cf</span></div>
 
@@ -765,7 +765,7 @@
 <div class="viewcode-block" id="cf_tetragonal_d">
 <a class="viewcode-back" href="../../reference/angular_momentum.html#edrixs.angular_momentum.cf_tetragonal_d">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">cf_tetragonal_d</span><span class="p">(</span><span class="n">ten_dq</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d3</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Given 10Dq, d1, d3, return tetragonal crystal field matrix for d orbitals</span>
 <span class="sd">    in the complex harmonics basis.</span>
 
@@ -782,7 +782,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    cf: 2d complex array, shape=(10, 10)</span>
 <span class="sd">        The matrix form of crystal field Hamiltonian in complex harmonics basis.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">dt</span> <span class="o">=</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">d3</span> <span class="o">-</span> <span class="mf">4.0</span> <span class="o">*</span> <span class="n">d1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">35</span>
     <span class="n">ds</span> <span class="o">=</span> <span class="p">(</span><span class="n">d3</span> <span class="o">+</span> <span class="n">d1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">7.0</span>
@@ -799,7 +799,7 @@
     <span class="n">cf</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
     <span class="n">cf</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
 
-    <span class="n">cf</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">cb_op</span><span class="p">(</span><span class="n">cf</span><span class="p">,</span> <span class="n">tmat_r2c</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+    <span class="n">cf</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">cb_op</span><span class="p">(</span><span class="n">cf</span><span class="p">,</span> <span class="n">tmat_r2c</span><span class="p">(</span><span class="s1">'d'</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">cf</span></div>
 
@@ -808,7 +808,7 @@
 <div class="viewcode-block" id="cf_trigonal_t2g">
 <a class="viewcode-back" href="../../reference/angular_momentum.html#edrixs.angular_momentum.cf_trigonal_t2g">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">cf_trigonal_t2g</span><span class="p">(</span><span class="n">delta</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Given delta, return trigonal crystal field matrix for t2g orbitals</span>
 <span class="sd">    in the complex harmonics basis.</span>
 
@@ -821,7 +821,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    cf: 2d complex array, shape=(6, 6)</span>
 <span class="sd">        The matrix form of crystal field Hamiltonian in complex harmonics basis.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">delta</span><span class="p">],</span>
                     <span class="p">[</span><span class="n">delta</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">delta</span><span class="p">],</span>
@@ -829,7 +829,7 @@
     <span class="n">cf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
     <span class="n">cf</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">tmp</span>
     <span class="n">cf</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">6</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="mi">6</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">tmp</span>
-    <span class="n">cf</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">cb_op</span><span class="p">(</span><span class="n">cf</span><span class="p">,</span> <span class="n">tmat_r2c</span><span class="p">(</span><span class="s1">&#39;t2g&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+    <span class="n">cf</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">cb_op</span><span class="p">(</span><span class="n">cf</span><span class="p">,</span> <span class="n">tmat_r2c</span><span class="p">(</span><span class="s1">'t2g'</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">cf</span></div>
 
@@ -838,7 +838,7 @@
 <div class="viewcode-block" id="cf_square_planar_d">
 <a class="viewcode-back" href="../../reference/angular_momentum.html#edrixs.angular_momentum.cf_square_planar_d">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">cf_square_planar_d</span><span class="p">(</span><span class="n">ten_dq</span><span class="p">,</span> <span class="n">ds</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Given 10Dq, ds, return square planar crystal field matrix for d orbitals</span>
 <span class="sd">    in the complex harmonics basis. This is the limit of strong tetragonal</span>
 <span class="sd">    distortion with two axial ligands at infinity. Note that in this case the</span>
@@ -858,7 +858,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    cf: 2d complex array, shape=(10, 10)</span>
 <span class="sd">        The matrix form of crystal field Hamiltonian in complex harmonics basis.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">tmp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
     <span class="n">tmp</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">9</span><span class="o">/</span><span class="mi">35</span><span class="o">*</span><span class="n">ten_dq</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">ds</span>  <span class="c1"># d3z2-r2</span>
     <span class="n">tmp</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">6</span><span class="o">/</span><span class="mi">35</span><span class="o">*</span><span class="n">ten_dq</span> <span class="o">-</span> <span class="n">ds</span>  <span class="c1"># dzx</span>
@@ -870,14 +870,14 @@
     <span class="n">cf</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
     <span class="n">cf</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="mi">10</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
 
-    <span class="n">cf</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">cb_op</span><span class="p">(</span><span class="n">cf</span><span class="p">,</span> <span class="n">tmat_r2c</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+    <span class="n">cf</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">cb_op</span><span class="p">(</span><span class="n">cf</span><span class="p">,</span> <span class="n">tmat_r2c</span><span class="p">(</span><span class="s1">'d'</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">cf</span></div>
 
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">cf_tetragonal_t2g</span><span class="p">(</span><span class="n">ten_dq</span><span class="p">,</span> <span class="n">d1</span><span class="p">,</span> <span class="n">d3</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Given 10Dq, d1, d3, return tetragonal crystal field matrix for t2g orbitals</span>
 <span class="sd">    in the complex harmonics basis.</span>
 
@@ -894,7 +894,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    cf: 2d complex array, shape=(6, 6)</span>
 <span class="sd">        The matrix form of crystal field Hamiltonian in complex harmonics basis.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="n">dt</span> <span class="o">=</span> <span class="p">(</span><span class="mf">3.0</span> <span class="o">*</span> <span class="n">d3</span> <span class="o">-</span> <span class="mf">4.0</span> <span class="o">*</span> <span class="n">d1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">35</span>
     <span class="n">ds</span> <span class="o">=</span> <span class="p">(</span><span class="n">d3</span> <span class="o">+</span> <span class="n">d1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">7.0</span>
     <span class="n">dq</span> <span class="o">=</span> <span class="n">ten_dq</span> <span class="o">/</span> <span class="mf">10.0</span>
@@ -907,7 +907,7 @@
     <span class="n">cf</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
     <span class="n">cf</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">tmp</span>
     <span class="n">cf</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">6</span><span class="p">:</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="mi">6</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">tmp</span>
-    <span class="n">cf</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">cb_op</span><span class="p">(</span><span class="n">cf</span><span class="p">,</span> <span class="n">tmat_r2c</span><span class="p">(</span><span class="s1">&#39;t2g&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
+    <span class="n">cf</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">cb_op</span><span class="p">(</span><span class="n">cf</span><span class="p">,</span> <span class="n">tmat_r2c</span><span class="p">(</span><span class="s1">'t2g'</span><span class="p">,</span> <span class="kc">True</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">cf</span>
 </pre></div>
 

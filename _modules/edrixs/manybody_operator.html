@@ -81,8 +81,8 @@
            <div itemprop="articleBody">
              
   <h1>Source code for edrixs.manybody_operator</h1><div class="highlight"><pre>
-<span></span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;one_fermion_annihilation&#39;</span><span class="p">,</span> <span class="s1">&#39;two_fermion&#39;</span><span class="p">,</span> <span class="s1">&#39;four_fermion&#39;</span><span class="p">,</span>
-           <span class="s1">&#39;build_opers&#39;</span><span class="p">,</span> <span class="s1">&#39;density_matrix&#39;</span><span class="p">]</span>
+<span></span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'one_fermion_annihilation'</span><span class="p">,</span> <span class="s1">'two_fermion'</span><span class="p">,</span> <span class="s1">'four_fermion'</span><span class="p">,</span>
+           <span class="s1">'build_opers'</span><span class="p">,</span> <span class="s1">'density_matrix'</span><span class="p">]</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
@@ -91,7 +91,7 @@
 <div class="viewcode-block" id="one_fermion_annihilation">
 <a class="viewcode-back" href="../../reference/manybody_operator.html#edrixs.manybody_operator.one_fermion_annihilation">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">one_fermion_annihilation</span><span class="p">(</span><span class="n">iorb</span><span class="p">,</span> <span class="n">lb</span><span class="p">,</span> <span class="n">rb</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Build matrix form of a fermionic annihilation operator in the given Fock basis.</span>
 
 <span class="sd">    .. math::</span>
@@ -111,7 +111,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    hmat: 2d complex array</span>
 <span class="sd">        The matrix form of :math:`\\hat{f}_{i}`.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">lb</span><span class="p">,</span> <span class="n">rb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lb</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rb</span><span class="p">)</span>
     <span class="n">nr</span><span class="p">,</span> <span class="n">nl</span><span class="p">,</span> <span class="n">norbs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rb</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">lb</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">rb</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
@@ -138,7 +138,7 @@
 <div class="viewcode-block" id="two_fermion">
 <a class="viewcode-back" href="../../reference/manybody_operator.html#edrixs.manybody_operator.two_fermion">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">two_fermion</span><span class="p">(</span><span class="n">emat</span><span class="p">,</span> <span class="n">lb</span><span class="p">,</span> <span class="n">rb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1E-10</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Build matrix form of a two-fermionic operator in the given Fock basis,</span>
 
 <span class="sd">    .. math::</span>
@@ -161,7 +161,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    hmat: 2d complex array</span>
 <span class="sd">        The matrix form of the two-fermionic operator.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">rb</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">rb</span> <span class="o">=</span> <span class="n">lb</span>
     <span class="n">lb</span><span class="p">,</span> <span class="n">rb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lb</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rb</span><span class="p">)</span>
@@ -198,7 +198,7 @@
 <div class="viewcode-block" id="four_fermion">
 <a class="viewcode-back" href="../../reference/manybody_operator.html#edrixs.manybody_operator.four_fermion">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">four_fermion</span><span class="p">(</span><span class="n">umat</span><span class="p">,</span> <span class="n">lb</span><span class="p">,</span> <span class="n">rb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1E-10</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Build matrix form of a four-fermionic operator in the given Fock basis,</span>
 
 <span class="sd">    .. math::</span>
@@ -222,7 +222,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    hmat: 2d complex array</span>
 <span class="sd">        The matrix form of the four-fermionic operator.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">rb</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">rb</span> <span class="o">=</span> <span class="n">lb</span>
     <span class="n">lb</span><span class="p">,</span> <span class="n">rb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lb</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rb</span><span class="p">)</span>
@@ -271,7 +271,7 @@
 <div class="viewcode-block" id="build_opers">
 <a class="viewcode-back" href="../../reference/manybody_operator.html#edrixs.manybody_operator.build_opers">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">build_opers</span><span class="p">(</span><span class="n">nfermion</span><span class="p">,</span> <span class="n">coeff</span><span class="p">,</span> <span class="n">lb</span><span class="p">,</span> <span class="n">rb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1E-10</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Build matrix form of many-body operators in the given Fock basis,</span>
 
 <span class="sd">    .. math::</span>
@@ -326,19 +326,19 @@
 <span class="sd">        - if nfermion=2, coeff.shape=(2, 3, 10, 10), hmat.shape=(2, 3, len(lb), len(rb))</span>
 
 <span class="sd">        - if nfermion=4, coeff.shape=(2, 3, 10, 10, 10, 10), hmat.shape=(2, 3, len(lb), len(rb))</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">nfermion</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;nfermion is not 2 or 4&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"nfermion is not 2 or 4"</span><span class="p">)</span>
     <span class="n">nl</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lb</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">rb</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">nr</span> <span class="o">=</span> <span class="n">nl</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">nr</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rb</span><span class="p">)</span>
-    <span class="n">coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coeff</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+    <span class="n">coeff</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">coeff</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s1">'C'</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">nfermion</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
         <span class="n">dim</span> <span class="o">=</span> <span class="n">coeff</span><span class="o">.</span><span class="n">shape</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Dimension of coeff should be at least 2 when nfermion=2&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"Dimension of coeff should be at least 2 when nfermion=2"</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
             <span class="n">hmat</span> <span class="o">=</span> <span class="n">two_fermion</span><span class="p">(</span><span class="n">coeff</span><span class="p">,</span> <span class="n">lb</span><span class="p">,</span> <span class="n">rb</span><span class="p">,</span> <span class="n">tol</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -351,7 +351,7 @@
     <span class="k">if</span> <span class="n">nfermion</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
         <span class="n">dim</span> <span class="o">=</span> <span class="n">coeff</span><span class="o">.</span><span class="n">shape</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Dimension of coeff should be at least 4 when nfermion=4&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"Dimension of coeff should be at least 4 when nfermion=4"</span><span class="p">)</span>
         <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">dim</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
             <span class="n">hmat</span> <span class="o">=</span> <span class="n">four_fermion</span><span class="p">(</span><span class="n">coeff</span><span class="p">,</span> <span class="n">lb</span><span class="p">,</span> <span class="n">rb</span><span class="p">,</span> <span class="n">tol</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -369,7 +369,7 @@
 <div class="viewcode-block" id="density_matrix">
 <a class="viewcode-back" href="../../reference/manybody_operator.html#edrixs.manybody_operator.density_matrix">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">density_matrix</span><span class="p">(</span><span class="n">iorb</span><span class="p">,</span> <span class="n">jorb</span><span class="p">,</span> <span class="n">lb</span><span class="p">,</span> <span class="n">rb</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Calculate the matrix form of density operators :math:`\\hat{f}_{i}^{\\dagger}\\hat{f}_{j}`</span>
 <span class="sd">    in the given Fock basis,</span>
 
@@ -392,7 +392,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    hmat: 2d complex array</span>
 <span class="sd">        The calculated matrix form of the density operator.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">lb</span><span class="p">,</span> <span class="n">rb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lb</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rb</span><span class="p">)</span>
     <span class="n">nr</span><span class="p">,</span> <span class="n">nl</span><span class="p">,</span> <span class="n">norbs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rb</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">lb</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">rb</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>

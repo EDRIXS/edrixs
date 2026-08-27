@@ -81,10 +81,10 @@
            <div itemprop="articleBody">
              
   <h1>Source code for edrixs.photon_transition</h1><div class="highlight"><pre>
-<span></span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;dipole_trans_oper&#39;</span><span class="p">,</span> <span class="s1">&#39;quadrupole_trans_oper&#39;</span><span class="p">,</span> <span class="s1">&#39;get_trans_oper&#39;</span><span class="p">,</span>
-           <span class="s1">&#39;unit_wavevector&#39;</span><span class="p">,</span> <span class="s1">&#39;wavevector_with_length&#39;</span><span class="p">,</span> <span class="s1">&#39;get_wavevector_rixs&#39;</span><span class="p">,</span>
-           <span class="s1">&#39;linear_polvec&#39;</span><span class="p">,</span> <span class="s1">&#39;dipole_polvec_rixs&#39;</span><span class="p">,</span> <span class="s1">&#39;dipole_polvec_xas&#39;</span><span class="p">,</span>
-           <span class="s1">&#39;quadrupole_polvec&#39;</span><span class="p">]</span>
+<span></span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'dipole_trans_oper'</span><span class="p">,</span> <span class="s1">'quadrupole_trans_oper'</span><span class="p">,</span> <span class="s1">'get_trans_oper'</span><span class="p">,</span>
+           <span class="s1">'unit_wavevector'</span><span class="p">,</span> <span class="s1">'wavevector_with_length'</span><span class="p">,</span> <span class="s1">'get_wavevector_rixs'</span><span class="p">,</span>
+           <span class="s1">'linear_polvec'</span><span class="p">,</span> <span class="s1">'dipole_polvec_rixs'</span><span class="p">,</span> <span class="s1">'dipole_polvec_xas'</span><span class="p">,</span>
+           <span class="s1">'quadrupole_polvec'</span><span class="p">]</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">sympy.physics.wigner</span><span class="w"> </span><span class="kn">import</span> <span class="n">clebsch_gordan</span>
@@ -144,7 +144,7 @@
 <div class="viewcode-block" id="get_trans_oper">
 <a class="viewcode-back" href="../../reference/photon_transition.html#edrixs.photon_transition.get_trans_oper">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_trans_oper</span><span class="p">(</span><span class="n">case</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Get the matrix of transition operators between two atomic shell in the complex</span>
 <span class="sd">    spherical harmonics basis.</span>
 
@@ -153,56 +153,56 @@
 <span class="sd">    case: string</span>
 <span class="sd">        A string indicating the two atomic shells, possible transitions are:</span>
 
-<span class="sd">        -   &#39;ss&#39;:     :math:`s \\rightarrow s`</span>
-<span class="sd">        -   &#39;ps&#39;:     :math:`s \\rightarrow p`</span>
-<span class="sd">        -   &#39;t2gs&#39;:   :math:`s \\rightarrow t2g`</span>
-<span class="sd">        -   &#39;ds&#39;:     :math:`s \\rightarrow d`</span>
-<span class="sd">        -   &#39;fs&#39;:     :math:`s \\rightarrow f`</span>
-<span class="sd">        -   &#39;sp&#39;:     :math:`p \\rightarrow s`</span>
-<span class="sd">        -   &#39;sp12&#39;:   :math:`p_{1/2} \\rightarrow s`</span>
-<span class="sd">        -   &#39;sp32&#39;:   :math:`p_{3/2} \\rightarrow s`</span>
-<span class="sd">        -   &#39;pp&#39;:     :math:`p \\rightarrow p`</span>
-<span class="sd">        -   &#39;pp12&#39;:   :math:`p_{1/2} \\rightarrow p`</span>
-<span class="sd">        -   &#39;pp32&#39;:   :math:`p_{3/2} \\rightarrow p`</span>
-<span class="sd">        -   &#39;t2gp&#39;:   :math:`p \\rightarrow t_{2g}`</span>
-<span class="sd">        -   &#39;t2gp12&#39;: :math:`p_{1/2} \\rightarrow t_{2g}`</span>
-<span class="sd">        -   &#39;t2gp32&#39;: :math:`p_{3/2} \\rightarrow t_{2g}`</span>
-<span class="sd">        -   &#39;dp&#39;:     :math:`p \\rightarrow d`</span>
-<span class="sd">        -   &#39;dp12&#39;:   :math:`p_{1/2} \\rightarrow d`</span>
-<span class="sd">        -   &#39;dp32&#39;:   :math:`p_{3/2} \\rightarrow d`</span>
-<span class="sd">        -   &#39;fp&#39;:     :math:`p \\rightarrow f`</span>
-<span class="sd">        -   &#39;fp12&#39;:   :math:`p_{1/2} \\rightarrow f`</span>
-<span class="sd">        -   &#39;fp32&#39;:   :math:`p_{3/2} \\rightarrow f`</span>
-<span class="sd">        -   &#39;sd&#39;:     :math:`d \\rightarrow s`</span>
-<span class="sd">        -   &#39;sd32&#39;:   :math:`d_{3/2} \\rightarrow s`</span>
-<span class="sd">        -   &#39;sd52&#39;:   :math:`d_{5/2} \\rightarrow s`</span>
-<span class="sd">        -   &#39;pd&#39;:     :math:`d \\rightarrow p`</span>
-<span class="sd">        -   &#39;pd32&#39;:   :math:`d_{3/2} \\rightarrow p`</span>
-<span class="sd">        -   &#39;pd52&#39;:   :math:`d_{5/2} \\rightarrow p`</span>
-<span class="sd">        -   &#39;t2gd&#39;:   :math:`d \\rightarrow t_{2g}`</span>
-<span class="sd">        -   &#39;t2gd32&#39;: :math:`d_{3/2} \\rightarrow t_{2g}`</span>
-<span class="sd">        -   &#39;t2gd52&#39;: :math:`d_{5/2} \\rightarrow t_{2g}`</span>
-<span class="sd">        -   &#39;dd&#39;:     :math:`d \\rightarrow d`</span>
-<span class="sd">        -   &#39;dd32&#39;:   :math:`d_{3/2} \\rightarrow d`</span>
-<span class="sd">        -   &#39;dd52&#39;:   :math:`d_{5/2} \\rightarrow d`</span>
-<span class="sd">        -   &#39;fd&#39;:     :math:`d \\rightarrow f`</span>
-<span class="sd">        -   &#39;fd32&#39;:   :math:`d_{3/2} \\rightarrow f`</span>
-<span class="sd">        -   &#39;fd52&#39;:   :math:`d_{5/2} \\rightarrow f`</span>
-<span class="sd">        -   &#39;sf&#39;:     :math:`f \\rightarrow s`</span>
-<span class="sd">        -   &#39;sf52&#39;:   :math:`f_{5/2} \\rightarrow s`</span>
-<span class="sd">        -   &#39;sf72&#39;:   :math:`f_{7/2} \\rightarrow s`</span>
-<span class="sd">        -   &#39;pf&#39;:     :math:`f \\rightarrow p`</span>
-<span class="sd">        -   &#39;pf52&#39;:   :math:`f_{5/2} \\rightarrow p`</span>
-<span class="sd">        -   &#39;pf72&#39;:   :math:`f_{7/2} \\rightarrow p`</span>
-<span class="sd">        -   &#39;t2gf&#39;:   :math:`f \\rightarrow t_{2g}`</span>
-<span class="sd">        -   &#39;t2gf52&#39;: :math:`f_{5/2} \\rightarrow t_{2g}`</span>
-<span class="sd">        -   &#39;t2gf72&#39;: :math:`f_{7/2} \\rightarrow t_{2g}`</span>
-<span class="sd">        -   &#39;df&#39;:     :math:`f \\rightarrow d`</span>
-<span class="sd">        -   &#39;df52&#39;:   :math:`f_{5/2} \\rightarrow d`</span>
-<span class="sd">        -   &#39;df72&#39;:   :math:`f_{7/2} \\rightarrow d`</span>
-<span class="sd">        -   &#39;ff&#39;:     :math:`f \\rightarrow f`</span>
-<span class="sd">        -   &#39;ff52&#39;:   :math:`f_{5/2} \\rightarrow f`</span>
-<span class="sd">        -   &#39;ff72&#39;:   :math:`f_{7/2} \\rightarrow f`</span>
+<span class="sd">        -   'ss':     :math:`s \\rightarrow s`</span>
+<span class="sd">        -   'ps':     :math:`s \\rightarrow p`</span>
+<span class="sd">        -   't2gs':   :math:`s \\rightarrow t2g`</span>
+<span class="sd">        -   'ds':     :math:`s \\rightarrow d`</span>
+<span class="sd">        -   'fs':     :math:`s \\rightarrow f`</span>
+<span class="sd">        -   'sp':     :math:`p \\rightarrow s`</span>
+<span class="sd">        -   'sp12':   :math:`p_{1/2} \\rightarrow s`</span>
+<span class="sd">        -   'sp32':   :math:`p_{3/2} \\rightarrow s`</span>
+<span class="sd">        -   'pp':     :math:`p \\rightarrow p`</span>
+<span class="sd">        -   'pp12':   :math:`p_{1/2} \\rightarrow p`</span>
+<span class="sd">        -   'pp32':   :math:`p_{3/2} \\rightarrow p`</span>
+<span class="sd">        -   't2gp':   :math:`p \\rightarrow t_{2g}`</span>
+<span class="sd">        -   't2gp12': :math:`p_{1/2} \\rightarrow t_{2g}`</span>
+<span class="sd">        -   't2gp32': :math:`p_{3/2} \\rightarrow t_{2g}`</span>
+<span class="sd">        -   'dp':     :math:`p \\rightarrow d`</span>
+<span class="sd">        -   'dp12':   :math:`p_{1/2} \\rightarrow d`</span>
+<span class="sd">        -   'dp32':   :math:`p_{3/2} \\rightarrow d`</span>
+<span class="sd">        -   'fp':     :math:`p \\rightarrow f`</span>
+<span class="sd">        -   'fp12':   :math:`p_{1/2} \\rightarrow f`</span>
+<span class="sd">        -   'fp32':   :math:`p_{3/2} \\rightarrow f`</span>
+<span class="sd">        -   'sd':     :math:`d \\rightarrow s`</span>
+<span class="sd">        -   'sd32':   :math:`d_{3/2} \\rightarrow s`</span>
+<span class="sd">        -   'sd52':   :math:`d_{5/2} \\rightarrow s`</span>
+<span class="sd">        -   'pd':     :math:`d \\rightarrow p`</span>
+<span class="sd">        -   'pd32':   :math:`d_{3/2} \\rightarrow p`</span>
+<span class="sd">        -   'pd52':   :math:`d_{5/2} \\rightarrow p`</span>
+<span class="sd">        -   't2gd':   :math:`d \\rightarrow t_{2g}`</span>
+<span class="sd">        -   't2gd32': :math:`d_{3/2} \\rightarrow t_{2g}`</span>
+<span class="sd">        -   't2gd52': :math:`d_{5/2} \\rightarrow t_{2g}`</span>
+<span class="sd">        -   'dd':     :math:`d \\rightarrow d`</span>
+<span class="sd">        -   'dd32':   :math:`d_{3/2} \\rightarrow d`</span>
+<span class="sd">        -   'dd52':   :math:`d_{5/2} \\rightarrow d`</span>
+<span class="sd">        -   'fd':     :math:`d \\rightarrow f`</span>
+<span class="sd">        -   'fd32':   :math:`d_{3/2} \\rightarrow f`</span>
+<span class="sd">        -   'fd52':   :math:`d_{5/2} \\rightarrow f`</span>
+<span class="sd">        -   'sf':     :math:`f \\rightarrow s`</span>
+<span class="sd">        -   'sf52':   :math:`f_{5/2} \\rightarrow s`</span>
+<span class="sd">        -   'sf72':   :math:`f_{7/2} \\rightarrow s`</span>
+<span class="sd">        -   'pf':     :math:`f \\rightarrow p`</span>
+<span class="sd">        -   'pf52':   :math:`f_{5/2} \\rightarrow p`</span>
+<span class="sd">        -   'pf72':   :math:`f_{7/2} \\rightarrow p`</span>
+<span class="sd">        -   't2gf':   :math:`f \\rightarrow t_{2g}`</span>
+<span class="sd">        -   't2gf52': :math:`f_{5/2} \\rightarrow t_{2g}`</span>
+<span class="sd">        -   't2gf72': :math:`f_{7/2} \\rightarrow t_{2g}`</span>
+<span class="sd">        -   'df':     :math:`f \\rightarrow d`</span>
+<span class="sd">        -   'df52':   :math:`f_{5/2} \\rightarrow d`</span>
+<span class="sd">        -   'df72':   :math:`f_{7/2} \\rightarrow d`</span>
+<span class="sd">        -   'ff':     :math:`f \\rightarrow f`</span>
+<span class="sd">        -   'ff52':   :math:`f_{5/2} \\rightarrow f`</span>
+<span class="sd">        -   'ff72':   :math:`f_{7/2} \\rightarrow f`</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -213,12 +213,12 @@
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; import edrixs</span>
 <span class="sd">    p to d transition</span>
-<span class="sd">    &gt;&gt;&gt; trans_dp = get_trans_oper(&#39;dp&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; trans_dp = get_trans_oper('dp')</span>
 <span class="sd">    p to t2g transition</span>
-<span class="sd">    &gt;&gt;&gt; trans_t2gp = get_trans_oper(&#39;t2gp&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; trans_t2gp = get_trans_oper('t2gp')</span>
 <span class="sd">    p_{3/2} to d transition</span>
-<span class="sd">    &gt;&gt;&gt; trans_dp32 = get_trans_oper(&#39;dp32&#39;)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; trans_dp32 = get_trans_oper('dp32')</span>
+<span class="sd">    """</span>
     <span class="n">info</span> <span class="o">=</span> <span class="n">info_atomic_shell</span><span class="p">()</span>
     <span class="n">v_name</span><span class="p">,</span> <span class="n">c_name</span> <span class="o">=</span> <span class="n">case_to_shell_name</span><span class="p">(</span><span class="n">case</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
     <span class="n">v_orbl</span><span class="p">,</span> <span class="n">c_orbl</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="n">v_name</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">info</span><span class="p">[</span><span class="n">c_name</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
@@ -229,7 +229,7 @@
         <span class="n">op</span> <span class="o">=</span> <span class="n">dipole_trans_oper</span><span class="p">(</span><span class="n">v_orbl</span><span class="p">,</span> <span class="n">c_orbl</span><span class="p">)</span>
 
     <span class="c1"># truncate to a sub-shell if necessary</span>
-    <span class="n">special_shell</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;t2g&#39;</span><span class="p">,</span> <span class="s1">&#39;p12&#39;</span><span class="p">,</span> <span class="s1">&#39;p32&#39;</span><span class="p">,</span> <span class="s1">&#39;d32&#39;</span><span class="p">,</span> <span class="s1">&#39;d52&#39;</span><span class="p">,</span> <span class="s1">&#39;f52&#39;</span><span class="p">,</span> <span class="s1">&#39;f72&#39;</span><span class="p">]</span>
+    <span class="n">special_shell</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'t2g'</span><span class="p">,</span> <span class="s1">'p12'</span><span class="p">,</span> <span class="s1">'p32'</span><span class="p">,</span> <span class="s1">'d32'</span><span class="p">,</span> <span class="s1">'d52'</span><span class="p">,</span> <span class="s1">'f52'</span><span class="p">,</span> <span class="s1">'f72'</span><span class="p">]</span>
     <span class="n">orb_indx</span> <span class="o">=</span> <span class="p">{</span>
         <span class="n">special_shell</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">],</span>
         <span class="n">special_shell</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
@@ -244,8 +244,8 @@
     <span class="n">indx1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">v_norb</span><span class="p">))</span>
     <span class="n">indx2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">c_norb</span><span class="p">))</span>
     <span class="k">if</span> <span class="n">v_name</span> <span class="ow">in</span> <span class="n">special_shell</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">v_name</span> <span class="o">==</span> <span class="s1">&#39;t2g&#39;</span><span class="p">:</span>
-            <span class="n">left_tmat</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmat_c2r</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">v_name</span> <span class="o">==</span> <span class="s1">'t2g'</span><span class="p">:</span>
+            <span class="n">left_tmat</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmat_c2r</span><span class="p">(</span><span class="s1">'d'</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">left_tmat</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmat_c2j</span><span class="p">(</span><span class="n">v_orbl</span><span class="p">)</span>
         <span class="n">indx1</span> <span class="o">=</span> <span class="n">orb_indx</span><span class="p">[</span><span class="n">v_name</span><span class="p">]</span>
@@ -262,8 +262,8 @@
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">npol</span><span class="p">):</span>
         <span class="n">op</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">cb_op2</span><span class="p">(</span><span class="n">op</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">left_tmat</span><span class="p">,</span> <span class="n">right_tmat</span><span class="p">)</span>
         <span class="n">op_tmp</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">op</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">indx1</span><span class="p">][:,</span> <span class="n">indx2</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">v_name</span> <span class="o">==</span> <span class="s1">&#39;t2g&#39;</span><span class="p">:</span>
-            <span class="n">op_tmp</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">tmat_r2c</span><span class="p">(</span><span class="s1">&#39;t2g&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">))),</span> <span class="n">op_tmp</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">v_name</span> <span class="o">==</span> <span class="s1">'t2g'</span><span class="p">:</span>
+            <span class="n">op_tmp</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">tmat_r2c</span><span class="p">(</span><span class="s1">'t2g'</span><span class="p">,</span> <span class="kc">True</span><span class="p">))),</span> <span class="n">op_tmp</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
     <span class="n">res</span> <span class="o">=</span> <span class="n">op_tmp</span>
     <span class="k">return</span> <span class="n">res</span></div>
 
@@ -271,8 +271,8 @@
 
 <div class="viewcode-block" id="unit_wavevector">
 <a class="viewcode-back" href="../../reference/photon_transition.html#edrixs.photon_transition.unit_wavevector">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">unit_wavevector</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">local_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">unit_wavevector</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">local_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">'in'</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Given incident or scattered angle, and azimuthal angle, return</span>
 <span class="sd">    unit wavevector with respect to global :math:`xyz`-axis.</span>
 
@@ -295,32 +295,32 @@
 <span class="sd">    direction: string</span>
 <span class="sd">        The direction of photon wave, options can be</span>
 
-<span class="sd">        - &#39;in&#39;: incident photon</span>
+<span class="sd">        - 'in': incident photon</span>
 
-<span class="sd">        - &#39;out&#39;: scattered photon</span>
+<span class="sd">        - 'out': scattered photon</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    unit_k: list of 3 float numbers</span>
 <span class="sd">        The unit wavevector.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">local_axis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">local_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">local_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">local_axis</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">direction</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;in&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">direction</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'in'</span><span class="p">:</span>
         <span class="n">unit_k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">),</span>
                            <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">),</span>
                            <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)])</span>
         <span class="n">unit_k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">local_axis</span><span class="p">,</span> <span class="n">unit_k</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">direction</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;out&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">direction</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'out'</span><span class="p">:</span>
         <span class="n">unit_k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">),</span>
                            <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">theta</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">),</span>
                            <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">theta</span><span class="p">)])</span>
         <span class="n">unit_k</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">local_axis</span><span class="p">,</span> <span class="n">unit_k</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unknown direction in unit_wavevector: &quot;</span><span class="p">,</span> <span class="n">direction</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"Unknown direction in unit_wavevector: "</span><span class="p">,</span> <span class="n">direction</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">unit_k</span></div>
 
@@ -328,8 +328,8 @@
 
 <div class="viewcode-block" id="wavevector_with_length">
 <a class="viewcode-back" href="../../reference/photon_transition.html#edrixs.photon_transition.wavevector_with_length">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">wavevector_with_length</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">local_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">wavevector_with_length</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">local_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">'in'</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Given incident or scattered angle, azimuthal angle, energy of photon, return</span>
 <span class="sd">    wavevector with respect to global :math:`xyz`-axis.</span>
 
@@ -354,15 +354,15 @@
 <span class="sd">    direction: string</span>
 <span class="sd">        The direction of photon wave, options can be</span>
 
-<span class="sd">        - &#39;in&#39;: incident photon</span>
+<span class="sd">        - 'in': incident photon</span>
 
-<span class="sd">        - &#39;out&#39;: scattered photon</span>
+<span class="sd">        - 'out': scattered photon</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    k_with_length: list of 3 float numbers</span>
 <span class="sd">        The wavevector with length.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">hbarc</span> <span class="o">=</span> <span class="mf">1.973270533</span> <span class="o">*</span> <span class="mi">1000</span>  <span class="c1"># eV*A</span>
     <span class="n">k_len</span> <span class="o">=</span> <span class="n">energy</span> <span class="o">/</span> <span class="n">hbarc</span>
@@ -380,7 +380,7 @@
 <div class="viewcode-block" id="get_wavevector_rixs">
 <a class="viewcode-back" href="../../reference/photon_transition.html#edrixs.photon_transition.get_wavevector_rixs">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_wavevector_rixs</span><span class="p">(</span><span class="n">thin</span><span class="p">,</span> <span class="n">thout</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">ein</span><span class="p">,</span> <span class="n">eout</span><span class="p">,</span> <span class="n">local_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Return the wave vector of incident and scattered photons, for RIXS calculation.</span>
 
 <span class="sd">    Parameters</span>
@@ -412,14 +412,14 @@
 <span class="sd">        The wave vector of the incident photon, with respect to the global :math:`xyz` -axis.</span>
 <span class="sd">    k_out_global: 3-length float array</span>
 <span class="sd">        The wave vector of the scattered photon, with respect to the global :math:`xyz` -axis.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">local_axis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">local_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">local_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">local_axis</span><span class="p">)</span>
 
-    <span class="n">k_in_global</span> <span class="o">=</span> <span class="n">wavevector_with_length</span><span class="p">(</span><span class="n">thin</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">ein</span><span class="p">,</span> <span class="n">local_axis</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">)</span>
-    <span class="n">k_out_global</span> <span class="o">=</span> <span class="n">wavevector_with_length</span><span class="p">(</span><span class="n">thout</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">eout</span><span class="p">,</span> <span class="n">local_axis</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;out&#39;</span><span class="p">)</span>
+    <span class="n">k_in_global</span> <span class="o">=</span> <span class="n">wavevector_with_length</span><span class="p">(</span><span class="n">thin</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">ein</span><span class="p">,</span> <span class="n">local_axis</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">'in'</span><span class="p">)</span>
+    <span class="n">k_out_global</span> <span class="o">=</span> <span class="n">wavevector_with_length</span><span class="p">(</span><span class="n">thout</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">eout</span><span class="p">,</span> <span class="n">local_axis</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">'out'</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">k_in_global</span><span class="p">,</span> <span class="n">k_out_global</span></div>
 
@@ -427,8 +427,8 @@
 
 <div class="viewcode-block" id="linear_polvec">
 <a class="viewcode-back" href="../../reference/photon_transition.html#edrixs.photon_transition.linear_polvec">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">linear_polvec</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">local_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">linear_polvec</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">local_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">'in'</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Return linear polarization vector.</span>
 
 <span class="sd">    Parameters</span>
@@ -453,21 +453,21 @@
 <span class="sd">    direction: string</span>
 <span class="sd">        The direction of photon wave, options can be</span>
 
-<span class="sd">        - &#39;in&#39;: incident photon</span>
+<span class="sd">        - 'in': incident photon</span>
 
-<span class="sd">        - &#39;out&#39;: scattered photon</span>
+<span class="sd">        - 'out': scattered photon</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    polvec: list of 3 float number</span>
 <span class="sd">        The polarization vector.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">local_axis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">local_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">local_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">local_axis</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">direction</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;in&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">direction</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'in'</span><span class="p">:</span>
         <span class="n">polvec</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="n">theta</span><span class="p">),</span>
                       <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="n">theta</span><span class="p">),</span>
@@ -475,7 +475,7 @@
             <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">),</span> <span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="n">polvec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">local_axis</span><span class="p">,</span> <span class="n">polvec</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">direction</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;out&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">direction</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'out'</span><span class="p">:</span>
         <span class="n">polvec</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="n">theta</span><span class="p">),</span>
                       <span class="o">+</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">2.0</span> <span class="o">-</span> <span class="n">theta</span><span class="p">),</span>
@@ -484,7 +484,7 @@
         <span class="p">)</span>
         <span class="n">polvec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">local_axis</span><span class="p">,</span> <span class="n">polvec</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unknown direction in linear_polvec: &quot;</span><span class="p">,</span> <span class="n">direction</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"Unknown direction in linear_polvec: "</span><span class="p">,</span> <span class="n">direction</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">polvec</span></div>
 
@@ -493,7 +493,7 @@
 <div class="viewcode-block" id="dipole_polvec_rixs">
 <a class="viewcode-back" href="../../reference/photon_transition.html#edrixs.photon_transition.dipole_polvec_rixs">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">dipole_polvec_rixs</span><span class="p">(</span><span class="n">thin</span><span class="p">,</span> <span class="n">thout</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">beta</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">local_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pol_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Return polarization vector of incident and scattered photons, for RIXS calculation.</span>
 
 <span class="sd">    Parameters</span>
@@ -524,11 +524,11 @@
 <span class="sd">        Specify types of polarization for incident and scattered photons.</span>
 <span class="sd">        case[0] for incident photon, case[1] for scattered photon. Options can be</span>
 
-<span class="sd">        - &#39;linear&#39;: Linear polarization</span>
-<span class="sd">        - &#39;left&#39;  : Left-circular polarization.</span>
-<span class="sd">        - &#39;right&#39; : Right-circular polarization.</span>
+<span class="sd">        - 'linear': Linear polarization</span>
+<span class="sd">        - 'left'  : Left-circular polarization.</span>
+<span class="sd">        - 'right' : Right-circular polarization.</span>
 
-<span class="sd">        It will set pol_type=(&#39;linear&#39;, &#39;linear&#39;) if not provided.</span>
+<span class="sd">        It will set pol_type=('linear', 'linear') if not provided.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -538,36 +538,36 @@
 <span class="sd">    ef_out_global: 3-length complex array</span>
 <span class="sd">        The linear polarization vector of the scattered photon</span>
 <span class="sd">        with respect to the global :math:`xyz` -axis.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">local_axis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">local_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">local_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">local_axis</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">pol_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">pol_type</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="s1">&#39;linear&#39;</span><span class="p">)</span>
+        <span class="n">pol_type</span> <span class="o">=</span> <span class="p">(</span><span class="s1">'linear'</span><span class="p">,</span> <span class="s1">'linear'</span><span class="p">)</span>
 
-    <span class="n">ex</span> <span class="o">=</span> <span class="n">linear_polvec</span><span class="p">(</span><span class="n">thin</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">local_axis</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">)</span>
-    <span class="n">ey</span> <span class="o">=</span> <span class="n">linear_polvec</span><span class="p">(</span><span class="n">thin</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">local_axis</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">pol_type</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span><span class="p">:</span>
-        <span class="n">ei_global</span> <span class="o">=</span> <span class="n">linear_polvec</span><span class="p">(</span><span class="n">thin</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">local_axis</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">pol_type</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;left&#39;</span><span class="p">:</span>
+    <span class="n">ex</span> <span class="o">=</span> <span class="n">linear_polvec</span><span class="p">(</span><span class="n">thin</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">local_axis</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">'in'</span><span class="p">)</span>
+    <span class="n">ey</span> <span class="o">=</span> <span class="n">linear_polvec</span><span class="p">(</span><span class="n">thin</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">local_axis</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">'in'</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">pol_type</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'linear'</span><span class="p">:</span>
+        <span class="n">ei_global</span> <span class="o">=</span> <span class="n">linear_polvec</span><span class="p">(</span><span class="n">thin</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">local_axis</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">'in'</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">pol_type</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'left'</span><span class="p">:</span>
         <span class="n">ei_global</span> <span class="o">=</span> <span class="p">(</span><span class="n">ex</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">ey</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">pol_type</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;right&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">pol_type</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'right'</span><span class="p">:</span>
         <span class="n">ei_global</span> <span class="o">=</span> <span class="p">(</span><span class="n">ex</span> <span class="o">-</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">ey</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unknown polarization type for incident photon: &quot;</span><span class="p">,</span> <span class="n">pol_type</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"Unknown polarization type for incident photon: "</span><span class="p">,</span> <span class="n">pol_type</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
-    <span class="n">ex</span> <span class="o">=</span> <span class="n">linear_polvec</span><span class="p">(</span><span class="n">thout</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">local_axis</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;out&#39;</span><span class="p">)</span>
-    <span class="n">ey</span> <span class="o">=</span> <span class="n">linear_polvec</span><span class="p">(</span><span class="n">thout</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">local_axis</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;out&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">pol_type</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span><span class="p">:</span>
-        <span class="n">ef_global</span> <span class="o">=</span> <span class="n">linear_polvec</span><span class="p">(</span><span class="n">thout</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">local_axis</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;out&#39;</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">pol_type</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;left&#39;</span><span class="p">:</span>
+    <span class="n">ex</span> <span class="o">=</span> <span class="n">linear_polvec</span><span class="p">(</span><span class="n">thout</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">local_axis</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">'out'</span><span class="p">)</span>
+    <span class="n">ey</span> <span class="o">=</span> <span class="n">linear_polvec</span><span class="p">(</span><span class="n">thout</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">local_axis</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">'out'</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">pol_type</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'linear'</span><span class="p">:</span>
+        <span class="n">ef_global</span> <span class="o">=</span> <span class="n">linear_polvec</span><span class="p">(</span><span class="n">thout</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">local_axis</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">'out'</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">pol_type</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'left'</span><span class="p">:</span>
         <span class="n">ef_global</span> <span class="o">=</span> <span class="p">(</span><span class="n">ex</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">ey</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">pol_type</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;right&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">pol_type</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'right'</span><span class="p">:</span>
         <span class="n">ef_global</span> <span class="o">=</span> <span class="p">(</span><span class="n">ex</span> <span class="o">-</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">ey</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unknown polarization type for scattered photon: &quot;</span><span class="p">,</span> <span class="n">pol_type</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"Unknown polarization type for scattered photon: "</span><span class="p">,</span> <span class="n">pol_type</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="n">ei_global</span><span class="p">,</span> <span class="n">ef_global</span></div>
 
@@ -575,8 +575,8 @@
 
 <div class="viewcode-block" id="dipole_polvec_xas">
 <a class="viewcode-back" href="../../reference/photon_transition.html#edrixs.photon_transition.dipole_polvec_xas">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">dipole_polvec_xas</span><span class="p">(</span><span class="n">thin</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">local_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pol_type</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">dipole_polvec_xas</span><span class="p">(</span><span class="n">thin</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">local_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">pol_type</span><span class="o">=</span><span class="s1">'linear'</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Return the linear polarization vector of incident photons, for XAS calculation.</span>
 
 <span class="sd">    Parameters</span>
@@ -600,31 +600,31 @@
 <span class="sd">        It will be an identity matrix if not provided.</span>
 <span class="sd">    pol_type: string</span>
 
-<span class="sd">        - &#39;linear&#39;: Linear polarization.</span>
-<span class="sd">        - &#39;left&#39;  : Left-circular polarization.</span>
-<span class="sd">        - &#39;right&#39; : Right-circular polarization.</span>
+<span class="sd">        - 'linear': Linear polarization.</span>
+<span class="sd">        - 'left'  : Left-circular polarization.</span>
+<span class="sd">        - 'right' : Right-circular polarization.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    ei_global: 3-length float array</span>
 <span class="sd">        The linear polarization vector of the incident photon, with resepct to the</span>
 <span class="sd">        global :math:`xyz` -axis.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
     <span class="k">if</span> <span class="n">local_axis</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">local_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">local_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">local_axis</span><span class="p">)</span>
 
-    <span class="n">ex</span> <span class="o">=</span> <span class="n">linear_polvec</span><span class="p">(</span><span class="n">thin</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">local_axis</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">)</span>
-    <span class="n">ey</span> <span class="o">=</span> <span class="n">linear_polvec</span><span class="p">(</span><span class="n">thin</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">local_axis</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">pol_type</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;linear&#39;</span><span class="p">:</span>
-        <span class="n">ei_global</span> <span class="o">=</span> <span class="n">linear_polvec</span><span class="p">(</span><span class="n">thin</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">local_axis</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">&#39;in&#39;</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">pol_type</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;left&#39;</span><span class="p">:</span>
+    <span class="n">ex</span> <span class="o">=</span> <span class="n">linear_polvec</span><span class="p">(</span><span class="n">thin</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">local_axis</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">'in'</span><span class="p">)</span>
+    <span class="n">ey</span> <span class="o">=</span> <span class="n">linear_polvec</span><span class="p">(</span><span class="n">thin</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">local_axis</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">'in'</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">pol_type</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'linear'</span><span class="p">:</span>
+        <span class="n">ei_global</span> <span class="o">=</span> <span class="n">linear_polvec</span><span class="p">(</span><span class="n">thin</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">local_axis</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">'in'</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">pol_type</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'left'</span><span class="p">:</span>
         <span class="n">ei_global</span> <span class="o">=</span> <span class="p">(</span><span class="n">ex</span> <span class="o">+</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">ey</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
-    <span class="k">elif</span> <span class="n">pol_type</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;right&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">pol_type</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'right'</span><span class="p">:</span>
         <span class="n">ei_global</span> <span class="o">=</span> <span class="p">(</span><span class="n">ex</span> <span class="o">-</span> <span class="mi">1</span><span class="n">j</span> <span class="o">*</span> <span class="n">ey</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unknown polarization type for incident photon: &quot;</span><span class="p">,</span> <span class="n">pol_type</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"Unknown polarization type for incident photon: "</span><span class="p">,</span> <span class="n">pol_type</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">ei_global</span></div>
 
@@ -633,7 +633,7 @@
 <div class="viewcode-block" id="quadrupole_polvec">
 <a class="viewcode-back" href="../../reference/photon_transition.html#edrixs.photon_transition.quadrupole_polvec">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">quadrupole_polvec</span><span class="p">(</span><span class="n">polvec</span><span class="p">,</span> <span class="n">wavevec</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Given dipolar polarization vector and wave-vector, return quadrupolar polarization vector.</span>
 
 <span class="sd">    Parameters</span>
@@ -648,7 +648,7 @@
 <span class="sd">    -------</span>
 <span class="sd">    quad_vec: 5 elements of float array</span>
 <span class="sd">        Quadrupolar polarization vector.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="n">quad_vec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
     <span class="n">kvec</span> <span class="o">=</span> <span class="n">wavevec</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">wavevec</span><span class="p">,</span> <span class="n">wavevec</span><span class="p">))</span>
