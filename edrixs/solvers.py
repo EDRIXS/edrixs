@@ -24,7 +24,9 @@ from .photon_transition import (
 )
 from .coulomb_utensor import get_umat_slater
 from .manybody_operator import two_fermion, four_fermion
-from .fock_basis import build_fock_basis, get_fock_bin_by_N, write_fock_dec_by_N
+from .fock_basis import (
+    FockBasisSpec, build_fock_basis, get_fock_bin_by_N, write_fock_dec_by_N
+)
 from .basis_transform import cb_op2, tmat_r2c, cb_op
 from .utils import info_atomic_shell, slater_integrals_name, boltz_dist
 from .rixs_utils import scattering_mat
@@ -32,6 +34,7 @@ from .plot_spectrum import get_spectra_from_poles, merge_pole_dicts
 from .soc import atom_hsoc
 from .petsc_backend import petsc_backend
 from .scipy_backend import scipy_backend
+from .fortran_backend import fortran_backend
 from ._solvers_helpers import (
     _ed_1or2_valence_1core,
     _infer_backend,
@@ -100,10 +103,15 @@ def build_op(emat, umat, lb, rb=None, *, backend='scipy',
             build_op_backend = scipy_backend.build_op_dense
         case 'petsc':
             build_op_backend = petsc_backend.build_op_petsc
+        case 'fortran':
+            raise ValueError(
+                "the 'fortran' backend builds all operators together; call "
+                "get_ops(..., backend='fortran')"
+            )
         case _:
             raise ValueError(
-                "Unknown backend {!r}; expected 'scipy', 'dense', or "
-                "'petsc'".format(backend)
+                "Unknown backend {!r}; expected 'scipy', 'dense', 'petsc', or "
+                "'fortran'".format(backend)
             )
 
     lb = build_fock_basis(lb, method=basis_method)
@@ -133,8 +141,11 @@ def get_ops(
     emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
         Backend-neutral problem definition returned by :mod:`edrixs.models`
         model functions.
-    backend : {'scipy', 'dense', 'petsc'}, optional
+    backend : {'scipy', 'dense', 'petsc', 'fortran'}, optional
         Backend used for the returned operators. The default is ``'scipy'``.
+        The ``'fortran'`` backend writes the whole problem to native files in
+        the working directory and returns on-disk markers; ``basis_method`` and
+        ``use_numba`` do not apply to it.
     basis_method : {'combinadic', 'explicit'}, optional
         Basis representation constructed from the model metadata. The default
         is ``'combinadic'``.
@@ -150,6 +161,15 @@ def get_ops(
         Initial/final Hamiltonian, intermediate Hamiltonian, and transition
         operators for the selected backend.
     """
+    if backend == 'fortran':
+        trans_mat = np.asarray(trans_mat)
+        if trans_mat.ndim != 3:
+            raise ValueError("trans_mat must be a three-dimensional array")
+        return fortran_backend.write_problem(
+            emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
+            backend_kws=backend_kws,
+        )
+
     basis_i = build_fock_basis(basis_i, method=basis_method)
     basis_n = build_fock_basis(basis_n, method=basis_method)
 
@@ -165,12 +185,36 @@ def get_ops(
     trans_mat = np.asarray(trans_mat)
     if trans_mat.ndim != 3:
         raise ValueError("trans_mat must be a three-dimensional array")
+
+    # model_* follows the legacy Fortran Hilbert-space convention: the initial
+    # basis contains valence orbitals only, whereas the transition operator is
+    # defined in the full valence+core orbital space.  For operator construction
+    # only, lift the initial basis by appending one completely filled core
+    # sector.  Its dimension is one, so this preserves the initial basis
+    # dimension and column ordering exactly.
+    trans_basis_i = basis_i
+    if basis_n.norbs > basis_i.norbs:
+        core_norb = basis_n.norbs - basis_i.norbs
+        if getattr(basis_i, 'spec', None) is None:
+            raise ValueError(
+                "cannot construct a valence-to-core transition from an "
+                "unstructured initial Fock basis"
+            )
+        lifted_spec = FockBasisSpec(
+            basis_i.spec.shapes + ((core_norb, core_norb),)
+        )
+        trans_basis_i = build_fock_basis(lifted_spec, method=basis_method)
+    elif basis_n.norbs < basis_i.norbs:
+        raise ValueError(
+            "intermediate basis cannot have fewer orbitals than initial basis"
+        )
+
     trans_ops = [
         build_op(
             component,
             None,
             basis_n,
-            basis_i,
+            trans_basis_i,
             backend=backend,
             use_numba=use_numba, backend_kws=backend_kws,
         )
@@ -207,10 +251,12 @@ def ed(hmat_i, num_evals=1, *, backend=None, backend_kws=None):
             ed_backend = scipy_backend.ed_dense
         case 'petsc':
             ed_backend = petsc_backend.ed_petsc
+        case 'fortran':
+            ed_backend = fortran_backend.ed_fortran
         case _:
             raise ValueError(
-                "Unknown backend {!r}; expected 'scipy', 'dense', or "
-                "'petsc'".format(backend_name)
+                "Unknown backend {!r}; expected 'scipy', 'dense', 'petsc', or "
+                "'fortran'".format(backend_name)
             )
 
     return ed_backend(
@@ -242,10 +288,12 @@ def xas(eval_i, evec_i, hmat_n, trans_op, ominc, *,
             xas_backend = scipy_backend.xas_dense
         case 'petsc':
             xas_backend = petsc_backend.xas_petsc
+        case 'fortran':
+            xas_backend = fortran_backend.xas_fortran
         case _:
             raise ValueError(
-                "Unknown backend {!r}; expected 'scipy', 'dense', or "
-                "'petsc'".format(backend_name)
+                "Unknown backend {!r}; expected 'scipy', 'dense', 'petsc', or "
+                "'fortran'".format(backend_name)
             )
 
     return xas_backend(
@@ -288,10 +336,12 @@ def rixs(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
             rixs_backend = scipy_backend.rixs_dense
         case 'petsc':
             rixs_backend = petsc_backend.rixs_petsc
+        case 'fortran':
+            rixs_backend = fortran_backend.rixs_fortran
         case _:
             raise ValueError(
-                "Unknown backend {!r}; expected 'scipy', 'dense', or "
-                "'petsc'".format(backend_name)
+                "Unknown backend {!r}; expected 'scipy', 'dense', 'petsc', or "
+                "'fortran'".format(backend_name)
             )
 
     return rixs_backend(

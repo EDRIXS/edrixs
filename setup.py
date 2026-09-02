@@ -126,7 +126,10 @@ setup(
         "Programming Language :: Python :: 3",
     ],
     ext_modules=[
-        CMakeExtension("edrixs.placeholder")
-    ],  # edrixs.foo puts build outputs under edrixs subdir
+        # This must name CMake's actual output.  A placeholder makes modern
+        # setuptools attempt to copy a nonexistent placeholder extension
+        # after the CMake build succeeds.
+        CMakeExtension("edrixs.fedrixs")
+    ],
     cmdclass={"build_ext": cmake_build_ext},
 )

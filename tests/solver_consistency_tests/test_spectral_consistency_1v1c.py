@@ -5,11 +5,13 @@ XAS/RIXS drivers, then compare complete spectra or outputs with the existing
 dense Python path.  They are not isolated unit tests.
 """
 
+import shutil
+
 import numpy as np
 import pytest
 from numpy.testing import assert_allclose
 
-from edrixs.solvers import rixs, rixs_1v1c_py, xas, xas_1v1c_py
+from edrixs.solvers import ed, get_ops, rixs, rixs_1v1c_py, xas, xas_1v1c_py
 
 from ._helpers import exact_1v1c_reference_data
 
@@ -19,6 +21,81 @@ pytestmark = [
         "ignore:.*is deprecated; use .* instead.:DeprecationWarning"
     ),
 ]
+
+_FORTRAN_SOLVERS = ('ed.x', 'xas.x', 'rixs.x')
+_FORTRAN_SOLVERS_AVAILABLE = all(shutil.which(command) for command in _FORTRAN_SOLVERS)
+
+
+@pytest.mark.skipif(
+    not _FORTRAN_SOLVERS_AVAILABLE,
+    reason='requires ed.x, xas.x, and rixs.x on PATH',
+)
+def test_fortran_xas_matches_existing_dense_solver(small_1v1c_problem, tmp_path, monkeypatch):
+    """Compare the disk-backed Fortran XAS workflow with dense Python XAS."""
+    monkeypatch.chdir(tmp_path)
+    _, scipy_hmat_n, _, eval_i, _, eval_n, trans_eig = exact_1v1c_reference_data(
+        small_1v1c_problem
+    )
+    hmat_i, hmat_n, transitions = get_ops(
+        *small_1v1c_problem, backend='fortran'
+    )
+    fortran_eval_i, fortran_evec_i = ed(
+        hmat_i, num_evals=1, backend_kws={'ed_solver': 0, 'nvector': 1}
+    )
+    center = float(np.median(eval_n) - eval_i[0])
+    ominc = np.linspace(center - 0.8, center + 0.8, 9)
+    pol_type = [('linear', 0.2), ('isotropic', 0.0)]
+
+    fortran_result = xas(
+        fortran_eval_i, fortran_evec_i, hmat_n, transitions, ominc,
+        gamma_c=0.25, thin=0.7, phi=0.1, pol_type=pol_type,
+        temperature=20.0, backend='fortran',
+        backend_kws={'num_gs': 1, 'nkryl': scipy_hmat_n.shape[0]},
+    )
+    dense_result = xas_1v1c_py(
+        eval_i, eval_n, trans_eig, ominc,
+        gamma_c=0.25, thin=0.7, phi=0.1, pol_type=pol_type,
+        gs_list=[0], temperature=20.0,
+    )
+
+    assert_allclose(fortran_result, dense_result, rtol=2e-7, atol=2e-9)
+
+
+@pytest.mark.skipif(
+    not _FORTRAN_SOLVERS_AVAILABLE,
+    reason='requires ed.x, xas.x, and rixs.x on PATH',
+)
+def test_fortran_rixs_matches_existing_dense_solver(small_1v1c_problem, tmp_path, monkeypatch):
+    """Compare the disk-backed Fortran RIXS workflow with dense Python RIXS."""
+    monkeypatch.chdir(tmp_path)
+    _, scipy_hmat_n, _, eval_i, _, eval_n, trans_eig = exact_1v1c_reference_data(
+        small_1v1c_problem
+    )
+    hmat_i, hmat_n, transitions = get_ops(
+        *small_1v1c_problem, backend='fortran'
+    )
+    fortran_eval_i, fortran_evec_i = ed(
+        hmat_i, num_evals=1, backend_kws={'ed_solver': 0, 'nvector': 1}
+    )
+    center = float(np.median(eval_n) - eval_i[0])
+    ominc = np.array([center - 0.2, center + 0.25])
+    eloss = np.linspace(-0.4, 1.2, 11)
+    pol_type = [('linear', 0.1, 'linear', -0.3)]
+
+    fortran_result = rixs(
+        fortran_eval_i, fortran_evec_i, hmat_i, hmat_n, transitions,
+        ominc, eloss, gamma_c=0.25, gamma_f=0.08, thin=0.7,
+        thout=1.1, phi=0.2, pol_type=pol_type, temperature=20.0,
+        backend='fortran',
+        backend_kws={'num_gs': 1, 'nkryl': scipy_hmat_n.shape[0]},
+    )
+    dense_result = rixs_1v1c_py(
+        eval_i, eval_n, trans_eig, ominc, eloss,
+        gamma_c=0.25, gamma_f=0.08, thin=0.7, thout=1.1, phi=0.2,
+        pol_type=pol_type, gs_list=[0], temperature=20.0,
+    )
+
+    assert_allclose(fortran_result, dense_result, rtol=2e-6, atol=2e-8)
 
 
 def test_public_xas_matches_existing_dense_solver(small_1v1c_problem):
