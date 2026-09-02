@@ -32,6 +32,7 @@ from .plot_spectrum import get_spectra_from_poles, merge_pole_dicts
 from .soc import atom_hsoc
 from .petsc_backend import petsc_backend
 from .scipy_backend import scipy_backend
+from .fortran_backend import fortran_backend
 from ._solvers_helpers import (
     _ed_1or2_valence_1core,
     _infer_backend,
@@ -100,10 +101,15 @@ def build_op(emat, umat, lb, rb=None, *, backend='scipy',
             build_op_backend = scipy_backend.build_op_dense
         case 'petsc':
             build_op_backend = petsc_backend.build_op_petsc
+        case 'fortran':
+            raise ValueError(
+                "The Fortran backend writes a complete problem through get_ops; "
+                "build_op is not available for backend='fortran'"
+            )
         case _:
             raise ValueError(
                 "Unknown backend {!r}; expected 'scipy', 'dense', or "
-                "'petsc'".format(backend)
+                "'petsc', or 'fortran'".format(backend)
             )
 
     lb = build_fock_basis(lb, method=basis_method)
@@ -133,7 +139,7 @@ def get_ops(
     emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
         Backend-neutral problem definition returned by :mod:`edrixs.models`
         model functions.
-    backend : {'scipy', 'dense', 'petsc'}, optional
+    backend : {'scipy', 'dense', 'petsc', 'fortran'}, optional
         Backend used for the returned operators. The default is ``'scipy'``.
     basis_method : {'combinadic', 'explicit'}, optional
         Basis representation constructed from the model metadata. The default
@@ -141,8 +147,13 @@ def get_ops(
     use_numba : bool, optional
         JIT-compile matrix-entry construction. The default is False.
     backend_kws : mapping, optional
-        Backend-specific operator-construction options. For the SciPy and
-        dense compatibility backends this includes ``tol``.
+        Backend-specific operator-construction options. Solver calls for the
+        Fortran backend accept ``ed_executable``, ``xas_executable``, and
+        ``rixs_executable``. ``comm`` selects the parent mpi4py communicator.
+        With a multi-rank ``comm``, every rank must make each Fortran-backend
+        call collectively; rank zero spawns the standalone solver with the
+        parent communicator size. The MPI allocation must have enough spare
+        slots for those child processes (or permit oversubscription).
 
     Returns
     -------
@@ -150,6 +161,12 @@ def get_ops(
         Initial/final Hamiltonian, intermediate Hamiltonian, and transition
         operators for the selected backend.
     """
+    if backend == 'fortran':
+        return fortran_backend.write_problem(
+            emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
+            backend_kws=backend_kws,
+        )
+
     basis_i = build_fock_basis(basis_i, method=basis_method)
     basis_n = build_fock_basis(basis_n, method=basis_method)
 
@@ -207,10 +224,12 @@ def ed(hmat_i, num_evals=1, *, backend=None, backend_kws=None):
             ed_backend = scipy_backend.ed_dense
         case 'petsc':
             ed_backend = petsc_backend.ed_petsc
+        case 'fortran':
+            ed_backend = fortran_backend.ed_fortran
         case _:
             raise ValueError(
                 "Unknown backend {!r}; expected 'scipy', 'dense', or "
-                "'petsc'".format(backend_name)
+                "'petsc', or 'fortran'".format(backend_name)
             )
 
     return ed_backend(
@@ -242,10 +261,12 @@ def xas(eval_i, evec_i, hmat_n, trans_op, ominc, *,
             xas_backend = scipy_backend.xas_dense
         case 'petsc':
             xas_backend = petsc_backend.xas_petsc
+        case 'fortran':
+            xas_backend = fortran_backend.xas_fortran
         case _:
             raise ValueError(
                 "Unknown backend {!r}; expected 'scipy', 'dense', or "
-                "'petsc'".format(backend_name)
+                "'petsc', or 'fortran'".format(backend_name)
             )
 
     return xas_backend(
@@ -288,10 +309,12 @@ def rixs(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
             rixs_backend = scipy_backend.rixs_dense
         case 'petsc':
             rixs_backend = petsc_backend.rixs_petsc
+        case 'fortran':
+            rixs_backend = fortran_backend.rixs_fortran
         case _:
             raise ValueError(
                 "Unknown backend {!r}; expected 'scipy', 'dense', or "
-                "'petsc'".format(backend_name)
+                "'petsc', or 'fortran'".format(backend_name)
             )
 
     return rixs_backend(

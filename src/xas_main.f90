@@ -7,12 +7,14 @@ program xas_main
     implicit none
  
     integer :: ierror
+    integer :: parent_comm
     integer :: color
     integer :: key
     integer :: min_dim
 
     origin_comm = MPI_COMM_WORLD
     call MPI_INIT(ierror)
+    call MPI_COMM_GET_PARENT(parent_comm, ierror)
     call MPI_COMM_RANK(origin_comm, origin_myid,   ierror)
     call MPI_COMM_SIZE(origin_comm, origin_nprocs, ierror)
     call MPI_BARRIER(origin_comm, ierror)
@@ -51,6 +53,7 @@ program xas_main
     endif
 
     call MPI_BARRIER(origin_comm, ierror)
+    if (parent_comm /= MPI_COMM_NULL) call MPI_COMM_DISCONNECT(parent_comm, ierror)
     call MPI_FINALIZE(ierror)
 
 end program xas_main

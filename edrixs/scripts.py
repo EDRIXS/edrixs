@@ -1,46 +1,38 @@
-def ed():
+def _run_solver(solver):
+    """Call an f2py solver and detach cleanly when MPI-spawned."""
     from mpi4py import MPI
-    from .fedrixs import ed_fsolver
 
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
     size = comm.Get_size()
     fcomm = comm.py2f()
+    try:
+        solver(fcomm, rank, size)
+    finally:
+        parent = MPI.Comm.Get_parent()
+        if parent != MPI.COMM_NULL:
+            parent.Disconnect()
 
-    ed_fsolver(fcomm, rank, size)
+
+def ed():
+    from .fedrixs import ed_fsolver
+
+    _run_solver(ed_fsolver)
 
 
 def xas():
-    from mpi4py import MPI
     from .fedrixs import xas_fsolver
 
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    size = comm.Get_size()
-    fcomm = comm.py2f()
-
-    xas_fsolver(fcomm, rank, size)
+    _run_solver(xas_fsolver)
 
 
 def rixs():
-    from mpi4py import MPI
     from .fedrixs import rixs_fsolver
 
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    size = comm.Get_size()
-    fcomm = comm.py2f()
-
-    rixs_fsolver(fcomm, rank, size)
+    _run_solver(rixs_fsolver)
 
 
 def opavg():
-    from mpi4py import MPI
     from .fedrixs import opavg_fsolver
 
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    size = comm.Get_size()
-    fcomm = comm.py2f()
-
-    opavg_fsolver(fcomm, rank, size)
+    _run_solver(opavg_fsolver)
