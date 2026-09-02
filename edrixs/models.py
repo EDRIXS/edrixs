@@ -14,7 +14,6 @@ from .angular_momentum import get_wigner_dmat, rmat_to_euler
 from .basis_transform import cb_op, tmat_r2c
 from .coulomb_utensor import get_umat_slater, get_umat_slater_3shells
 from .fock_basis import FockBasisSpec
-from .iostream import write_emat, write_umat
 from .photon_transition import get_trans_oper
 from .soc import atom_hsoc
 from .utils import info_atomic_shell, slater_integrals_name
@@ -29,9 +28,20 @@ from ._solvers_helpers import (
 __all__ = ['model_1v1c', 'model_2v1c', 'model_siam']
 
 
+def _print_slater_summary(slater_name, slater_i, slater_n):
+    """Print the initial/intermediate Slater-integral table."""
+    print()
+    print("    Summary of Slater integrals:")
+    print("    ------------------------------")
+    print("    Terms,   Initial Hamiltonian,  Intermediate Hamiltonian")
+    for name, s_i, s_n in zip(slater_name, slater_i, slater_n):
+        print("    ", name, ":  {:20.10f}{:20.10f}".format(s_i, s_n))
+    print()
+
+
 def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
                v_noccu=1, slater=None, ext_B=None, on_which='spin',
-               v_cfmat=None, v_othermat=None, loc_axis=None, verbose=0,
+               v_cfmat=None, v_othermat=None, loc_axis=None, verbose=False,
                sparse_U=False, tol=1E-10):
     """
     Set up orbital-space data and Fock-basis metadata for a 1v1c problem.
@@ -48,8 +58,12 @@ def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
         Names of the valence and core shells.
 
     shell_level, v_soc, c_soc, v_noccu, slater, ext_B, on_which,
-    v_cfmat, v_othermat, loc_axis, verbose
+    v_cfmat, v_othermat, loc_axis
         Same physical model parameters as ed_1v1c_py.
+
+    verbose : bool, optional
+        If True, print a setup summary (Slater integrals and Hilbert-space
+        dimensions). Default False.
 
     sparse_U : bool, optional
         If False, return dense rank-4 Coulomb tensors. If True, return each
@@ -66,7 +80,8 @@ def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
         Backend-independent problem definition. ``basis_i`` and ``basis_n`` are
         compact Fock-basis specifications; trans_mat has shape (npol, ntot, ntot).
     """
-    print("edrixs >>> Setting up 1v1c problem ...")
+    if verbose:
+        print("edrixs >>> Setting up 1v1c problem ...")
 
     v_name_options = ['s', 'p', 't2g', 'd', 'f']
     c_name_options = ['s', 'p', 'p12', 'p32', 't2g', 'd', 'd32', 'd52',
@@ -110,15 +125,8 @@ def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
         else:
             slater_n[:] = slater[1][0:nslat]
 
-    print()
-    print("    Summary of Slater integrals:")
-    print("    ------------------------------")
-    print("    Terms,   Initial Hamiltonian,  Intermediate Hamiltonian")
-    for i in range(nslat):
-        print("    ", slater_name[i], ":  {:20.10f}{:20.10f}".format(
-            slater_i[i], slater_n[i]
-        ))
-    print()
+    if verbose:
+        _print_slater_summary(slater_name, slater_i, slater_n)
 
     case = v_name + c_name
     umat_i_full = get_umat_slater(case, *slater_i)
@@ -128,10 +136,6 @@ def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
         0:v_norb, 0:v_norb, 0:v_norb, 0:v_norb
     ]
     umat_n = get_umat_slater(case, *slater_n)
-
-    if verbose > 0:
-        write_umat(umat_i, 'coulomb_i.in')
-        write_umat(umat_n, 'coulomb_n.in')
 
     if sparse_U:
         umat_i = _umat_dense_to_sparse(umat_i, tol=tol)
@@ -191,16 +195,13 @@ def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
         emat_i[0:v_norb, 0:v_norb] += zeeman
         emat_n[0:v_norb, 0:v_norb] += zeeman
 
-    if verbose > 0:
-        write_emat(emat_i, 'hopping_i.in')
-        write_emat(emat_n, 'hopping_n.in')
-
     # Fock-basis metadata.
     basis_i = FockBasisSpec.from_args(v_norb, v_noccu)
     basis_n = FockBasisSpec.from_args(v_norb, v_noccu + 1, c_norb, c_norb - 1)
 
-    print("edrixs >>> Dimension of the initial Hamiltonian: ", len(basis_i))
-    print("edrixs >>> Dimension of the intermediate Hamiltonian: ", len(basis_n))
+    if verbose:
+        print("edrixs >>> Dimension of the initial Hamiltonian: ", len(basis_i))
+        print("edrixs >>> Dimension of the intermediate Hamiltonian: ", len(basis_n))
 
     # Transition operators in local coordinates, rotated to global coordinates.
     if loc_axis is not None:
@@ -233,7 +234,8 @@ def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
     for i in range(npol):
         trans_mat[i, 0:v_norb, v_norb:ntot] = tmp_g[i]
 
-    print("edrixs >>> 1v1c setup Done !")
+    if verbose:
+        print("edrixs >>> 1v1c setup Done !")
 
     return emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
 
@@ -244,7 +246,7 @@ def model_2v1c(
     v1_ext_B=None, v2_ext_B=None, v1_on_which='spin',
     v2_on_which='spin', v1_cfmat=None, v2_cfmat=None,
     v1_othermat=None, v2_othermat=None, hopping_v1v2=None,
-    trans_to_which=1, loc_axis=None, verbose=0, sparse_U=False, tol=1E-10
+    trans_to_which=1, loc_axis=None, verbose=False, sparse_U=False, tol=1E-10
 ):
     """
     Set up orbital-space data and Fock-basis metadata for a 2v1c problem.
@@ -255,12 +257,19 @@ def model_2v1c(
     the returned Coulomb tensors are sparse flattened matrices rather than
     dense rank-4 arrays.
 
+    Parameters
+    ----------
+    verbose : bool, optional
+        If True, print a setup summary (Slater integrals and Hilbert-space
+        dimensions). Default False.
+
     Returns
     -------
     emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
         These can be passed directly to ``get_ops`` with the SciPy or dense backend.
     """
-    print("edrixs >>> Setting up 2v1c problem ...")
+    if verbose:
+        print("edrixs >>> Setting up 2v1c problem ...")
 
     v_name_options = ['s', 'p', 't2g', 'd', 'f']
     c_name_options = [
@@ -310,15 +319,8 @@ def model_2v1c(
         else:
             slater_n[:] = slater[1][0:nslat]
 
-    print()
-    print("    Summary of Slater integrals:")
-    print("    ------------------------------")
-    print("    Terms,   Initial Hamiltonian,  Intermediate Hamiltonian")
-    for i in range(nslat):
-        print("    ", slater_name[i], ":  {:20.10f}{:20.10f}".format(
-            slater_i[i], slater_n[i]
-        ))
-    print()
+    if verbose:
+        _print_slater_summary(slater_name, slater_i, slater_n)
 
     umat_i_full = get_umat_slater_3shells(
         (v1_name, v2_name, c_name), *slater_i
@@ -330,10 +332,6 @@ def model_2v1c(
     umat_n = get_umat_slater_3shells(
         (v1_name, v2_name, c_name), *slater_n
     )
-
-    if verbose > 0:
-        write_umat(umat_i, 'coulomb_i.in')
-        write_umat(umat_n, 'coulomb_n.in')
 
     if sparse_U:
         umat_i = _umat_dense_to_sparse(umat_i, tol=tol)
@@ -437,17 +435,14 @@ def model_2v1c(
             np.transpose(hopping_v1v2)
         )
 
-    if verbose > 0:
-        write_emat(emat_i, 'hopping_i.in')
-        write_emat(emat_n, 'hopping_n.in')
-
     basis_i = FockBasisSpec.from_args(v1v2_norb, v_tot_noccu)
     basis_n = FockBasisSpec.from_args(
         v1v2_norb, v_tot_noccu + 1, c_norb, c_norb - 1
     )
 
-    print("edrixs >>> Dimension of the initial Hamiltonian: ", len(basis_i))
-    print("edrixs >>> Dimension of the intermediate Hamiltonian: ", len(basis_n))
+    if verbose:
+        print("edrixs >>> Dimension of the initial Hamiltonian: ", len(basis_i))
+        print("edrixs >>> Dimension of the intermediate Hamiltonian: ", len(basis_n))
 
     if trans_to_which == 1:
         case = v1_name + c_name
@@ -462,7 +457,8 @@ def model_2v1c(
     else:
         raise Exception("Unknown trans_to_which: ", trans_to_which)
 
-    print("edrixs >>> 2v1c setup Done !")
+    if verbose:
+        print("edrixs >>> 2v1c setup Done !")
 
     return emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
 
@@ -472,7 +468,7 @@ def model_siam(
     c_level=0, c_soc=0, trans_c2n=None, imp_mat=None, imp_mat_n=None,
     bath_level=None, bath_level_n=None, hyb=None, hyb_n=None,
     hopping=None, hopping_n=None, slater=None, ext_B=None,
-    on_which='spin', loc_axis=None, verbose=0, sparse_U=False, tol=1E-10
+    on_which='spin', loc_axis=None, verbose=False, sparse_U=False, tol=1E-10
 ):
     """
     Set up orbital-space data and Fock-basis metadata for a SIAM problem.
@@ -483,12 +479,19 @@ def model_siam(
     sparse_U=True, the impurity+core Coulomb tensor is embedded directly into
     the full SIAM orbital space as a sparse flattened matrix.
 
+    Parameters
+    ----------
+    verbose : bool, optional
+        If True, print a setup summary (Slater integrals and Hilbert-space
+        dimensions). Default False.
+
     Returns
     -------
     emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
         These can be passed directly to ``get_ops`` with the SciPy or dense backend.
     """
-    print("edrixs >>> Setting up SIAM problem ...")
+    if verbose:
+        print("edrixs >>> Setting up SIAM problem ...")
 
     v_name_options = ['s', 'p', 't2g', 'd', 'f']
     c_name_options = [
@@ -530,15 +533,8 @@ def model_siam(
         else:
             slater_n[:] = slater[1][0:nslat]
 
-    print()
-    print("    Summary of Slater integrals:")
-    print("    ------------------------------")
-    print("    Terms,   Initial Hamiltonian,  Intermediate Hamiltonian")
-    for i in range(nslat):
-        print("    ", slater_name[i], ":  {:20.10f}{:20.10f}".format(
-            slater_i[i], slater_n[i]
-        ))
-    print()
+    if verbose:
+        _print_slater_summary(slater_name, slater_i, slater_n)
 
     umat_tmp_i = get_umat_slater(v_name + c_name, *slater_i)
     umat_tmp_n = get_umat_slater(v_name + c_name, *slater_n)
@@ -563,10 +559,6 @@ def model_siam(
         umat_n = _embed_impurity_core_umat(
             umat_tmp_n, v_norb, c_norb, ntot_v
         )
-
-    if verbose > 0:
-        write_umat(umat_i, 'coulomb_i.in')
-        write_umat(umat_n, 'coulomb_n.in')
 
     emat_i = np.zeros((ntot_v, ntot_v), dtype=complex)
     emat_n = np.zeros((ntot, ntot), dtype=complex)
@@ -663,20 +655,18 @@ def model_siam(
     emat_i[0:ntot_v, 0:ntot_v] += np.eye(ntot_v) * eval_shift
     emat_n[ntot_v:ntot, ntot_v:ntot] += np.eye(c_norb) * c_level
 
-    if verbose > 0:
-        write_emat(emat_i, 'hopping_i.in')
-        write_emat(emat_n, 'hopping_n.in')
-
     basis_i = FockBasisSpec.from_args(ntot_v, v_noccu)
     basis_n = FockBasisSpec.from_args(ntot_v, v_noccu + 1, c_norb, c_norb - 1)
 
-    print("edrixs >>> Dimension of the initial Hamiltonian: ", len(basis_i))
-    print("edrixs >>> Dimension of the intermediate Hamiltonian: ", len(basis_n))
+    if verbose:
+        print("edrixs >>> Dimension of the initial Hamiltonian: ", len(basis_i))
+        print("edrixs >>> Dimension of the intermediate Hamiltonian: ", len(basis_n))
 
     tmp_g = _rotated_transition_blocks(v_name + c_name, loc_axis)
     trans_mat = np.zeros((tmp_g.shape[0], ntot, ntot), dtype=complex)
     trans_mat[:, 0:v_norb, ntot_v:ntot] = tmp_g
 
-    print("edrixs >>> SIAM setup Done !")
+    if verbose:
+        print("edrixs >>> SIAM setup Done !")
 
     return emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat

@@ -39,8 +39,7 @@ class _RootComm:
 class _NonrootComm:
     """Stand-in for a non-root rank receiving rank-zero broadcasts."""
 
-    def __init__(self, directory):
-        self.directory = str(directory)
+    def __init__(self):
         self.barriers = 0
         self.broadcasts = 0
 
@@ -56,9 +55,8 @@ class _NonrootComm:
     def bcast(self, value, root):
         assert root == 0
         self.broadcasts += 1
-        # The first bcast supplies rank zero's working directory, and the
-        # second supplies the successful root-only write result.
-        return self.directory if self.broadcasts == 1 else (True, None)
+        # The only bcast reports the successful root-only write result.
+        return (True, None)
 
 
 def test_parent_mpi_root_collective_broadcasts_values_and_errors():
@@ -73,7 +71,8 @@ def test_parent_mpi_root_collective_broadcasts_values_and_errors():
 
 def test_parent_mpi_nonroot_does_not_write_problem_files(tmp_path, monkeypatch):
     """Only rank zero writes native inputs; non-root returns disk handles."""
-    comm = _NonrootComm(tmp_path)
+    monkeypatch.chdir(tmp_path)
+    comm = _NonrootComm()
 
     def forbidden_write(*args, **kwargs):
         raise AssertionError('non-root wrote a native input file')
@@ -83,8 +82,8 @@ def test_parent_mpi_nonroot_does_not_write_problem_files(tmp_path, monkeypatch):
     hmat_i, hmat_n, transitions = fortran_backend.write_problem(
         *problem, backend_kws={'comm': comm},
     )
-    assert hmat_i.directory == tmp_path
-    assert hmat_n.directory == tmp_path
+    assert fortran_backend.owns_operator_fortran(hmat_i)
+    assert fortran_backend.owns_operator_fortran(hmat_n)
     assert len(transitions) == 5
     assert comm.barriers == 2
 
@@ -98,10 +97,10 @@ def test_parent_mpi_run_uses_one_spawn_and_rejects_launchers(tmp_path, monkeypat
         '_spawn_native',
         lambda command, num_procs: launches.append((command, num_procs)),
     )
-    fortran_backend._run('fake-solver --flag', tmp_path, {}, comm)
+    fortran_backend._run('fake-solver --flag', {}, comm)
     assert launches == [(['fake-solver', '--flag'], 2)]
     with pytest.raises(ValueError, match='Do not use an MPI launcher'):
-        fortran_backend._run('mpirun -np 2 fake-solver', tmp_path, {}, comm)
+        fortran_backend._run('mpirun -np 2 fake-solver', {}, comm)
 
 
 @pytest.mark.skipif(

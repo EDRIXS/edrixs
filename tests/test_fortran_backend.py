@@ -8,8 +8,8 @@ from edrixs.models import model_1v1c
 from edrixs.solvers import ed, get_ops, rixs, xas
 
 
-def _write_poles(directory, stem):
-    (directory / f'{stem}.1').write_text(
+def _write_poles(stem):
+    Path(f'{stem}.1').write_text(
         'npoles 1\n'
         'eigval 0.0\n'
         'norm 1.0\n'
@@ -22,15 +22,15 @@ def test_fortran_backend_uses_native_files_and_executables(tmp_path, monkeypatch
     monkeypatch.chdir(tmp_path)
     calls = []
 
-    def fake_run(command, cwd, check, shell):
-        calls.append(((command,), Path(cwd)))
+    def fake_run(command, check, shell):
+        calls.append(command)
         program = command
         if program == 'fake-ed':
-            (Path(cwd) / 'eigvals.dat').write_text('1 -0.25\n')
+            Path('eigvals.dat').write_text('1 -0.25\n')
         elif program == 'fake-xas':
-            _write_poles(Path(cwd), 'xas_poles')
+            _write_poles('xas_poles')
         elif program == 'fake-rixs':
-            _write_poles(Path(cwd), 'rixs_poles')
+            _write_poles('rixs_poles')
 
     monkeypatch.setattr('edrixs.fortran_backend.fortran_backend.subprocess.run', fake_run)
     problem = model_1v1c(('s', 's'), v_noccu=1)
@@ -62,7 +62,6 @@ def test_fortran_backend_uses_native_files_and_executables(tmp_path, monkeypatch
 
     assert absorption.shape == (1, 1)
     assert scattering.shape == (1, 1, 1)
-    assert [call[0][0] for call in calls] == (
+    assert calls == (
         ['fake-ed'] + ['fake-xas'] * len(transitions) + ['fake-rixs']
     )
-    assert all(call[1] == tmp_path for call in calls)
