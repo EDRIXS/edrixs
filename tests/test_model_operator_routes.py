@@ -86,9 +86,9 @@ def test_all_model_functions_return_compact_basis_metadata():
     ]
 
     expected_shapes = [
-        (((6, 1), (2, 2)), ((6, 2), (2, 1))),
-        (((4, 1), (6, 6)), ((4, 2), (6, 5))),
-        (((4, 1), (6, 6)), ((4, 2), (6, 5))),
+        (((6, 1),), ((6, 2), (2, 1))),
+        (((4, 1),), ((4, 2), (6, 5))),
+        (((4, 1),), ((4, 2), (6, 5))),
     ]
 
     for problem, (initial_shapes, intermediate_shapes) in zip(problems, expected_shapes):
