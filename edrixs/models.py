@@ -87,7 +87,9 @@ def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
     c_norb = info_shell[c_name][1]
     ntot = v_norb + c_norb
 
-    emat_i = np.zeros((ntot, ntot), dtype=complex)
+    # Match the legacy Fortran initial Hilbert space: the core shell is not an
+    # explicit degree of freedom before the x-ray transition.
+    emat_i = np.zeros((v_norb, v_norb), dtype=complex)
     emat_n = np.zeros((ntot, ntot), dtype=complex)
 
     # Coulomb interaction.
@@ -119,7 +121,12 @@ def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
     print()
 
     case = v_name + c_name
-    umat_i = get_umat_slater(case, *slater_i)
+    umat_i_full = get_umat_slater(case, *slater_i)
+    # Legacy Fortran accepts initial core-related Slater integrals but they are
+    # ineffective because fock_i contains valence orbitals only.
+    umat_i = umat_i_full[
+        0:v_norb, 0:v_norb, 0:v_norb, 0:v_norb
+    ]
     umat_n = get_umat_slater(case, *slater_n)
 
     if verbose > 0:
@@ -151,8 +158,9 @@ def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
 
     # Shell levels.
     if shell_level is not None:
+        eval_shift = shell_level[1] * c_norb / v_noccu
         emat_i[0:v_norb, 0:v_norb] += np.eye(v_norb) * shell_level[0]
-        emat_i[v_norb:ntot, v_norb:ntot] += np.eye(c_norb) * shell_level[1]
+        emat_i[0:v_norb, 0:v_norb] += np.eye(v_norb) * eval_shift
 
         emat_n[0:v_norb, 0:v_norb] += np.eye(v_norb) * shell_level[0]
         emat_n[v_norb:ntot, v_norb:ntot] += np.eye(c_norb) * shell_level[1]
@@ -188,7 +196,7 @@ def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
         write_emat(emat_n, 'hopping_n.in')
 
     # Fock-basis metadata.
-    basis_i = FockBasisSpec.from_args(v_norb, v_noccu, c_norb, c_norb)
+    basis_i = FockBasisSpec.from_args(v_norb, v_noccu)
     basis_n = FockBasisSpec.from_args(v_norb, v_noccu + 1, c_norb, c_norb - 1)
 
     print("edrixs >>> Dimension of the initial Hamiltonian: ", len(basis_i))
@@ -250,8 +258,7 @@ def model_2v1c(
     Returns
     -------
     emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
-        These can be passed directly to ``get_ops`` with the SciPy, dense,
-        or PETSc backend.
+        These can be passed directly to ``get_ops`` with the SciPy or dense backend.
     """
     print("edrixs >>> Setting up 2v1c problem ...")
 
@@ -313,9 +320,13 @@ def model_2v1c(
         ))
     print()
 
-    umat_i = get_umat_slater_3shells(
+    umat_i_full = get_umat_slater_3shells(
         (v1_name, v2_name, c_name), *slater_i
     )
+    umat_i = umat_i_full[
+        0:v1v2_norb, 0:v1v2_norb,
+        0:v1v2_norb, 0:v1v2_norb
+    ]
     umat_n = get_umat_slater_3shells(
         (v1_name, v2_name, c_name), *slater_n
     )
@@ -328,7 +339,7 @@ def model_2v1c(
         umat_i = _umat_dense_to_sparse(umat_i, tol=tol)
         umat_n = _umat_dense_to_sparse(umat_n, tol=tol)
 
-    emat_i = np.zeros((ntot, ntot), dtype=complex)
+    emat_i = np.zeros((v1v2_norb, v1v2_norb), dtype=complex)
     emat_n = np.zeros((ntot, ntot), dtype=complex)
 
     # Spin-orbit coupling.
@@ -375,22 +386,25 @@ def model_2v1c(
             v2_othermat
         )
 
-    # Shell levels.  Since the setup/get_ops route keeps the core orbitals in the
-    # Fock basis, the filled core contribution is represented explicitly.
+    # Shell levels.  Match the legacy Fortran convention: the filled core is
+    # absent from the initial basis and its one-body energy is redistributed
+    # uniformly over the fixed-total-occupancy valence sector.
     if shell_level is not None:
+        eval_shift = shell_level[2] * c_norb / v_tot_noccu
         emat_i[0:v1_norb, 0:v1_norb] += np.eye(v1_norb) * shell_level[0]
+        emat_i[0:v1_norb, 0:v1_norb] += np.eye(v1_norb) * eval_shift
         emat_n[0:v1_norb, 0:v1_norb] += np.eye(v1_norb) * shell_level[0]
 
         emat_i[v1_norb:v1v2_norb, v1_norb:v1v2_norb] += (
             np.eye(v2_norb) * shell_level[1]
         )
+        emat_i[v1_norb:v1v2_norb, v1_norb:v1v2_norb] += (
+            np.eye(v2_norb) * eval_shift
+        )
         emat_n[v1_norb:v1v2_norb, v1_norb:v1v2_norb] += (
             np.eye(v2_norb) * shell_level[1]
         )
 
-        emat_i[v1v2_norb:ntot, v1v2_norb:ntot] += (
-            np.eye(c_norb) * shell_level[2]
-        )
         emat_n[v1v2_norb:ntot, v1v2_norb:ntot] += (
             np.eye(c_norb) * shell_level[2]
         )
@@ -427,9 +441,7 @@ def model_2v1c(
         write_emat(emat_i, 'hopping_i.in')
         write_emat(emat_n, 'hopping_n.in')
 
-    basis_i = FockBasisSpec.from_args(
-        v1v2_norb, v_tot_noccu, c_norb, c_norb
-    )
+    basis_i = FockBasisSpec.from_args(v1v2_norb, v_tot_noccu)
     basis_n = FockBasisSpec.from_args(
         v1v2_norb, v_tot_noccu + 1, c_norb, c_norb - 1
     )
@@ -474,8 +486,7 @@ def model_siam(
     Returns
     -------
     emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
-        These can be passed directly to ``get_ops`` with the SciPy, dense,
-        or PETSc backend.
+        These can be passed directly to ``get_ops`` with the SciPy or dense backend.
     """
     print("edrixs >>> Setting up SIAM problem ...")
 
@@ -532,16 +543,22 @@ def model_siam(
     umat_tmp_i = get_umat_slater(v_name + c_name, *slater_i)
     umat_tmp_n = get_umat_slater(v_name + c_name, *slater_n)
 
+    # The legacy initial SIAM basis contains impurity+bath orbitals only.
+    # Consequently all initial Coulomb terms involving the core are ineffective.
+    umat_tmp_i = umat_tmp_i[
+        0:v_norb, 0:v_norb, 0:v_norb, 0:v_norb
+    ]
+
     if sparse_U:
         umat_i = _embed_impurity_core_umat_sparse(
-            umat_tmp_i, v_norb, c_norb, ntot_v, tol=tol
+            umat_tmp_i, v_norb, 0, ntot_v, tol=tol
         )
         umat_n = _embed_impurity_core_umat_sparse(
             umat_tmp_n, v_norb, c_norb, ntot_v, tol=tol
         )
     else:
         umat_i = _embed_impurity_core_umat(
-            umat_tmp_i, v_norb, c_norb, ntot_v
+            umat_tmp_i, v_norb, 0, ntot_v
         )
         umat_n = _embed_impurity_core_umat(
             umat_tmp_n, v_norb, c_norb, ntot_v
@@ -551,7 +568,7 @@ def model_siam(
         write_umat(umat_i, 'coulomb_i.in')
         write_umat(umat_n, 'coulomb_n.in')
 
-    emat_i = np.zeros((ntot, ntot), dtype=complex)
+    emat_i = np.zeros((ntot_v, ntot_v), dtype=complex)
     emat_n = np.zeros((ntot, ntot), dtype=complex)
 
     if siam_type == 1:
@@ -633,7 +650,7 @@ def model_siam(
             np.transpose(trans_c2n)
         )
 
-    emat_i[:, :] = cb_op(emat_i, tmat)
+    emat_i[:, :] = cb_op(emat_i, tmat[0:ntot_v, 0:ntot_v])
     emat_n[:, :] = cb_op(emat_n, tmat)
 
     if ext_B is not None:
@@ -641,16 +658,16 @@ def model_siam(
         emat_i[0:v_norb, 0:v_norb] += zeeman
         emat_n[0:v_norb, 0:v_norb] += zeeman
 
-    # Since the setup/get_ops route keeps the core orbitals in the Fock basis, the
-    # filled-core contribution is represented explicitly.
-    emat_i[ntot_v:ntot, ntot_v:ntot] += np.eye(c_norb) * c_level
+    # Match the fixed-N legacy Fortran convention for the omitted filled core.
+    eval_shift = c_level * c_norb / v_noccu
+    emat_i[0:ntot_v, 0:ntot_v] += np.eye(ntot_v) * eval_shift
     emat_n[ntot_v:ntot, ntot_v:ntot] += np.eye(c_norb) * c_level
 
     if verbose > 0:
         write_emat(emat_i, 'hopping_i.in')
         write_emat(emat_n, 'hopping_n.in')
 
-    basis_i = FockBasisSpec.from_args(ntot_v, v_noccu, c_norb, c_norb)
+    basis_i = FockBasisSpec.from_args(ntot_v, v_noccu)
     basis_n = FockBasisSpec.from_args(ntot_v, v_noccu + 1, c_norb, c_norb - 1)
 
     print("edrixs >>> Dimension of the initial Hamiltonian: ", len(basis_i))
