@@ -39,6 +39,7 @@ from ._solvers_helpers import (
     _ed_1or2_valence_1core,
     _infer_backend,
     _rixs_1or2_valence_1core,
+    _run_fortran_executable,
     _xas_1or2_valence_1core,
 )
 
@@ -945,8 +946,8 @@ def ed_1v1c_fort(comm, shell_name, *, shell_level=None,
 
     ED will be only performed on the initial Hamiltonian to find a few lowest eigenstates
     do_ed=True. Only input files will be written if do_ed=False.
-    Due to large Hilbert space, the ed_fsolver written in Fortran will be called.
-    mpi4py and a MPI environment (mpich or openmpi) are required to launch ed_fsolver.
+    Due to large Hilbert space, the separately compiled ``ed.x`` Fortran solver will be called.
+    mpi4py and an MPI environment (MPICH or Open MPI) are required for multi-rank execution.
 
     If do_ed=True, it will output the eigenvalues in file (eigvals.dat) and eigenvectors in files
     (eigvec.n), where n means the n-th eigenvectors. The eigvec.n files will be used later
@@ -1324,8 +1325,8 @@ def ed_2v1c_fort(comm, shell_name, *, shell_level=None,
 
     ED will be only performed on the initial Hamiltonian to find a few lowest eigenstates
     do_ed=True. Only input files will be written if do_ed=False.
-    Due to large Hilbert space, the ed_fsolver written in Fortran will be called.
-    mpi4py and a MPI environment (mpich or openmpi) are required to launch ed_fsolver.
+    Due to large Hilbert space, the separately compiled ``ed.x`` Fortran solver will be called.
+    mpi4py and an MPI environment (MPICH or Open MPI) are required for multi-rank execution.
 
     If do_ed=True, it will output the eigenvalues in file (eigvals.dat) and eigenvectors in files
     (eigvec.n), where n means the n-th eigenvectors. The eigvec.n files will be used later
@@ -1873,11 +1874,7 @@ def ed_siam_fort(comm, shell_name, nbath, *, siam_type=0, v_noccu=1, static_core
         'ed_siam_fort',
         'edrixs.models.model_siam + edrixs.solvers.get_ops/ed',
     )
-    from .fedrixs import ed_fsolver
-
     rank = comm.Get_rank()
-    size = comm.Get_size()
-    fcomm = comm.py2f()
     if rank == 0:
         print("edrixs >>> Running ED ...", flush=True)
 
@@ -2053,9 +2050,9 @@ def ed_siam_fort(comm, shell_name, nbath, *, siam_type=0, v_noccu=1, static_core
         if do_ed == 1:
             if rank == 0:
                 print("edrixs >>> do_ed=1, perform ED at noccu: ", v_noccu, flush=True)
-            comm.Barrier()
-            ed_fsolver(fcomm, rank, size)
-            comm.Barrier()
+            _run_fortran_executable(
+                comm, 'ed.x', outputs=('eigvals.dat', 'denmat.dat')
+            )
             data = np.loadtxt('eigvals.dat', ndmin=2)
             eval_i = np.zeros(neval, dtype=float)
             eval_i[0:neval] = data[0:neval, 1]
@@ -2083,9 +2080,9 @@ def ed_siam_fort(comm, shell_name, nbath, *, siam_type=0, v_noccu=1, static_core
                 maxiter=maxiter, min_ndim=min_ndim, eigval_tol=eigval_tol
             )
             write_fock_dec_by_N(ntot_v, num_electron, "fock_i.in")
-        comm.Barrier()
-        ed_fsolver(fcomm, rank, size)
-        comm.Barrier()
+        _run_fortran_executable(
+            comm, 'ed.x', outputs=('eigvals.dat', 'denmat.dat')
+        )
         data = np.loadtxt('eigvals.dat', ndmin=2)
         eval_gs = data[0, 1]
         data = np.loadtxt('denmat.dat', ndmin=2)
@@ -2105,9 +2102,9 @@ def ed_siam_fort(comm, shell_name, nbath, *, siam_type=0, v_noccu=1, static_core
                 num_electron = nplus_list[i]
                 if rank == 0:
                     write_fock_dec_by_N(ntot_v, num_electron, "fock_i.in")
-                comm.Barrier()
-                ed_fsolver(fcomm, rank, size)
-                comm.Barrier()
+                _run_fortran_executable(
+                    comm, 'ed.x', outputs=('eigvals.dat', 'denmat.dat')
+                )
                 data = np.loadtxt('eigvals.dat', ndmin=2)
                 eigval = data[0, 1]
                 if eigval > eval_gs:
@@ -2128,9 +2125,9 @@ def ed_siam_fort(comm, shell_name, nbath, *, siam_type=0, v_noccu=1, static_core
                 num_electron = nminus_list[i]
                 if rank == 0:
                     write_fock_dec_by_N(ntot_v, num_electron, "fock_i.in")
-                comm.Barrier()
-                ed_fsolver(fcomm, rank, size)
-                comm.Barrier()
+                _run_fortran_executable(
+                    comm, 'ed.x', outputs=('eigvals.dat', 'denmat.dat')
+                )
                 data = np.loadtxt('eigvals.dat', ndmin=2)
                 eigval = data[0, 1]
                 if eigval > eval_gs:
@@ -2167,9 +2164,9 @@ def ed_siam_fort(comm, shell_name, nbath, *, siam_type=0, v_noccu=1, static_core
                 idump=idump, maxiter=maxiter, min_ndim=min_ndim, eigval_tol=eigval_tol
             )
             write_fock_dec_by_N(ntot_v, noccu_gs, "fock_i.in")
-        comm.Barrier()
-        ed_fsolver(fcomm, rank, size)
-        comm.Barrier()
+        _run_fortran_executable(
+            comm, 'ed.x', outputs=('eigvals.dat', 'denmat.dat')
+        )
         data = np.loadtxt('eigvals.dat', ndmin=2)
         eval_i = np.zeros(neval, dtype=float)
         eval_i[0:neval] = data[0:neval, 1]
@@ -2270,11 +2267,7 @@ def xas_siam_fort(comm, shell_name, nbath, ominc, *, gamma_c=0.1,
         'xas_siam_fort',
         'edrixs.models.model_siam + edrixs.solvers.get_ops/ed/xas',
     )
-    from .fedrixs import xas_fsolver
-
     rank = comm.Get_rank()
-    size = comm.Get_size()
-    fcomm = comm.py2f()
 
     v_name_options = ['s', 'p', 't2g', 'd', 'f']
     c_name_options = ['s', 'p', 'p12', 'p32', 't2g', 'd', 'd32', 'd52', 'f', 'f52', 'f72']
@@ -2361,12 +2354,10 @@ def xas_siam_fort(comm, shell_name, nbath, ominc, *, gamma_c=0.1,
                     trans[:, :] += trans_mat[i] * polvec[i]
                 write_emat(trans, 'transop_xas.in')
 
-            # call XAS solver in fedrixs
-            comm.Barrier()
-            xas_fsolver(fcomm, rank, size)
-            comm.Barrier()
-
+            # Run the separately compiled native XAS executable.
             file_list = ['xas_poles.' + str(i+1) for i in range(num_gs)]
+            _run_fortran_executable(comm, 'xas.x', outputs=file_list)
+
             pole_dict = read_poles_from_file(file_list)
             poles.append(pole_dict)
             xas[:, it] = get_spectra_from_poles(pole_dict, ominc, gamma_core, temperature)
@@ -2378,12 +2369,10 @@ def xas_siam_fort(comm, shell_name, nbath, ominc, *, gamma_c=0.1,
                     print("edrixs >>> Isotropic, component: ", k, flush=True)
                     write_emat(trans_mat[k], 'transop_xas.in')
 
-                # call XAS solver in fedrixs
-                comm.Barrier()
-                xas_fsolver(fcomm, rank, size)
-                comm.Barrier()
-
+                # Run the separately compiled native XAS executable.
                 file_list = ['xas_poles.' + str(i+1) for i in range(num_gs)]
+                _run_fortran_executable(comm, 'xas.x', outputs=file_list)
+
                 pole_tmp = read_poles_from_file(file_list)
                 xas[:, it] += get_spectra_from_poles(pole_tmp, ominc, gamma_core, temperature)
                 pole_dicts.append(pole_tmp)
@@ -2493,11 +2482,7 @@ def rixs_siam_fort(comm, shell_name, nbath, ominc, eloss, *, gamma_c=0.1, gamma_
         'rixs_siam_fort',
         'edrixs.models.model_siam + edrixs.solvers.get_ops/ed/rixs',
     )
-    from .fedrixs import rixs_fsolver
-
     rank = comm.Get_rank()
-    size = comm.Get_size()
-    fcomm = comm.py2f()
 
     v_name_options = ['s', 'p', 't2g', 'd', 'f']
     c_name_options = ['s', 'p', 'p12', 'p32', 't2g', 'd', 'd32', 'd52', 'f', 'f52', 'f72']
@@ -2612,12 +2597,10 @@ def rixs_siam_fort(comm, shell_name, nbath, ominc, eloss, *, gamma_c=0.1, gamma_
                     trans_f[:, :] += trans_mat[i] * polvec_f[i]
                 write_emat(np.conj(np.transpose(trans_f)), 'transop_rixs_f.in')
 
-            # call RIXS solver in fedrixs
-            comm.Barrier()
-            rixs_fsolver(fcomm, rank, size)
-            comm.Barrier()
-
+            # Run the separately compiled native RIXS executable.
             file_list = ['rixs_poles.' + str(i+1) for i in range(num_gs)]
+            _run_fortran_executable(comm, 'rixs.x', outputs=file_list)
+
             pole_dict = read_poles_from_file(file_list)
             poles_per_om.append(pole_dict)
             rixs[iom, :, ip] = get_spectra_from_poles(pole_dict, eloss,
