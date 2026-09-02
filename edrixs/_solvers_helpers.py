@@ -52,6 +52,23 @@ def _infer_backend(*operators):
             )
 
 
+def _run_fortran_executable(comm, program, *, outputs=()):
+    """Run a standalone native Fortran solver collectively from a Python MPI parent.
+
+    This uses the same process-launch path as the disk-backed Fortran backend:
+    rank zero runs the native ``*.x`` program (or spawns a child MPI group when
+    ``comm`` has multiple ranks), while the result/error is broadcast to every
+    parent rank.  No ``fedrixs``/F2PY extension is involved.
+    """
+    from .fortran_backend import fortran_backend
+
+    options = {}
+    return fortran_backend._root_collective(
+        comm,
+        lambda: fortran_backend._run(program, options, comm, outputs=outputs),
+    )
+
+
 def _rotated_transition_blocks(case, loc_axis=None):
     """
     Build transition blocks in global coordinates for a shell-transition case.
@@ -233,11 +250,7 @@ def _ed_1or2_valence_1core(
         hopping_v1v2=None, do_ed=True, ed_solver=2, neval=1, nvector=1, ncv=3,
         idump=False, maxiter=500, eigval_tol=1e-8, min_ndim=1000
         ):
-    from .fedrixs import ed_fsolver
-
     rank = comm.Get_rank()
-    size = comm.Get_size()
-    fcomm = comm.py2f()
     if rank == 0:
         print("edrixs >>> Running ED ...", flush=True)
     v1_name = shell_name[0].strip()
@@ -396,10 +409,10 @@ def _ed_1or2_valence_1core(
         write_fock_dec_by_N(v1v2_norb, v_tot_noccu, "fock_i.in")
 
     if do_ed:
-        # now, call ed solver
-        comm.Barrier()
-        ed_fsolver(fcomm, rank, size)
-        comm.Barrier()
+        # Run the separately compiled native ED executable.
+        _run_fortran_executable(
+            comm, 'ed.x', outputs=('eigvals.dat', 'denmat.dat')
+        )
 
         # read eigvals.dat and denmat.dat
         data = np.loadtxt('eigvals.dat', ndmin=2)
@@ -420,11 +433,7 @@ def _xas_1or2_valence_1core(
         pol_type=None, num_gs=1, nkryl=200, temperature=1.0,
         loc_axis=None, scatter_axis=None
         ):
-    from .fedrixs import xas_fsolver
-
     rank = comm.Get_rank()
-    size = comm.Get_size()
-    fcomm = comm.py2f()
 
     v1_name = shell_name[0].strip()
     v2_name = shell_name[1].strip()
@@ -517,12 +526,10 @@ def _xas_1or2_valence_1core(
                     trans[:, :] += trans_mat[i] * polvec[i]
                 write_emat(trans, 'transop_xas.in')
 
-            # call XAS solver in fedrixs
-            comm.Barrier()
-            xas_fsolver(fcomm, rank, size)
-            comm.Barrier()
-
+            # Run the separately compiled native XAS executable.
             file_list = ['xas_poles.' + str(i+1) for i in range(num_gs)]
+            _run_fortran_executable(comm, 'xas.x', outputs=file_list)
+
             pole_dict = read_poles_from_file(file_list)
             poles.append(pole_dict)
             xas[:, it] = get_spectra_from_poles(pole_dict, ominc, gamma_core, temperature)
@@ -533,12 +540,10 @@ def _xas_1or2_valence_1core(
                     print("edrixs >>> Loop over for polarization: ", it, pt, flush=True)
                     print("edrixs >>> Isotropic, component: ", k, flush=True)
                     write_emat(trans_mat[k], 'transop_xas.in')
-                # call XAS solver in fedrixs
-                comm.Barrier()
-                xas_fsolver(fcomm, rank, size)
-                comm.Barrier()
-
+                # Run the separately compiled native XAS executable.
                 file_list = ['xas_poles.' + str(i+1) for i in range(num_gs)]
+                _run_fortran_executable(comm, 'xas.x', outputs=file_list)
+
                 pole_tmp = read_poles_from_file(file_list)
                 xas[:, it] += get_spectra_from_poles(pole_tmp, ominc, gamma_core, temperature)
                 pole_dicts.append(pole_tmp)
@@ -556,11 +561,7 @@ def _rixs_1or2_valence_1core(
         pol_type=None, num_gs=1, nkryl=200, linsys_max=500, linsys_tol=1e-8,
         temperature=1.0, loc_axis=None, scatter_axis=None
         ):
-    from .fedrixs import rixs_fsolver
-
     rank = comm.Get_rank()
-    size = comm.Get_size()
-    fcomm = comm.py2f()
 
     v1_name = shell_name[0].strip()
     v2_name = shell_name[1].strip()
@@ -683,12 +684,10 @@ def _rixs_1or2_valence_1core(
                     trans_f[:, :] += trans_mat[i] * polvec_f[i]
                 write_emat(np.conj(np.transpose(trans_f)), 'transop_rixs_f.in')
 
-            # call RIXS solver in fedrixs
-            comm.Barrier()
-            rixs_fsolver(fcomm, rank, size)
-            comm.Barrier()
-
+            # Run the separately compiled native RIXS executable.
             file_list = ['rixs_poles.' + str(i+1) for i in range(num_gs)]
+            _run_fortran_executable(comm, 'rixs.x', outputs=file_list)
+
             pole_dict = read_poles_from_file(file_list)
             poles_per_om.append(pole_dict)
             rixs[iom, :, ip] = get_spectra_from_poles(pole_dict, eloss,

@@ -1,9 +1,7 @@
 import os
-import subprocess
 import sys
 
-from setuptools import Extension, find_packages, setup
-from setuptools.command.build_ext import build_ext
+from setuptools import find_packages, setup
 
 # needed for setuptools.build_meta to pickup vendored versioneer.py
 sys.path.insert(0, os.path.dirname(__file__))
@@ -43,52 +41,6 @@ with open(os.path.join(here, "requirements.txt")) as requirements_file:
     ]
 
 
-# adapted from https://martinopilia.com/posts/2018/09/15/building-python-extension.html
-# see also https://github.com/pyscf/pyscf/blob/master/setup.py
-class CMakeExtension(Extension):
-    def __init__(self, name, cmake_lists_dir=".", sources=[], **kwargs):
-        Extension.__init__(self, name, sources=sources, **kwargs)
-        self.cmake_lists_dir = os.path.abspath(cmake_lists_dir)
-
-
-class cmake_build_ext(build_ext):
-    def build_extensions(self):
-        # Ensure that CMake is present and working
-        try:
-            _ = subprocess.check_output(["cmake", "--version"])
-        except OSError:
-            raise RuntimeError("Cannot find CMake executable")
-
-        for ext in self.extensions:
-
-            extdir = os.path.abspath(os.path.dirname(self.get_ext_fullpath(ext.name)))
-
-            cmake_args = [
-                "-DEDRIXS_PY_INTERFACE=ON",
-                # Ask CMake to place the resulting library in the directory containing the extension
-                "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}".format(extdir),
-                # static libraries are placed in a temporary build directory
-                "-DCMAKE_ARCHIVE_OUTPUT_DIRECTORY={}".format(self.build_temp),
-                # Don't need executables for python lib
-                "-DCMAKE_RUNTIME_OUTPUT_DIRECTORY={}".format(self.build_temp),
-            ]
-
-            configure_args = os.getenv("CMAKE_CONFIGURE_ARGS")
-            if configure_args:
-                cmake_args.extend(configure_args.split(" "))
-
-            if not os.path.exists(self.build_temp):
-                os.makedirs(self.build_temp)
-
-            # Config
-            subprocess.check_call(
-                ["cmake", ext.cmake_lists_dir] + cmake_args, cwd=self.build_temp
-            )
-
-            # Build
-            subprocess.check_call(["cmake", "--build", "."], cwd=self.build_temp)
-
-
 setup(
     name="edrixs",
     version=versioneer.get_version(),
@@ -98,14 +50,6 @@ setup(
     author_email="yilinwang@bnl.gov",
     url="https://github.com/NSLS-II/edrixs",
     packages=find_packages(exclude=["docs", "tests", "bin", "examples", "src"]),
-    entry_points={
-        "console_scripts": [
-            "ed.x=edrixs.scripts:ed",
-            "xas.x=edrixs.scripts:xas",
-            "rixs.x=edrixs.scripts:rixs",
-            "opavg.x=edrixs.scripts:opavg",
-        ],
-    },
     include_package_data=True,
     package_data={
         "edrixs": [
@@ -125,11 +69,4 @@ setup(
         "Natural Language :: English",
         "Programming Language :: Python :: 3",
     ],
-    ext_modules=[
-        # This must name CMake's actual output.  A placeholder makes modern
-        # setuptools attempt to copy a nonexistent placeholder extension
-        # after the CMake build succeeds.
-        CMakeExtension("edrixs.fedrixs")
-    ],
-    cmdclass={"build_ext": cmake_build_ext},
 )
