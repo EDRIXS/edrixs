@@ -34,26 +34,13 @@ If you are using the EDRIXS code to do some studies and would like to publish yo
 
 Usage
 -----
-We recommend Mamba for installation on Linux and macOS. The current source can
-be built in a consistent conda-forge environment as follows:
+For Linux and macOS, we recommend installing the released edrixs package with
+Mamba in a separate environment:
 
   .. code-block:: bash
 
      mamba create --name edrixs_env -c conda-forge --strict-channel-priority \
-         python=3.14 "numpy>=2" scipy sympy matplotlib sphinx mpi4py \
-         "arpack=*=mpi_openmpi*" openmpi gfortran \
-         "libblas=*=*openblas" cmake ninja pip setuptools wheel
-     conda activate edrixs_env
-     git clone https://github.com/EDRIXS/edrixs.git
-     cd edrixs
-     python -m pip install --no-build-isolation --no-deps .
-
-Linux users may instead install the released conda package:
-
-  .. code-block:: bash
-
-     mamba create --name edrixs_env -c conda-forge \
-         --strict-channel-priority edrixs matplotlib
+         edrixs matplotlib
      conda activate edrixs_env
 
 For Windows, we recommend Docker. See https://edrixs.github.io/edrixs for the
