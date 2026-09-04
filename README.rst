@@ -34,12 +34,14 @@ If you are using the EDRIXS code to do some studies and would like to publish yo
 
 Usage
 -----
-For Linux users we suggest installing with anaconda.
+For Linux and macOS, we recommend installing the released edrixs package with
+Mamba in a separate environment:
 
   .. code-block:: bash
 
-     $ conda create --name edrixs_env python=3.14
-     $ conda activate edrixs_env
-     $ conda install -c conda-forge edrixs
+     mamba create --name edrixs_env -c conda-forge --strict-channel-priority \
+         edrixs matplotlib
+     conda activate edrixs_env
 
- For Windows and macOS machines, we suggest using docker. See https://edrixs.github.io/edrixs for more details.
+For Windows, we recommend Docker. See https://edrixs.github.io/edrixs for the
+complete installation, verification, requirements, and Docker instructions.

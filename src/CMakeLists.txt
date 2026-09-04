@@ -71,6 +71,7 @@ if (EDRIXS_PY_INTERFACE)
       PROPERTIES
           PREFIX ""
           OUTPUT_NAME ${generated_module_file}
+          SUFFIX ".so"
           LINKER_LANGUAGE C
           LINK_FLAGS "-undefined dynamic_lookup"
     )
