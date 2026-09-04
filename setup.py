@@ -65,6 +65,7 @@ class cmake_build_ext(build_ext):
 
             cmake_args = [
                 "-DEDRIXS_PY_INTERFACE=ON",
+                "-DPython3_EXECUTABLE={}".format(sys.executable),
                 # Ask CMake to place the resulting library in the directory containing the extension
                 "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY={}".format(extdir),
                 # static libraries are placed in a temporary build directory
@@ -72,6 +73,22 @@ class cmake_build_ext(build_ext):
                 # Don't need executables for python lib
                 "-DCMAKE_RUNTIME_OUTPUT_DIRECTORY={}".format(self.build_temp),
             ]
+
+            # Keep compiled dependencies within one conda toolchain. Without
+            # this, CMake can accidentally mix conda libraries with libraries
+            # installed by Homebrew or MacPorts on macOS.
+            conda_prefix = os.getenv("CONDA_PREFIX")
+            if conda_prefix:
+                cmake_args.extend(
+                    [
+                        "-DCMAKE_PREFIX_PATH={}".format(conda_prefix),
+                        "-DCMAKE_FIND_ROOT_PATH={}".format(conda_prefix),
+                        "-DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY",
+                        "-DARPACK_ROOT={}".format(
+                            os.path.join(conda_prefix, "lib")
+                        ),
+                    ]
+                )
 
             configure_args = os.getenv("CMAKE_CONFIGURE_ARGS")
             if configure_args:
@@ -94,6 +111,7 @@ setup(
     version=versioneer.get_version(),
     description="An open source toolkit for simulating RIXS spectra based on ED",
     long_description=readme,
+    python_requires=">=3.10",
     author="Brookhaven National Lab",
     author_email="yilinwang@bnl.gov",
     url="https://github.com/NSLS-II/edrixs",

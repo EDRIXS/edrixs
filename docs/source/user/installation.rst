@@ -1,182 +1,97 @@
 ************
 Installation
 ************
-For Linux users we suggest :ref:`installing with anaconda <AnacondaInstall>`. For Windows and macOS machines, we suggest using the :ref:`docker instructions <edrixsanddocker>`, which are relatively straightforward.  In principle, you can also compile the code from the source for Linux, but this is quite involved and we recommend against this for standard use.
+For Linux and macOS, we recommend installation via Mamba. Windows users should use the :ref:`Docker instructions
+<edrixsanddocker>`.
 
 
 .. _AnacondaInstall:
 
-Install and use edrixs via Anaconda
-====================================================
-A conda package has been built for Linux. To use edrixs via Anaconda, you need first to install `Anaconda <https://www.anaconda.com/distribution/>`_ in your system.
-We recommend installing edrixs into a separate environment, for example, called ``edrixs_env``, together with any other packages you might want to use like this::
+Install the released package with Mamba on Linux
+================================================
 
-    conda create --name edrixs_env -c conda-forge python=3.13 edrixs matplotlib
+A prebuilt conda package is available for Linux. First install `Miniforge
+<https://github.com/conda-forge/miniforge>`_, which provides Conda and Mamba,
+then create a separate environment for edrixs::
 
-We endeavor to keep the conda-forge release up to date, but note that these builds will usually not correspond to the latest version of edrixs, which is available in the `master branch of edrixs <https://github.com/NSLS-II/edrixs>`_.
+    mamba create --name edrixs_env -c conda-forge --strict-channel-priority \
+        edrixs matplotlib
+    conda activate edrixs_env
 
-edrixs will also run on `Google Colaboratory <https://research.google.com/colaboratory/>`_, but does not come installed as default. Installing it requires a you to install conda and then edrixs, which can be done by executing a cell::
+edrixs will also run on `Google Colaboratory
+<https://research.google.com/colaboratory/>`_, but is not installed there by
+default. Install Conda and then edrixs from within a notebook cell::
 
     !pip install -q condacolab
     import condacolab
     condacolab.install()
     !conda install -c conda-forge edrixs
 
-from within a notebook cell.
+.. _MacOSInstall:
+.. _SourceInstall:
+
+Build the current source with Mamba on Linux or macOS
+=====================================================
+
+This is the recommended way to build the current source on Linux and macOS.
+The same environment provides Python, OpenMPI, OpenBLAS, parallel ARPACK, and
+gfortran, preventing incompatible system and conda libraries from being mixed.
+On macOS, in particular, do not mix this environment with Homebrew or MacPorts
+versions of these libraries, as that can cause linker or OpenMP runtime errors.
+
+Install `Miniforge <https://github.com/conda-forge/miniforge>`_, then create
+and activate the build environment::
+
+    mamba create --name edrixs_env -c conda-forge --strict-channel-priority \
+        python=3.14 "numpy>=2" scipy sympy matplotlib sphinx mpi4py \
+        "arpack=*=mpi_openmpi*" openmpi gfortran \
+        "libblas=*=*openblas" cmake ninja pip setuptools wheel
+    conda activate edrixs_env
+
+Clone and install edrixs from the repository root::
+
+    git clone https://github.com/EDRIXS/edrixs.git
+    cd edrixs
+    python -m pip install --no-build-isolation --no-deps .
+
+The ``--no-build-isolation`` option makes the extension use NumPy and the
+compiler toolchain from the activated environment. The ``--no-deps`` option
+prevents pip from replacing the compatible conda packages installed above.
+
+Run these checks from outside the source directory so that Python imports the
+installed package::
+
+    cd ..
+    python -c "from edrixs import fedrixs; print(fedrixs.__file__)"
+    mpirun -np 2 python -c "from mpi4py import MPI; from edrixs import fedrixs; print(MPI.COMM_WORLD.rank)"
+
+The first command should print the path to a file ending in ``.so``. The
+second should print ranks ``0`` and ``1``. On macOS, the linker may print
+harmless ``compact unwind`` warnings while compiling the gfortran objects.
 
 Requirements
 ============
-Several tools and libraries are required to build and install edrixs,
+The Mamba command above installs compatible versions of all build and runtime
+requirements. The supported versions and required components are:
 
-   * Fortran compiler: gfortran and ifort are supported
-   * MPI environment: openmpi and mpich are tested
-   * MPI Fortran and C compilers: mpif90, mpicc
-   * BLAS and LAPACK libraries: `OpenBLAS <https://github.com/xianyi/OpenBLAS/>`_ with gfortran and MKL with ifort
-   * ARPACK library: `arpack-ng <https://github.com/opencollab/arpack-ng/>`_  with mpi enabled
-   * Only Python3 is supported
-   * numpy, scipy, sympy, matplotlib, sphinx, numpydoc
-   * mpi4py with the same MPI implementation libraries (``openmpi`` or ``mpich``) as building edrixs
+   * Python 3.10 or newer; Python 3.14 is used in the recommended environment
+   * NumPy 1.26 or newer at runtime; NumPy 2 or newer is used to build the
+     extension for compatibility with both NumPy 1.26 and 2.x
+   * SciPy, SymPy, Matplotlib, Sphinx, and numpydoc
+   * CMake 3.17.3 or newer and Ninja
+   * A Fortran compiler; the recommended environment currently uses gfortran
+     16
+   * An MPI environment with Fortran and C compilers; OpenMPI 5 and its
+     ``mpif90`` and ``mpicc`` wrappers are used in the recommended environment
+   * mpi4py 4 or newer, built with the same MPI implementation used to build
+     edrixs
+   * BLAS and LAPACK; OpenBLAS 0.3 is used in the recommended environment
+   * `ARPACK-NG <https://github.com/opencollab/arpack-ng/>`_ 3.9 or newer,
+     built with MPI support
 
-Build from source
-=================
-We will show how to build edrixs from source on Ubuntu Linux 20.04.
-We will use gcc, gfortran, openmpi and OpenBLAS in these examples.
-Building edrixs on other versions of Linux or with Intel's ifort+MKL will be similar.
+Install with Docker on Windows
+==============================
 
-Ubuntu Linux 20.04
-------------------
-Install compilers and tools::
-
-    sudo apt-get update
-    sudo apt-get install build-essential gfortran gcc
-    sudo apt-get install git wget
-    sudo apt-get install python3 libpython3-dev python3-pip python3-venv
-
-Create and activate a python virtual environment for edrixs::
-
-    python3 -m venv VIRTUAL_ENV
-    source VIRTUAL_ENV/bin/activate
-
-where ``VIRTUAL_ENV`` should be replaced by the directory where you wish to install edrixs.
-
-Alternatively create and activate a conda environment for edrixs::
-
-    conda create --name edrixs_env python=3.8
-    conda activate edrixs_env
-
-We will assume ``python`` and ``pip`` are pointing to the activated environment from now on.
-Check we are using the expected python and pip::
-
-    which python
-    which pip
-    python --version
-
-Fetch the latest version of ``pip``::
-
-    pip install --upgrade pip
-
-openmpi, OpenBLAS, ARPACK can be installed by ``apt-get``, but their versions are old and may not work properly.
-However, they can also be compiled from source easily. In the following, we will show both ways, but we always recommend to build newer ones from source.
-
-openmpi can be installed by::
-
-    sudo apt-get install libopenmpi-dev
-
-or from newer version of source, for example v3.1.4::
-
-    wget https://download.open-mpi.org/release/open-mpi/v3.1/openmpi-3.1.4.tar.bz2
-    tar -xjf openmpi-3.1.4.tar.bz2
-    cd openmpi-3.1.4
-    ./configure CC=gcc CXX=g++ FC=gfortran
-    make
-    sudo make install
-
-the compiling process will take a while.
-
-OpenBLAS can be installed by::
-
-    sudo apt-get install libopenblas-dev
-
-or from a newer version of source::
-
-    wget https://github.com/xianyi/OpenBLAS/archive/v0.3.6.tar.gz
-    tar -xzf v0.3.6.tar.gz
-    cd OpenBLAS-0.3.6
-    make CC=gcc FC=gfortran
-    sudo make PREFIX=/usr/local install
-
-ARPACK can be installed by::
-
-    sudo apt-get install libarpack2-dev libparpack2-dev
-
-or from a newer version of source::
-
-    wget https://github.com/opencollab/arpack-ng/archive/3.6.3.tar.gz
-    tar -xzf 3.6.3.tar.gz
-    cd arpack-ng-3.6.3
-    ./bootstrap
-    ./configure --enable-mpi --with-blas="-L/usr/local/lib/ -lopenblas" FC=gfortran F77=gfortran MPIFC=mpif90 MPIF77=mpif90
-    make
-    sudo make install
-
-mpi4py can be installed by::
-
-    export MPICC=/usr/local/bin/mpicc
-    sudo pip install --no-cache-dir mpi4py
-
-or from source::
-
-    wget https://github.com/mpi4py/mpi4py/archive/3.0.1.tar.gz
-    tar xzf 3.0.1.tar.gz
-    cd mpi4py-3.0.1
-
-edit mpi.cfg to set MPI paths as following::
-
-    [mpi]
-    mpi_dir              = /usr/local
-    mpicc                = %(mpi_dir)s/bin/mpicc
-    mpicxx               = %(mpi_dir)s/bin/mpicxx
-    include_dirs         = %(mpi_dir)s/include
-    libraries            = mpi
-    library_dirs         = %(mpi_dir)s/lib
-    runtime_library_dirs = %(mpi_dir)s/lib
-
-and comment all other contents. Then, build and install by::
-
-    python setup.py build
-    sudo pip install .
-
-Check whether the MPI paths are correct by::
-
-    python
-    >>> import mpi4py
-    >>> mpi4py.get_config()
-    {'mpicc': '/usr/local/bin/mpicc',
-     'mpicxx': '/usr/local/bin/mpicxx',
-     'include_dirs': '/usr/local/include',
-     'libraries': 'mpi',
-     'library_dirs': '/usr/local/lib',
-     'runtime_library_dirs': '/usr/local/lib'}
-
-Now, we are ready to build edrixs::
-
-    git clone https://github.com/NSLS-II/edrixs.git
-    cd edrixs
-    pip install -v .
-
-Start to play with edrixs by::
-
-    python
-    >>> import edrixs
-    >>> edrixs.some_functions(...)
-
-or go to ``examples`` directory to run some examples::
-
-    cd examples/more/ED/14orb
-    ./get_inputs.py
-    mpirun -np 2 ed.x
-    mpirun -np 2 ./run_fedsolver.py
-    cd ../../RIXS/LaNiO3_thin
-    mpirun -np 2 ./run_rixs_fsolver.py
-
-if no errors, the installation is successful.
+For Windows, we recommend using the maintained edrixs Docker image instead of
+building the Fortran extension natively. See :ref:`edrixsanddocker` for the
+image, Docker Compose configuration, and usage instructions.
