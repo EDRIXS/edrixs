@@ -7,10 +7,10 @@ For Linux and macOS, we recommend installation via Mamba. Windows users should u
 
 .. _AnacondaInstall:
 
-Install the released package with Mamba on Linux
-================================================
+Install the released package with Mamba on Linux and macOS
+==========================================================
 
-A prebuilt conda package is available for Linux. First install `Miniforge
+A prebuilt conda package is available for Linux and macOS. First install `Miniforge
 <https://github.com/conda-forge/miniforge>`_, which provides Conda and Mamba,
 then create a separate environment for edrixs::
 
