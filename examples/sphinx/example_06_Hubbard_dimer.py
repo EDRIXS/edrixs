@@ -38,7 +38,6 @@ particle basis.
 # two electron occupation and build the Fock basis.
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy
 import edrixs
 np.set_printoptions(precision=4)
 
@@ -47,7 +46,7 @@ ll = 0
 case = 's'
 norb = 4
 noccu = 2
-basis = edrixs.get_fock_bin_by_N(norb, noccu)
+basis = edrixs.get_fock_basis_int(norb, noccu)
 
 ################################################################################
 # Create function to populate and diagonalize matrices
@@ -64,8 +63,11 @@ basis = edrixs.get_fock_bin_by_N(norb, noccu)
 # The converse is true for the hopping between the sites.
 # From here let us generate a function to build and diagonalize the Hamiltonian.
 # We need to generate the Coulomb matrix for the on-site interactions and
-# apply it to the  block diagonal. The hopping connects off-site indices with
-# the same spin.
+# apply it to the block diagonal. The hopping connects off-site indices with
+# the same spin. :func:`~edrixs.build_op` transforms the one-body matrix
+# :code:`emat` and the two-body tensor :code:`umat` into the many-body
+# Hamiltonian in our Fock basis and :func:`~edrixs.ed` diagonalizes it. This
+# problem is tiny, so we use the :code:`'dense'` backend.
 def diagonalize(U, t, extra_emat=None):
     """Diagonalize 2 site Hubbard Hamiltonian"""
     umat = np.zeros((norb, norb, norb, norb), dtype=np.complex128)
@@ -77,10 +79,8 @@ def diagonalize(U, t, extra_emat=None):
     if extra_emat is not None:
         emat = emat + extra_emat
 
-    H = (edrixs.build_opers(2, emat, basis)
-         + edrixs.build_opers(4, umat, basis))
-
-    e, v = scipy.linalg.eigh(H)
+    H = edrixs.build_op(emat, umat, basis, backend='dense')
+    e, v = edrixs.ed(H, num_evals=len(basis), backend='dense')
     return e, v
 
 ################################################################################
@@ -99,7 +99,8 @@ spin_mom_one_site = edrixs.get_spin_momentum(ll)
 spin_mom = np.zeros((3, norb, norb), dtype=np.complex128)
 spin_mom[:, :2, :2] = spin_mom[:, 2:, 2:] = spin_mom_one_site
 
-opS = edrixs.build_opers(2, spin_mom, basis)
+opS = [edrixs.build_op(component, None, basis, backend='dense')
+       for component in spin_mom]
 opS_squared = (np.dot(opS[0], opS[0]) + np.dot(opS[1], opS[1])
                + np.dot(opS[2], opS[2]))
 
@@ -122,8 +123,8 @@ for i in range(len(e)):
 ################################################################################
 # For :math:`U \gg t` the two states with double occupancy acquire an energy of
 # approximately :math:`U`. The low energy states are a :math:`S=0` singlet and
-# and :math:`S=1` triplet, which are split by :math:`4t^2/U`, which is the
-# magnetic exchange term.
+# an :math:`S=1` triplet, which are split by :math:`4t^2/U`, the
+# magnetic exchange energy.
 
 ################################################################################
 # :math:`U` dependence
@@ -145,10 +146,12 @@ plt.show()
 # of the single particle states.
 
 def get_single_particle_repesentations(v):
+    # binary occupation vectors, in the same order as ``basis``
+    fock_vectors = np.array(edrixs.get_fock_bin_by_N(norb, noccu))
     reps = []
     for i in range(6):
         rep = sum([vec*weight for weight, vec
-                        in zip(v[:, i], np.array(basis))])
+                        in zip(v[:, i], fock_vectors)])
         reps.append(rep)
 
     return np.array(reps)

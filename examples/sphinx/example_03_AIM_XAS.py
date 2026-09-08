@@ -23,7 +23,7 @@ interact with the impurity by symmetry. By doing this the problem can be
 represented with fewer orbitals, which makes the calculation far more efficient.
 The standard EDRIXS solver that we will use assumes that the bath states are
 represented by an integer number of bath sites set by :code:`nbath`, each of
-which hosts the same number of spin-orbits as the impurity e.g. 10 for a
+which hosts the same number of spin-orbitals as the impurity e.g. 10 for a
 :math:`d`-electron material.
 
 NiO has a rocksalt structure in which all Ni atoms are surrounded by six O
@@ -51,7 +51,7 @@ import matplotlib.pyplot as plt
 # bath is full. The solver that we will
 # use can simulate multiple bath sites. In our case we specify
 # :code:`nbath  = 1` sites. Electrons will be able to transition from O to Ni
-# during our calculation, but the total number of valance electrons
+# during our calculation, but the total number of valence electrons
 # :code:`v_noccu` will be conserved.
 nd = 8
 norb_d = 10
@@ -120,7 +120,7 @@ message = ("E_d = {:.3f} eV\n"
            "E_dc = {:.3f} eV\n"
            "E_Lc = {:.3f} eV\n"
            "E_p = {:.3f} eV\n")
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(message.format(E_d, E_L, E_dc, E_Lc, E_p))
 
 
@@ -189,8 +189,8 @@ imp_mat_n = CF + soc + E_dc_mat
 ################################################################################
 # The energy level of the bath(s) is described by a matrix where the row index
 # denotes which bath and the column index denotes which orbital. Here we have
-# only one bath, with 10 spin-orbitals. We initialize the matrix to
-# :code:`norb_d` and then split the energies according to :code:`ten_dq_bath`.
+# only one bath, with 10 spin-orbitals. We initialize every entry to the bath
+# energy :code:`E_L` and then split the levels according to :code:`ten_dq_bath`.
 ten_dq_bath = 1.44
 bath_level = np.full((nbath, norb_d), E_L, dtype=complex)
 bath_level[0, :2] += ten_dq_bath*.6  # 3z2-r2
@@ -233,7 +233,7 @@ phi = 0.0
 ################################################################################
 # these are with respect to the crystal field :math:`z` and :math:`x` axes
 # written above. (That is, unless you specify the :code:`loc_axis` parameter
-# described in the :code:`edrixs.xas_siam_fort` function documentation.)
+# described in the :code:`edrixs.model_siam` function documentation.)
 
 ################################################################################
 # The spectrum in the raw calculation is offset by the energy involved with the
@@ -241,7 +241,7 @@ phi = 0.0
 # this and use :code:`om_shift` as an adjustable parameters for comparing
 # theory to experiment. We also use this to specify :code:`ominc_xas`
 # the range we want to compute the spectrum over. The core hole lifetime
-# broadening also needs to be set via :code:`gamma_c_stat`.
+# broadening also needs to be set via :code:`gamma_c`.
 om_shift = 857.6
 c_level = -om_shift - 5*E_p
 ominc_xas = om_shift + np.linspace(-15, 25, 1000)
@@ -255,85 +255,93 @@ gamma_c = np.full(ominc_xas.shape, 0.48/2)
 
 ################################################################################
 # Magnetic field is a three-component vector in eV specified with respect to the
-# same local axis as the x-ray beam. Since we are considering a powder here
-# we create an isotropic normalized vector. :code:`on_which = 'both'` specifies to
-# apply the operator to the total spin plus orbital angular momentum as is
-# appropriate for a physical external magnetic field. You can use
-# :code:`on_which = 'spin'` to apply the operator to spin in order to simulate
-# magnetic order in the sample. The value of the Bohr Magneton can
-# be useful for converting here :math:`\mu_B = 5.7883818012\times 10^{−5}`.
-# For this example, we will account for magnetic order in the sample by
+# same local axis as the x-ray beam. :code:`on_which = 'both'` applies the
+# operator to the total spin plus orbital angular momentum, as is appropriate
+# for a physical external magnetic field. Passing :code:`on_which = 'spin'`
+# instead applies it to spin only, which is a convenient way to impose a
+# magnetic order direction on the sample. The Bohr magneton
+# :math:`\mu_B = 5.7883818012\times 10^{-5}` eV/T is useful for converting
+# a physical field strength. Here we mimic magnetic order by applying a small
+# spin field along :math:`z`.
 ext_B = np.array([0.00, 0.00, 0.12])
 on_which = 'spin'
 
 ################################################################################
-# The number crunching uses
-# `mpi4py <https://mpi4py.readthedocs.io/en/stable/>`_. You can safely ignore
-# this for most purposes, but see
-# `Y. L. Wang et al., Computer Physics Communications 243, 151-165 (2019) <https://doi.org/10.1016/j.cpc.2019.04.018>`_
-# if you would like more details.
-# The main thing to remember is that you should call this script via::
-#
-#        mpirun -n <number of processors> python example_AIM_XAS.py
-#
-# where :code:`<number of processors>` is the number of processors
-# you'd like to us. Running it as normal will work, it will just be slower.
-if __name__ == '__main__':
-    from mpi4py import MPI
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    size = comm.Get_size()
+# Build the model
+# ------------------------------------------------------------------------------
+# The staged EDRIXS interface separates the physical model from its numerical
+# representation. :func:`~edrixs.model_siam` collects the one-body matrices,
+# Coulomb parameters and Fock-basis specifications for the impurity plus bath
+# problem. With :code:`siam_type=0` the model is assembled from :code:`imp_mat`,
+# :code:`bath_level` and :code:`hyb` (and their core-hole counterparts). The
+# external magnetic field is applied via :code:`ext_B` acting
+# :code:`on_which='spin'`. The returned :code:`i` quantities describe the
+# initial and final states without a core hole, while the :code:`n` quantities
+# describe the intermediate state with a core hole. :code:`trans_mat` holds the
+# Cartesian dipole matrices.
+out = edrixs.model_siam(
+    shell_name, nbath, siam_type=0, v_noccu=v_noccu,
+    c_level=c_level, c_soc=c_soc, trans_c2n=trans_c2n,
+    imp_mat=imp_mat, imp_mat_n=imp_mat_n,
+    bath_level=bath_level, bath_level_n=bath_level_n, hyb=hyb,
+    slater=slater, ext_B=ext_B, on_which=on_which,
+)
+emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat = out
 
 ################################################################################
-# Calling the :code:`edrixs.ed_siam_fort` solver will find the ground state and
-# write input files, *hopping_i.in*, *hopping_n.in*, *coulomb_i.in*, *coulomb_n.in*
-# for following XAS (or RIXS) calculation. We need to specify :code:`siam_type=0`
-# which says that we will pass *imp_mat*, *bath_level* and *hyb*.
-# We need to specify :code:`do_ed = 1`. For this example, we cannot use
-# :code:`do_ed = 0` for a ground state search as we have set the impurity and
-# bath energy levels artificially, which means edrixs will have trouble to know
-# which subspace to search to find the ground state.
-if __name__ == '__main__':
-    do_ed = 1
-    eval_i, denmat, noccu_gs = edrixs.ed_siam_fort(
-        comm, shell_name, nbath, siam_type=0, imp_mat=imp_mat, imp_mat_n=imp_mat_n,
-        bath_level=bath_level, bath_level_n=bath_level_n, hyb=hyb, c_level=c_level,
-        c_soc=c_soc, slater=slater, ext_B=ext_B,
-        on_which=on_which, trans_c2n=trans_c2n, v_noccu=v_noccu, do_ed=do_ed,
-        ed_solver=2, neval=50, nvector=3, ncv=100, idump=True)
-################################################################################
-# Let's check that we have all the electrons we think we have and print how
-# the electron are distributed between the Ni (impurity) and O (bath).
-if __name__ == '__main__':
-    assert np.abs(noccu_gs - v_noccu) < 1e-6
-    impurity_occupation = np.sum(denmat[0].diagonal()[0:norb_d]).real
-    bath_occupation = np.sum(denmat[0].diagonal()[norb_d:]).real
-    print('Impurity occupation = {:.6f}\n'.format(impurity_occupation))
-    print('Bath occupation = {:.6f}\n'.format(bath_occupation))
-################################################################################
-# We see that 0.18 electrons move from the O to the Ni in the ground state.
+# Diagonalization
+# ------------------------------------------------------------------------------
+# :func:`~edrixs.get_ops` converts these backend-independent ingredients into
+# many-body initial/final and intermediate Hamiltonians, plus the dipole
+# operators that map the initial Fock space to the intermediate one. Here we
+# select the PETSc backend, which stores the Hamiltonians as distributed
+# sparse matrices and uses SLEPc to extract the lowest eigenpairs. This scales
+# to the larger Hilbert spaces typical of Anderson impurity models and runs in
+# parallel if the script is launched with::
 #
-# We can now construct the XAS spectrum edrixs by applying a transition
-# operator to create the excited state. We need to be careful to specify how
-# many of the low energy states are thermally populated. In this case
-# :code:`num_gs=3`. This can be determined by inspecting the function output.
-if __name__ == '__main__':
-    xas, xas_poles = edrixs.xas_siam_fort(
-        comm, shell_name, nbath, ominc_xas, gamma_c=gamma_c, v_noccu=v_noccu, thin=thin,
-        phi=phi, num_gs=3, nkryl=200, pol_type=poltype_xas, temperature=temperature
-    )
+#        mpirun -n <number of processors> python example_03_AIM_XAS.py
+#
+# Running it as a plain :code:`python` script also works, it is just slower.
+backend = 'petsc'
+hmat_i, hmat_n, trans_ops = edrixs.get_ops(
+    emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
+    backend=backend,
+)
+
 ################################################################################
-# Let's plot the data and save it just in case
-if __name__ == '__main__':
+# :func:`~edrixs.ed` obtains the retained low-energy eigenpairs of the
+# Hamiltonian without a core hole. Here :code:`num_evals=3` states are
+# thermally populated at the temperature of interest.
+eval_i, evec_i = edrixs.ed(hmat_i, num_evals=3, backend=backend)
+
+################################################################################
+# Compute XAS
+# ------------------------------------------------------------------------------
+# The spectrum is built by applying the dipole operators to the thermally
+# populated initial states and propagating in the intermediate-state
+# Hamiltonian. EDRIXS weights the retained eigenstates by their Boltzmann
+# factors at :code:`temperature`. Because our model includes hybridization,
+# the spectrum captures charge-transfer processes in which electrons move
+# between the O bath and the Ni impurity.
+xas = edrixs.xas(
+    eval_i, evec_i, hmat_n, trans_ops, ominc_xas,
+    gamma_c=gamma_c, thin=thin, phi=phi, pol_type=poltype_xas,
+    temperature=temperature, backend=backend,
+)
+
+################################################################################
+# Let's plot the data and save it just in case. The returned array has shape
+# :code:`(len(ominc_xas), len(poltype_xas))`.
+if __name__ == "__main__":
     fig, ax = plt.subplots()
 
-    ax.plot(ominc_xas, xas)
+    ax.plot(ominc_xas, xas[:, 0])
     ax.set_xlabel('Energy (eV)')
     ax.set_ylabel('XAS intensity')
     ax.set_title('Anderson impurity model for NiO')
     plt.show()
 
-    np.savetxt('xas.dat', np.concatenate((np.array([ominc_xas]).T, xas), axis=1))
+np.savetxt('xas.dat', np.column_stack((ominc_xas, xas)))
 
 ##############################################################################
 #

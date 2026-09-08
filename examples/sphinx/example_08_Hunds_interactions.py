@@ -6,7 +6,7 @@ In this exercise we will solve a toy model relevant to cubic :math:`d^8` charge 
 such as NiO or NiPS\\ :sub:`3`. We are interested in better understanding the interplay between the
 Hund's interactions and the charge transfer energy in terms of the energy of the triplet-singlet
 excitations of this model. These seem to act against each other in that the Hund's interactions
-impose a energy cost for the triplet-singlet excitations whenever there are two holes on
+impose an energy cost for the triplet-singlet excitations whenever there are two holes on
 the Ni :math:`d` orbitals. The charge transfer physics, on the other hand, will promote a
 :math:`d^9\\underline{L}` ground state in which the Hund's interactions are not active.
 
@@ -19,14 +19,14 @@ realistic model would account for the different Coulomb and hopping of the :math
 and :math:`d_{x^2-y^2}` orbitals. We therefore simply connect Ni and ligand orbitals via a constant
 hopping :math:`t`. We also include the ligand energy parameter :math:`e_L`.
 
-The easiest way to implement the requried Coulomb interactions is to use the so-called Kanamori
-Hamiltonian, which is a simplfied form for the interactions, which treats all orbitals as
+The easiest way to implement the required Coulomb interactions is to use the so-called Kanamori
+Hamiltonian, which is a simplified form for the interactions that treats all orbitals as
 equivalent. Daniel Khomskii's book provides a great explanation of this physics [1]_.  We
 parameterize the interactions via Coulomb repulsion parameter :math:`U` and Hund's exchange
-:math:`J_H`. EDRIXS provides this functionality via the  more general
+:math:`J_H`. EDRIXS provides this functionality via the more general
 :func:`.get_umat_kanamori` function.
 
-It's also easiest to consider this problem in hole langauge, which means our eight spin-orbitals
+It's also easiest to consider this problem in hole language, which means our eight spin-orbitals
 are populated by two fermions.
 """
 
@@ -36,7 +36,6 @@ are populated by two fermions.
 # We start by loading the necessary modules, and defining the total number of
 # orbitals and electrons.
 import edrixs
-import scipy
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -78,21 +77,23 @@ def diagonalize(U, JH, t, eL, n=1):
     # add small effective field along z
     emat += 1e-6*spin_mom[2]
 
-    # Diagonalize
-    basis = edrixs.get_fock_bin_by_N(norb, noccu)
-    H = edrixs.build_opers(2, emat, basis) + edrixs.build_opers(4, umat, basis)
-    e, v = scipy.linalg.eigh(H)
+    # Diagonalize. This problem is small, so we use the dense backend.
+    basis = edrixs.get_fock_basis_int(norb, noccu)
+    H = edrixs.build_op(emat, umat, basis, backend='dense')
+    e, v = edrixs.ed(H, num_evals=len(basis), backend='dense')
     e -= e[0]  # Define ground state as zero energy
 
-    # Operator for holes on Ni
-    basis = np.array(basis)
-    num_d_electrons = basis[:, :4].sum(1)
+    # Operator for holes on Ni. The binary occupation vectors are in the same
+    # order as ``basis``.
+    fock_vectors = np.array(edrixs.get_fock_bin_by_N(norb, noccu))
+    num_d_electrons = fock_vectors[:, :4].sum(1)
     d0 = np.sum(np.abs(v[num_d_electrons == 0, :])**2, axis=0)
     d1 = np.sum(np.abs(v[num_d_electrons == 1, :])**2, axis=0)
     d2 = np.sum(np.abs(v[num_d_electrons == 2, :])**2, axis=0)
 
     # S^2 and Sz operators
-    opS = edrixs.build_opers(2, spin_mom, basis)
+    opS = [edrixs.build_op(component, None, basis, backend='dense')
+           for component in spin_mom]
     S_squared_op = np.dot(opS[0], opS[0]) + np.dot(opS[1], opS[1]) + np.dot(opS[2], opS[2])
     S_squared_exp = edrixs.cb_op(S_squared_op, v).diagonal().real
     S_z_exp = edrixs.cb_op(opS[2], v).diagonal().real
@@ -163,9 +164,8 @@ plt.show()
 # For large :math:`e_L`, we see that both holes are on nickel as expected. In
 # the opposite limit of :math:`|e_L| \ll t` and :math:`U \ll t` the holes are
 # shared in the ratio 0.25:0.5:0.25 as there are two ways to have one hole on
-# Ni. In the limit of large :math:`e_L`, all holes move onto Ni. Since
-# :math:`t` is large, this applies equally to both the ground state and the
-# exciton.
+# Ni. Since :math:`t` is large, the location of the holes is essentially the
+# same for the ground state and the exciton.
 
 
 ################################################################################
@@ -213,17 +213,17 @@ plt.tight_layout()
 plt.show()
 ##############################################################################
 # In the left panel, we see that the two limits are adiabatically connected
-# as they preseve the same quantum numbers. This is because there is always
+# as they preserve the same quantum numbers. This is because there is always
 # an appreciable double occupancy under conditions where the
 # :math:`d^9\underline{L}` character is maximized and this continues to favor
-# the high spin ground state. Other interactions such as strong tetragonal
+# the high spin ground state. Other interactions such as a strong tetragonal
 # crystal field would be needed to overcome the Hund's interactions and break
 # this paradigm. In the right panel, we see that the exciton energy simply
 # scales with the double occupancy. Overall, even though
 # Hund's interactions are irrelevant for the :math:`d^9\underline{L}`
-# electronic configuration, whenever :math:`t` is appreciable there is a
-# strong mixing with the :math:`d^8` component is always present, which
-# dominates the energy of the exciton.
+# electronic configuration, whenever :math:`t` is appreciable a strong mixing
+# with the :math:`d^8` component is always present, and this dominates the
+# energy of the exciton.
 
 ################################################################################
 # Charge transfer excitons
@@ -261,7 +261,7 @@ axs[1].set_title("Location of exciton holes")
 plt.tight_layout()
 plt.show()
 ################################################################################
-# Around :math:`e_L = 7` the plot shows that the excition is primairly a
+# Around :math:`e_L = 7` the plot shows that the exciton is primarily a
 # :math:`d^2 \rightarrow d^1` transition or a
 # :math:`d^8 \rightarrow d^{9}\underline{L}` transition in electron language.
 # Let's examine the energy and quantum numbers.

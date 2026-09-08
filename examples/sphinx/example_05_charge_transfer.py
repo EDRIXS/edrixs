@@ -10,126 +10,98 @@ in the atomic limit, after considering Coulomb interactions and crystal field. A
 this can be determined analytically in some cases, the easiest way is often just to
 calculate it, as we will do here.
 """
-import edrixs
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy
-import example_03_AIM_XAS
-import importlib
-_ = importlib.reload(example_03_AIM_XAS)
+import edrixs
+from edrixs import FockBasisSpec
 
 ################################################################################
 # Determine eigenvectors and occupations
 # ------------------------------------------------------------------------------
 # The first step repeats what was done in
-# :ref:`sphx_glr_auto_examples_example_04_GS_analysis.py` but it does not apply
-# the hybridization between the impurity and both states.
+# :ref:`sphx_glr_auto_examples_example_04_GS_analysis.py` but removes
+# the hybridization between the impurity and bath states.
 
-from example_03_AIM_XAS import (F0_dd, F2_dd, F4_dd,
-                               nd, norb_d, norb_bath, v_noccu,
-                               imp_mat, bath_level,
-                               hyb, ext_B, trans_c2n)
-ntot = 20
-umat_delectrons = edrixs.get_umat_slater('d', F0_dd, F2_dd, F4_dd)
-umat = np.zeros((ntot, ntot, ntot, ntot), dtype=complex)
-umat[:norb_d, :norb_d, :norb_d, :norb_d] += umat_delectrons
-emat_rhb = np.zeros((ntot, ntot), dtype='complex')
-emat_rhb[0:norb_d, 0:norb_d] += imp_mat
-indx = np.arange(norb_d, norb_d*2)
-emat_rhb[indx, indx] += bath_level[0]
-tmat = np.eye(ntot, dtype=complex)
-for i in range(2):
-    off = i * norb_d
-    tmat[off:off+norb_d, off:off+norb_d] = np.conj(np.transpose(trans_c2n))
+# sphinx_gallery_start_ignore
+# Importing these scripts re-executes examples 3 and 4. Silence their prints and
+# discard any figures they leave open so sphinx-gallery does not attach them to
+# this page.
+import contextlib
+import io
+with contextlib.redirect_stdout(io.StringIO()):
+    from example_03_AIM_XAS import emat_i, umat_i, basis_i, norb_d, nd, nbath
+    from example_04_GS_analysis import O
+plt.close('all')
+# sphinx_gallery_end_ignore
 
-emat_chb = edrixs.cb_op(emat_rhb, tmat)
-v_orbl = 2
-sx = edrixs.get_sx(v_orbl)
-sy = edrixs.get_sy(v_orbl)
-sz = edrixs.get_sz(v_orbl)
-zeeman = ext_B[0] * (2 * sx) + ext_B[1] * (2 * sy) + ext_B[2] * (2 * sz)
-emat_chb[0:norb_d, 0:norb_d] += zeeman
-basis = np.array(edrixs.get_fock_bin_by_N(ntot, v_noccu))
-H = (edrixs.build_opers(2, emat_chb, basis)
-     + edrixs.build_opers(4, umat, basis))
+emat_i[:norb_d, norb_d:(norb_d + nbath*norb_d)] = 0
+emat_i[norb_d:(norb_d + nbath*norb_d), :norb_d] = 0
 
-e, v = scipy.linalg.eigh(H)
-e -= e[0]
+backend = 'petsc'
+hmat_i = edrixs.build_op(emat_i, umat_i, basis_i, backend=backend)
+eval_i, evec_i = edrixs.ed(hmat_i, num_evals=len(basis_i), backend=backend)
+eval_i = eval_i - eval_i.min()
 
-num_d_electrons = basis[:, :norb_d].sum(1)
-alphas = np.sum(np.abs(v[num_d_electrons == 8, :])**2, axis=0)
-betas = np.sum(np.abs(v[num_d_electrons == 9, :])**2, axis=0)
+work = O.createVecLeft()
+nd_expect = np.empty(len(evec_i))
+for k, psi in enumerate(evec_i):
+    O.mult(psi, work)
+    nd_expect[k] = work.dot(psi).real
 
 ################################################################################
 # Energy to lowest energy ligand orbital
 # ------------------------------------------------------------------------------
-# Let's vizualize :math:`\alpha` and :math:`\beta`.
+# Let's plot the :math:`d`-electron count of each eigenstate against its energy.
 
 fig, ax = plt.subplots()
 
-ax.plot(e, alphas, '.-', label=r'$\alpha$ $d^8L^{10}$')
-ax.plot(e, betas, '.-', label=r'$\beta$ $d^9L^{9}$')
+ax.plot(eval_i, nd_expect, '.-')
 
 ax.set_xlabel('Energy (eV)')
-ax.set_ylabel('Population')
-ax.set_title('NiO')
-ax.legend()
+ax.set_ylabel('Number of $d$ electrons')
 plt.show()
 
 ################################################################################
-# One can see that the mixing between impurity and bath states has disappered
-# because we have turned off the hybridization. The energy required to
+# With the hybridization turned off, the impurity and bath states no longer mix,
+# so every eigenstate has an (almost) integer :math:`d` count. The charge
+# transfer energy is the energy to go from the :math:`d^8` ground state to the
+# lowest :math:`d^9\underline{L}` state:
 
-GS_energy = min(e[np.isclose(alphas, 1)])
-lowest_energy_to_transfer_electron = min(e[np.isclose(betas, 1)])
+GS_energy = min(eval_i[np.isclose(nd_expect, 8)])
+lowest_energy_to_transfer_electron = min(eval_i[np.isclose(nd_expect, 9)])
 E_to_ligand = lowest_energy_to_transfer_electron - GS_energy
 print(f"Energy to lowest energy ligand state is {E_to_ligand:.3f} eV")
 
-################################################################################
-# where we have used :code:`np.isclose` to avoid errors from finite numerical
-# precision.
 
 ################################################################################
 # Diagonalizing by blocks
 # ------------------------------------------------------------------------------
 # When working on a problem with a large basis, one can take advantage of the
 # lack of hybridization and separately diagonalize the impurity and bath
-# states
+# states. With the staged interface, each block Hamiltonian is built from the
+# relevant sub-blocks of :code:`emat_i` and :code:`umat_i` together with a
+# :class:`~edrixs.FockBasisSpec` fixing that block's occupancy. The blocks are
+# small, so we use the dense backend.
+
+d_block = slice(0, norb_d)
+L_block = slice(norb_d, 2 * norb_d)
+umat_d = umat_i[d_block, d_block, d_block, d_block]
 
 energies = []
-
 for n_ligand_holes in [0, 1]:
-    basis_d = edrixs.get_fock_bin_by_N(10, nd + n_ligand_holes)
-    Hd = (edrixs.build_opers(2, emat_chb[:10, :10], basis_d)
-          + edrixs.build_opers(4, umat[:10, :10, :10, :10], basis_d))
-    ed = scipy.linalg.eigh(Hd, eigvals_only=True, subset_by_index=[0, 0])[0]
+    basis_d = FockBasisSpec.from_args(norb_d, nd + n_ligand_holes)
+    Hd = edrixs.build_op(emat_i[d_block, d_block], umat_d, basis_d, backend='dense')
+    e_d = edrixs.ed(Hd, num_evals=1, backend='dense')[0][0]
 
-    basis_L = edrixs.get_fock_bin_by_N(10, 10 - n_ligand_holes)
-    HL = (edrixs.build_opers(2, emat_chb[10:, 10:], basis_L)
-          + edrixs.build_opers(4, umat[10:, 10:, 10:, 10:], basis_L))
-    eL = scipy.linalg.eigh(HL, eigvals_only=True, subset_by_index=[0, 0])[0]
+    basis_L = FockBasisSpec.from_args(norb_d, norb_d - n_ligand_holes)
+    HL = edrixs.build_op(emat_i[L_block, L_block], None, basis_L, backend='dense')
+    e_L = edrixs.ed(HL, num_evals=1, backend='dense')[0][0]
 
-    energies.append(ed + eL)
+    energies.append(e_d + e_L)
 
-print(f"Energy to lowest energy ligand state is {energies[1] - energies[0]:.3f} eV")
+print("Energy to lowest energy ligand state (block diagonalization) is "
+      f"{energies[1] - energies[0]:.3f} eV")
 
-################################################################################
-# which yields the same result.
-
-################################################################################
-# Energy splitting in ligand states
-# ------------------------------------------------------------------------------
-# The last thing to consider is that our definition of the charge transfer
-# energy refers to the atomic limit with all hopping terms switched off, whereas
-# the ligand states in the model are already split by the oxygen-oxygen hopping
-# term :math:`T_{pp}` as illustrated below. So the final charge transer energy
-# needs to account for this.
-#
-#     .. image:: /_static/energy_level.png
-#
-
-T_pp = 1
-print(f"Charge transfer is {energies[1] - energies[0] + T_pp:.3f} eV")
 
 
 ##############################################################################

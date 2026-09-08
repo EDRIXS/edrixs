@@ -6,16 +6,16 @@ For Linux users we suggest :ref:`installing with anaconda <AnacondaInstall>`. Fo
 
 .. _AnacondaInstall:
 
-Install and use edrixs via Anaconda
+Install and use EDRIXS via Anaconda
 ====================================================
-A conda package has been built for Linux. To use edrixs via Anaconda, you need first to install `Anaconda <https://www.anaconda.com/distribution/>`_ in your system.
-We recommend installing edrixs into a separate environment, for example, called ``edrixs_env``, together with any other packages you might want to use like this::
+A conda package has been built for Linux. To use EDRIXS via Anaconda, you need first to install `Anaconda <https://www.anaconda.com/distribution/>`_ in your system.
+We recommend installing EDRIXS into a separate environment, for example, called ``edrixs_env``, together with any other packages you might want to use like this::
 
     conda create --name edrixs_env -c conda-forge python=3.13 edrixs matplotlib
 
-We endeavor to keep the conda-forge release up to date, but note that these builds will usually not correspond to the latest version of edrixs, which is available in the `master branch of edrixs <https://github.com/NSLS-II/edrixs>`_.
+We endeavor to keep the conda-forge release up to date, but note that these builds will usually not correspond to the latest version of EDRIXS, which is available in the `master branch of EDRIXS <https://github.com/NSLS-II/edrixs>`_.
 
-edrixs will also run on `Google Colaboratory <https://research.google.com/colaboratory/>`_, but does not come installed as default. Installing it requires a you to install conda and then edrixs, which can be done by executing a cell::
+EDRIXS will also run on `Google Colaboratory <https://research.google.com/colaboratory/>`_, but does not come installed as default. Installing it requires a you to install conda and then EDRIXS, which can be done by executing a cell::
 
     !pip install -q condacolab
     import condacolab
@@ -26,7 +26,7 @@ from within a notebook cell.
 
 Requirements
 ============
-Several tools and libraries are required to build and install edrixs,
+Several tools and libraries are required to build and install EDRIXS,
 
    * Fortran compiler: gfortran and ifort are supported
    * MPI environment: openmpi and mpich are tested
@@ -35,13 +35,13 @@ Several tools and libraries are required to build and install edrixs,
    * ARPACK library: `arpack-ng <https://github.com/opencollab/arpack-ng/>`_  with mpi enabled
    * Only Python3 is supported
    * numpy, scipy, sympy, matplotlib, sphinx, numpydoc
-   * mpi4py with the same MPI implementation libraries (``openmpi`` or ``mpich``) as building edrixs
+   * mpi4py with the same MPI implementation libraries (``openmpi`` or ``mpich``) as building EDRIXS
 
 Build from source
 =================
-We will show how to build edrixs from source on Ubuntu Linux 20.04.
+We will show how to build EDRIXS from source on Ubuntu Linux 20.04.
 We will use gcc, gfortran, openmpi and OpenBLAS in these examples.
-Building edrixs on other versions of Linux or with Intel's ifort+MKL will be similar.
+Building EDRIXS on other versions of Linux or with Intel's ifort+MKL will be similar.
 
 Ubuntu Linux 20.04
 ------------------
@@ -52,14 +52,14 @@ Install compilers and tools::
     sudo apt-get install git wget
     sudo apt-get install python3 libpython3-dev python3-pip python3-venv
 
-Create and activate a python virtual environment for edrixs::
+Create and activate a python virtual environment for EDRIXS::
 
     python3 -m venv VIRTUAL_ENV
     source VIRTUAL_ENV/bin/activate
 
-where ``VIRTUAL_ENV`` should be replaced by the directory where you wish to install edrixs.
+where ``VIRTUAL_ENV`` should be replaced by the directory where you wish to install EDRIXS.
 
-Alternatively create and activate a conda environment for edrixs::
+Alternatively create and activate a conda environment for EDRIXS::
 
     conda create --name edrixs_env python=3.10
     conda activate edrixs_env
@@ -158,13 +158,13 @@ Check whether the MPI paths are correct by::
      'library_dirs': '/usr/local/lib',
      'runtime_library_dirs': '/usr/local/lib'}
 
-Now, we are ready to build edrixs::
+Now, we are ready to build EDRIXS::
 
     git clone https://github.com/NSLS-II/edrixs.git
     cd edrixs
     pip install -v .
 
-Start to play with edrixs by::
+Start to play with EDRIXS by::
 
     python
     >>> import edrixs

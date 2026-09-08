@@ -6,7 +6,7 @@ Here we show how to compute RIXS for a single site atomic model with crystal
 field and electron-electron interactions. We take the case of
 Sr\ :sub:`2`\ YIrO\ :sub:`6`
 from Ref. [1]_ as the material in question. The aim of this example is to
-illustrate the proceedure and to provide what we hope is useful advice. What is
+illustrate the procedure and to provide what we hope is useful advice. What is
 written is not meant to be a replacement for reading the docstrings of the
 functions, which can always be accessed on the
 `edrixs website <https://edrixs.github.io/edrixs/reference/index.html>`_ or
@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 # Sr\ :sub:`2`\ YIrO\ :sub:`6`\  has a :math:`5d^4` electronic configuration and
 # we want to calculate the :math:`L_3` edge spectrum i.e. resonating with a
 # :math:`2p_{3/2}` core hole. We will start by including only the
-# :math:`t_{2g}` valance orbitals.
+# :math:`t_{2g}` valence orbitals.
 shell_name = ('t2g', 'p32')
 v_noccu = 4
 
@@ -53,25 +53,53 @@ slater_n = [
     0.0, 0.0           # Fk for p
 ]
 slater = [slater_i, slater_n]
-v_soc = (lam, lam)
 
 ################################################################################
 # Diagonalization
 # ------------------------------------------------------------------------------
-# We obtain the ground and intermediate state eigenenergies and the transition
-# operators via matrix diagonalization. Note that the calculation does not know
-# the core hole energy, so we need to adjust the energy that the resonance will
-# appear at by hand. We know empirically that the resonance is at 11215 eV
-# and that putting four electrons into the valance band costs about
-# :math:`4 F^0_d\approx6` eV. In this case
-# we are assuming a perfectly cubic crystal field, which we have already
-# implemented when we specified the use of the :math:`t_{2g}` subshell only
+# The EDRIXS interface separates the physical model from the methods used to
+# compute XAS or RIXS. :func:`~edrixs.model_1v1c` returns one-body matrices
+# (:code:`emat_i` and :code:`emat_n`), Coulomb tensors (:code:`umat_i` and
+# :code:`umat_n`), compact Fock-basis specifications (:code:`basis_i` and
+# :code:`basis_n`), and Cartesian dipole matrices (:code:`trans_mat`). The
+# impurity one-body matrix :code:`imp_mat` contains the valence spin--orbit
+# coupling and, below, the crystal field.
+# :code:`i` quantities describe the initial and final states without a core
+# hole, while the :code:`n` quantities describe the intermediate state with a
+# core hole.
+#
+# :func:`~edrixs.get_ops` converts these backend-independent ingredients into
+# many-body initial/final and intermediate Hamiltonians, plus dipole operators
+# that map the initial Fock space to the intermediate one. We choose the SciPy
+# backend, which represents these many-body operators as sparse matrices.
+# :func:`~edrixs.ed` then obtains the retained low-energy eigenpairs used
+# by :func:`~edrixs.xas` and :func:`~edrixs.rixs`.
+# Note that the calculation does not know
+# the core hole energy, so we need to adjust the energy at which the resonance
+# will appear by hand. We know empirically that the resonance is at 11215 eV,
+# and there is a further few-eV shift from the Coulomb energy of adding the
+# valence electrons that is not captured by the raw calculation. We fold both
+# into a single offset :code:`off` and tune the small correction (here
+# :math:`\approx6` eV) so the computed spectrum lines up with experiment. In
+# this case we are assuming a perfectly cubic crystal field, which we have
+# already implemented by specifying the use of the :math:`t_{2g}` subshell only,
 # so we do not need to pass an additional :code:`v_cfmat` matrix.
-
+backend = 'scipy'
 off = 11215 - 6
-out = edrixs.ed_1v1c_py(shell_name, shell_level=(0, -off), v_soc=v_soc,
-                        c_soc=info['c_soc'], v_noccu=v_noccu, slater=slater)
-eval_i, eval_n, trans_op = out
+imp_mat = edrixs.atom_hsoc(shell_name[0], lam)
+out = edrixs.model_1v1c(
+    shell_name, v_noccu=v_noccu, shell_level=(0, -off),
+    v_othermat=imp_mat, slater=slater,
+)
+emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat = out
+
+hmat_i, hmat_n, trans_ops = edrixs.get_ops(
+    emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
+    backend=backend,
+)
+
+
+eval_i, evec_i = edrixs.ed(hmat_i, num_evals=2, backend=backend)
 
 ################################################################################
 # Compute XAS
@@ -79,7 +107,7 @@ eval_i, eval_n, trans_op = out
 # To calculate XAS we need to correctly specify the orientation of the x-rays
 # with respect to the sample. By default, the :math:`x, y, z` coordinates
 # of the sample's crystal field, will be aligned with our lab frame, passing
-# :code:`loc_axis` to :code:`ed_1v1c_py` can be used to specify a different
+# :code:`loc_axis` to :code:`model_1v1c` can be used to specify a different
 # convention. The experimental geometry is specified following the angles
 # shown in Figure 1 of Y. Wang et al.,
 # `Computer Physics Communications 243, 151-165 (2019)
@@ -87,36 +115,30 @@ eval_i, eval_n, trans_op = out
 # setting has x-rays along :math:`z` for :math:`\theta=\pi/2` rad
 # and the x-ray beam along :math:`-x` for
 # :math:`\theta=\phi=0`. Parameter :code:`scatter_axis` can be passed to
-# :code:`xas_1v1c_py` to specify a different geometry if desired.
+# :code:`xas` to specify a different geometry if desired.
 #
 # Variable :code:`pol_type` specifies a list of different x-ray
 # polarizations to calculate. Here we will use so-called :math:`\pi`-polarization
 # where the x-rays are parallel to the plane spanned by the incident
 # beam and the sample :math:`z`-axis.
 #
-# EDRIXS represents the system's ground state using a set of
-# low energy eigenstates weighted by Boltzmann thermal factors.
-# These eigenstates are specified by :code:`gs_list`,
-# which is of the form :math:`[0, 1, 2, 3, \dots]`. In this example, we
-# calculate these states as those that have non-negligible thermal
-# population. The function :code:`xas_1v1c_py` assumes that the spectral
-# broadening is dominated by the inverse core hole lifetime :code:`gamma_c`,
-# which is the Lorentzian half width at half maximum.
+# EDRIXS weights the retained low-energy eigenstates by their Boltzmann factors.
+# The spectral broadening is dominated by the inverse core-hole lifetime
+# :code:`gamma_c`, the Lorentzian half width at half maximum.
 
 ominc = np.linspace(11200, 11230, 50)
 temperature = 300  # in K
-prob = edrixs.boltz_dist(eval_i, temperature)
-gs_list = [n for n, prob in enumerate(prob) if prob > 1e-6]
 
 thin = 30*np.pi/180
 phi = 0
 pol_type = [('linear', 0)]
+gamma_c = info['gamma_c'][0]
 
-xas = edrixs.xas_1v1c_py(
-    eval_i, eval_n, trans_op, ominc, gamma_c=info['gamma_c'],
-    thin=thin, phi=phi, pol_type=pol_type,
-    gs_list=gs_list)
-
+xas = edrixs.xas(
+    eval_i, evec_i, hmat_n, trans_ops, ominc,
+    gamma_c=gamma_c, thin=thin, phi=phi, pol_type=pol_type,
+    temperature=temperature, backend=backend,
+)
 
 ################################################################################
 # Compute RIXS
@@ -128,11 +150,10 @@ xas = edrixs.xas_1v1c_py(
 # -- the Lorentzian half width at half maximum.
 #
 # The angle and polarization of the emitted beam must also be specified, so
-# we pass :code:`pol_type_rixs` to the function, which specifies the
-# includes the incoming and outgoing x-ray states. If, as is common in
-# experiments, the emitted polarization is not resolved
-# one needs to add both emitted polarization channels, which is what we will
-# do later on in this example.
+# we pass :code:`pol_type_rixs` to the function. Each entry is a 4-tuple that
+# specifies both the incoming and the outgoing x-ray polarization. If, as is
+# common in experiments, the emitted polarization is not resolved, one needs to
+# add both outgoing polarization channels, which is what we do here.
 
 eloss = np.linspace(-.5, 6, 400)
 pol_type_rixs = [('linear', 0, 'linear', 0), ('linear', 0, 'linear', np.pi/2)]
@@ -140,24 +161,24 @@ pol_type_rixs = [('linear', 0, 'linear', 0), ('linear', 0, 'linear', np.pi/2)]
 thout = 60*np.pi/180
 gamma_f = 0.02
 
-rixs = edrixs.rixs_1v1c_py(
-    eval_i, eval_n, trans_op, ominc, eloss,
-    gamma_c=info['gamma_c'], gamma_f=gamma_f,
+rixs = edrixs.rixs(
+    eval_i, evec_i, hmat_i, hmat_n, trans_ops, ominc, eloss,
+    gamma_c=gamma_c, gamma_f=gamma_f,
     thin=thin, thout=thout, phi=phi,
-    pol_type=pol_type_rixs, gs_list=gs_list,
-    temperature=temperature
+    pol_type=pol_type_rixs,
+    temperature=temperature, backend=backend,
 )
 
 ################################################################################
 # The array :code:`xas` will have shape
-# :code:`(len(ominc_xas), len(pol_type))`
+# :code:`(len(ominc), len(pol_type))`
 
 ################################################################################
 # Plot XAS and RIXS
 # ------------------------------------------------------------------------------
 # Let's plot everything. We will use a function so we can reuse the code later.
 # Note that the rixs array :code:`rixs` has shape
-# :code:`(len(ominc_xas), len(ominc_xas), len(pol_type))`. We will use some numpy
+# :code:`(len(ominc), len(eloss), len(pol_type))`. We will use some numpy
 # tricks to sum over the two different emitted polarizations.
 
 fig, axs = plt.subplots(2, 2, figsize=(10, 10))
@@ -205,22 +226,30 @@ plt.show()
 ten_dq = 3.5
 v_cfmat = edrixs.cf_cubic_d(ten_dq)
 off = 11215 - 6 + ten_dq*2/5
-out = edrixs.ed_1v1c_py(('d', 'p32'), shell_level=(0, -off), v_soc=v_soc,
-                        v_cfmat=v_cfmat,
-                        c_soc=info['c_soc'], v_noccu=v_noccu, slater=slater)
-eval_i, eval_n, trans_op = out
+imp_mat = edrixs.atom_hsoc('d', lam) + v_cfmat
+out = edrixs.model_1v1c(
+    ('d', 'p32'), v_noccu=v_noccu, shell_level=(0, -off),
+    v_othermat=imp_mat, slater=slater,
+)
+emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat = out
+hmat_i, hmat_n, trans_ops = edrixs.get_ops(
+    emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
+    backend=backend,
+)
+eval_i, evec_i = edrixs.ed(hmat_i, num_evals=2, backend=backend)
 
-xas_full_d_shell = edrixs.xas_1v1c_py(
-    eval_i, eval_n, trans_op, ominc, gamma_c=info['gamma_c'],
-    thin=thin, phi=phi, pol_type=pol_type,
-    gs_list=gs_list)
+xas_full_d_shell = edrixs.xas(
+    eval_i, evec_i, hmat_n, trans_ops, ominc,
+    gamma_c=gamma_c, thin=thin, phi=phi, pol_type=pol_type,
+    temperature=temperature, backend=backend,
+)
 
-rixs_full_d_shell = edrixs.rixs_1v1c_py(
-    eval_i, eval_n, trans_op, np.array([11215]), eloss,
-    gamma_c=info['gamma_c'], gamma_f=gamma_f,
-    thin=thin, thout=thout, phi=phi,
-    pol_type=pol_type_rixs, gs_list=gs_list,
-    temperature=temperature)
+rixs_full_d_shell = edrixs.rixs(
+    eval_i, evec_i, hmat_i, hmat_n, trans_ops, np.array([11215]), eloss,
+    gamma_c=gamma_c, gamma_f=gamma_f,
+    thin=thin, thout=thout, phi=phi, pol_type=pol_type_rixs,
+    temperature=temperature, backend=backend,
+)
 
 fig, axs = plt.subplots(1, 2, figsize=(10, 4))
 plot_it(axs, ominc, xas, eloss, rixscut, label='$t_{2g}$ subshell')
@@ -234,7 +263,7 @@ plt.show()
 ################################################################################
 # As expected, we see the appearance of excitations on the energy scale of
 # :math:`10D_q` in the XAS and RIXS. The low energy manifold is qualitatively,
-# but not quantiatively similar. This makes it clear that the parameterization
+# but not quantitatively similar. This makes it clear that the parameterization
 # of Sr\ :sub:`2`\ YIrO\ :sub:`6`\  is dependent on the model.
 
 ##############################################################################

@@ -1,10 +1,10 @@
 .. _pythontips:
 
 **************************
-Tips for python and edrixs
+Tips for python and EDRIXS
 **************************
 
-In the design of edrixs, we made a deliberate choice to use
+In the design of EDRIXS, we made a deliberate choice to use
 `python <http://www.python.org>`_ for the application programming interface. This is
 because of its readability, easy of use and flexibility to run and combine it
 in many different ways.
@@ -29,7 +29,7 @@ would like to. If you want to modify, say, solvers.py. we would suggest copying
 solvers.py to your working directory under a different name e.g.
 :code:`my_solvers.py`. Executing :code:`%run my_solvers.py`
 from within your script will then load the functions from the file into your
-namespace. Just be sure to tell the script to load functions from edrixs
+namespace. Just be sure to tell the script to load functions from EDRIXS
 (and not via a relative file import) i.e. :code:`from .soc import atom_hsoc`
 should be :code:`from edrixs.soc import atom_hsoc`.
 
@@ -62,5 +62,5 @@ Use ``import pdb; pdb.set_trace()`` to set the place where you want to enter the
 debugger. See `here <https://docs.python.org/3/library/pdb.html>`_ for more details.
 
 If you are feeling even braver, you can browse the Fortran code which does the
-heavyweight computation. Either in the source edrixs directory or via the online
-`edrixs repo <http://www.github.com/NSLS-II/edrixs>`_.
+heavyweight computation. Either in the source EDRIXS directory or via the online
+`EDRIXS repo <http://www.github.com/NSLS-II/edrixs>`_.

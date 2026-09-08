@@ -1,13 +1,13 @@
 .. _edrixsanddocker:
 
 *********************
-edrixs and docker
+EDRIXS and docker
 *********************
 
-Run edrixs in a docker container
+Run EDRIXS in a docker container
 --------------------------------
 
-To make life easier, we have built a docker image based on Ubuntu Linux (22.04) for edrixs, so you don't need to struggle with the installation anymore.
+To make life easier, we have built a docker image based on Ubuntu Linux (22.04) for EDRIXS, so you don't need to struggle with the installation anymore.
 The docker image can be used on any OS as long as the `docker <https://www.docker.com/>`_ application is available.
 Follow these steps to use the docker image:
 
@@ -44,7 +44,7 @@ Follow these steps to use the docker image:
 Use the docker image as a Dev Container
 ----------------------------------------
 
-You can use the edrixs docker image as a `Dev Container
+You can use the EDRIXS docker image as a `Dev Container
 <https://containers.readthedocs.io/>`_ in VS Code or GitHub Codespaces without
 cloning the full repository. Create a file ``.devcontainer/devcontainer.json``
 in your project with the following contents ::
@@ -58,7 +58,7 @@ Open the project in VS Code with the `Dev Containers
 <https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers>`_
 extension installed and choose **Reopen in Container** when prompted.
 
-See :ref:`devcontainer` for more details on using Dev Containers with edrixs.
+See :ref:`devcontainer` for more details on using Dev Containers with EDRIXS.
 
 Sharing your code
 -----------------

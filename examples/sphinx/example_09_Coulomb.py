@@ -53,14 +53,13 @@ that one might not anticipate. Our example is based on a :math:`d` atomic shell.
 # In EDRIXS the matrix can be created as follows:
 import edrixs
 import numpy as np
-import scipy
 import matplotlib.pyplot as plt
 import itertools
 
 F0, F2, F4 = 6.94, 14.7, 4.41
 umat_chb = edrixs.get_umat_slater('d', F0, F2, F4)
 ################################################################################
-# We stored this under variable :code:`umat_chb` where "cbh" stands for
+# We stored this under variable :code:`umat_chb` where "chb" stands for
 # complex harmonic basis, which is the default basis in EDRIXS.
 
 ################################################################################
@@ -254,7 +253,7 @@ for i, j, k, l in ijkl:
 # Effects of multi-orbital terms
 # ------------------------------------------------------------------------------
 # To test the effects of the multi-orbital terms, let's plot the eigenenergy
-# spectra with and without multi-orbital terms switched on for system with and
+# spectra with and without multi-orbital terms switched on for systems with and
 # without a cubic crystal field. We will use a :math:`d`-shell with two
 # electrons.
 ten_dqs = [0, 2, 4, 12]
@@ -262,12 +261,11 @@ ten_dqs = [0, 2, 4, 12]
 def diagonalize(ten_dq, umat):
     emat = edrixs.cb_op(edrixs.cf_cubic_d(ten_dq),
                         edrixs.tmat_c2r('d', ispin=True))
-    H = (edrixs.build_opers(4, umat, basis)
-         + edrixs.build_opers(2, emat, basis))
-    e, v = scipy.linalg.eigh(H)
+    H = edrixs.build_op(emat, umat, basis, backend='dense')
+    e = edrixs.ed(H, num_evals=len(basis), backend='dense')[0]
     return e - e.min()
 
-basis = edrixs.get_fock_bin_by_N(10, 2)
+basis = edrixs.get_fock_basis_int(10, 2)
 umat_no_multiorbital = np.copy(umat)
 B = F2/49 - 5*F4/441
 for val in [np.sqrt(3)*B/2, np.sqrt(3)*B, 3*B/2]:
@@ -295,11 +293,11 @@ plt.show()
 
 ################################################################################
 # On the left of the plot Coulomb interactions in spherical symmetry cause
-# substantial mxing between :math:`t_{2g}` and :math:`e_{g}` orbitals in the
-# eigenstates and 3 & 4 orbital orbital terms are crucial for obtaining the
-# the right eigenenergies. As :math:`10D_q` get large, this mixing is switched
+# substantial mixing between :math:`t_{2g}` and :math:`e_{g}` orbitals in the
+# eigenstates and the 3 & 4 orbital terms are crucial for obtaining the
+# right eigenenergies. As :math:`10D_q` gets large, this mixing is switched
 # off and the spectra start to become independent of whether the 3 & 4 orbital
-# orbital terms are included or not.
+# terms are included or not.
 #
 #
 #

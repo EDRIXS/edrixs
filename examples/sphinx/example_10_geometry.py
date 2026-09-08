@@ -36,27 +36,41 @@ import io
 
 def make_rixs(v_cfmat, thin, thout, loc_axis=None, scatter_axis=None):
     v_noccu = 8
-    gs_list = [0, 1, 2]
     ominc = np.array([853])
     gamma_f = 0.1
     pol_type = [('linear', 0, 'linear', 0), ('linear', 0, 'linear', np.pi/2)]
     info = edrixs.utils.get_atom_data('Ni', '3d', v_noccu, edge='L3')
     slater = [[s[1] for s in info['slater_i']],
               [s[1] for s in info['slater_n']]]
-    off = 871
+    off = 871  # core-level offset, tuned so the resonance sits near the Ni L3 edge
+    backend = 'scipy'
+
+    # :func:`~edrixs.model_1v1c` builds the backend-independent problem
+    # (one-body matrices, Coulomb tensors, Fock-basis specs and dipole
+    # matrices), :func:`~edrixs.get_ops` turns them into many-body operators,
+    # and :func:`~edrixs.ed` returns the low-energy initial states. The Ni
+    # :math:`d^8` ground state is a spin triplet, so we keep three states.
     with contextlib.redirect_stdout(io.StringIO()):
-        out = edrixs.ed_1v1c_py(('d', 'p32'), shell_level=(0, -off),
-                                v_cfmat=v_cfmat, loc_axis=loc_axis,
-                                c_soc=info['c_soc'], v_noccu=v_noccu, slater=slater)
-    eval_i, eval_n, trans_op = out
+        out = edrixs.model_1v1c(
+            ('d', 'p32'), shell_level=(0, -off), v_cfmat=v_cfmat,
+            loc_axis=loc_axis, c_soc=info['c_soc'], v_noccu=v_noccu,
+            slater=slater,
+        )
+    emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat = out
+
+    hmat_i, hmat_n, trans_ops = edrixs.get_ops(
+        emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
+        backend=backend,
+    )
+    eval_i, evec_i = edrixs.ed(hmat_i, num_evals=3, backend=backend)
 
     eloss = np.arange(-1, 5, 0.01)
-    with contextlib.redirect_stdout(io.StringIO()):
-        rixs_all = edrixs.rixs_1v1c_py(
-            eval_i, eval_n, trans_op, ominc, eloss,
-            gamma_c=info['gamma_c'], gamma_f=gamma_f,
-            thin=thin, thout=thout, scatter_axis=scatter_axis,
-            pol_type=pol_type, gs_list=gs_list)
+    rixs_all = edrixs.rixs(
+        eval_i, evec_i, hmat_i, hmat_n, trans_ops, ominc, eloss,
+        gamma_c=info['gamma_c'], gamma_f=gamma_f,
+        thin=thin, thout=thout, scatter_axis=scatter_axis,
+        pol_type=pol_type, backend=backend,
+    )
 
     rixs = rixs_all.sum(axis=(0, 2))
     return eloss, rixs

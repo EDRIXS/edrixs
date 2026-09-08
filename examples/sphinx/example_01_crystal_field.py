@@ -9,6 +9,7 @@ This example explains how to implement crystal fields in edrixs.
 import edrixs
 import numpy as np
 import scipy
+from edrixs.fock_basis import FockBasisSpec
 
 np.set_printoptions(precision=2, suppress=True, linewidth=90)
 
@@ -18,23 +19,23 @@ np.set_printoptions(precision=2, suppress=True, linewidth=90)
 # Let us start by considering the common case of a :math:`d` atomic shell in a
 # cubic crystal field. This is controlled by parameter :math:`10D_q` and is
 # described in terms of a matrix which we will assign to :code:`cfmat`. edrixs
-# can make this matrix via.
+# can make this matrix via
 ten_dq = 10
 cfmat = edrixs.angular_momentum.cf_cubic_d(ten_dq)
 
 ################################################################################
 # Note this matrix is in a complex harmonic basis :math:`Y^m_l` where :math:`m`
-# goes from :math:`-l,-l+1,...,l-1, l`. There is an up spin and a down
+# goes from :math:`-l, -l+1, ..., l-1, l`. There is an up spin and a down
 # spin for each :math:`Y^m_l`. This matrix is not diagonal in the complex
 # harmonic basis, but it would be diagonal in the real harmonic basis
 # :math:`d_{3z^2-r^2}, d_{xz}, d_{yz}, d_{x^2-y^2}, d_{xy}`.
 # Let us diagonalize this matrix as a check and print out the energies
 # and their degeneracies.
 
-e, v = scipy.linalg.eigh(cfmat)
-e = e.round(decimals=6)
-unique_e = np.unique(e)
-degeneracies = [sum(evalue == e) for evalue in unique_e]
+evals_i, evecs_i = edrixs.ed(cfmat, num_evals=10)
+evals_i = evals_i.round(decimals=6)
+unique_e = np.unique(evals_i)
+degeneracies = [sum(evalue == evals_i) for evalue in unique_e]
 
 print("E  \tDegeneracy")
 for evalue, degenvalue in zip(unique_e, degeneracies):
@@ -45,13 +46,13 @@ print("{} distinct energies".format(len(unique_e)))
 # This makes sense! We see two different energies split by :math:`10D_q=10`. Let
 # us look at the six columns corresponding to the lower energy eigenvalues.
 
-print(v[:, :6].real)
+print(evecs_i[:, :6].real)
 
 ################################################################################
 # These are the set of so-called :math:`t_{2g}` orbitals, composed of
 # :math:`Y^2_2, Y^{-2}_2, Y^{1}_2, Y^{-1}_2`. The rest of the eigenvectors
 # (the last four) are
-print(v[:, 6:].real)
+print(evecs_i[:, 6:].real)
 
 ################################################################################
 # These are the set of so-called :math:`e_{g}` orbitals, composed of
@@ -72,20 +73,18 @@ print(cfmat_rhb.real)
 ################################################################################
 # where :code:`edrixs.tmat_c2r('d', ispin=True)` is the transformation matrix.
 # We needed to tell edrixs that we are working with a :math:`d`-shell and that it
-# should include spin. We could also have transformed :code:`v` to see how these
-# eignevectors are  composed of the real harmonic basis. We will see an example
-# of this later.
+# should include spin. We could also have transformed :code:`evecs_i` to see how
+# these eigenvectors are composed of the real harmonic basis. We will see an
+# example of this later.
 
 ################################################################################
 # Crystal field on an atom
 # ------------------------------------------------------------------------------
 # To simulate the solid state, we need to combine the crystal field with Coulomb
 # interactions. Let us choose an atomic model for Ni.
-l = 2
 norb = 10
 noccu = 8
-basis = edrixs.get_fock_bin_by_N(norb, noccu)
-slater = edrixs.get_atom_data('Ni', '3d', noccu, edge='L3')['slater_i']
+atomic_slater = edrixs.get_atom_data('Ni', '3d', noccu, edge='L3')['slater_i']
 
 ################################################################################
 # Let us implement a tetragonal crystal field, for which we need to pass
@@ -94,22 +93,26 @@ slater = edrixs.get_atom_data('Ni', '3d', noccu, edge='L3')['slater_i']
 ten_dq, d1, d3 = 2.5, 0.9, .2
 
 ################################################################################
-# To determine the eigenvalues and eigenvectors we need to transform both our
-# Coulomb matrix and our crystal field matrix into the same basis. See the
-# example on exact diagonalization if needed. In this case, we put this
-# procedure into a function, with the option to scale the Coulomb interactions.
+# Since this is a purely atomic calculation with no core shell, we assemble the
+# single-particle ingredients directly rather than going through
+# :func:`~edrixs.model_1v1c`. :class:`~edrixs.FockBasisSpec` describes the
+# :math:`d^8` Fock space (8 electrons in 10 spin-orbitals),
+# :func:`~edrixs.cf_tetragonal_d` builds the one-body crystal-field matrix and
+# :func:`~edrixs.get_umat_slater` the Coulomb tensor, both in the default
+# complex-harmonic basis. :func:`~edrixs.build_op` then constructs the many-body
+# Hamiltonian and :func:`~edrixs.ed` diagonalizes it. We put this procedure into
+# a function, with the option to scale the Coulomb interactions.
 
 
-def diagonlize(scaleU=1):
-    umat = edrixs.get_umat_slater('d',
-                                  slater[0][1]*scaleU,
-                                  slater[1][1]*scaleU,
-                                  slater[2][1]*scaleU)
+def diagonalize(scaleU=1):
+    basis_i = FockBasisSpec.from_args(10, 8)
+    slater_i = [term[1] * scaleU for term in atomic_slater[:3]]
     cfmat = edrixs.angular_momentum.cf_tetragonal_d(ten_dq=ten_dq, d1=d1, d3=d3)
-    H = edrixs.build_opers(2, cfmat, basis) + edrixs.build_opers(4, umat, basis)
-    e, v = scipy.linalg.eigh(H)
-    e = e - np.min(e)  # define ground state as zero energy
-    return e, v
+    umat_i = edrixs.get_umat_slater('d', *slater_i)
+    hmat_i = edrixs.build_op(cfmat, umat_i, basis_i, backend='dense')
+    evals_i, evecs_i = edrixs.ed(hmat_i, num_evals=len(basis_i), backend='dense')
+    evals_i = evals_i - np.min(evals_i)  # define ground state as zero energy
+    return evals_i, evecs_i, basis_i
 
 
 ################################################################################
@@ -118,10 +121,10 @@ def diagonlize(scaleU=1):
 # python
 # `string formatting tutorial <https://realpython.com/python-formatted-output/>`_
 # if the code is confusing.
-e, v = diagonlize(scaleU=0)
-e = e.round(decimals=6)
-unique_e = np.unique(e)
-degeneracies = [sum(evalue == e) for evalue in unique_e]
+evals_i, evecs_i, basis_i = diagonalize(scaleU=0)
+evals_i = evals_i.round(decimals=6)
+unique_e = np.unique(evals_i)
+degeneracies = [sum(evalue == evals_i) for evalue in unique_e]
 
 print("E  \tDegeneracy")
 for evalue, degenvalue in zip(unique_e, degeneracies):
@@ -152,7 +155,17 @@ nd_real_harmoic_basis[indx, indx, indx] = 1
 # into the complex harmonic basis and then transform into our Fock basis
 nd_complex_harmoic_basis = edrixs.cb_op(nd_real_harmoic_basis,
                                         edrixs.tmat_r2c('d', True))
-nd_op = edrixs.build_opers(2, nd_complex_harmoic_basis, basis)
+
+
+def transform_occupancy_operators(evecs_i):
+    op = [edrixs.cb_op(
+            edrixs.build_op(nd_vec, None, basis_i, backend='dense'),
+            evecs_i)
+        for nd_vec in nd_complex_harmoic_basis]
+    return op
+
+
+nd_op = transform_occupancy_operators(evecs_i)
 
 
 ################################################################################
@@ -160,31 +173,32 @@ nd_op = edrixs.build_opers(2, nd_complex_harmoic_basis, basis)
 # `numpy docs <https://numpy.org/doc/1.18/reference/generated/numpy.reshape.html>`_
 # if the details of how the spin pairs have been added up is not immediately
 # transparent.
-nd_expt = np.array([edrixs.cb_op(nd_vec, v).diagonal().real for nd_vec in nd_op])
+nd_expt = np.array([nd_vec.diagonal().real for nd_vec in nd_op])
 
 message = "{:>3s}" + "\t{:>6s}"*5
 print(message.format(*"E 3z2-r2 zx zy x2-y2 xy".split(" ")))
 
 message = "{:>3.1f}" + "\t{:>6.1f}"*5
-for evalue, row in zip(e, nd_expt.T):
+for evalue, row in zip(evals_i, nd_expt.T):
     spin_pairs = row.reshape(-1, 2).sum(1)
     print(message.format(evalue, *spin_pairs))
 
 ################################################################################
 # The lowest energy state involves putting both holes in the :math:`x^2-y^2`
-# orbital, which makes sense.  Now, let us redo the proceedure including Coulomb
+# orbital, which makes sense.  Now, let us redo the procedure including Coulomb
 # repulsion, which imposes an energy cost to putting multiple electrons in the
 # same orbital.
 
-e, v = diagonlize(scaleU=1)
+evals_i, evecs_i, _ = diagonalize(scaleU=1)
 
-nd_expt = np.array([edrixs.cb_op(nd_vec, v).diagonal().real for nd_vec in nd_op])
+nd_op = transform_occupancy_operators(evecs_i)
+nd_expt = np.array([nd_vec.diagonal().real for nd_vec in nd_op])
 
 message = "{:>3s}" + "\t{:>6s}"*5
 print(message.format(*"E 3z2-r2 zx zy x2-y2 xy".split(" ")))
 
 message = "{:>3.1f}" + "\t{:>6.1f}"*5
-for evalue, row in zip(e, nd_expt.T):
+for evalue, row in zip(evals_i, nd_expt.T):
     spin_pairs = row.reshape(-1, 2).sum(1)
     print(message.format(evalue, *spin_pairs))
 
