@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:09.515** total execution time for 11 files **from all galleries**:
+**00:09.935** total execution time for 11 files **from all galleries**:
 
 .. container::
 
@@ -33,35 +33,35 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_auto_examples_example_02_single_atom_RIXS.py` (``../../examples/sphinx/example_02_single_atom_RIXS.py``)
-     - 00:03.797
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_example_10_geometry.py` (``../../examples/sphinx/example_10_geometry.py``)
-     - 00:01.796
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_example_08_Hunds_interactions.py` (``../../examples/sphinx/example_08_Hunds_interactions.py``)
-     - 00:01.195
+     - 00:03.458
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_03_AIM_XAS.py` (``../../examples/sphinx/example_03_AIM_XAS.py``)
-     - 00:00.578
+     - 00:02.116
      - 0.0
-   * - :ref:`sphx_glr_auto_examples_example_07_transitions.py` (``../../examples/sphinx/example_07_transitions.py``)
-     - 00:00.545
+   * - :ref:`sphx_glr_auto_examples_example_10_geometry.py` (``../../examples/sphinx/example_10_geometry.py``)
+     - 00:01.466
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_example_08_Hunds_interactions.py` (``../../examples/sphinx/example_08_Hunds_interactions.py``)
+     - 00:01.045
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_05_charge_transfer.py` (``../../examples/sphinx/example_05_charge_transfer.py``)
-     - 00:00.453
+     - 00:00.445
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_example_07_transitions.py` (``../../examples/sphinx/example_07_transitions.py``)
+     - 00:00.416
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_04_GS_analysis.py` (``../../examples/sphinx/example_04_GS_analysis.py``)
-     - 00:00.410
+     - 00:00.401
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_09_Coulomb.py` (``../../examples/sphinx/example_09_Coulomb.py``)
-     - 00:00.360
+     - 00:00.297
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_00_ed_calculator.py` (``../../examples/sphinx/example_00_ed_calculator.py``)
-     - 00:00.145
+     - 00:00.110
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_01_crystal_field.py` (``../../examples/sphinx/example_01_crystal_field.py``)
-     - 00:00.136
+     - 00:00.097
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_06_Hubbard_dimer.py` (``../../examples/sphinx/example_06_Hubbard_dimer.py``)
-     - 00:00.101
+     - 00:00.084
      - 0.0

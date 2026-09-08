@@ -56,12 +56,10 @@
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">edrixs User Guide</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="whatisedrixs.html">What is edrixs?</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Installation</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#install-and-use-edrixs-via-anaconda">Install and use edrixs via Anaconda</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#install-the-released-package-with-mamba-on-linux-and-macos">Install the released package with Mamba on Linux and macOS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#build-the-current-source-with-mamba-on-linux-or-macos">Build the current source with Mamba on Linux or macOS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#requirements">Requirements</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#build-from-source">Build from source</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#ubuntu-linux-20-04">Ubuntu Linux 20.04</a></li>
-</ul>
-</li>
+<li class="toctree-l3"><a class="reference internal" href="#install-with-docker-on-windows">Install with Docker on Windows</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="usedocker.html">edrixs and docker</a></li>
@@ -105,180 +103,89 @@
              
   <section id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
-<p>For Linux users we suggest <a class="reference internal" href="#anacondainstall"><span class="std std-ref">installing with anaconda</span></a>. For Windows and macOS machines, we suggest using the <a class="reference internal" href="usedocker.html#edrixsanddocker"><span class="std std-ref">docker instructions</span></a>, which are relatively straightforward.  In principle, you can also compile the code from the source for Linux, but this is quite involved and we recommend against this for standard use.</p>
-<section id="install-and-use-edrixs-via-anaconda">
-<span id="anacondainstall"></span><h2>Install and use edrixs via Anaconda<a class="headerlink" href="#install-and-use-edrixs-via-anaconda" title="Link to this heading"></a></h2>
-<p>A conda package has been built for Linux. To use edrixs via Anaconda, you need first to install <a class="reference external" href="https://www.anaconda.com/distribution/">Anaconda</a> in your system.
-We recommend installing edrixs into a separate environment, for example, called <code class="docutils literal notranslate"><span class="pre">edrixs_env</span></code>, together with any other packages you might want to use like this:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">--</span><span class="n">name</span> <span class="n">edrixs_env</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="n">python</span><span class="o">=</span><span class="mf">3.13</span> <span class="n">edrixs</span> <span class="n">matplotlib</span>
+<p>For Linux and macOS, we recommend installation via Mamba. Windows users should use the <a class="reference internal" href="usedocker.html#edrixsanddocker"><span class="std std-ref">Docker instructions</span></a>.</p>
+<section id="install-the-released-package-with-mamba-on-linux-and-macos">
+<span id="anacondainstall"></span><h2>Install the released package with Mamba on Linux and macOS<a class="headerlink" href="#install-the-released-package-with-mamba-on-linux-and-macos" title="Link to this heading"></a></h2>
+<p>A prebuilt conda package is available for Linux and macOS. First install <a class="reference external" href="https://github.com/conda-forge/miniforge">Miniforge</a>, which provides Conda and Mamba,
+then create a separate environment for edrixs:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mamba</span> <span class="n">create</span> <span class="o">--</span><span class="n">name</span> <span class="n">edrixs_env</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="o">--</span><span class="n">strict</span><span class="o">-</span><span class="n">channel</span><span class="o">-</span><span class="n">priority</span> \
+    <span class="n">edrixs</span> <span class="n">matplotlib</span>
+<span class="n">conda</span> <span class="n">activate</span> <span class="n">edrixs_env</span>
 </pre></div>
 </div>
-<p>We endeavor to keep the conda-forge release up to date, but note that these builds will usually not correspond to the latest version of edrixs, which is available in the <a class="reference external" href="https://github.com/NSLS-II/edrixs">master branch of edrixs</a>.</p>
-<p>edrixs will also run on <a class="reference external" href="https://research.google.com/colaboratory/">Google Colaboratory</a>, but does not come installed as default. Installing it requires a you to install conda and then edrixs, which can be done by executing a cell:</p>
+<p>edrixs will also run on <a class="reference external" href="https://research.google.com/colaboratory/">Google Colaboratory</a>, but is not installed there by
+default. Install Conda and then edrixs from within a notebook cell:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>!pip install -q condacolab
 import condacolab
 condacolab.install()
 !conda install -c conda-forge edrixs
 </pre></div>
 </div>
-<p>from within a notebook cell.</p>
 </section>
-<section id="requirements">
-<h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
-<p>Several tools and libraries are required to build and install edrixs,</p>
-<blockquote>
-<div><ul class="simple">
-<li><p>Fortran compiler: gfortran and ifort are supported</p></li>
-<li><p>MPI environment: openmpi and mpich are tested</p></li>
-<li><p>MPI Fortran and C compilers: mpif90, mpicc</p></li>
-<li><p>BLAS and LAPACK libraries: <a class="reference external" href="https://github.com/xianyi/OpenBLAS/">OpenBLAS</a> with gfortran and MKL with ifort</p></li>
-<li><p>ARPACK library: <a class="reference external" href="https://github.com/opencollab/arpack-ng/">arpack-ng</a>  with mpi enabled</p></li>
-<li><p>Only Python3 is supported</p></li>
-<li><p>numpy, scipy, sympy, matplotlib, sphinx, numpydoc</p></li>
-<li><p>mpi4py with the same MPI implementation libraries (<code class="docutils literal notranslate"><span class="pre">openmpi</span></code> or <code class="docutils literal notranslate"><span class="pre">mpich</span></code>) as building edrixs</p></li>
-</ul>
-</div></blockquote>
-</section>
-<section id="build-from-source">
-<h2>Build from source<a class="headerlink" href="#build-from-source" title="Link to this heading"></a></h2>
-<p>We will show how to build edrixs from source on Ubuntu Linux 20.04.
-We will use gcc, gfortran, openmpi and OpenBLAS in these examples.
-Building edrixs on other versions of Linux or with Intel’s ifort+MKL will be similar.</p>
-<section id="ubuntu-linux-20-04">
-<h3>Ubuntu Linux 20.04<a class="headerlink" href="#ubuntu-linux-20-04" title="Link to this heading"></a></h3>
-<p>Install compilers and tools:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">update</span>
-<span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">build</span><span class="o">-</span><span class="n">essential</span> <span class="n">gfortran</span> <span class="n">gcc</span>
-<span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">git</span> <span class="n">wget</span>
-<span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">python3</span> <span class="n">libpython3</span><span class="o">-</span><span class="n">dev</span> <span class="n">python3</span><span class="o">-</span><span class="n">pip</span> <span class="n">python3</span><span class="o">-</span><span class="n">venv</span>
-</pre></div>
-</div>
-<p>Create and activate a python virtual environment for edrixs:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">venv</span> <span class="n">VIRTUAL_ENV</span>
-<span class="n">source</span> <span class="n">VIRTUAL_ENV</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">activate</span>
-</pre></div>
-</div>
-<p>where <code class="docutils literal notranslate"><span class="pre">VIRTUAL_ENV</span></code> should be replaced by the directory where you wish to install edrixs.</p>
-<p>Alternatively create and activate a conda environment for edrixs:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">--</span><span class="n">name</span> <span class="n">edrixs_env</span> <span class="n">python</span><span class="o">=</span><span class="mf">3.8</span>
+<section id="build-the-current-source-with-mamba-on-linux-or-macos">
+<span id="sourceinstall"></span><span id="macosinstall"></span><h2>Build the current source with Mamba on Linux or macOS<a class="headerlink" href="#build-the-current-source-with-mamba-on-linux-or-macos" title="Link to this heading"></a></h2>
+<p>This is the recommended way to build the current source on Linux and macOS.
+The same environment provides Python, OpenMPI, OpenBLAS, parallel ARPACK, and
+gfortran, preventing incompatible system and conda libraries from being mixed.
+On macOS, in particular, do not mix this environment with Homebrew or MacPorts
+versions of these libraries, as that can cause linker or OpenMP runtime errors.</p>
+<p>Install <a class="reference external" href="https://github.com/conda-forge/miniforge">Miniforge</a>, then create
+and activate the build environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mamba</span> <span class="n">create</span> <span class="o">--</span><span class="n">name</span> <span class="n">edrixs_env</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="o">--</span><span class="n">strict</span><span class="o">-</span><span class="n">channel</span><span class="o">-</span><span class="n">priority</span> \
+    <span class="n">python</span><span class="o">=</span><span class="mf">3.14</span> <span class="s2">"numpy&gt;=2"</span> <span class="n">scipy</span> <span class="n">sympy</span> <span class="n">matplotlib</span> <span class="n">sphinx</span> <span class="n">mpi4py</span> \
+    <span class="s2">"arpack=*=mpi_openmpi*"</span> <span class="n">openmpi</span> <span class="n">gfortran</span> \
+    <span class="s2">"libblas=*=*openblas"</span> <span class="n">cmake</span> <span class="n">ninja</span> <span class="n">pip</span> <span class="n">setuptools</span> <span class="n">wheel</span>
 <span class="n">conda</span> <span class="n">activate</span> <span class="n">edrixs_env</span>
 </pre></div>
 </div>
-<p>We will assume <code class="docutils literal notranslate"><span class="pre">python</span></code> and <code class="docutils literal notranslate"><span class="pre">pip</span></code> are pointing to the activated environment from now on.
-Check we are using the expected python and pip:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">which</span> <span class="n">python</span>
-<span class="n">which</span> <span class="n">pip</span>
-<span class="n">python</span> <span class="o">--</span><span class="n">version</span>
-</pre></div>
-</div>
-<p>Fetch the latest version of <code class="docutils literal notranslate"><span class="pre">pip</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">upgrade</span> <span class="n">pip</span>
-</pre></div>
-</div>
-<p>openmpi, OpenBLAS, ARPACK can be installed by <code class="docutils literal notranslate"><span class="pre">apt-get</span></code>, but their versions are old and may not work properly.
-However, they can also be compiled from source easily. In the following, we will show both ways, but we always recommend to build newer ones from source.</p>
-<p>openmpi can be installed by:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">libopenmpi</span><span class="o">-</span><span class="n">dev</span>
-</pre></div>
-</div>
-<p>or from newer version of source, for example v3.1.4:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wget</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">download</span><span class="o">.</span><span class="n">open</span><span class="o">-</span><span class="n">mpi</span><span class="o">.</span><span class="n">org</span><span class="o">/</span><span class="n">release</span><span class="o">/</span><span class="nb">open</span><span class="o">-</span><span class="n">mpi</span><span class="o">/</span><span class="n">v3</span><span class="mf">.1</span><span class="o">/</span><span class="n">openmpi</span><span class="o">-</span><span class="mf">3.1.4</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">bz2</span>
-<span class="n">tar</span> <span class="o">-</span><span class="n">xjf</span> <span class="n">openmpi</span><span class="o">-</span><span class="mf">3.1.4</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">bz2</span>
-<span class="n">cd</span> <span class="n">openmpi</span><span class="o">-</span><span class="mf">3.1.4</span>
-<span class="o">./</span><span class="n">configure</span> <span class="n">CC</span><span class="o">=</span><span class="n">gcc</span> <span class="n">CXX</span><span class="o">=</span><span class="n">g</span><span class="o">++</span> <span class="n">FC</span><span class="o">=</span><span class="n">gfortran</span>
-<span class="n">make</span>
-<span class="n">sudo</span> <span class="n">make</span> <span class="n">install</span>
-</pre></div>
-</div>
-<p>the compiling process will take a while.</p>
-<p>OpenBLAS can be installed by:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">libopenblas</span><span class="o">-</span><span class="n">dev</span>
-</pre></div>
-</div>
-<p>or from a newer version of source:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wget</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">xianyi</span><span class="o">/</span><span class="n">OpenBLAS</span><span class="o">/</span><span class="n">archive</span><span class="o">/</span><span class="n">v0</span><span class="mf">.3.6</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
-<span class="n">tar</span> <span class="o">-</span><span class="n">xzf</span> <span class="n">v0</span><span class="mf">.3.6</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
-<span class="n">cd</span> <span class="n">OpenBLAS</span><span class="o">-</span><span class="mf">0.3.6</span>
-<span class="n">make</span> <span class="n">CC</span><span class="o">=</span><span class="n">gcc</span> <span class="n">FC</span><span class="o">=</span><span class="n">gfortran</span>
-<span class="n">sudo</span> <span class="n">make</span> <span class="n">PREFIX</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span> <span class="n">install</span>
-</pre></div>
-</div>
-<p>ARPACK can be installed by:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">libarpack2</span><span class="o">-</span><span class="n">dev</span> <span class="n">libparpack2</span><span class="o">-</span><span class="n">dev</span>
-</pre></div>
-</div>
-<p>or from a newer version of source:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wget</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">opencollab</span><span class="o">/</span><span class="n">arpack</span><span class="o">-</span><span class="n">ng</span><span class="o">/</span><span class="n">archive</span><span class="o">/</span><span class="mf">3.6.3</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
-<span class="n">tar</span> <span class="o">-</span><span class="n">xzf</span> <span class="mf">3.6.3</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
-<span class="n">cd</span> <span class="n">arpack</span><span class="o">-</span><span class="n">ng</span><span class="o">-</span><span class="mf">3.6.3</span>
-<span class="o">./</span><span class="n">bootstrap</span>
-<span class="o">./</span><span class="n">configure</span> <span class="o">--</span><span class="n">enable</span><span class="o">-</span><span class="n">mpi</span> <span class="o">--</span><span class="k">with</span><span class="o">-</span><span class="n">blas</span><span class="o">=</span><span class="s2">"-L/usr/local/lib/ -lopenblas"</span> <span class="n">FC</span><span class="o">=</span><span class="n">gfortran</span> <span class="n">F77</span><span class="o">=</span><span class="n">gfortran</span> <span class="n">MPIFC</span><span class="o">=</span><span class="n">mpif90</span> <span class="n">MPIF77</span><span class="o">=</span><span class="n">mpif90</span>
-<span class="n">make</span>
-<span class="n">sudo</span> <span class="n">make</span> <span class="n">install</span>
-</pre></div>
-</div>
-<p>mpi4py can be installed by:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">export</span> <span class="n">MPICC</span><span class="o">=/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">mpicc</span>
-<span class="n">sudo</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">cache</span><span class="o">-</span><span class="nb">dir</span> <span class="n">mpi4py</span>
-</pre></div>
-</div>
-<p>or from source:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wget</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">mpi4py</span><span class="o">/</span><span class="n">mpi4py</span><span class="o">/</span><span class="n">archive</span><span class="o">/</span><span class="mf">3.0.1</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
-<span class="n">tar</span> <span class="n">xzf</span> <span class="mf">3.0.1</span><span class="o">.</span><span class="n">tar</span><span class="o">.</span><span class="n">gz</span>
-<span class="n">cd</span> <span class="n">mpi4py</span><span class="o">-</span><span class="mf">3.0.1</span>
-</pre></div>
-</div>
-<p>edit mpi.cfg to set MPI paths as following:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">mpi</span><span class="p">]</span>
-<span class="n">mpi_dir</span>              <span class="o">=</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">local</span>
-<span class="n">mpicc</span>                <span class="o">=</span> <span class="o">%</span><span class="p">(</span><span class="n">mpi_dir</span><span class="p">)</span><span class="n">s</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">mpicc</span>
-<span class="n">mpicxx</span>               <span class="o">=</span> <span class="o">%</span><span class="p">(</span><span class="n">mpi_dir</span><span class="p">)</span><span class="n">s</span><span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">mpicxx</span>
-<span class="n">include_dirs</span>         <span class="o">=</span> <span class="o">%</span><span class="p">(</span><span class="n">mpi_dir</span><span class="p">)</span><span class="n">s</span><span class="o">/</span><span class="n">include</span>
-<span class="n">libraries</span>            <span class="o">=</span> <span class="n">mpi</span>
-<span class="n">library_dirs</span>         <span class="o">=</span> <span class="o">%</span><span class="p">(</span><span class="n">mpi_dir</span><span class="p">)</span><span class="n">s</span><span class="o">/</span><span class="n">lib</span>
-<span class="n">runtime_library_dirs</span> <span class="o">=</span> <span class="o">%</span><span class="p">(</span><span class="n">mpi_dir</span><span class="p">)</span><span class="n">s</span><span class="o">/</span><span class="n">lib</span>
-</pre></div>
-</div>
-<p>and comment all other contents. Then, build and install by:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="n">setup</span><span class="o">.</span><span class="n">py</span> <span class="n">build</span>
-<span class="n">sudo</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">.</span>
-</pre></div>
-</div>
-<p>Check whether the MPI paths are correct by:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="nn">mpi4py</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">mpi4py</span><span class="o">.</span><span class="n">get_config</span><span class="p">()</span>
-<span class="p">{</span><span class="s1">'mpicc'</span><span class="p">:</span> <span class="s1">'/usr/local/bin/mpicc'</span><span class="p">,</span>
- <span class="s1">'mpicxx'</span><span class="p">:</span> <span class="s1">'/usr/local/bin/mpicxx'</span><span class="p">,</span>
- <span class="s1">'include_dirs'</span><span class="p">:</span> <span class="s1">'/usr/local/include'</span><span class="p">,</span>
- <span class="s1">'libraries'</span><span class="p">:</span> <span class="s1">'mpi'</span><span class="p">,</span>
- <span class="s1">'library_dirs'</span><span class="p">:</span> <span class="s1">'/usr/local/lib'</span><span class="p">,</span>
- <span class="s1">'runtime_library_dirs'</span><span class="p">:</span> <span class="s1">'/usr/local/lib'</span><span class="p">}</span>
-</pre></div>
-</div>
-<p>Now, we are ready to build edrixs:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">NSLS</span><span class="o">-</span><span class="n">II</span><span class="o">/</span><span class="n">edrixs</span><span class="o">.</span><span class="n">git</span>
+<p>Clone and install edrixs from the repository root:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">EDRIXS</span><span class="o">/</span><span class="n">edrixs</span><span class="o">.</span><span class="n">git</span>
 <span class="n">cd</span> <span class="n">edrixs</span>
-<span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">v</span> <span class="o">.</span>
+<span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pip</span> <span class="n">install</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">build</span><span class="o">-</span><span class="n">isolation</span> <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">deps</span> <span class="o">.</span>
 </pre></div>
 </div>
-<p>Start to play with edrixs by:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
-<span class="o">&gt;&gt;&gt;</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">some_functions</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<p>The <code class="docutils literal notranslate"><span class="pre">--no-build-isolation</span></code> option makes the extension use NumPy and the
+compiler toolchain from the activated environment. The <code class="docutils literal notranslate"><span class="pre">--no-deps</span></code> option
+prevents pip from replacing the compatible conda packages installed above.</p>
+<p>Run these checks from outside the source directory so that Python imports the
+installed package:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">..</span>
+<span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s2">"from edrixs import fedrixs; print(fedrixs.__file__)"</span>
+<span class="n">mpirun</span> <span class="o">-</span><span class="n">np</span> <span class="mi">2</span> <span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s2">"from mpi4py import MPI; from edrixs import fedrixs; print(MPI.COMM_WORLD.rank)"</span>
 </pre></div>
 </div>
-<p>or go to <code class="docutils literal notranslate"><span class="pre">examples</span></code> directory to run some examples:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="n">examples</span><span class="o">/</span><span class="n">more</span><span class="o">/</span><span class="n">ED</span><span class="o">/</span><span class="mi">14</span><span class="n">orb</span>
-<span class="o">./</span><span class="n">get_inputs</span><span class="o">.</span><span class="n">py</span>
-<span class="n">mpirun</span> <span class="o">-</span><span class="n">np</span> <span class="mi">2</span> <span class="n">ed</span><span class="o">.</span><span class="n">x</span>
-<span class="n">mpirun</span> <span class="o">-</span><span class="n">np</span> <span class="mi">2</span> <span class="o">./</span><span class="n">run_fedsolver</span><span class="o">.</span><span class="n">py</span>
-<span class="n">cd</span> <span class="o">../../</span><span class="n">RIXS</span><span class="o">/</span><span class="n">LaNiO3_thin</span>
-<span class="n">mpirun</span> <span class="o">-</span><span class="n">np</span> <span class="mi">2</span> <span class="o">./</span><span class="n">run_rixs_fsolver</span><span class="o">.</span><span class="n">py</span>
-</pre></div>
-</div>
-<p>if no errors, the installation is successful.</p>
+<p>The first command should print the path to a file ending in <code class="docutils literal notranslate"><span class="pre">.so</span></code>. The
+second should print ranks <code class="docutils literal notranslate"><span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">1</span></code>. On macOS, the linker may print
+harmless <code class="docutils literal notranslate"><span class="pre">compact</span> <span class="pre">unwind</span></code> warnings while compiling the gfortran objects.</p>
 </section>
+<section id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
+<p>The Mamba command above installs compatible versions of all build and runtime
+requirements. The supported versions and required components are:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>Python 3.10 or newer; Python 3.14 is used in the recommended environment</p></li>
+<li><p>NumPy 1.26 or newer at runtime; NumPy 2 or newer is used to build the
+extension for compatibility with both NumPy 1.26 and 2.x</p></li>
+<li><p>SciPy, SymPy, Matplotlib, Sphinx, and numpydoc</p></li>
+<li><p>CMake 3.17.3 or newer and Ninja</p></li>
+<li><p>A Fortran compiler; the recommended environment currently uses gfortran
+16</p></li>
+<li><p>An MPI environment with Fortran and C compilers; OpenMPI 5 and its
+<code class="docutils literal notranslate"><span class="pre">mpif90</span></code> and <code class="docutils literal notranslate"><span class="pre">mpicc</span></code> wrappers are used in the recommended environment</p></li>
+<li><p>mpi4py 4 or newer, built with the same MPI implementation used to build
+edrixs</p></li>
+<li><p>BLAS and LAPACK; OpenBLAS 0.3 is used in the recommended environment</p></li>
+<li><p><a class="reference external" href="https://github.com/opencollab/arpack-ng/">ARPACK-NG</a> 3.9 or newer,
+built with MPI support</p></li>
+</ul>
+</div></blockquote>
+</section>
+<section id="install-with-docker-on-windows">
+<h2>Install with Docker on Windows<a class="headerlink" href="#install-with-docker-on-windows" title="Link to this heading"></a></h2>
+<p>For Windows, we recommend using the maintained edrixs Docker image instead of
+building the Fortran extension natively. See <a class="reference internal" href="usedocker.html#edrixsanddocker"><span class="std std-ref">edrixs and docker</span></a> for the
+image, Docker Compose configuration, and usage instructions.</p>
 </section>
 </section>
 

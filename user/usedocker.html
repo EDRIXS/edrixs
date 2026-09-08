@@ -104,7 +104,9 @@
 <span id="edrixsanddocker"></span><h1>edrixs and docker<a class="headerlink" href="#edrixs-and-docker" title="Link to this heading"></a></h1>
 <section id="run-edrixs-in-a-docker-container">
 <h2>Run edrixs in a docker container<a class="headerlink" href="#run-edrixs-in-a-docker-container" title="Link to this heading"></a></h2>
-<p>To make life easier, we have built a docker image based on Ubuntu Linux (22.04) for edrixs, so you don’t need to struggle with the installation anymore.
+<p>To make life easier, we have built a Docker image based on Ubuntu Linux 24.04
+for edrixs, so you do not need to install its compiler toolchain yourself.
+The image is published for both AMD64 and ARM64 systems.
 The docker image can be used on any OS as long as the <a class="reference external" href="https://www.docker.com/">docker</a> application is available.
 Follow these steps to use the docker image:</p>
 <ul>
@@ -130,7 +132,7 @@ Follow these steps to use the docker image:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">compose</span> <span class="n">up</span>
 </pre></div>
 </div>
-<p>This will return a url, which you can open to connect to the jupyter session.</p>
+<p>This will return a URL, which you can open to connect to the Jupyter session.</p>
 </li>
 <li><p>If you would like to access a terminal rather than jupyter run</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">compose</span> <span class="n">run</span> <span class="o">--</span><span class="n">rm</span> <span class="n">edrixs</span><span class="o">-</span><span class="n">ipython</span>
