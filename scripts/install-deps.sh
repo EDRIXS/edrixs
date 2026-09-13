@@ -28,7 +28,7 @@ which gfortran
 which python
 python -VV
 
-python -m pip install --upgrade pip setuptools wheel numpy
+python -m pip install --upgrade pip setuptools wheel
 
 # Generate .whl file.
 if [ "${platform}" == "Linux" ]; then

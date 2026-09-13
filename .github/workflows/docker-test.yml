@@ -1,0 +1,27 @@
+name: Test Docker image
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  docker-smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v4
+
+      - name: Build application image
+        run: docker build --target app --tag edrixs:test --file docker/Dockerfile .
+
+      - name: Test Python extension
+        run: |
+          docker run --rm edrixs:test python -c \
+            "import numpy; from edrixs import fedrixs; assert int(numpy.__version__.split('.')[0]) >= 2; print(fedrixs.__file__)"
+
+      - name: Test two-rank MPI execution
+        run: |
+          docker run --rm edrixs:test mpirun -np 2 python -c \
+            "from mpi4py import MPI; from edrixs import fedrixs; print(MPI.COMM_WORLD.rank)"

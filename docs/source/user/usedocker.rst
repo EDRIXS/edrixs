@@ -7,7 +7,9 @@ edrixs and docker
 Run edrixs in a docker container
 --------------------------------
 
-To make life easier, we have built a docker image based on Ubuntu Linux (22.04) for edrixs, so you don't need to struggle with the installation anymore.
+To make life easier, we have built a Docker image based on Ubuntu Linux 24.04
+for edrixs, so you do not need to install its compiler toolchain yourself.
+The image is published for both AMD64 and ARM64 systems.
 The docker image can be used on any OS as long as the `docker <https://www.docker.com/>`_ application is available.
 Follow these steps to use the docker image:
 
@@ -34,7 +36,7 @@ Follow these steps to use the docker image:
 
     docker compose up
 
-  This will return a url, which you can open to connect to the jupyter session. 
+  This will return a URL, which you can open to connect to the Jupyter session.
 
 * If you would like to access a terminal rather than jupyter run ::
 

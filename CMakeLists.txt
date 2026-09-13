@@ -18,7 +18,7 @@ find_package(MPI REQUIRED)
 
 find_package(LAPACK REQUIRED)
 
-option(EDRIXS_PYINTERFACE "Build python interface" OFF)
+option(EDRIXS_PY_INTERFACE "Build python interface" OFF)
 
 # see https://gitlab.kitware.com/cmake/cmake/-/issues/21779
 if (CMAKE_VERSION VERSION_LESS 3.20)
