@@ -124,17 +124,17 @@ condacolab.install()
 </section>
 <section id="build-the-current-source-with-mamba-on-linux-or-macos">
 <span id="sourceinstall"></span><span id="macosinstall"></span><h2>Build the current source with Mamba on Linux or macOS<a class="headerlink" href="#build-the-current-source-with-mamba-on-linux-or-macos" title="Link to this heading"></a></h2>
-<p>This is the recommended way to build the current source on Linux and macOS.
-The same environment provides Python, OpenMPI, OpenBLAS, parallel ARPACK, and
-gfortran, preventing incompatible system and conda libraries from being mixed.
-On macOS, in particular, do not mix this environment with Homebrew or MacPorts
-versions of these libraries, as that can cause linker or OpenMP runtime errors.</p>
+<p>This is the recommended way to build the current source on
+Linux and macOS. See the <a class="reference internal" href="#macos-sdk-note"><span class="std std-ref">macOS compiler note</span></a> if the
+standard build fails on a recent macOS release.</p>
 <p>Install <a class="reference external" href="https://github.com/conda-forge/miniforge">Miniforge</a>, then create
 and activate the build environment:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mamba</span> <span class="n">create</span> <span class="o">--</span><span class="n">name</span> <span class="n">edrixs_env</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="o">--</span><span class="n">strict</span><span class="o">-</span><span class="n">channel</span><span class="o">-</span><span class="n">priority</span> \
-    <span class="n">python</span><span class="o">=</span><span class="mf">3.14</span> <span class="s2">"numpy&gt;=2"</span> <span class="n">scipy</span> <span class="n">sympy</span> <span class="n">matplotlib</span> <span class="n">sphinx</span> <span class="n">mpi4py</span> \
+    <span class="n">python</span><span class="o">=</span><span class="mf">3.14</span> <span class="s2">"numpy&gt;=2"</span> <span class="n">scipy</span> <span class="n">sympy</span> <span class="n">matplotlib</span> <span class="n">mpi4py</span> \
     <span class="s2">"arpack=*=mpi_openmpi*"</span> <span class="n">openmpi</span> <span class="n">gfortran</span> \
-    <span class="s2">"libblas=*=*openblas"</span> <span class="n">cmake</span> <span class="n">ninja</span> <span class="n">pip</span> <span class="n">setuptools</span> <span class="n">wheel</span>
+    <span class="s2">"libblas=*=*openblas"</span> <span class="n">cmake</span> <span class="n">ninja</span> <span class="n">pip</span> <span class="n">setuptools</span> <span class="n">wheel</span> \
+    <span class="n">sphinx</span> <span class="n">ipython</span> <span class="n">numpydoc</span> <span class="n">pillow</span> <span class="n">sphinx</span><span class="o">-</span><span class="n">copybutton</span> <span class="n">sphinx</span><span class="o">-</span><span class="n">gallery</span> \
+    <span class="n">sphinx_rtd_theme</span>
 <span class="n">conda</span> <span class="n">activate</span> <span class="n">edrixs_env</span>
 </pre></div>
 </div>
@@ -147,16 +147,6 @@ and activate the build environment:</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">--no-build-isolation</span></code> option makes the extension use NumPy and the
 compiler toolchain from the activated environment. The <code class="docutils literal notranslate"><span class="pre">--no-deps</span></code> option
 prevents pip from replacing the compatible conda packages installed above.</p>
-<p>Run these checks from outside the source directory so that Python imports the
-installed package:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cd</span> <span class="o">..</span>
-<span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s2">"from edrixs import fedrixs; print(fedrixs.__file__)"</span>
-<span class="n">mpirun</span> <span class="o">-</span><span class="n">np</span> <span class="mi">2</span> <span class="n">python</span> <span class="o">-</span><span class="n">c</span> <span class="s2">"from mpi4py import MPI; from edrixs import fedrixs; print(MPI.COMM_WORLD.rank)"</span>
-</pre></div>
-</div>
-<p>The first command should print the path to a file ending in <code class="docutils literal notranslate"><span class="pre">.so</span></code>. The
-second should print ranks <code class="docutils literal notranslate"><span class="pre">0</span></code> and <code class="docutils literal notranslate"><span class="pre">1</span></code>. On macOS, the linker may print
-harmless <code class="docutils literal notranslate"><span class="pre">compact</span> <span class="pre">unwind</span></code> warnings while compiling the gfortran objects.</p>
 </section>
 <section id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
@@ -167,7 +157,9 @@ requirements. The supported versions and required components are:</p>
 <li><p>Python 3.10 or newer; Python 3.14 is used in the recommended environment</p></li>
 <li><p>NumPy 1.26 or newer at runtime; NumPy 2 or newer is used to build the
 extension for compatibility with both NumPy 1.26 and 2.x</p></li>
-<li><p>SciPy, SymPy, Matplotlib, Sphinx, and numpydoc</p></li>
+<li><p>SciPy, SymPy, and Matplotlib</p></li>
+<li><p>Sphinx, IPython, numpydoc, Pillow, sphinx-copybutton, sphinx-gallery, and
+sphinx-rtd-theme for building the documentation</p></li>
 <li><p>CMake 3.17.3 or newer and Ninja</p></li>
 <li><p>A Fortran compiler; the recommended environment currently uses gfortran
 16</p></li>
@@ -186,6 +178,30 @@ built with MPI support</p></li>
 <p>For Windows, we recommend using the maintained edrixs Docker image instead of
 building the Fortran extension natively. See <a class="reference internal" href="usedocker.html#edrixsanddocker"><span class="std std-ref">edrixs and docker</span></a> for the
 image, Docker Compose configuration, and usage instructions.</p>
+<p class="rubric" id="macos-sdk-note">macOS compiler note</p>
+<p>If compilation reports that <code class="docutils literal notranslate"><span class="pre">libSystem.tbd</span></code> is malformed or contains an
+unknown architecture such as <code class="docutils literal notranslate"><span class="pre">arm64e.x1</span></code>, use Apple Clang and Apple’s
+SDK-compatible linker while retaining gfortran, OpenMPI, ARPACK, and BLAS from
+the active Conda environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>xcode-select -p || xcode-select --install
+export PATH="$CONDA_PREFIX/bin:/usr/bin:/bin"
+export CC=/usr/bin/clang
+export CXX=/usr/bin/clang++
+export FC="$CONDA_PREFIX/bin/gfortran"
+export F77="$FC"
+export OMPI_CC="$CC"
+export OMPI_CXX="$CXX"
+export OMPI_FC="$FC"
+apple_bin="$(dirname "$(xcrun --find ld)")"
+export FFLAGS="-B${apple_bin}"
+export FCFLAGS="$FFLAGS"
+export LDFLAGS="-B${apple_bin}"
+python -m pip install \
+    --no-build-isolation --no-deps .
+</pre></div>
+</div>
+<p>When retrying after changing compilers or environments, first remove the
+generated CMake cache with <code class="docutils literal notranslate"><span class="pre">cmake</span> <span class="pre">-E</span> <span class="pre">remove_directory</span> <span class="pre">build</span></code>.</p>
 </section>
 </section>
 

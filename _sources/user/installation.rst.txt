@@ -33,19 +33,19 @@ default. Install Conda and then edrixs from within a notebook cell::
 Build the current source with Mamba on Linux or macOS
 =====================================================
 
-This is the recommended way to build the current source on Linux and macOS.
-The same environment provides Python, OpenMPI, OpenBLAS, parallel ARPACK, and
-gfortran, preventing incompatible system and conda libraries from being mixed.
-On macOS, in particular, do not mix this environment with Homebrew or MacPorts
-versions of these libraries, as that can cause linker or OpenMP runtime errors.
+This is the recommended way to build the current source on
+Linux and macOS. See the :ref:`macOS compiler note <macos-sdk-note>` if the
+standard build fails on a recent macOS release.
 
 Install `Miniforge <https://github.com/conda-forge/miniforge>`_, then create
 and activate the build environment::
 
     mamba create --name edrixs_env -c conda-forge --strict-channel-priority \
-        python=3.14 "numpy>=2" scipy sympy matplotlib sphinx mpi4py \
+        python=3.14 "numpy>=2" scipy sympy matplotlib mpi4py \
         "arpack=*=mpi_openmpi*" openmpi gfortran \
-        "libblas=*=*openblas" cmake ninja pip setuptools wheel
+        "libblas=*=*openblas" cmake ninja pip setuptools wheel \
+        sphinx ipython numpydoc pillow sphinx-copybutton sphinx-gallery \
+        sphinx_rtd_theme
     conda activate edrixs_env
 
 Clone and install edrixs from the repository root::
@@ -58,17 +58,6 @@ The ``--no-build-isolation`` option makes the extension use NumPy and the
 compiler toolchain from the activated environment. The ``--no-deps`` option
 prevents pip from replacing the compatible conda packages installed above.
 
-Run these checks from outside the source directory so that Python imports the
-installed package::
-
-    cd ..
-    python -c "from edrixs import fedrixs; print(fedrixs.__file__)"
-    mpirun -np 2 python -c "from mpi4py import MPI; from edrixs import fedrixs; print(MPI.COMM_WORLD.rank)"
-
-The first command should print the path to a file ending in ``.so``. The
-second should print ranks ``0`` and ``1``. On macOS, the linker may print
-harmless ``compact unwind`` warnings while compiling the gfortran objects.
-
 Requirements
 ============
 The Mamba command above installs compatible versions of all build and runtime
@@ -77,7 +66,9 @@ requirements. The supported versions and required components are:
    * Python 3.10 or newer; Python 3.14 is used in the recommended environment
    * NumPy 1.26 or newer at runtime; NumPy 2 or newer is used to build the
      extension for compatibility with both NumPy 1.26 and 2.x
-   * SciPy, SymPy, Matplotlib, Sphinx, and numpydoc
+   * SciPy, SymPy, and Matplotlib
+   * Sphinx, IPython, numpydoc, Pillow, sphinx-copybutton, sphinx-gallery, and
+     sphinx-rtd-theme for building the documentation
    * CMake 3.17.3 or newer and Ninja
    * A Fortran compiler; the recommended environment currently uses gfortran
      16
@@ -95,3 +86,31 @@ Install with Docker on Windows
 For Windows, we recommend using the maintained edrixs Docker image instead of
 building the Fortran extension natively. See :ref:`edrixsanddocker` for the
 image, Docker Compose configuration, and usage instructions.
+
+.. _macos-sdk-note:
+
+.. rubric:: macOS compiler note
+
+If compilation reports that ``libSystem.tbd`` is malformed or contains an
+unknown architecture such as ``arm64e.x1``, use Apple Clang and Apple's
+SDK-compatible linker while retaining gfortran, OpenMPI, ARPACK, and BLAS from
+the active Conda environment::
+
+    xcode-select -p || xcode-select --install
+    export PATH="$CONDA_PREFIX/bin:/usr/bin:/bin"
+    export CC=/usr/bin/clang
+    export CXX=/usr/bin/clang++
+    export FC="$CONDA_PREFIX/bin/gfortran"
+    export F77="$FC"
+    export OMPI_CC="$CC"
+    export OMPI_CXX="$CXX"
+    export OMPI_FC="$FC"
+    apple_bin="$(dirname "$(xcrun --find ld)")"
+    export FFLAGS="-B${apple_bin}"
+    export FCFLAGS="$FFLAGS"
+    export LDFLAGS="-B${apple_bin}"
+    python -m pip install \
+        --no-build-isolation --no-deps .
+
+When retrying after changing compilers or environments, first remove the
+generated CMake cache with ``cmake -E remove_directory build``.
