@@ -45,7 +45,7 @@ and activate the build environment::
         "arpack=*=mpi_openmpi*" openmpi gfortran \
         "libblas=*=*openblas" cmake ninja pip setuptools wheel \
         sphinx ipython numpydoc pillow sphinx-copybutton sphinx-gallery \
-        sphinx_rtd_theme
+        sphinx_rtd_theme pytest
     conda activate edrixs_env
 
 Clone and install edrixs from the repository root::
