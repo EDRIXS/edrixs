@@ -7,7 +7,7 @@ import scipy.sparse as sp
 
 import edrixs
 from edrixs.fortran_backend import fortran_backend
-from edrixs.fortran_backend.isostream_fortran import write_config, write_umat
+from edrixs.fortran_backend.iostream_fortran import write_config, write_umat
 from edrixs.models import model_1v1c
 from edrixs.solvers import ed, get_ops, rixs, xas
 

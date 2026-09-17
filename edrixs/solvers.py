@@ -11,7 +11,7 @@ import warnings
 import numpy as np
 import scipy
 
-from .fortran_backend.isostream_fortran import (
+from .fortran_backend.iostream_fortran import (
     read_poles_from_file, write_config, write_emat, write_umat,
 )
 from .iostream import write_tensor
