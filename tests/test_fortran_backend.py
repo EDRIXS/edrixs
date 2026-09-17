@@ -40,8 +40,11 @@ def test_fortran_backend_uses_native_files_and_f2py_solvers(tmp_path, monkeypatc
     problem = model_1v1c(('s', 's'), v_noccu=1)
     hmat_i, hmat_n, transitions = get_ops(*problem, backend='fortran')
     assert len(transitions) == 5
+    handles = (hmat_i, hmat_n, *transitions)
+    assert all(type(handle) is type(hmat_i) for handle in handles)
+    assert all(not vars(handle) for handle in handles)
 
-    assert 'on disk' in repr(hmat_i)
+    assert str(tmp_path) in repr(hmat_i)
     for filename in (
         'hopping_i.in', 'hopping_n.in', 'coulomb_i.in', 'coulomb_n.in',
         'fock_i.in', 'fock_n.in', 'fock_f.in', 'config.in',
@@ -50,7 +53,9 @@ def test_fortran_backend_uses_native_files_and_f2py_solvers(tmp_path, monkeypatc
 
     eval_i, evec_i = ed(hmat_i)
     np.testing.assert_allclose(eval_i, [-0.25])
-    assert 'on disk' in repr(evec_i)
+    assert type(evec_i) is type(hmat_i)
+    assert not vars(evec_i)
+    assert str(tmp_path) in repr(evec_i)
 
     absorption = xas(
         eval_i, evec_i, hmat_n, transitions, np.array([0.0]),

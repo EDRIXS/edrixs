@@ -2,7 +2,6 @@
 
 from .fortran_backend import (
     FortranDiskOperator,
-    FortranEigenvectors,
     ed_fortran,
     owns_operator_fortran,
     rixs_fortran,
@@ -12,7 +11,6 @@ from .fortran_backend import (
 
 __all__ = [
     'FortranDiskOperator',
-    'FortranEigenvectors',
     'ed_fortran',
     'owns_operator_fortran',
     'rixs_fortran',

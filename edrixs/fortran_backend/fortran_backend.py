@@ -22,34 +22,23 @@ from ..photon_transition import dipole_polvec_xas, dipole_polvec_rixs, quadrupol
 from ..plot_spectrum import get_spectra_from_poles, merge_pole_dicts
 
 __all__ = [
-    'FortranDiskOperator', 'FortranEigenvectors', 'write_problem',
-    'ed_fortran', 'xas_fortran', 'rixs_fortran', 'owns_operator_fortran',
+    'FortranDiskOperator', 'write_problem', 'ed_fortran', 'xas_fortran',
+    'rixs_fortran', 'owns_operator_fortran',
 ]
 
 
 class FortranDiskOperator:
-    """Placeholder for a Fortran operator held in native files on disk.
+    """Stateless marker identifying the disk-backed Fortran backend.
 
-    ``get_ops(..., backend='fortran')`` returns these in place of ``hmat_i``,
-    ``hmat_n`` and ``trans_ops``.  They carry no array data -- everything lives
-    in the working directory -- and only name the role each on-disk operator
-    plays.
+    The handle contains no operator data or path.  Subsequent calls using
+    ``backend='fortran'`` read the native input and output files from the
+    current working directory.
     """
 
-    def __init__(self, role):
-        self.role = role
-
     def __repr__(self):
-        return f"<Fortran {self.role}: data on disk in {Path.cwd()}>"
+        return f"<Fortran disk handle: using files in {Path.cwd()}>"
 
     __str__ = __repr__
-
-
-class FortranEigenvectors(FortranDiskOperator):
-    """Placeholder for the ``eigvec.*`` files written by ``ed_fsolver``."""
-
-    def __init__(self):
-        super().__init__('eigenvectors')
 
 
 def owns_operator_fortran(operator):
@@ -166,10 +155,10 @@ def write_problem(emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
     _root_collective(comm, write_inputs)
     # The transition components stay on disk in transop_components.in; xas/rixs
     # reload them and write the polarization-specific native input files later.
-    handles = [FortranDiskOperator('transition') for _ in range(len(trans_mat))]
+    handles = [FortranDiskOperator() for _ in range(len(trans_mat))]
     return (
-        FortranDiskOperator('initial Hamiltonian'),
-        FortranDiskOperator('intermediate Hamiltonian'),
+        FortranDiskOperator(),
+        FortranDiskOperator(),
         handles,
     )
 
@@ -194,14 +183,7 @@ def _run_solver(solver, comm, outputs=()):
     solver(comm.py2f(), rank, comm.Get_size())
 
 
-def _check_handle(handle):
-    if not owns_operator_fortran(handle):
-        raise TypeError("Fortran backend requires operators returned by get_ops(..., backend='fortran')")
-    return handle
-
-
 def ed_fortran(hmat_i, num_evals=1, *, backend_kws=None):
-    _check_handle(hmat_i)
     options = _options(backend_kws)
     comm = _communicator(options)
     nvector = int(options.get('nvector', num_evals))
@@ -222,15 +204,11 @@ def ed_fortran(hmat_i, num_evals=1, *, backend_kws=None):
 
     _root_collective(comm, prepare_ed)
     _run_solver(_solver('ed_fsolver'), comm, outputs=['eigvals.dat'])
-    return _root_collective(comm, read_eigenvalues), FortranEigenvectors()
+    return _root_collective(comm, read_eigenvalues), FortranDiskOperator()
 
 
-def _transitions(trans_op):
-    handles = list(trans_op)
-    if not handles:
-        raise ValueError("at least one transition operator is required")
-    for item in handles:
-        _check_handle(item)
+def _read_transition_components():
+    """Read the polarization components from the current working directory."""
     num_val_orbs, num_core_orbs = _read_config()
     ntot = num_val_orbs + num_core_orbs
     rows = np.loadtxt('transop_components.in', ndmin=2)
@@ -249,8 +227,7 @@ def xas_fortran(eval_i, evec_i, hmat_n, trans_op, ominc, *, gamma_c=0.1,
     """Run XAS collectively on the existing MPI communicator."""
     options = _options(backend_kws)
     comm = _communicator(options)
-    components = _root_collective(comm, lambda: _transitions(trans_op))
-    _check_handle(hmat_n)
+    components = _root_collective(comm, _read_transition_components)
     if pol_type is None:
         pol_type = [('isotropic', 0)]
     scatter_axis = np.eye(3) if scatter_axis is None else np.asarray(scatter_axis)
@@ -304,9 +281,7 @@ def rixs_fortran(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss,
     """Run RIXS collectively on the existing MPI communicator."""
     options = _options(backend_kws)
     comm = _communicator(options)
-    components = _root_collective(comm, lambda: _transitions(trans_op))
-    _check_handle(hmat_i)
-    _check_handle(hmat_n)
+    components = _root_collective(comm, _read_transition_components)
     if skip_gs:
         raise NotImplementedError("skip_gs is not supported by the disk-backed Fortran solver")
     if pol_type is None:
