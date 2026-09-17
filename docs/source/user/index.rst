@@ -16,6 +16,7 @@ edrixs User Guide
    devcontainer
    quickstart
    basics
+   backends
    pythontips
    examples
    papers
