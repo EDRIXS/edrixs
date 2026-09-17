@@ -3,7 +3,11 @@
 from pathlib import Path
 
 import numpy as np
+import scipy.sparse as sp
 
+from edrixs.fortran_backend import fortran_backend
+from edrixs.fortran_backend.isostream_fortran import write_config, write_umat
+from edrixs import iostream
 from edrixs.models import model_1v1c
 from edrixs.solvers import ed, get_ops, rixs, xas
 
@@ -14,6 +18,43 @@ def _write_poles(stem):
         'eigval 0.0\n'
         'norm 1.0\n'
         '1 1.0 0.0\n'
+    )
+
+
+def test_sparse_umat_is_written_without_densifying(tmp_path, monkeypatch):
+    umat = np.zeros((2, 2, 2, 2), dtype=complex)
+    umat[0, 1, 1, 0] = 1.25 - 0.5j
+    umat[1, 0, 0, 1] = -0.75 + 0.25j
+    sparse_umat = sp.csr_matrix(umat.reshape(4, 4))
+    dense_file = tmp_path / 'dense.in'
+    sparse_file = tmp_path / 'sparse.in'
+    compatibility_file = tmp_path / 'compatibility.in'
+
+    write_umat(umat, dense_file)
+    iostream.write_umat(umat, compatibility_file)
+
+    def forbidden_toarray(*args, **kwargs):
+        raise AssertionError('sparse Coulomb data was densified')
+
+    monkeypatch.setattr(sp.csr_matrix, 'toarray', forbidden_toarray)
+    write_umat(sparse_umat, sparse_file)
+
+    assert sparse_file.read_text() == dense_file.read_text()
+    assert compatibility_file.read_text() == dense_file.read_text()
+
+
+def test_transition_components_round_trip(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    components = np.arange(20).reshape(5, 2, 2).astype(complex)
+    components += 0.5j * components
+    write_config(num_val_orbs=1, num_core_orbs=1)
+
+    fortran_backend._write_transition_components(
+        components, 'transop_components.in',
+    )
+
+    np.testing.assert_allclose(
+        fortran_backend._read_transition_components(), components,
     )
 
 

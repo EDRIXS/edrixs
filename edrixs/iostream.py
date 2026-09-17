@@ -163,164 +163,41 @@ def write_tensor(tensor, fname, only_nonzeros=False, tol=1E-10, fmt_int='{:10d}'
 
 
 def write_emat(emat, fname, tol=1E-12, fmt_int='{:10d}', fmt_float='{:.15f}'):
-    """
-    Write the nonzeros of the rank-2 hopping matrices to file.
-    The first line is the number of nonzeros, and the following lines are the nonzero elements.
-    This file will be read by ed.x, xas.x or rixs.x.
+    """Compatibility wrapper for the native Fortran matrix writer."""
+    from .fortran_backend.isostream_fortran import write_emat as implementation
 
-    Parameters
-    ----------
-    emat: 2d complex array
-        The array to be written.
-    fname: str
-        File name.
-    tol: float
-        Precision.
-    fmt_int: str (default: '{:10d}')
-        Format for printing integer numbers.
-    fmt_float: str (default: '{:.15f}')
-        Format for printing float numbers.
-    """
-
-    a1, a2 = np.nonzero(abs(emat) > tol)
-    nonzero = np.stack((a1, a2), axis=-1)
-
-    space = "    "
-    fmt_string = (fmt_int + space) * 2 + (fmt_float + space) * 2 + '\n'
-    f = open(fname, 'w')
-    if len(nonzero) == 0:
-        f.write("{:10d}\n".format(1))
-        f.write(fmt_string.format(1, 1, 0.0, 0.0))
-    else:
-        f.write("{:20d}\n".format(len(nonzero)))
-        for i, j in nonzero:
-            f.write(fmt_string.format(i + 1, j + 1, emat[i, j].real, emat[i, j].imag))
-    f.close()
+    return implementation(emat, fname, tol, fmt_int, fmt_float)
 
 
 def write_umat(umat, fname, tol=1E-12, fmt_int='{:10d}', fmt_float='{:.15f}'):
-    """
-    Write the nonzeros of the rank-4 Coulomb U tensor to file.
-    The first line is the number of nonzeros, and the following lines are the nonzero elements.
-    This file will be read by ed.x, xas.x or rixs.x.
+    """Compatibility wrapper for the native Fortran Coulomb writer."""
+    from .fortran_backend.isostream_fortran import write_umat as implementation
 
-    Parameters
-    ----------
-    umat: 4d complex array
-        The array to be written.
-    fname: str
-        File name.
-    tol: float (default: 1E-12)
-        Precision.
-    fmt_int: str (default: '{:10d}')
-        Format for printing integer numbers.
-    fmt_float: str (default: '{:.15f}')
-        Format for printing float numbers.
-    """
-
-    a1, a2, a3, a4 = np.nonzero(abs(umat) > tol)
-    nonzero = np.stack((a1, a2, a3, a4), axis=-1)
-
-    space = "    "
-    fmt_string = (fmt_int + space) * 4 + (fmt_float + space) * 2 + '\n'
-    f = open(fname, 'w')
-    if len(nonzero) == 0:
-        f.write("{:10d}\n".format(1))
-        f.write(fmt_string.format(1, 1, 1, 1, 0.0, 0.0))
-    else:
-        f.write("{:20d}\n".format(len(nonzero)))
-        for i, j, k, l in nonzero:
-            f.write(fmt_string.format(i + 1, j + 1, k + 1, l + 1,
-                                      umat[i, j, k, l].real, umat[i, j, k, l].imag))
-    f.close()
+    return implementation(umat, fname, tol, fmt_int, fmt_float)
 
 
 def write_config(
         directory='.', ed_solver=1, num_val_orbs=2, num_core_orbs=2,
         neval=1, nvector=1, ncv=1, idump=True, num_gs=1, maxiter=500,
         linsys_max=1000, min_ndim=1000, nkryl=500, eigval_tol=1e-8,
-        linsys_tol=1e-10, omega_in=0.0, gamma_in=0.1
-        ):
-    """
-    Write control parameters in config.in file for ed_fsolver.
-    """
-    if idump:
-        dump_vector = '.true.'
-    else:
-        dump_vector = '.false.'
+        linsys_tol=1e-10, omega_in=0.0, gamma_in=0.1):
+    """Compatibility wrapper for the native Fortran configuration writer."""
+    from .fortran_backend.isostream_fortran import write_config as implementation
 
-    config = [
-        "&control",
-        "ed_solver=" + str(ed_solver),
-        "num_val_orbs=" + str(num_val_orbs),
-        "num_core_orbs=" + str(num_core_orbs),
-        "neval=" + str(neval),
-        "nvector=" + str(nvector),
-        "ncv=" + str(ncv),
-        "idump=" + str(dump_vector),
-        "num_gs=" + str(num_gs),
-        "maxiter=" + str(maxiter),
-        "linsys_max=" + str(linsys_max),
-        "min_ndim=" + str(min_ndim),
-        "nkryl=" + str(nkryl),
-        "eigval_tol=" + str(eigval_tol),
-        "linsys_tol=" + str(linsys_tol),
-        "omega_in=" + str(omega_in),
-        "gamma_in=" + str(gamma_in),
-        "&end"
-    ]
-
-    f = open(directory + '/config.in', 'w')
-    for item in config:
-        f.write(item + "\n")
-    f.close()
+    return implementation(
+        directory, ed_solver, num_val_orbs, num_core_orbs, neval, nvector,
+        ncv, idump, num_gs, maxiter, linsys_max, min_ndim, nkryl,
+        eigval_tol, linsys_tol, omega_in, gamma_in,
+    )
 
 
 def read_poles_from_file(file_list):
-    """
-    Read informations in files xas_poles.n or rixs_poles.n to a dict.
+    """Compatibility wrapper for the native Fortran pole-file reader."""
+    from .fortran_backend.isostream_fortran import (
+        read_poles_from_file as implementation,
+    )
 
-    Parameters
-    ----------
-    file_list: list of strings
-        Names of pole files.
-
-    pole_dict: dict
-        A dict containing information of poles.
-    """
-    pole_dict = {
-        'npoles': [],
-        'eigval': [],
-        'norm': [],
-        'alpha': [],
-        'beta': []
-    }
-    for fname in file_list:
-        f = open(fname, 'r')
-        line = f.readline()
-        neff = int(line.strip().split()[1])
-        pole_dict['npoles'].append(neff)
-
-        line = f.readline()
-        eigval = float(line.strip().split()[1])
-        pole_dict['eigval'].append(eigval)
-
-        line = f.readline()
-        norm = float(line.strip().split()[1])
-        pole_dict['norm'].append(norm)
-
-        alpha = []
-        beta = []
-        for i in range(neff):
-            line = f.readline()
-            line = line.strip().split()
-            alpha.append(float(line[1]))
-            beta.append(float(line[2]))
-        pole_dict['alpha'].append(alpha)
-        pole_dict['beta'].append(beta)
-        f.close()
-
-    return pole_dict
+    return implementation(file_list)
 
 
 def dump_poles(obj, file_name="poles"):

@@ -11,9 +11,10 @@ import warnings
 import numpy as np
 import scipy
 
-from .iostream import (
-    write_tensor, write_emat, write_umat, write_config, read_poles_from_file
+from .fortran_backend.isostream_fortran import (
+    read_poles_from_file, write_config, write_emat, write_umat,
 )
+from .iostream import write_tensor
 from .angular_momentum import (
     get_sx, get_sy, get_sz, get_lx, get_ly, get_lz,
     rmat_to_euler, get_wigner_dmat,

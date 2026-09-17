@@ -14,12 +14,13 @@ from pathlib import Path
 import traceback
 
 import numpy as np
-import scipy.sparse as sp
 
 from ..fock_basis import write_fock_dec_by_N
-from ..iostream import write_config, write_emat, write_umat, write_tensor, read_poles_from_file
 from ..photon_transition import dipole_polvec_xas, dipole_polvec_rixs, quadrupole_polvec, unit_wavevector
 from ..plot_spectrum import get_spectra_from_poles, merge_pole_dicts
+from .isostream_fortran import (
+    read_poles_from_file, write_config, write_emat, write_umat,
+)
 
 __all__ = [
     'FortranDiskOperator', 'write_problem', 'ed_fortran', 'xas_fortran',
@@ -107,19 +108,19 @@ def _basis_spec(basis, name):
     return spec
 
 
-def _write_umat(umat, fname, tol=1e-12):
-    """Write the Coulomb tensor in native rank-4 format via :func:`write_umat`.
+def _write_transition_components(trans_mat, fname):
+    """Write dense transition components in the backend's private format."""
+    trans_mat = np.asarray(trans_mat, dtype=complex)
+    if trans_mat.ndim != 3:
+        raise ValueError("trans_mat must be a three-dimensional array")
 
-    ``models`` may hand back the interaction as a flattened ``(n*n, n*n)``
-    sparse matrix; expand it back to a rank-4 tensor so the shared writer can
-    emit the standard ``coulomb_*.in`` file.
-    """
-    if sp.issparse(umat):
-        norbs = round(np.sqrt(umat.shape[0]))
-        if umat.shape != (norbs * norbs, norbs * norbs):
-            raise ValueError("sparse umat must use the flattened (n*n, n*n) convention")
-        umat = umat.toarray().reshape(norbs, norbs, norbs, norbs)
-    write_umat(np.asarray(umat), str(fname), tol=tol)
+    with Path(fname).open('w') as stream:
+        for component, row, col in np.ndindex(trans_mat.shape):
+            value = trans_mat[component, row, col]
+            stream.write(
+                f"{component + 1:10d}    {row + 1:10d}    {col + 1:10d}    "
+                f"{value.real:.15f}    {value.imag:.15f}    \n"
+            )
 
 
 def write_problem(emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
@@ -144,13 +145,13 @@ def write_problem(emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
     def write_inputs():
         write_emat(np.asarray(emat_i), 'hopping_i.in')
         write_emat(np.asarray(emat_n), 'hopping_n.in')
-        _write_umat(umat_i, 'coulomb_i.in', options.get('tol', 1e-12))
-        _write_umat(umat_n, 'coulomb_n.in', options.get('tol', 1e-12))
+        write_umat(umat_i, 'coulomb_i.in', options.get('tol', 1e-12))
+        write_umat(umat_n, 'coulomb_n.in', options.get('tol', 1e-12))
         write_fock_dec_by_N(num_val_orbs, v_noccu, 'fock_i.in')
         write_fock_dec_by_N(num_val_orbs, v_noccu + 1, 'fock_n.in')
         write_fock_dec_by_N(num_val_orbs, v_noccu, 'fock_f.in')
         write_config(num_val_orbs=num_val_orbs, num_core_orbs=num_core_orbs)
-        write_tensor(np.asarray(trans_mat, dtype=complex), 'transop_components.in')
+        _write_transition_components(trans_mat, 'transop_components.in')
 
     _root_collective(comm, write_inputs)
     # The transition components stay on disk in transop_components.in; xas/rixs
