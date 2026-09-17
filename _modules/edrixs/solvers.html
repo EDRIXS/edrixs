@@ -10,7 +10,7 @@
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=c83e6b79" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -546,11 +546,11 @@
 
 <span class="sd">        (str1, alpha, str2, beta)</span>
 
-<span class="sd">        where, str1 (str2) can be 'linear', 'left', 'right', 'isotropic' and alpha (beta) is</span>
+<span class="sd">        where, str1 (str2) can be 'linear', 'left', or 'right' and alpha (beta) is</span>
 <span class="sd">        the angle (in radians) between the linear polarization vector and the scattering plane.</span>
 
-<span class="sd">        If str1 (or str2) is 'isotropic' then the polarization vector projects equally</span>
-<span class="sd">        along each axis and the other variables are ignored.</span>
+<span class="sd">        ``'isotropic'`` is not supported for RIXS; passing it emits a</span>
+<span class="sd">        :class:`UserWarning` and raises :class:`ValueError`.</span>
 
 <span class="sd">        It will set pol_type=[('linear', 0, 'linear', 0)] if not provided.</span>
 <span class="sd">    gs_list: 1d list of ints</span>
@@ -623,10 +623,6 @@
         <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">jt</span><span class="p">,</span> <span class="n">beta</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">pol_type</span><span class="p">):</span>
             <span class="n">ei</span><span class="p">,</span> <span class="n">ef</span> <span class="o">=</span> <span class="n">dipole_polvec_rixs</span><span class="p">(</span><span class="n">thin</span><span class="p">,</span> <span class="n">thout</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span>
                                         <span class="n">scatter_axis</span><span class="p">,</span> <span class="p">(</span><span class="n">it</span><span class="p">,</span> <span class="n">jt</span><span class="p">))</span>
-            <span class="k">if</span> <span class="n">it</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'isotropic'</span><span class="p">:</span>
-                <span class="n">ei</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>                        <span class="c1"># Powder spectrum</span>
-            <span class="k">if</span> <span class="n">jt</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'isotropic'</span><span class="p">:</span>
-                <span class="n">ef</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
             <span class="c1"># dipolar transition</span>
             <span class="k">if</span> <span class="n">npol</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
                 <span class="n">polvec_i</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">ei</span>

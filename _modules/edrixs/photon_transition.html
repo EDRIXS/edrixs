@@ -10,7 +10,7 @@
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
       <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
-      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=fd6457a4" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=c83e6b79" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -85,6 +85,8 @@
            <span class="s1">'unit_wavevector'</span><span class="p">,</span> <span class="s1">'wavevector_with_length'</span><span class="p">,</span> <span class="s1">'get_wavevector_rixs'</span><span class="p">,</span>
            <span class="s1">'linear_polvec'</span><span class="p">,</span> <span class="s1">'dipole_polvec_rixs'</span><span class="p">,</span> <span class="s1">'dipole_polvec_xas'</span><span class="p">,</span>
            <span class="s1">'quadrupole_polvec'</span><span class="p">]</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">sympy.physics.wigner</span><span class="w"> </span><span class="kn">import</span> <span class="n">clebsch_gordan</span>
@@ -528,6 +530,9 @@
 <span class="sd">        - 'left'  : Left-circular polarization.</span>
 <span class="sd">        - 'right' : Right-circular polarization.</span>
 
+<span class="sd">        ``'isotropic'`` is not supported for RIXS; passing it emits a</span>
+<span class="sd">        :class:`UserWarning` and raises :class:`ValueError`.</span>
+
 <span class="sd">        It will set pol_type=('linear', 'linear') if not provided.</span>
 
 <span class="sd">    Returns</span>
@@ -546,6 +551,13 @@
 
     <span class="k">if</span> <span class="n">pol_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">pol_type</span> <span class="o">=</span> <span class="p">(</span><span class="s1">'linear'</span><span class="p">,</span> <span class="s1">'linear'</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">kind</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'isotropic'</span> <span class="k">for</span> <span class="n">kind</span> <span class="ow">in</span> <span class="n">pol_type</span><span class="p">):</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">"'isotropic' polarization is not supported for RIXS; "</span>
+            <span class="s2">"use 'linear', 'left', or 'right'."</span>
+        <span class="p">)</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">,</span> <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
 
     <span class="n">ex</span> <span class="o">=</span> <span class="n">linear_polvec</span><span class="p">(</span><span class="n">thin</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">local_axis</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">'in'</span><span class="p">)</span>
     <span class="n">ey</span> <span class="o">=</span> <span class="n">linear_polvec</span><span class="p">(</span><span class="n">thin</span><span class="p">,</span> <span class="n">phi</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">local_axis</span><span class="p">,</span> <span class="n">direction</span><span class="o">=</span><span class="s1">'in'</span><span class="p">)</span>

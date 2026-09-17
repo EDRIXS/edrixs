@@ -11,7 +11,7 @@
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
       <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
-      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=fd6457a4" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=c83e6b79" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
       <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
@@ -699,10 +699,10 @@ or energy loss dependent.</p>
 </dd>
 <dt><strong>pol_type: list of 4-elements-tuples</strong></dt><dd><p>Type of polarizations. It has the following form:</p>
 <p>(str1, alpha, str2, beta)</p>
-<p>where, str1 (str2) can be ‘linear’, ‘left’, ‘right’, ‘isotropic’ and alpha (beta) is
+<p>where, str1 (str2) can be ‘linear’, ‘left’, or ‘right’ and alpha (beta) is
 the angle (in radians) between the linear polarization vector and the scattering plane.</p>
-<p>If str1 (or str2) is ‘isotropic’ then the polarization vector projects equally
-along each axis and the other variables are ignored.</p>
+<p><code class="docutils literal notranslate"><span class="pre">'isotropic'</span></code> is not supported for RIXS; passing it emits a
+<a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#UserWarning" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">UserWarning</span></code></a> and raises <a class="reference external" href="https://docs.python.org/3/builtins/exceptions.html#ValueError" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValueError</span></code></a>.</p>
 <p>It will set pol_type=[(‘linear’, 0, ‘linear’, 0)] if not provided.</p>
 </dd>
 <dt><strong>gs_list: 1d list of ints</strong></dt><dd><p>The indices of initial states which will be used in RIXS calculations.</p>
