@@ -249,16 +249,6 @@ def xas_fortran(eval_i, evec_i, hmat_n, trans_op, ominc, *, gamma_c=0.1,
     """Run XAS collectively on the existing MPI communicator."""
     options = _options(backend_kws)
     comm = _communicator(options)
-    return _xas_fortran_collective(
-        eval_i, evec_i, hmat_n, trans_op, ominc, gamma_c=gamma_c,
-        thin=thin, phi=phi, pol_type=pol_type, temperature=temperature,
-        scatter_axis=scatter_axis, options=options, comm=comm,
-    )
-
-
-def _xas_fortran_collective(eval_i, evec_i, hmat_n, trans_op, ominc, *, gamma_c,
-                            thin, phi, pol_type, temperature, scatter_axis,
-                            options, comm):
     components = _root_collective(comm, lambda: _transitions(trans_op))
     _check_handle(hmat_n)
     if pol_type is None:
@@ -314,19 +304,6 @@ def rixs_fortran(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss,
     """Run RIXS collectively on the existing MPI communicator."""
     options = _options(backend_kws)
     comm = _communicator(options)
-    return _rixs_fortran_collective(
-        eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss,
-        gamma_c=gamma_c, gamma_f=gamma_f, thin=thin, thout=thout,
-        phi=phi, pol_type=pol_type, temperature=temperature,
-        scatter_axis=scatter_axis, skip_gs=skip_gs,
-        return_poles=return_poles, options=options, comm=comm,
-    )
-
-
-def _rixs_fortran_collective(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc,
-                             eloss, *, gamma_c, gamma_f, thin, thout, phi,
-                             pol_type, temperature, scatter_axis, skip_gs,
-                             return_poles, options, comm):
     components = _root_collective(comm, lambda: _transitions(trans_op))
     _check_handle(hmat_i)
     _check_handle(hmat_n)
