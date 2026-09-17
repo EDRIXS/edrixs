@@ -1,4 +1,4 @@
-__all__ = ['get_spectra_from_poles', 'merge_pole_dicts', 'plot_spectrum', 'plot_rixs_map']
+__all__ = ['get_spectra_from_poles', 'merge_pole_dicts', 'write_spectrum', 'plot_rixs_map']
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -94,8 +94,8 @@ def merge_pole_dicts(list_pole_dict):
     return new_pole_dict
 
 
-def plot_spectrum(file_list, omega_mesh, gamma_mesh, T=1.0, fname='spectrum.dat',
-                  om_shift=0.0, fmt_float='{:.15f}'):
+def write_spectrum(file_list, omega_mesh, gamma_mesh, T=1.0, fname='spectrum.dat',
+                   om_shift=0.0, fmt_float='{:.15f}'):
     """
     Reading poles :math:`\\alpha` and :math:`\\beta`, and calculate
     the spectrum using continued fraction formula,

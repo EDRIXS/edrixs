@@ -22,5 +22,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
     omega_mesh = np.linspace(args.ommin, args.ommax, args.N)
     gamma_mesh = np.ones(args.N) * args.G
-    edrixs.plot_spectrum(args.files_of_poles, omega_mesh, gamma_mesh, args.T, args.f,
-                         om_shift=args.off)
+    edrixs.write_spectrum(args.files_of_poles, omega_mesh, gamma_mesh, args.T, args.f,
+                          om_shift=args.off)
