@@ -5,7 +5,7 @@ XAS/RIXS drivers, then compare complete spectra or outputs with the existing
 dense Python path.  They are not isolated unit tests.
 """
 
-import shutil
+import importlib.util
 
 import numpy as np
 import pytest
@@ -22,13 +22,12 @@ pytestmark = [
     ),
 ]
 
-_FORTRAN_SOLVERS = ('ed.x', 'xas.x', 'rixs.x')
-_FORTRAN_SOLVERS_AVAILABLE = all(shutil.which(command) for command in _FORTRAN_SOLVERS)
+_FORTRAN_SOLVERS_AVAILABLE = importlib.util.find_spec('edrixs.fedrixs') is not None
 
 
 @pytest.mark.skipif(
     not _FORTRAN_SOLVERS_AVAILABLE,
-    reason='requires ed.x, xas.x, and rixs.x on PATH',
+    reason='requires the compiled edrixs.fedrixs extension',
 )
 def test_fortran_xas_matches_existing_dense_solver(small_1v1c_problem, tmp_path, monkeypatch):
     """Compare the disk-backed Fortran XAS workflow with dense Python XAS."""
@@ -63,7 +62,7 @@ def test_fortran_xas_matches_existing_dense_solver(small_1v1c_problem, tmp_path,
 
 @pytest.mark.skipif(
     not _FORTRAN_SOLVERS_AVAILABLE,
-    reason='requires ed.x, xas.x, and rixs.x on PATH',
+    reason='requires the compiled edrixs.fedrixs extension',
 )
 def test_fortran_rixs_matches_existing_dense_solver(small_1v1c_problem, tmp_path, monkeypatch):
     """Compare the disk-backed Fortran RIXS workflow with dense Python RIXS."""

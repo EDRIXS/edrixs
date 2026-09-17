@@ -1,4 +1,4 @@
-"""Tests for the disk-backed standalone-Fortran backend."""
+"""Tests for the disk-backed f2py Fortran backend."""
 
 from pathlib import Path
 
@@ -17,22 +17,26 @@ def _write_poles(stem):
     )
 
 
-def test_fortran_backend_uses_native_files_and_executables(tmp_path, monkeypatch):
-    """The public API delegates all numerical work to the three commands."""
+def test_fortran_backend_uses_native_files_and_f2py_solvers(tmp_path, monkeypatch):
+    """The public API delegates all numerical work to the f2py solvers."""
     monkeypatch.chdir(tmp_path)
     calls = []
 
-    def fake_run(command, check, shell):
-        calls.append(command)
-        program = command
-        if program == 'fake-ed':
-            Path('eigvals.dat').write_text('1 -0.25\n')
-        elif program == 'fake-xas':
-            _write_poles('xas_poles')
-        elif program == 'fake-rixs':
-            _write_poles('rixs_poles')
+    def fake_solver(name):
+        def run(fcomm, rank, size):
+            calls.append((name, fcomm, rank, size))
+            if name == 'ed_fsolver':
+                Path('eigvals.dat').write_text('1 -0.25\n')
+            elif name == 'xas_fsolver':
+                _write_poles('xas_poles')
+            elif name == 'rixs_fsolver':
+                _write_poles('rixs_poles')
 
-    monkeypatch.setattr('edrixs.fortran_backend.fortran_backend.subprocess.run', fake_run)
+        return run
+
+    monkeypatch.setattr(
+        'edrixs.fortran_backend.fortran_backend._solver', fake_solver,
+    )
     problem = model_1v1c(('s', 's'), v_noccu=1)
     hmat_i, hmat_n, transitions = get_ops(*problem, backend='fortran')
     assert len(transitions) == 5
@@ -44,24 +48,22 @@ def test_fortran_backend_uses_native_files_and_executables(tmp_path, monkeypatch
     ):
         assert (tmp_path / filename).is_file()
 
-    eval_i, evec_i = ed(
-        hmat_i, backend_kws={'ed_executable': 'fake-ed'}
-    )
+    eval_i, evec_i = ed(hmat_i)
     np.testing.assert_allclose(eval_i, [-0.25])
     assert 'on disk' in repr(evec_i)
 
     absorption = xas(
         eval_i, evec_i, hmat_n, transitions, np.array([0.0]),
-        backend_kws={'xas_executable': 'fake-xas'},
     )
     scattering = rixs(
         eval_i, evec_i, hmat_i, hmat_n, transitions,
         np.array([0.0]), np.array([0.0]),
-        backend_kws={'rixs_executable': 'fake-rixs'},
     )
 
     assert absorption.shape == (1, 1)
     assert scattering.shape == (1, 1, 1)
-    assert calls == (
-        ['fake-ed'] + ['fake-xas'] * len(transitions) + ['fake-rixs']
+    names = [name for name, fcomm, rank, size in calls]
+    assert names == (
+        ['ed_fsolver'] + ['xas_fsolver'] * len(transitions) + ['rixs_fsolver']
     )
+    assert all(rank == 0 and size == 1 for name, fcomm, rank, size in calls)

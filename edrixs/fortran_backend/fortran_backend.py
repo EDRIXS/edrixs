@@ -1,4 +1,4 @@
-"""Backend implementation which delegates calculations to ``*.x`` programs.
+"""Backend implementation which delegates calculations to f2py solvers.
 
 The Fortran programs communicate exclusively through their conventional input
 and output files in the current working directory.  ``get_ops`` writes the whole
@@ -11,9 +11,6 @@ read ``eigvals.dat`` / ``*_poles.*`` back.
 from __future__ import annotations
 
 from pathlib import Path
-import shlex
-import subprocess
-import time
 import traceback
 
 import numpy as np
@@ -49,7 +46,7 @@ class FortranDiskOperator:
 
 
 class FortranEigenvectors(FortranDiskOperator):
-    """Placeholder for the ``eigvec.*`` files written by ``ed.x``."""
+    """Placeholder for the ``eigvec.*`` files written by ``ed_fsolver``."""
 
     def __init__(self):
         super().__init__('eigenvectors')
@@ -83,13 +80,13 @@ def _options(backend_kws):
 
 
 def _communicator(options):
-    """Return the parent communicator used to coordinate disk-backed work."""
+    """Return the communicator used by the disk-backed Fortran solvers."""
     if 'comm' in options:
         comm = options['comm']
     else:
         from mpi4py import MPI
         comm = MPI.COMM_WORLD
-    for method in ('Get_rank', 'Get_size', 'Barrier', 'bcast'):
+    for method in ('Get_rank', 'Get_size', 'Barrier', 'bcast', 'py2f'):
         if not hasattr(comm, method):
             raise TypeError("backend_kws['comm'] must be an mpi4py communicator")
     return comm
@@ -141,7 +138,7 @@ def write_problem(emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
     """Write the complete native Fortran problem input and return disk handles.
 
     Every native file is written to the current working directory.  Under an
-    MPI parent communicator only rank zero writes; all ranks share one working
+    MPI communicator only rank zero writes; all ranks share one working
     directory, so no path needs to be exchanged.
     """
     options = _options(backend_kws)
@@ -177,49 +174,24 @@ def write_problem(emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
     )
 
 
-def _run(program, options, comm, outputs=()):
+def _solver(name):
+    """Return an f2py solver lazily so importing EDRIXS stays lightweight."""
+    from .. import fedrixs
+
+    return getattr(fedrixs, name)
+
+
+def _run_solver(solver, comm, outputs=()):
+    """Call an f2py solver on every rank of the existing communicator."""
     outputs = tuple(Path(path) for path in outputs)
-    for output in outputs:
-        output.unlink(missing_ok=True)
-    command = options.get('command', program)
-    if comm.Get_size() > 1:
-        if isinstance(command, str):
-            command = shlex.split(command)
-        else:
-            command = list(command)
-        if not command:
-            raise ValueError("Fortran executable command must not be empty")
-        if Path(command[0]).name in {'mpirun', 'mpiexec', 'srun'}:
-            raise ValueError(
-                "Do not use an MPI launcher in parent-MPI mode; the Fortran "
-                "backend spawns the native solver with comm.Get_size() ranks"
-            )
-        _spawn_native(command, comm.Get_size())
-    else:
-        # A string is intentionally run through the shell so callers can supply an
-        # MPI launcher, e.g. ``'mpirun -np 4 ed.x'``.  A sequence avoids a shell
-        # and is preferred when no launcher syntax is needed.  Either way the
-        # native program runs in the current working directory.
-        subprocess.run(command, check=True, shell=isinstance(command, str))
 
-    deadline = time.monotonic() + float(options.get('output_timeout', 60.0))
-    while outputs and not all(output.is_file() for output in outputs):
-        if time.monotonic() >= deadline:
-            missing = ', '.join(str(path) for path in outputs if not path.is_file())
-            raise RuntimeError("Fortran solver did not produce expected output: {}".format(missing))
-        time.sleep(0.01)
+    def clear_outputs():
+        for output in outputs:
+            output.unlink(missing_ok=True)
 
-
-def _spawn_native(command, num_procs):
-    """Spawn one native MPI solver group and wait for its clean disconnect.
-
-    Kept separate from :func:`_run` so the parent-MPI control flow can be
-    tested without requiring an MPI runtime capable of dynamic spawning.
-    """
-    from mpi4py import MPI
-
-    children = MPI.COMM_SELF.Spawn(command[0], args=command[1:], maxprocs=num_procs)
-    children.Disconnect()
+    _root_collective(comm, clear_outputs)
+    rank = comm.Get_rank()
+    solver(comm.py2f(), rank, comm.Get_size())
 
 
 def _check_handle(handle):
@@ -234,21 +206,23 @@ def ed_fortran(hmat_i, num_evals=1, *, backend_kws=None):
     comm = _communicator(options)
     nvector = int(options.get('nvector', num_evals))
 
-    def run_ed():
+    def prepare_ed():
         num_val_orbs, num_core_orbs = _read_config()
         write_config(ed_solver=options.get('ed_solver', 1),
                      num_val_orbs=num_val_orbs, num_core_orbs=num_core_orbs,
                      neval=num_evals, nvector=nvector, ncv=options.get('ncv', max(3, num_evals + 2)),
                      idump=options.get('idump', True), maxiter=options.get('maxiter', 500),
                      min_ndim=options.get('min_ndim', 1000), eigval_tol=options.get('eigval_tol', 1e-8))
-        _run(options.get('ed_executable', 'ed.x'), options, comm,
-             outputs=['eigvals.dat'])
+
+    def read_eigenvalues():
         data = np.loadtxt('eigvals.dat', ndmin=2)
         if data.shape[0] < num_evals:
-            raise RuntimeError("ed.x produced fewer eigenvalues than requested")
+            raise RuntimeError("ed_fsolver produced fewer eigenvalues than requested")
         return np.asarray(data[:num_evals, 1], dtype=float)
 
-    return _root_collective(comm, run_ed), FortranEigenvectors()
+    _root_collective(comm, prepare_ed)
+    _run_solver(_solver('ed_fsolver'), comm, outputs=['eigvals.dat'])
+    return _root_collective(comm, read_eigenvalues), FortranEigenvectors()
 
 
 def _transitions(trans_op):
@@ -272,33 +246,36 @@ def _gamma(value, mesh):
 def xas_fortran(eval_i, evec_i, hmat_n, trans_op, ominc, *, gamma_c=0.1,
                 thin=1.0, phi=0.0, pol_type=None, temperature=1.0,
                 scatter_axis=None, backend_kws=None):
-    """Run XAS collectively when called from an MPI parent communicator."""
+    """Run XAS collectively on the existing MPI communicator."""
     options = _options(backend_kws)
     comm = _communicator(options)
-    return _root_collective(
-        comm,
-        lambda: _xas_fortran_root(
-            eval_i, evec_i, hmat_n, trans_op, ominc, gamma_c=gamma_c,
-            thin=thin, phi=phi, pol_type=pol_type, temperature=temperature,
-            scatter_axis=scatter_axis, options=options, comm=comm,
-        ),
+    return _xas_fortran_collective(
+        eval_i, evec_i, hmat_n, trans_op, ominc, gamma_c=gamma_c,
+        thin=thin, phi=phi, pol_type=pol_type, temperature=temperature,
+        scatter_axis=scatter_axis, options=options, comm=comm,
     )
 
 
-def _xas_fortran_root(eval_i, evec_i, hmat_n, trans_op, ominc, *, gamma_c,
-                      thin, phi, pol_type, temperature, scatter_axis, options, comm):
-    components = _transitions(trans_op)
+def _xas_fortran_collective(eval_i, evec_i, hmat_n, trans_op, ominc, *, gamma_c,
+                            thin, phi, pol_type, temperature, scatter_axis,
+                            options, comm):
+    components = _root_collective(comm, lambda: _transitions(trans_op))
     _check_handle(hmat_n)
     if pol_type is None:
         pol_type = [('isotropic', 0)]
     scatter_axis = np.eye(3) if scatter_axis is None else np.asarray(scatter_axis)
     num_gs = int(options.get('num_gs', len(eval_i)))
     nkryl = int(options.get('nkryl', 200))
-    num_val_orbs, num_core_orbs = _read_config()
-    write_config(
-        num_val_orbs=num_val_orbs,
-        num_core_orbs=num_core_orbs, num_gs=num_gs, nkryl=nkryl,
-    )
+
+    def prepare_xas():
+        num_val_orbs, num_core_orbs = _read_config()
+        write_config(
+            num_val_orbs=num_val_orbs,
+            num_core_orbs=num_core_orbs, num_gs=num_gs, nkryl=nkryl,
+        )
+
+    _root_collective(comm, prepare_xas)
+    xas_fsolver = _solver('xas_fsolver')
     gamma = _gamma(gamma_c, ominc)
     result, poles = np.zeros((len(ominc), len(pol_type))), []
     for ipol, (kind, alpha) in enumerate(pol_type):
@@ -315,11 +292,14 @@ def _xas_fortran_root(eval_i, evec_i, hmat_n, trans_op, ominc, *, gamma_c,
         for vector in vectors:
             if len(components) == 5 and kind.strip() != 'isotropic':
                 vector = quadrupole_polvec(vector, unit_wavevector(thin, phi, scatter_axis, 'in'))
-            write_emat(np.tensordot(vector, components, axes=(0, 0)), 'transop_xas.in')
+            transop = np.tensordot(vector, components, axes=(0, 0))
+            _root_collective(
+                comm,
+                lambda transop=transop: write_emat(transop, 'transop_xas.in'),
+            )
             pole_files = [f'xas_poles.{i + 1}' for i in range(num_gs)]
-            _run(options.get('xas_executable', 'xas.x'), options, comm,
-                 outputs=pole_files)
-            pole = read_poles_from_file(pole_files)
+            _run_solver(xas_fsolver, comm, outputs=pole_files)
+            pole = _root_collective(comm, lambda: read_poles_from_file(pole_files))
             item_poles.append(pole)
             result[:, ipol] += get_spectra_from_poles(pole, ominc, gamma, temperature)
         result[:, ipol] /= len(vectors)
@@ -331,26 +311,23 @@ def rixs_fortran(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss,
                  *, gamma_c=0.1, gamma_f=0.01, thin=1.0, thout=1.0,
                  phi=0.0, pol_type=None, temperature=1.0, scatter_axis=None,
                  skip_gs=False, return_poles=False, backend_kws=None):
-    """Run RIXS collectively when called from an MPI parent communicator."""
+    """Run RIXS collectively on the existing MPI communicator."""
     options = _options(backend_kws)
     comm = _communicator(options)
-    return _root_collective(
-        comm,
-        lambda: _rixs_fortran_root(
-            eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss,
-            gamma_c=gamma_c, gamma_f=gamma_f, thin=thin, thout=thout,
-            phi=phi, pol_type=pol_type, temperature=temperature,
-            scatter_axis=scatter_axis, skip_gs=skip_gs,
-            return_poles=return_poles, options=options, comm=comm,
-        ),
+    return _rixs_fortran_collective(
+        eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss,
+        gamma_c=gamma_c, gamma_f=gamma_f, thin=thin, thout=thout,
+        phi=phi, pol_type=pol_type, temperature=temperature,
+        scatter_axis=scatter_axis, skip_gs=skip_gs,
+        return_poles=return_poles, options=options, comm=comm,
     )
 
 
-def _rixs_fortran_root(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss,
-                       *, gamma_c, gamma_f, thin, thout, phi, pol_type,
-                       temperature, scatter_axis, skip_gs, return_poles,
-                       options, comm):
-    components = _transitions(trans_op)
+def _rixs_fortran_collective(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc,
+                             eloss, *, gamma_c, gamma_f, thin, thout, phi,
+                             pol_type, temperature, scatter_axis, skip_gs,
+                             return_poles, options, comm):
+    components = _root_collective(comm, lambda: _transitions(trans_op))
     _check_handle(hmat_i)
     _check_handle(hmat_n)
     if skip_gs:
@@ -360,36 +337,43 @@ def _rixs_fortran_root(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss,
     scatter_axis = np.eye(3) if scatter_axis is None else np.asarray(scatter_axis)
     num_gs = int(options.get('num_gs', len(eval_i)))
     nkryl = int(options.get('nkryl', 200))
-    num_val_orbs, num_core_orbs = _read_config()
     gamma_in, gamma_out = _gamma(gamma_c, ominc), _gamma(gamma_f, eloss)
+    rixs_fsolver = _solver('rixs_fsolver')
     result, poles = np.zeros((len(ominc), len(eloss), len(pol_type))), []
     for iom, omega in enumerate(ominc):
-        write_config(
-            num_val_orbs=num_val_orbs,
-            num_core_orbs=num_core_orbs, num_gs=num_gs, nkryl=nkryl,
-            linsys_max=options.get('linsys_max', 1000),
-            linsys_tol=options.get('linsys_tol', 1e-10), omega_in=omega,
-            gamma_in=gamma_in[iom],
-        )
+        def prepare_rixs():
+            num_val_orbs, num_core_orbs = _read_config()
+            write_config(
+                num_val_orbs=num_val_orbs,
+                num_core_orbs=num_core_orbs, num_gs=num_gs, nkryl=nkryl,
+                linsys_max=options.get('linsys_max', 1000),
+                linsys_tol=options.get('linsys_tol', 1e-10), omega_in=omega,
+                gamma_in=gamma_in[iom],
+            )
+
+        _root_collective(comm, prepare_rixs)
         row = []
         for ipol, (it, alpha, jt, beta) in enumerate(pol_type):
-            vin, vout = dipole_polvec_rixs(thin, thout, phi, alpha, beta, scatter_axis, (it, jt))
+            vin, vout = dipole_polvec_rixs(
+                thin, thout, phi, alpha, beta, scatter_axis, (it, jt),
+            )
             if len(components) == 5:
                 vin = quadrupole_polvec(vin, unit_wavevector(thin, phi, scatter_axis, 'in'))
                 vout = quadrupole_polvec(vout, unit_wavevector(thout, phi, scatter_axis, 'out'))
-            write_emat(
-                np.tensordot(vin, components, axes=(0, 0)),
-                'transop_rixs_i.in',
-            )
-            write_emat(
-                np.conj(np.tensordot(vout, components, axes=(0, 0)).T),
-                'transop_rixs_f.in',
-            )
+            transop_in = np.tensordot(vin, components, axes=(0, 0))
+            transop_out = np.conj(np.tensordot(vout, components, axes=(0, 0)).T)
+
+            def write_transops():
+                write_emat(transop_in, 'transop_rixs_i.in')
+                write_emat(transop_out, 'transop_rixs_f.in')
+
+            _root_collective(comm, write_transops)
             pole_files = [f'rixs_poles.{i + 1}' for i in range(num_gs)]
-            _run(options.get('rixs_executable', 'rixs.x'), options, comm,
-                 outputs=pole_files)
-            pole = read_poles_from_file(pole_files)
+            _run_solver(rixs_fsolver, comm, outputs=pole_files)
+            pole = _root_collective(comm, lambda: read_poles_from_file(pole_files))
             row.append(pole)
-            result[iom, :, ipol] = get_spectra_from_poles(pole, eloss, gamma_out, temperature)
+            result[iom, :, ipol] = get_spectra_from_poles(
+                pole, eloss, gamma_out, temperature,
+            )
         poles.append(row)
     return (result, poles) if return_poles else result

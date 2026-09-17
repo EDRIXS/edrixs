@@ -1,4 +1,4 @@
-"""Disk-backed interface to the standalone Fortran EDRIXS solvers."""
+"""Disk-backed interface to the f2py Fortran EDRIXS solvers."""
 
 from .fortran_backend import (
     FortranDiskOperator,

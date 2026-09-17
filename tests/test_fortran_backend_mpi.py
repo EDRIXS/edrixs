@@ -35,6 +35,9 @@ class _RootComm:
         self.broadcasts.append(value)
         return value
 
+    def py2f(self):
+        return 42
+
 
 class _NonrootComm:
     """Stand-in for a non-root rank receiving rank-zero broadcasts."""
@@ -57,6 +60,9 @@ class _NonrootComm:
         self.broadcasts += 1
         # The only bcast reports the successful root-only write result.
         return (True, None)
+
+    def py2f(self):
+        return 43
 
 
 def test_parent_mpi_root_collective_broadcasts_values_and_errors():
@@ -88,27 +94,24 @@ def test_parent_mpi_nonroot_does_not_write_problem_files(tmp_path, monkeypatch):
     assert comm.barriers == 2
 
 
-def test_parent_mpi_run_uses_one_spawn_and_rejects_launchers(tmp_path, monkeypatch):
+def test_run_solver_reuses_existing_communicator():
     comm = _RootComm()
-    launches = []
+    calls = []
 
-    monkeypatch.setattr(
-        fortran_backend,
-        '_spawn_native',
-        lambda command, num_procs: launches.append((command, num_procs)),
+    fortran_backend._run_solver(
+        lambda fcomm, rank, size: calls.append((fcomm, rank, size)),
+        comm,
     )
-    fortran_backend._run('fake-solver --flag', {}, comm)
-    assert launches == [(['fake-solver', '--flag'], 2)]
-    with pytest.raises(ValueError, match='Do not use an MPI launcher'):
-        fortran_backend._run('mpirun -np 2 fake-solver', {}, comm)
+
+    assert calls == [(42, 0, 2)]
 
 
 @pytest.mark.skipif(
-    not all(shutil.which(command) for command in ('mpirun', 'ed.x', 'xas.x', 'rixs.x')),
-    reason='requires mpirun and the standalone Fortran solver commands',
+    shutil.which('mpirun') is None,
+    reason='requires mpirun',
 )
-def test_fortran_backend_collectively_spawns_native_solvers(tmp_path):
-    """Two parent ranks launch one two-rank child group per native call."""
+def test_fortran_backend_reuses_existing_mpi_communicator(tmp_path):
+    """All Python ranks call the f2py solvers on their shared communicator."""
     script = tmp_path / 'collective_fortran.py'
     script.write_text(
         """
