@@ -1,5 +1,4 @@
-__all__ = ['write_tensor', 'write_emat', 'write_umat', 'write_config',
-           'read_poles_from_file', 'dump_poles', 'load_poles']
+__all__ = ['write_tensor', 'dump_poles', 'load_poles']
 
 import numpy as np
 import json
@@ -160,44 +159,6 @@ def write_tensor(tensor, fname, only_nonzeros=False, tol=1E-10, fmt_int='{:10d}'
                        fmt_int=fmt_int, fmt_float=fmt_float)
     else:
         raise Exception("error in write_tensor: ndim >5, not implemented !")
-
-
-def write_emat(emat, fname, tol=1E-12, fmt_int='{:10d}', fmt_float='{:.15f}'):
-    """Compatibility wrapper for the native Fortran matrix writer."""
-    from .fortran_backend.isostream_fortran import write_emat as implementation
-
-    return implementation(emat, fname, tol, fmt_int, fmt_float)
-
-
-def write_umat(umat, fname, tol=1E-12, fmt_int='{:10d}', fmt_float='{:.15f}'):
-    """Compatibility wrapper for the native Fortran Coulomb writer."""
-    from .fortran_backend.isostream_fortran import write_umat as implementation
-
-    return implementation(umat, fname, tol, fmt_int, fmt_float)
-
-
-def write_config(
-        directory='.', ed_solver=1, num_val_orbs=2, num_core_orbs=2,
-        neval=1, nvector=1, ncv=1, idump=True, num_gs=1, maxiter=500,
-        linsys_max=1000, min_ndim=1000, nkryl=500, eigval_tol=1e-8,
-        linsys_tol=1e-10, omega_in=0.0, gamma_in=0.1):
-    """Compatibility wrapper for the native Fortran configuration writer."""
-    from .fortran_backend.isostream_fortran import write_config as implementation
-
-    return implementation(
-        directory, ed_solver, num_val_orbs, num_core_orbs, neval, nvector,
-        ncv, idump, num_gs, maxiter, linsys_max, min_ndim, nkryl,
-        eigval_tol, linsys_tol, omega_in, gamma_in,
-    )
-
-
-def read_poles_from_file(file_list):
-    """Compatibility wrapper for the native Fortran pole-file reader."""
-    from .fortran_backend.isostream_fortran import (
-        read_poles_from_file as implementation,
-    )
-
-    return implementation(file_list)
 
 
 def dump_poles(obj, file_name="poles"):

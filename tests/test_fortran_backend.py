@@ -5,9 +5,9 @@ from pathlib import Path
 import numpy as np
 import scipy.sparse as sp
 
+import edrixs
 from edrixs.fortran_backend import fortran_backend
 from edrixs.fortran_backend.isostream_fortran import write_config, write_umat
-from edrixs import iostream
 from edrixs.models import model_1v1c
 from edrixs.solvers import ed, get_ops, rixs, xas
 
@@ -31,7 +31,7 @@ def test_sparse_umat_is_written_without_densifying(tmp_path, monkeypatch):
     compatibility_file = tmp_path / 'compatibility.in'
 
     write_umat(umat, dense_file)
-    iostream.write_umat(umat, compatibility_file)
+    edrixs.write_umat(umat, compatibility_file)
 
     def forbidden_toarray(*args, **kwargs):
         raise AssertionError('sparse Coulomb data was densified')

@@ -3,7 +3,6 @@ __all__ = ['get_spectra_from_poles', 'merge_pole_dicts', 'plot_spectrum', 'plot_
 import numpy as np
 import matplotlib.pyplot as plt
 from .utils import boltz_dist
-from .iostream import read_poles_from_file
 
 
 def get_spectra_from_poles(poles_dict, omega_mesh, gamma_mesh, temperature):
@@ -21,7 +20,8 @@ def get_spectra_from_poles(poles_dict, omega_mesh, gamma_mesh, temperature):
     poles_dict: dict
         Dict containing information of poles, which are calculated from
         xas_fsolver and rixs_fsolver.
-        This dict is constructed by :func:`iostream.read_poles_from_file`.
+        This dict is constructed by
+        :func:`fortran_backend.isostream_fortran.read_poles_from_file`.
     omega_mesh: 1d float array
         Energy grid.
     gamma_mesh: 1d float array
@@ -36,7 +36,8 @@ def get_spectra_from_poles(poles_dict, omega_mesh, gamma_mesh, temperature):
 
     See also
     --------
-    iostream.read_poles_from_file: read XAS or RIXS poles files.
+    fortran_backend.isostream_fortran.read_poles_from_file:
+        Read XAS or RIXS poles files.
     """
     nom = len(omega_mesh)
     spectra = np.zeros(nom, dtype=np.float64)
@@ -122,6 +123,8 @@ def plot_spectrum(file_list, omega_mesh, gamma_mesh, T=1.0, fname='spectrum.dat'
     fmt_float: str (default: '{:.15f}')
         Format for printing float numbers.
     """
+
+    from .fortran_backend.isostream_fortran import read_poles_from_file
 
     pole_dict = read_poles_from_file(file_list)
     spectrum = get_spectra_from_poles(pole_dict, omega_mesh, gamma_mesh, T)
