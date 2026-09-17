@@ -17,7 +17,7 @@ import numpy as np
 
 from ..fock_basis import write_fock_dec_by_N
 from ..photon_transition import dipole_polvec_xas, dipole_polvec_rixs, quadrupole_polvec, unit_wavevector
-from ..plot_spectrum import get_spectra_from_poles, merge_pole_dicts
+from ..poles import get_spectra_from_poles, merge_pole_dicts
 from .isostream_fortran import (
     read_poles_from_file, write_config, write_emat, write_umat,
 )

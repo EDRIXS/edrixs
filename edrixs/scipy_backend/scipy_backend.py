@@ -15,7 +15,7 @@ from .krylov import lanczos_tridiagonal
 from ..photon_transition import (
     dipole_polvec_xas, dipole_polvec_rixs, quadrupole_polvec, unit_wavevector,
 )
-from ..plot_spectrum import get_spectra_from_poles
+from ..poles import get_spectra_from_poles
 
 __all__ = [
     'owns_operator_scipy', 'owns_operator_dense',

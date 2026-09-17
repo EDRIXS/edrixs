@@ -8,6 +8,7 @@ from .fortran_backend.isostream_fortran import *
 from .manybody_operator import *
 from .models import *
 from .photon_transition import *
+from .poles import *
 from .plot_spectrum import *
 from .rixs_utils import *
 from .soc import *

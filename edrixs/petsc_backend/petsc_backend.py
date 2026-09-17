@@ -362,7 +362,7 @@ def xas_petsc(eval_i, evec_i, hmat_n, trans_op, ominc, *,
     transition operator is applied in the original Fock basis, and a Lanczos
     tridiagonalization of the intermediate Hamiltonian ``hmat_n`` generates
     the pole representation consumed by
-    :func:`edrixs.plot_spectrum.get_spectra_from_poles`.
+    :func:`edrixs.poles.get_spectra_from_poles`.
 
     Parameters
     ----------
@@ -404,7 +404,7 @@ def xas_petsc(eval_i, evec_i, hmat_n, trans_op, ominc, *,
     """
     _petsc_module()
     from .lanczos import lanczos_tridiagonal
-    from ..plot_spectrum import get_spectra_from_poles, merge_pole_dicts
+    from ..poles import get_spectra_from_poles, merge_pole_dicts
     from .._solvers_helpers import _expand_broadening
     from ..photon_transition import (
         dipole_polvec_xas, quadrupole_polvec, unit_wavevector,
@@ -498,7 +498,7 @@ def rixs_petsc(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
     system ``(omega + E_i + i*gamma_c - H_n) x = D_k |i>`` with a PETSc KSP
     (GMRES), and a Lanczos tridiagonalization of ``hmat_i`` seeded by
     ``D_k'^dagger x`` produces the pole representation consumed by
-    :func:`edrixs.plot_spectrum.get_spectra_from_poles`.
+    :func:`edrixs.poles.get_spectra_from_poles`.
 
     Parameters
     ----------
@@ -547,7 +547,7 @@ def rixs_petsc(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
     """
     PETSc = _petsc_module()
     from .lanczos import lanczos_tridiagonal
-    from ..plot_spectrum import get_spectra_from_poles
+    from ..poles import get_spectra_from_poles
     from .._solvers_helpers import _expand_broadening
 
     kws = _backend_kws(backend_kws)

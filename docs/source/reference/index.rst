@@ -24,6 +24,7 @@ included in EDRIXS, describing what they are and what they do.
    iostream
    manybody_operator
    photon_transition
+   poles
    plot_spectrum
    rixs_utils
    soc

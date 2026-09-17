@@ -31,7 +31,7 @@ from .fock_basis import (
 from .basis_transform import cb_op2, tmat_r2c, cb_op
 from .utils import info_atomic_shell, slater_integrals_name, boltz_dist
 from .rixs_utils import scattering_mat
-from .plot_spectrum import get_spectra_from_poles, merge_pole_dicts
+from .poles import get_spectra_from_poles, merge_pole_dicts
 from .soc import atom_hsoc
 from .petsc_backend import petsc_backend
 from .scipy_backend import scipy_backend

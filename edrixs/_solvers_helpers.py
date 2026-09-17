@@ -16,7 +16,7 @@ from .coulomb_utensor import get_umat_slater, get_umat_slater_3shells
 from .fock_basis import write_fock_dec_by_N
 from .basis_transform import tmat_r2c
 from .utils import info_atomic_shell, slater_integrals_name
-from .plot_spectrum import get_spectra_from_poles, merge_pole_dicts
+from .poles import get_spectra_from_poles, merge_pole_dicts
 from .soc import atom_hsoc
 
 
