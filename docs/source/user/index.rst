@@ -17,6 +17,5 @@ EDRIXS User Guide
    introduction
    conventions
    backend
-   pythontips
    examples
    papers

@@ -184,6 +184,4 @@ Where to go next
   numerical options.
 * :ref:`examples` -- pedagogical scripts that build up each concept above with
   physical commentary.
-* :ref:`pythontips` -- practical advice for running and inspecting EDRIXS
-  scripts.
 * :ref:`reference` -- the full API reference.
