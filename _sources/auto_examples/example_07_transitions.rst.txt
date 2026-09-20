@@ -192,17 +192,18 @@ whether we access the excited state with the spin flipped.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 115-122
+.. GENERATED FROM PYTHON SOURCE LINES 115-123
 
 Angular dependence
 ------------------------------------------------------------------------------
 Let's consider the common case of fixing the total scattering angle at
 :code:`two_theta = 90` and choosing a series of incident angles :code:`thins`.
 Since the detector does not resolve polarization, we need to add both outgoing
-polarizations. It is then convenient to use function :func:`.dipole_polvec_rixs`
+polarizations. It is then convenient to use function
+:func:`~edrixs.photon_transition.dipole_polvec_rixs`
 to obtain the incoming and outgoing polarization vectors.
 
-.. GENERATED FROM PYTHON SOURCE LINES 122-137
+.. GENERATED FROM PYTHON SOURCE LINES 123-138
 
 .. code-block:: Python
 
@@ -228,7 +229,7 @@ to obtain the incoming and outgoing polarization vectors.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 138-143
+.. GENERATED FROM PYTHON SOURCE LINES 139-144
 
 Plot
 ------------------------------------------------------------------------------
@@ -236,7 +237,7 @@ We now run through a few configurations specified in terms of incoming
 polarization angle :math:`\alpha` (defined in radians w.r.t. the scattering
 plane), :math:`F`, plotting label, and plotting color.
 
-.. GENERATED FROM PYTHON SOURCE LINES 143-159
+.. GENERATED FROM PYTHON SOURCE LINES 144-160
 
 .. code-block:: Python
 
@@ -268,14 +269,14 @@ plane), :math:`F`, plotting label, and plotting color.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 160-164
+.. GENERATED FROM PYTHON SOURCE LINES 161-165
 
 Run through orbitals
 ------------------------------------------------------------------------------
 For completeness, let's look at transitions from :math:`x^2-y^2` to all other
 orbitals.
 
-.. GENERATED FROM PYTHON SOURCE LINES 164-191
+.. GENERATED FROM PYTHON SOURCE LINES 165-192
 
 .. code-block:: Python
 
@@ -318,7 +319,7 @@ orbitals.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 192-198
+.. GENERATED FROM PYTHON SOURCE LINES 193-199
 
 .. rubric:: Footnotes
 
@@ -330,7 +331,7 @@ orbitals.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.245 seconds)
+   **Total running time of the script:** (0 minutes 0.406 seconds)
 
 
 .. _sphx_glr_download_auto_examples_example_07_transitions.py:

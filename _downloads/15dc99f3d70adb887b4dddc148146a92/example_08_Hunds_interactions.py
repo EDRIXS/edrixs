@@ -24,7 +24,7 @@ Hamiltonian, which is a simplfied form for the interactions, which treats all or
 equivalent. Daniel Khomskii's book provides a great explanation of this physics [1]_.  We
 parameterize the interactions via Coulomb repulsion parameter :math:`U` and Hund's exchange
 :math:`J_H`. EDRIXS provides this functionality via the  more general
-:func:`.get_umat_kanamori` function.
+:func:`~edrixs.coulomb_utensor.get_umat_kanamori` function.
 
 It's also easiest to consider this problem in hole langauge, which means our eight spin-orbitals
 are populated by two fermions.

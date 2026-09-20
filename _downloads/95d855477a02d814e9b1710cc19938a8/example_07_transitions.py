@@ -117,7 +117,8 @@ F_SF = get_F(groundstate_vector, excitedstate_vector)
 # Let's consider the common case of fixing the total scattering angle at
 # :code:`two_theta = 90` and choosing a series of incident angles :code:`thins`.
 # Since the detector does not resolve polarization, we need to add both outgoing
-# polarizations. It is then convenient to use function :func:`.dipole_polvec_rixs`
+# polarizations. It is then convenient to use function
+# :func:`~edrixs.photon_transition.dipole_polvec_rixs`
 # to obtain the incoming and outgoing polarization vectors.
 thins = np.linspace(0, 90)
 two_theta = 90

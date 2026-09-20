@@ -94,7 +94,7 @@ In EDRIXS the matrix can be created as follows:
 We stored this under variable :code:`umat_chb` where "cbh" stands for
 complex harmonic basis, which is the default basis in EDRIXS.
 
-.. GENERATED FROM PYTHON SOURCE LINES 67-96
+.. GENERATED FROM PYTHON SOURCE LINES 67-98
 
 Parameterizing interactions
 ------------------------------------------------------------------------------
@@ -103,9 +103,11 @@ parameters :math:`F^{k}`. These relate to integrals of various spherical
 Harmonics as well as Clebsch-Gordon coefficients, Gaunt coefficients,
 and Wigner 3J symbols. Textbooks such as [1]_ can be used for further
 reference. If you are interested in the details of how
-EDRIXS does this (and you probably aren't) function :func:`.umat_slater`,
+EDRIXS does this (and you probably aren't) function
+:func:`~edrixs.coulomb_utensor.umat_slater`,
 constructs the required matrix via Gaunt coeficents from
-:func:`.get_gaunt`. Two alternative parameterizations are common.
+:func:`~edrixs.coulomb_utensor.get_gaunt`. Two alternative parameterizations
+are common.
 The first are the Racah parameters, which are
 
   .. math::
@@ -126,7 +128,7 @@ or an alternative form for the Slater integrals
 
 which involves different normalization parameters.
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-105
+.. GENERATED FROM PYTHON SOURCE LINES 100-107
 
 Basis transform
 ------------------------------------------------------------------------------
@@ -136,7 +138,7 @@ transformation, which imposes the following orbital order
 :math:`\uparrow, \downarrow` spin pairs. Let's perform this transformation and
 store a list of these orbitals.
 
-.. GENERATED FROM PYTHON SOURCE LINES 105-108
+.. GENERATED FROM PYTHON SOURCE LINES 107-110
 
 .. code-block:: Python
 
@@ -150,7 +152,7 @@ store a list of these orbitals.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-162
+.. GENERATED FROM PYTHON SOURCE LINES 111-164
 
 Interactions
 ------------------------------------------------------------------------------
@@ -206,7 +208,7 @@ elements are the same and equal to
 
 Let's print these to demonstrate where these live in the array
 
-.. GENERATED FROM PYTHON SOURCE LINES 162-166
+.. GENERATED FROM PYTHON SOURCE LINES 164-168
 
 .. code-block:: Python
 
@@ -231,7 +233,7 @@ Let's print these to demonstrate where these live in the array
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 167-174
+.. GENERATED FROM PYTHON SOURCE LINES 169-176
 
 2. Inter orbital Coulomb interactions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -241,7 +243,7 @@ Expresions for these parameters are provided in column :math:`U` in
 :ref:`table_2_orbital`. We can print the values from :code:`umat`
 like this:
 
-.. GENERATED FROM PYTHON SOURCE LINES 174-178
+.. GENERATED FROM PYTHON SOURCE LINES 176-180
 
 .. code-block:: Python
 
@@ -271,7 +273,7 @@ like this:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 179-185
+.. GENERATED FROM PYTHON SOURCE LINES 181-187
 
 3. Inter-orbital exchange interactions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -280,7 +282,7 @@ Exchange terms exist with the form
 Expresions for these parameters are provided in column :math:`J` of
 :ref:`table_2_orbital`. These come from terms like this in the matrix:
 
-.. GENERATED FROM PYTHON SOURCE LINES 185-189
+.. GENERATED FROM PYTHON SOURCE LINES 187-191
 
 .. code-block:: Python
 
@@ -310,7 +312,7 @@ Expresions for these parameters are provided in column :math:`J` of
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 190-197
+.. GENERATED FROM PYTHON SOURCE LINES 192-199
 
 4. Pair hopping term
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -320,7 +322,7 @@ and depend on exchange interactions column :math:`J` from
 :ref:`table_2_orbital`
 and here in the matrix.
 
-.. GENERATED FROM PYTHON SOURCE LINES 197-201
+.. GENERATED FROM PYTHON SOURCE LINES 199-203
 
 .. code-block:: Python
 
@@ -350,7 +352,7 @@ and here in the matrix.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 202-219
+.. GENERATED FROM PYTHON SOURCE LINES 204-221
 
 5. Three orbital
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -370,7 +372,7 @@ These are needed to maintain the rotational symmetry of the interations.
 See :ref:`table_3_orbital` for the expressions. We can print some of
 these via:
 
-.. GENERATED FROM PYTHON SOURCE LINES 219-231
+.. GENERATED FROM PYTHON SOURCE LINES 221-233
 
 .. code-block:: Python
 
@@ -404,7 +406,7 @@ these via:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 232-237
+.. GENERATED FROM PYTHON SOURCE LINES 234-239
 
 6. Four orbital
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -412,7 +414,7 @@ Futher multi-orbital terms include
 :math:`U_{\alpha\sigma,\beta\sigma^\prime,\gamma\sigma^\prime,\delta\sigma}`.
 We can find these here in the matrix:
 
-.. GENERATED FROM PYTHON SOURCE LINES 237-253
+.. GENERATED FROM PYTHON SOURCE LINES 239-255
 
 .. code-block:: Python
 
@@ -454,7 +456,7 @@ We can find these here in the matrix:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 254-260
+.. GENERATED FROM PYTHON SOURCE LINES 256-262
 
 Effects of multi-orbital terms
 ------------------------------------------------------------------------------
@@ -463,7 +465,7 @@ spectra with and without multi-orbital terms switched on for system with and
 without a cubic crystal field. We will use a :math:`d`-shell with two
 electrons.
 
-.. GENERATED FROM PYTHON SOURCE LINES 260-296
+.. GENERATED FROM PYTHON SOURCE LINES 262-298
 
 .. code-block:: Python
 
@@ -515,7 +517,7 @@ electrons.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 297-386
+.. GENERATED FROM PYTHON SOURCE LINES 299-388
 
 On the left of the plot Coulomb interactions in spherical symmetry cause
 substantial mxing between :math:`t_{2g}` and :math:`e_{g}` orbitals in the
@@ -610,7 +612,7 @@ orbital terms are included or not.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.172 seconds)
+   **Total running time of the script:** (0 minutes 0.287 seconds)
 
 
 .. _sphx_glr_download_auto_examples_example_09_Coulomb.py:
