@@ -302,8 +302,8 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">ABC_to_F0F2F4</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Convert Racah parameters :math:`A`, :math:`B`, and :math:`C` to the</span>
-<span class="sd">    Slater integrals :math:`F^0`, :math:`F^2`, and :math:`F^4` for a</span>
-<span class="sd">    :math:`d` shell.</span>
+<span class="sd">    unnormalized (raw) Slater integrals :math:`F^0`, :math:`F^2`, and</span>
+<span class="sd">    :math:`F^4` for a :math:`d` shell.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -317,11 +317,18 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    F0: float</span>
-<span class="sd">        Slater integral :math:`F^0`.</span>
+<span class="sd">        Unnormalized Slater integral :math:`F^0`.</span>
 <span class="sd">    F2: float</span>
-<span class="sd">        Slater integral :math:`F^2`.</span>
+<span class="sd">        Unnormalized Slater integral :math:`F^2`.</span>
 <span class="sd">    F4: float</span>
-<span class="sd">        Slater integral :math:`F^4`.</span>
+<span class="sd">        Unnormalized Slater integral :math:`F^4`.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Here :math:`F^k` denotes the unnormalized Slater integral used by EDRIXS.</span>
+<span class="sd">    It should not be confused with the alternative normalized convention</span>
+<span class="sd">    :math:`F_0 = F^0`, :math:`F_2 = F^2 / 49`, and</span>
+<span class="sd">    :math:`F_4 = F^4 / 441`.</span>
 <span class="sd">    """</span>
 
     <span class="n">F0</span> <span class="o">=</span> <span class="n">A</span> <span class="o">+</span> <span class="mf">7.0</span> <span class="o">/</span> <span class="mf">5.0</span> <span class="o">*</span> <span class="n">C</span>
@@ -336,18 +343,18 @@
 <a class="viewcode-back" href="../../reference/utils.html#edrixs.utils.F0F2F4_to_ABC">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">F0F2F4_to_ABC</span><span class="p">(</span><span class="n">F0</span><span class="p">,</span> <span class="n">F2</span><span class="p">,</span> <span class="n">F4</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Convert the Slater integrals :math:`F^0`, :math:`F^2`, and :math:`F^4`</span>
-<span class="sd">    to Racah parameters :math:`A`, :math:`B`, and :math:`C` for a</span>
-<span class="sd">    :math:`d` shell.</span>
+<span class="sd">    Convert the unnormalized (raw) Slater integrals :math:`F^0`,</span>
+<span class="sd">    :math:`F^2`, and :math:`F^4` to Racah parameters :math:`A`, :math:`B`,</span>
+<span class="sd">    and :math:`C` for a :math:`d` shell.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    F0: float</span>
-<span class="sd">        Slater integral :math:`F^0`.</span>
+<span class="sd">        Unnormalized Slater integral :math:`F^0`.</span>
 <span class="sd">    F2: float</span>
-<span class="sd">        Slater integral :math:`F^2`.</span>
+<span class="sd">        Unnormalized Slater integral :math:`F^2`.</span>
 <span class="sd">    F4: float</span>
-<span class="sd">        Slater integral :math:`F^4`.</span>
+<span class="sd">        Unnormalized Slater integral :math:`F^4`.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -357,6 +364,13 @@
 <span class="sd">        Racah parameter :math:`B`.</span>
 <span class="sd">    C: float</span>
 <span class="sd">        Racah parameter :math:`C`.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Here :math:`F^k` denotes the unnormalized Slater integral used by EDRIXS.</span>
+<span class="sd">    It should not be confused with the alternative normalized convention</span>
+<span class="sd">    :math:`F_0 = F^0`, :math:`F_2 = F^2 / 49`, and</span>
+<span class="sd">    :math:`F_4 = F^4 / 441`.</span>
 <span class="sd">    """</span>
 
     <span class="n">A</span> <span class="o">=</span> <span class="n">F0</span> <span class="o">-</span> <span class="mf">49.0</span> <span class="o">/</span> <span class="mf">441.0</span> <span class="o">*</span> <span class="n">F4</span>

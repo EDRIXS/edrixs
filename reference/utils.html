@@ -130,8 +130,8 @@
 <dt class="sig sig-object py" id="edrixs.utils.ABC_to_F0F2F4">
 <span class="sig-prename descclassname"><span class="pre">edrixs.utils.</span></span><span class="sig-name descname"><span class="pre">ABC_to_F0F2F4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/utils.html#ABC_to_F0F2F4"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.utils.ABC_to_F0F2F4" title="Link to this definition"></a></dt>
 <dd><p>Convert Racah parameters <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(B\)</span>, and <span class="math notranslate nohighlight">\(C\)</span> to the
-Slater integrals <span class="math notranslate nohighlight">\(F^0\)</span>, <span class="math notranslate nohighlight">\(F^2\)</span>, and <span class="math notranslate nohighlight">\(F^4\)</span> for a
-<span class="math notranslate nohighlight">\(d\)</span> shell.</p>
+unnormalized (raw) Slater integrals <span class="math notranslate nohighlight">\(F^0\)</span>, <span class="math notranslate nohighlight">\(F^2\)</span>, and
+<span class="math notranslate nohighlight">\(F^4\)</span> for a <span class="math notranslate nohighlight">\(d\)</span> shell.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
@@ -145,15 +145,20 @@ Slater integrals <span class="math notranslate nohighlight">\(F^0\)</span>, <spa
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>F0: float</dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F^0\)</span>.</p>
+<dt>F0: float</dt><dd><p>Unnormalized Slater integral <span class="math notranslate nohighlight">\(F^0\)</span>.</p>
 </dd>
-<dt>F2: float</dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F^2\)</span>.</p>
+<dt>F2: float</dt><dd><p>Unnormalized Slater integral <span class="math notranslate nohighlight">\(F^2\)</span>.</p>
 </dd>
-<dt>F4: float</dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F^4\)</span>.</p>
-</dd>
-</dl>
+<dt>F4: float</dt><dd><p>Unnormalized Slater integral <span class="math notranslate nohighlight">\(F^4\)</span>.</p>
 </dd>
 </dl>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Here <span class="math notranslate nohighlight">\(F^k\)</span> denotes the unnormalized Slater integral used by EDRIXS.
+It should not be confused with the alternative normalized convention
+<span class="math notranslate nohighlight">\(F_0 = F^0\)</span>, <span class="math notranslate nohighlight">\(F_2 = F^2 / 49\)</span>, and
+<span class="math notranslate nohighlight">\(F_4 = F^4 / 441\)</span>.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -282,17 +287,17 @@ return <span class="math notranslate nohighlight">\(U_d\)</span> and <span class
 <dl class="py function">
 <dt class="sig sig-object py" id="edrixs.utils.F0F2F4_to_ABC">
 <span class="sig-prename descclassname"><span class="pre">edrixs.utils.</span></span><span class="sig-name descname"><span class="pre">F0F2F4_to_ABC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">F0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/utils.html#F0F2F4_to_ABC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.utils.F0F2F4_to_ABC" title="Link to this definition"></a></dt>
-<dd><p>Convert the Slater integrals <span class="math notranslate nohighlight">\(F^0\)</span>, <span class="math notranslate nohighlight">\(F^2\)</span>, and <span class="math notranslate nohighlight">\(F^4\)</span>
-to Racah parameters <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(B\)</span>, and <span class="math notranslate nohighlight">\(C\)</span> for a
-<span class="math notranslate nohighlight">\(d\)</span> shell.</p>
+<dd><p>Convert the unnormalized (raw) Slater integrals <span class="math notranslate nohighlight">\(F^0\)</span>,
+<span class="math notranslate nohighlight">\(F^2\)</span>, and <span class="math notranslate nohighlight">\(F^4\)</span> to Racah parameters <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(B\)</span>,
+and <span class="math notranslate nohighlight">\(C\)</span> for a <span class="math notranslate nohighlight">\(d\)</span> shell.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
-<dt><strong>F0: float</strong></dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F^0\)</span>.</p>
+<dt><strong>F0: float</strong></dt><dd><p>Unnormalized Slater integral <span class="math notranslate nohighlight">\(F^0\)</span>.</p>
 </dd>
-<dt><strong>F2: float</strong></dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F^2\)</span>.</p>
+<dt><strong>F2: float</strong></dt><dd><p>Unnormalized Slater integral <span class="math notranslate nohighlight">\(F^2\)</span>.</p>
 </dd>
-<dt><strong>F4: float</strong></dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F^4\)</span>.</p>
+<dt><strong>F4: float</strong></dt><dd><p>Unnormalized Slater integral <span class="math notranslate nohighlight">\(F^4\)</span>.</p>
 </dd>
 </dl>
 </dd>
@@ -307,6 +312,11 @@ to Racah parameters <span class="math notranslate nohighlight">\(A\)</span>, <sp
 </dl>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>Here <span class="math notranslate nohighlight">\(F^k\)</span> denotes the unnormalized Slater integral used by EDRIXS.
+It should not be confused with the alternative normalized convention
+<span class="math notranslate nohighlight">\(F_0 = F^0\)</span>, <span class="math notranslate nohighlight">\(F_2 = F^2 / 49\)</span>, and
+<span class="math notranslate nohighlight">\(F_4 = F^4 / 441\)</span>.</p>
 </dd></dl>
 
 <dl class="py function">
