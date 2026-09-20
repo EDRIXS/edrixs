@@ -82,7 +82,8 @@
              
   <h1>Source code for edrixs.utils</h1><div class="highlight"><pre>
 <span></span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'beta_to_kelvin'</span><span class="p">,</span> <span class="s1">'kelvin_to_beta'</span><span class="p">,</span> <span class="s1">'boltz_dist'</span><span class="p">,</span> <span class="s1">'UJ_to_UdJH'</span><span class="p">,</span>
-           <span class="s1">'UdJH_to_UJ'</span><span class="p">,</span> <span class="s1">'UdJH_to_F0F2F4'</span><span class="p">,</span> <span class="s1">'UdJH_to_F0F2F4F6'</span><span class="p">,</span> <span class="s1">'F0F2F4_to_UdJH'</span><span class="p">,</span>
+           <span class="s1">'UdJH_to_UJ'</span><span class="p">,</span> <span class="s1">'UdJH_to_F0F2F4'</span><span class="p">,</span> <span class="s1">'UdJH_to_F0F2F4F6'</span><span class="p">,</span>
+           <span class="s1">'ABC_to_F0F2F4'</span><span class="p">,</span> <span class="s1">'F0F2F4_to_ABC'</span><span class="p">,</span> <span class="s1">'F0F2F4_to_UdJH'</span><span class="p">,</span>
            <span class="s1">'F0F2F4_to_UJ'</span><span class="p">,</span> <span class="s1">'F0F2F4F6_to_UdJH'</span><span class="p">,</span> <span class="s1">'CT_imp_bath'</span><span class="p">,</span>
            <span class="s1">'CT_imp_bath_core_hole'</span><span class="p">,</span> <span class="s1">'info_atomic_shell'</span><span class="p">,</span>
            <span class="s1">'case_to_shell_name'</span><span class="p">,</span> <span class="s1">'edge_to_shell_name'</span><span class="p">,</span> <span class="s1">'slater_integrals_name'</span><span class="p">,</span>
@@ -293,6 +294,76 @@
     <span class="n">F6</span> <span class="o">=</span> <span class="mi">1001</span> <span class="o">/</span> <span class="mf">2025.0</span> <span class="o">*</span> <span class="n">F2</span>
 
     <span class="k">return</span> <span class="n">F0</span><span class="p">,</span> <span class="n">F2</span><span class="p">,</span> <span class="n">F4</span><span class="p">,</span> <span class="n">F6</span></div>
+
+
+
+<div class="viewcode-block" id="ABC_to_F0F2F4">
+<a class="viewcode-back" href="../../reference/utils.html#edrixs.utils.ABC_to_F0F2F4">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">ABC_to_F0F2F4</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Convert Racah parameters :math:`A`, :math:`B`, and :math:`C` to the</span>
+<span class="sd">    Slater integrals :math:`F^0`, :math:`F^2`, and :math:`F^4` for a</span>
+<span class="sd">    :math:`d` shell.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    A: float</span>
+<span class="sd">        Racah parameter :math:`A`.</span>
+<span class="sd">    B: float</span>
+<span class="sd">        Racah parameter :math:`B`.</span>
+<span class="sd">    C: float</span>
+<span class="sd">        Racah parameter :math:`C`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    F0: float</span>
+<span class="sd">        Slater integral :math:`F^0`.</span>
+<span class="sd">    F2: float</span>
+<span class="sd">        Slater integral :math:`F^2`.</span>
+<span class="sd">    F4: float</span>
+<span class="sd">        Slater integral :math:`F^4`.</span>
+<span class="sd">    """</span>
+
+    <span class="n">F0</span> <span class="o">=</span> <span class="n">A</span> <span class="o">+</span> <span class="mf">7.0</span> <span class="o">/</span> <span class="mf">5.0</span> <span class="o">*</span> <span class="n">C</span>
+    <span class="n">F2</span> <span class="o">=</span> <span class="mf">49.0</span> <span class="o">*</span> <span class="n">B</span> <span class="o">+</span> <span class="mf">7.0</span> <span class="o">*</span> <span class="n">C</span>
+    <span class="n">F4</span> <span class="o">=</span> <span class="mf">63.0</span> <span class="o">/</span> <span class="mf">5.0</span> <span class="o">*</span> <span class="n">C</span>
+
+    <span class="k">return</span> <span class="n">F0</span><span class="p">,</span> <span class="n">F2</span><span class="p">,</span> <span class="n">F4</span></div>
+
+
+
+<div class="viewcode-block" id="F0F2F4_to_ABC">
+<a class="viewcode-back" href="../../reference/utils.html#edrixs.utils.F0F2F4_to_ABC">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">F0F2F4_to_ABC</span><span class="p">(</span><span class="n">F0</span><span class="p">,</span> <span class="n">F2</span><span class="p">,</span> <span class="n">F4</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Convert the Slater integrals :math:`F^0`, :math:`F^2`, and :math:`F^4`</span>
+<span class="sd">    to Racah parameters :math:`A`, :math:`B`, and :math:`C` for a</span>
+<span class="sd">    :math:`d` shell.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    F0: float</span>
+<span class="sd">        Slater integral :math:`F^0`.</span>
+<span class="sd">    F2: float</span>
+<span class="sd">        Slater integral :math:`F^2`.</span>
+<span class="sd">    F4: float</span>
+<span class="sd">        Slater integral :math:`F^4`.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    A: float</span>
+<span class="sd">        Racah parameter :math:`A`.</span>
+<span class="sd">    B: float</span>
+<span class="sd">        Racah parameter :math:`B`.</span>
+<span class="sd">    C: float</span>
+<span class="sd">        Racah parameter :math:`C`.</span>
+<span class="sd">    """</span>
+
+    <span class="n">A</span> <span class="o">=</span> <span class="n">F0</span> <span class="o">-</span> <span class="mf">49.0</span> <span class="o">/</span> <span class="mf">441.0</span> <span class="o">*</span> <span class="n">F4</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mf">49.0</span> <span class="o">*</span> <span class="n">F2</span> <span class="o">-</span> <span class="mf">5.0</span> <span class="o">/</span> <span class="mf">441.0</span> <span class="o">*</span> <span class="n">F4</span>
+    <span class="n">C</span> <span class="o">=</span> <span class="mf">35.0</span> <span class="o">/</span> <span class="mf">441.0</span> <span class="o">*</span> <span class="n">F4</span>
+
+    <span class="k">return</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">C</span></div>
 
 
 

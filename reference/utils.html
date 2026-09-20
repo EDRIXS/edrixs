@@ -70,9 +70,11 @@
 <li class="toctree-l2"><a class="reference internal" href="soc.html">soc</a></li>
 <li class="toctree-l2"><a class="reference internal" href="solvers.html">solvers</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.ABC_to_F0F2F4"><code class="docutils literal notranslate"><span class="pre">ABC_to_F0F2F4()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.CT_imp_bath"><code class="docutils literal notranslate"><span class="pre">CT_imp_bath()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.CT_imp_bath_core_hole"><code class="docutils literal notranslate"><span class="pre">CT_imp_bath_core_hole()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.F0F2F4F6_to_UdJH"><code class="docutils literal notranslate"><span class="pre">F0F2F4F6_to_UdJH()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.F0F2F4_to_ABC"><code class="docutils literal notranslate"><span class="pre">F0F2F4_to_ABC()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.F0F2F4_to_UJ"><code class="docutils literal notranslate"><span class="pre">F0F2F4_to_UJ()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.F0F2F4_to_UdJH"><code class="docutils literal notranslate"><span class="pre">F0F2F4_to_UdJH()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.utils.UJ_to_UdJH"><code class="docutils literal notranslate"><span class="pre">UJ_to_UdJH()</span></code></a></li>
@@ -125,6 +127,36 @@
   <section id="utils">
 <span id="id1"></span><h1>utils<a class="headerlink" href="#utils" title="Link to this heading"></a></h1>
 <span class="target" id="module-edrixs.utils"></span><dl class="py function">
+<dt class="sig sig-object py" id="edrixs.utils.ABC_to_F0F2F4">
+<span class="sig-prename descclassname"><span class="pre">edrixs.utils.</span></span><span class="sig-name descname"><span class="pre">ABC_to_F0F2F4</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">B</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">C</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/utils.html#ABC_to_F0F2F4"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.utils.ABC_to_F0F2F4" title="Link to this definition"></a></dt>
+<dd><p>Convert Racah parameters <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(B\)</span>, and <span class="math notranslate nohighlight">\(C\)</span> to the
+Slater integrals <span class="math notranslate nohighlight">\(F^0\)</span>, <span class="math notranslate nohighlight">\(F^2\)</span>, and <span class="math notranslate nohighlight">\(F^4\)</span> for a
+<span class="math notranslate nohighlight">\(d\)</span> shell.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>A: float</strong></dt><dd><p>Racah parameter <span class="math notranslate nohighlight">\(A\)</span>.</p>
+</dd>
+<dt><strong>B: float</strong></dt><dd><p>Racah parameter <span class="math notranslate nohighlight">\(B\)</span>.</p>
+</dd>
+<dt><strong>C: float</strong></dt><dd><p>Racah parameter <span class="math notranslate nohighlight">\(C\)</span>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>F0: float</dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F^0\)</span>.</p>
+</dd>
+<dt>F2: float</dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F^2\)</span>.</p>
+</dd>
+<dt>F4: float</dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F^4\)</span>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="edrixs.utils.CT_imp_bath">
 <span class="sig-prename descclassname"><span class="pre">edrixs.utils.</span></span><span class="sig-name descname"><span class="pre">CT_imp_bath</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">U_dd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Delta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/utils.html#CT_imp_bath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.utils.CT_imp_bath" title="Link to this definition"></a></dt>
 <dd><p>Compute energies of the impurity and bath for an
@@ -241,6 +273,36 @@ return <span class="math notranslate nohighlight">\(U_d\)</span> and <span class
 <dt>Ud: float</dt><dd><p>Coulomb interaction <span class="math notranslate nohighlight">\(U_d\)</span>.</p>
 </dd>
 <dt>JH: float</dt><dd><p>Hund’s coupling <span class="math notranslate nohighlight">\(J_H\)</span>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.utils.F0F2F4_to_ABC">
+<span class="sig-prename descclassname"><span class="pre">edrixs.utils.</span></span><span class="sig-name descname"><span class="pre">F0F2F4_to_ABC</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">F0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">F4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/utils.html#F0F2F4_to_ABC"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.utils.F0F2F4_to_ABC" title="Link to this definition"></a></dt>
+<dd><p>Convert the Slater integrals <span class="math notranslate nohighlight">\(F^0\)</span>, <span class="math notranslate nohighlight">\(F^2\)</span>, and <span class="math notranslate nohighlight">\(F^4\)</span>
+to Racah parameters <span class="math notranslate nohighlight">\(A\)</span>, <span class="math notranslate nohighlight">\(B\)</span>, and <span class="math notranslate nohighlight">\(C\)</span> for a
+<span class="math notranslate nohighlight">\(d\)</span> shell.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>F0: float</strong></dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F^0\)</span>.</p>
+</dd>
+<dt><strong>F2: float</strong></dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F^2\)</span>.</p>
+</dd>
+<dt><strong>F4: float</strong></dt><dd><p>Slater integral <span class="math notranslate nohighlight">\(F^4\)</span>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>A: float</dt><dd><p>Racah parameter <span class="math notranslate nohighlight">\(A\)</span>.</p>
+</dd>
+<dt>B: float</dt><dd><p>Racah parameter <span class="math notranslate nohighlight">\(B\)</span>.</p>
+</dd>
+<dt>C: float</dt><dd><p>Racah parameter <span class="math notranslate nohighlight">\(C\)</span>.</p>
 </dd>
 </dl>
 </dd>

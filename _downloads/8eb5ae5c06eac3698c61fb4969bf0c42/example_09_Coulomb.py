@@ -95,6 +95,15 @@ umat_chb = edrixs.get_umat_slater('d', F0, F2, F4)
 #     \end{eqnarray}
 #
 # which involves different normalization parameters.
+# EDRIXS converts between the Slater integrals and Racah parameters in both
+# directions with :func:`~edrixs.utils.F0F2F4_to_ABC` and
+# :func:`~edrixs.utils.ABC_to_F0F2F4`:
+A, B, C = edrixs.F0F2F4_to_ABC(F0, F2, F4)
+F0_from_racah, F2_from_racah, F4_from_racah = edrixs.ABC_to_F0F2F4(A, B, C)
+assert np.allclose(
+    (F0_from_racah, F2_from_racah, F4_from_racah),
+    (F0, F2, F4),
+)
 
 ################################################################################
 # Basis transform
@@ -271,7 +280,6 @@ def diagonalize(ten_dq, umat):
 
 basis = edrixs.get_fock_bin_by_N(10, 2)
 umat_no_multiorbital = np.copy(umat)
-B = F2/49 - 5*F4/441
 for val in [np.sqrt(3)*B/2, np.sqrt(3)*B, 3*B/2]:
     umat_no_multiorbital[(np.abs(umat)- val) < 1e-6] = 0
 
