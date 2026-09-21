@@ -1,0 +1,67 @@
+
+:orphan:
+
+.. _sphx_glr_auto_examples_sg_execution_times:
+
+
+Computation times
+=================
+**00:07.853** total execution time for 11 files **from auto_examples**:
+
+.. container::
+
+  .. raw:: html
+
+    <style scoped>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+    </style>
+    <script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <script type="text/javascript" class="init">
+    $(document).ready( function () {
+        $('table.sg-datatable').DataTable({order: [[1, 'desc']]});
+    } );
+    </script>
+
+  .. list-table::
+   :header-rows: 1
+   :class: table table-striped sg-datatable
+
+   * - Example
+     - Time
+     - Mem (MB)
+   * - :ref:`sphx_glr_auto_examples_example_02_single_atom_RIXS.py` (``example_02_single_atom_RIXS.py``)
+     - 00:02.633
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_example_03_AIM_XAS.py` (``example_03_AIM_XAS.py``)
+     - 00:01.958
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_example_10_geometry.py` (``example_10_geometry.py``)
+     - 00:01.092
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_example_08_Hunds_interactions.py` (``example_08_Hunds_interactions.py``)
+     - 00:00.772
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_example_05_charge_transfer.py` (``example_05_charge_transfer.py``)
+     - 00:00.336
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_example_07_transitions.py` (``example_07_transitions.py``)
+     - 00:00.306
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_example_04_GS_analysis.py` (``example_04_GS_analysis.py``)
+     - 00:00.300
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_example_09_Coulomb.py` (``example_09_Coulomb.py``)
+     - 00:00.224
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_example_00_ed_calculator.py` (``example_00_ed_calculator.py``)
+     - 00:00.091
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_example_01_crystal_field.py` (``example_01_crystal_field.py``)
+     - 00:00.073
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_example_06_Hubbard_dimer.py` (``example_06_Hubbard_dimer.py``)
+     - 00:00.066
+     - 0.0
