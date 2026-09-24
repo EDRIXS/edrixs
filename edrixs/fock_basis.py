@@ -257,11 +257,10 @@ def get_fock_basis_int(*args):
         print("Error: number of arguments is not even")
         return None
     spec = FockBasisSpec.from_args(*args)
-    basis_binary = get_fock_bin_by_N(*args)
-    basis_int = np.asarray(
-        [int(''.join(map(str, row)), 2) for row in basis_binary],
-        dtype=object,
-    )
+    combinadic_basis = FockBinByN.from_spec(spec)
+    basis_int = [
+        combinadic_basis.decode(index) for index in range(len(combinadic_basis))
+    ]
     return FockBasis(basis_int, spec.norbs, spec=spec)
 
 
