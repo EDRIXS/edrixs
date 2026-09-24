@@ -130,9 +130,10 @@ def get_fock_half_N(N):
     return res
 
 
-def get_fock_full_N(norb, N):
+def get_fock_full_N(norb: int, N: int) -> list[int]:
     """
-    Get the decimal digitals to represent Fock states.
+    Get the decimal numbers to represent Fock states via a fast
+    Gosper’s hack method.
 
     Parameters
     ----------
@@ -143,32 +144,38 @@ def get_fock_full_N(norb, N):
 
     Returns
     -------
-    res: list of int
+    res: List[int]
         The decimal digitals to represent Fock states.
 
     Examples
     --------
-    >>> import edrixs
-    >>> edrixs.fock_bin(4,2)
-    [[1, 1, 0, 0],
-     [1, 0, 1, 0],
-     [0, 1, 1, 0],
-     [1, 0, 0, 1],
-     [0, 1, 0, 1],
-     [0, 0, 1, 1]]
 
     >>> import edrixs
     >>> edrixs.get_fock_full_N(4,2)
     [3, 5, 6, 9, 10, 12]
 
     """
+    if N < 0:
+        raise ValueError(f"N must be non-negative, "
+                         f"but N={N} was used.")
+    if N > norb:
+        raise ValueError(f"N cannot exceed norb, currently "
+                         f"N={N} and norb={norb}.")
+    if N == 0:
+        return [0]
 
     res = []
-    half_N = get_fock_half_N(norb // 2)
-    for m in range(norb // 2 + 1):
-        n = N - m
-        if n >= 0 and n <= norb // 2:
-            res.extend([i * 2**(norb // 2) + j for i in half_N[m] for j in half_N[n]])
+    # initial mask: N ones in the least significant bits
+    mask = (1 << N) - 1
+    limit = 1 << norb
+
+    while mask < limit:
+        res.append(mask)
+        # Gosper’s hack to get the next mask with the same popcount:
+        c = mask & -mask
+        r = mask + c
+        mask = (((r ^ mask) >> 2) // c) | r
+
     return res
 
 
@@ -419,22 +426,13 @@ def write_fock_dec_by_N(N, r, fname='fock_i.in'):
     >>> import edrixs
     >>> edrixs.write_fock_dec_by_N(4, 2, 'fock_i.in')
     file fock_i.in looks like
-    15
+    6
     3
     5
     6
     9
     10
     12
-    17
-    18
-    20
-    24
-    33
-    34
-    36
-    40
-    48
 
     where, the first line is the total numer of Fock states,
     and the following lines are the Fock states in decimal form.
