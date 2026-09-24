@@ -42,22 +42,12 @@ def cb_op(oper_O, TL, TR=None):
     res: same shape as oper_O
         The matrices form of operators :math:`\\hat{O}` in new basis.
     """
-    oper_O = np.array(oper_O, order='C')
-    dim = oper_O.shape
     if TR is None:
         TR = TL
-    if len(dim) < 2:
+    if oper_O.ndim < 2:
         raise Exception("Dimension of oper_O should be at least 2")
-    elif len(dim) == 2:
-        res = np.dot(np.dot(np.conj(np.transpose(TL)), oper_O), TR)
-    else:
-        tot = np.prod(dim[0:-2])
-        tmp_oper = oper_O.reshape((tot, dim[-2], dim[-1]))
-        for i in range(tot):
-            tmp_oper[i] = np.dot(np.dot(np.conj(np.transpose(TL)), tmp_oper[i]), TR)
-        res = tmp_oper.reshape(dim)
 
-    return res
+    return TL.conj().T @ oper_O @ TR
 
 
 def cb_op2(oper_O, TL, TR):

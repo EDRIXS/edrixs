@@ -1,4 +1,4 @@
-"""Option registry for the SciPy and dense compatibility backends."""
+"""Option registry for the iterative SciPy backend."""
 
 from __future__ import annotations
 

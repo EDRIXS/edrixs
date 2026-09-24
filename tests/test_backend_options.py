@@ -5,8 +5,10 @@ import inspect
 import numpy as np
 import pytest
 
+from edrixs.dense_backend import dense_backend
 from edrixs.fortran_backend import fortran_backend
 from edrixs.fortran_backend.options import OPTIONS as FORTRAN_OPTIONS
+from edrixs.dense_backend.options import OPTIONS as DENSE_OPTIONS
 from edrixs.petsc_backend.options import OPTIONS as PETSC_OPTIONS
 from edrixs.scipy_backend import scipy_backend
 from edrixs.scipy_backend.options import OPTIONS as SCIPY_OPTIONS
@@ -14,10 +16,14 @@ from edrixs.solvers import rixs_1v1c_fort, rixs_2v1c_fort, rixs_siam_fort
 
 
 def test_option_registries_cover_each_staged_operation():
+    assert set(DENSE_OPTIONS) == {'build_op', 'get_ops', 'ed', 'xas', 'rixs'}
     assert set(SCIPY_OPTIONS) == {'build_op', 'get_ops', 'ed', 'xas', 'rixs'}
     assert set(FORTRAN_OPTIONS) == {'get_ops', 'ed', 'xas', 'rixs'}
     assert set(PETSC_OPTIONS) == {'build_op', 'get_ops', 'ed', 'xas', 'rixs'}
     assert all(not options for options in PETSC_OPTIONS.values())
+    assert not DENSE_OPTIONS['ed']
+    assert not DENSE_OPTIONS['xas']
+    assert not DENSE_OPTIONS['rixs']
 
 
 def test_scipy_unknown_option_suggests_close_name():
@@ -52,6 +58,14 @@ def test_backend_options_require_string_keys():
 def test_scipy_ed_option_values_are_validated(backend_kws, error):
     with pytest.raises(error):
         scipy_backend.ed_scipy(np.eye(2), backend_kws=backend_kws)
+
+
+def test_dense_solver_rejects_iterative_scipy_options():
+    """Dense eigensums do not expose Krylov or GMRES controls."""
+    with pytest.raises(TypeError, match=r"dense\.ed.*tol"):
+        dense_backend.ed_dense(
+            np.eye(2), backend_kws={'tol': 1e-10}
+        )
 
 
 def test_fortran_staged_rixs_uses_standardized_iteration_name():

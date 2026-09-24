@@ -4,13 +4,14 @@ from docutils import nodes
 from docutils.parsers.rst import Directive
 
 from edrixs._backend_options import default_text
+from edrixs.dense_backend.options import OPTIONS as DENSE_OPTIONS
 from edrixs.fortran_backend.options import OPTIONS as FORTRAN_OPTIONS
 from edrixs.petsc_backend.options import OPTIONS as PETSC_OPTIONS
 from edrixs.scipy_backend.options import OPTIONS as SCIPY_OPTIONS
 
 
 REGISTRIES = {
-    'dense': SCIPY_OPTIONS,
+    'dense': DENSE_OPTIONS,
     'fortran': FORTRAN_OPTIONS,
     'petsc': PETSC_OPTIONS,
     'scipy': SCIPY_OPTIONS,
