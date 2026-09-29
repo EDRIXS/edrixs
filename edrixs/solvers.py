@@ -26,7 +26,7 @@ from .photon_transition import (
 from .coulomb_utensor import get_umat_slater
 from .manybody_operator import two_fermion, four_fermion
 from .fock_basis import (
-    FockBasisSpec, build_fock_basis, get_fock_bin_by_N, write_fock_dec_by_N
+    FockBasis, FockBasisSpec, build_fock_basis, get_fock_bin_by_N, write_fock_dec_by_N
 )
 from .basis_transform import cb_op2, tmat_r2c, cb_op
 from .utils import info_atomic_shell, slater_integrals_name, boltz_dist
@@ -199,15 +199,24 @@ def get_ops(
     trans_basis_i = basis_i
     if basis_n.norbs > basis_i.norbs:
         core_norb = basis_n.norbs - basis_i.norbs
-        if getattr(basis_i, 'spec', None) is None:
-            raise ValueError(
-                "cannot construct a valence-to-core transition from an "
-                "unstructured initial Fock basis"
+        if isinstance(basis_i, FockBasis):
+            # Preserve the actual retained states and their matrix-index order.
+            core_mask = (1 << core_norb) - 1
+            trans_basis_i = FockBasis(
+                [(state << core_norb) | core_mask
+                 for state in basis_i.basis_int],
+                norbs=basis_n.norbs,
             )
-        lifted_spec = FockBasisSpec(
-            basis_i.spec.shapes + ((core_norb, core_norb),)
-        )
-        trans_basis_i = build_fock_basis(lifted_spec, method=basis_method)
+        else:
+            if getattr(basis_i, 'spec', None) is None:
+                raise ValueError(
+                    "cannot construct a valence-to-core transition from an "
+                    "unstructured initial Fock basis"
+                )
+            lifted_spec = FockBasisSpec(
+                basis_i.spec.shapes + ((core_norb, core_norb),)
+            )
+            trans_basis_i = build_fock_basis(lifted_spec, method=basis_method)
     elif basis_n.norbs < basis_i.norbs:
         raise ValueError(
             "intermediate basis cannot have fewer orbitals than initial basis"
