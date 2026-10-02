@@ -195,7 +195,7 @@ def test_ed_petsc_returns_lowest_sorted_eigenpairs(complex_hermitian_petsc_mat):
     assert len(evecs) == 3
     assert_allclose(evals, expected_eigenvalues[:3], atol=1e-8)
 
-    residual = mat.getVecLeft()
+    residual = mat.createVecLeft()
     for value, vector in zip(evals, evecs):
         mat.mult(vector, residual)
         residual.axpy(-value, vector)
