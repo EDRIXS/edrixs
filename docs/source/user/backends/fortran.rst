@@ -63,6 +63,3 @@ must be at least the later ``num_gs`` value.  ``nvector`` cannot exceed
 ========
 
 .. backend-options:: fortran rixs
-
-The staged spelling ``linsys_maxiter`` is translated internally to the native
-Fortran namelist field ``linsys_max``.

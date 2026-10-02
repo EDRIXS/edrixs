@@ -7,9 +7,7 @@ Unreleased
 
 * Validate staged ``backend_kws`` by backend and operation, with typo
   suggestions and documented value constraints.
-* Document all SciPy, dense, and Fortran staged-backend options.  The staged
-  Fortran RIXS interface uses ``linsys_maxiter``; legacy Fortran function
-  signatures are unchanged.
+* Document all SciPy, dense, and Fortran staged-backend options.
 
 This page summarizes the user-visible changes in each tagged release.  See the
 `GitHub releases page <https://github.com/EDRIXS/edrixs/releases>`_ for the

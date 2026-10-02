@@ -68,14 +68,14 @@ def test_dense_solver_rejects_iterative_scipy_options():
         )
 
 
-def test_fortran_staged_rixs_uses_standardized_iteration_name():
-    assert 'linsys_maxiter' in FORTRAN_OPTIONS['rixs']
-    assert 'linsys_max' not in FORTRAN_OPTIONS['rixs']
+def test_fortran_staged_rixs_uses_native_iteration_name():
+    assert 'linsys_max' in FORTRAN_OPTIONS['rixs']
+    assert 'linsys_maxiter' not in FORTRAN_OPTIONS['rixs']
 
-    with pytest.raises(TypeError, match=r"linsys_max.*linsys_maxiter"):
+    with pytest.raises(TypeError, match=r"linsys_maxiter.*linsys_max"):
         fortran_backend.rixs_fortran(
             [], None, None, None, None, [], [],
-            backend_kws={'linsys_max': 10},
+            backend_kws={'linsys_maxiter': 10},
         )
 
 

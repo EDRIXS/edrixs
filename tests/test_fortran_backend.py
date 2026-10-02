@@ -135,7 +135,7 @@ def test_fortran_backend_uses_native_files_and_f2py_solvers(tmp_path, monkeypatc
     scattering = rixs(
         eval_i, evec_i, hmat_i, hmat_n, transitions,
         np.array([0.0]), np.array([0.0]),
-        backend_kws={'linsys_maxiter': 17},
+        backend_kws={'linsys_max': 17},
     )
 
     assert absorption.shape == (1, 1)

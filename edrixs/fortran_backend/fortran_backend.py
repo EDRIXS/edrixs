@@ -415,7 +415,7 @@ def rixs_fortran(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss,
                 num_val_orbs=num_val_orbs,
                 num_core_orbs=num_core_orbs, num_gs=num_gs, nkryl=nkryl,
                 linsys_max=options.get(
-                    'linsys_maxiter', OPTIONS['rixs']['linsys_maxiter'].default
+                    'linsys_max', OPTIONS['rixs']['linsys_max'].default
                 ),
                 linsys_tol=options.get(
                     'linsys_tol', OPTIONS['rixs']['linsys_tol'].default

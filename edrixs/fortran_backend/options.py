@@ -83,7 +83,7 @@ RIXS_OPTIONS = {
     'nkryl': OptionSpec(
         200, 'Maximum final-state Krylov dimension.', positive_integer
     ),
-    'linsys_maxiter': OptionSpec(
+    'linsys_max': OptionSpec(
         1000,
         'Maximum iterations for the intermediate-state linear solve.',
         positive_integer,
