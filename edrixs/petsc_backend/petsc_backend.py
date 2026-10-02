@@ -203,7 +203,7 @@ def ed_petsc(hmat_i, num_evals=1, *, backend_kws=None):
     eval_i = np.zeros(num_evals, dtype=float)
     evec_i = [None] * num_evals
     errors = np.zeros(num_evals, dtype=float)
-    vr = hmat_i.getVecLeft()
+    vr = hmat_i.createVecLeft()
     for index in range(num_evals):
         eigenvalue = eps.getEigenpair(index, vr)
         eval_i[index] = eigenvalue.real
