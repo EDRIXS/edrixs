@@ -9,6 +9,9 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
 markers = [
   "integration: marks tests that exercise integration between solver components",
+  "parallel: check that starts multiple worker processes",
 ]
