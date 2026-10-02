@@ -49,8 +49,9 @@ class FockBasis:
     """
     Integer-encoded Fock basis with constant-time state lookup.
 
-    Orbital zero is stored as the most significant bit, matching
-    :func:`get_fock_bin_by_N` and the many-body operator backends.
+    Orbital zero is stored as the least significant bit, as in native Fortran.
+    Orbital ``i`` has mask ``1 << i``; occupation lists remain in orbital
+    order, with orbital zero first.
 
     Parameters
     ----------
@@ -110,11 +111,11 @@ class FockBinByN:
         self.num_orbitals = self.norbs
         self.dim = prod(self.sizes)
 
-        running = self.norbs
+        running = 0
         offsets = []
         for norb in self.shell_norbs:
-            running -= norb
             offsets.append(running)
+            running += norb
         self.offsets = tuple(offsets)
 
         # The first shell varies fastest, matching get_fock_bin_by_N.
@@ -168,7 +169,7 @@ class FockBinByN:
 
 
 def _hash_decoder(rank, norb, nocc):
-    """Decode a conventional colex combinadic rank inside one shell."""
+    """Decode a reflected colex rank with orbital zero in the low bit."""
     if nocc == 0:
         return 0
     state = 0
@@ -177,7 +178,7 @@ def _hash_decoder(rank, norb, nocc):
     c = comb(i, j)
     while i >= 0 and j > 0:
         if c <= rank:
-            state |= 1 << i
+            state |= 1 << (norb - 1 - i)
             rank -= c
             old_i, old_j = i, j
             i -= 1
@@ -194,16 +195,16 @@ def _hash_decoder(rank, norb, nocc):
 
 
 def _hash_encoder(state, norb):
-    """Encode one shell into its conventional colex combinadic rank."""
+    """Encode one shell into its reflected colex combinadic rank."""
     state = int(state) & ((1 << norb) - 1)
     rank = 0
     k = 1
+    # Reflect orbital positions for the historical occupation-list ordering.
     while state:
-        lsb = state & -state
-        pos = lsb.bit_length() - 1
-        rank += comb(pos, k)
+        pos = state.bit_length() - 1
+        rank += comb(norb - 1 - pos, k)
         k += 1
-        state ^= lsb
+        state ^= 1 << pos
     return rank
 
 
@@ -233,16 +234,15 @@ def _encode_combinadic(state, norbs, noccus, offsets, sizes, strides):
 
 
 def _min_max_decode(shapes):
-    total_norb = sum(norb for norb, _ in shapes)
     state_min = 0
     state_max = 0
-    running = total_norb
+    running = 0
     for norb, nocc in shapes:
-        running -= norb
         shell_min = (1 << nocc) - 1
         shell_max = shell_min << (norb - nocc)
         state_min |= shell_min << running
         state_max |= shell_max << running
+        running += norb
     return state_min, state_max
 
 

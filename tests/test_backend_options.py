@@ -5,6 +5,8 @@ import inspect
 import numpy as np
 import pytest
 
+from edrixs.dense_backend import dense_backend
+from edrixs.dense_backend.options import OPTIONS as DENSE_OPTIONS
 from edrixs.fortran_backend import fortran_backend
 from edrixs.fortran_backend.options import OPTIONS as FORTRAN_OPTIONS
 from edrixs.petsc_backend.options import OPTIONS as PETSC_OPTIONS
@@ -18,6 +20,10 @@ def test_option_registries_cover_each_staged_operation():
     assert set(FORTRAN_OPTIONS) == {'get_ops', 'ed', 'xas', 'rixs'}
     assert set(PETSC_OPTIONS) == {'build_op', 'get_ops', 'ed', 'xas', 'rixs'}
     assert all(PETSC_OPTIONS.values())
+    assert set(DENSE_OPTIONS) == {'build_op', 'get_ops', 'ed', 'xas', 'rixs'}
+    assert not DENSE_OPTIONS['ed']
+    assert not DENSE_OPTIONS['xas']
+    assert not DENSE_OPTIONS['rixs']
 
 
 def test_scipy_unknown_option_suggests_close_name():
@@ -54,14 +60,22 @@ def test_scipy_ed_option_values_are_validated(backend_kws, error):
         scipy_backend.ed_scipy(np.eye(2), backend_kws=backend_kws)
 
 
-def test_fortran_staged_rixs_uses_standardized_iteration_name():
-    assert 'linsys_maxiter' in FORTRAN_OPTIONS['rixs']
-    assert 'linsys_max' not in FORTRAN_OPTIONS['rixs']
+def test_dense_solver_rejects_iterative_scipy_options():
+    """Dense eigensums do not expose Krylov or GMRES controls."""
+    with pytest.raises(TypeError, match=r"dense\.ed.*tol"):
+        dense_backend.ed_dense(
+            np.eye(2), backend_kws={'tol': 1e-10}
+        )
 
-    with pytest.raises(TypeError, match=r"linsys_max.*linsys_maxiter"):
+
+def test_fortran_staged_rixs_uses_native_iteration_name():
+    assert 'linsys_max' in FORTRAN_OPTIONS['rixs']
+    assert 'linsys_maxiter' not in FORTRAN_OPTIONS['rixs']
+
+    with pytest.raises(TypeError, match=r"linsys_maxiter.*linsys_max"):
         fortran_backend.rixs_fortran(
             [], None, None, None, None, [], [],
-            backend_kws={'linsys_max': 10},
+            backend_kws={'linsys_maxiter': 10},
         )
 
 

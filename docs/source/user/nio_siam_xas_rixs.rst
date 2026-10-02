@@ -42,9 +42,11 @@ The model parameters are specified before constructing the Hamiltonian:
   ``om_shift=857.6`` eV aligns the spectrum with the Ni L edge; the wrapper
   combines this with its internally derived core energy.
 
-The seven outputs from
-:func:`~edrixs.models.model_siam_2d1p` pass directly to
-:func:`~edrixs.solvers.get_ops`. The subsequent diagonalization, XAS, and RIXS
+The first seven outputs from
+:func:`~edrixs.models.model_siam_2d1p` pass to
+:func:`~edrixs.solvers.get_ops`. Pass the eighth output, ``shift``, to
+:func:`~edrixs.solvers.ed` to subtract the core shell-level energy during
+diagonalization and restore it in the returned eigenvalues. The ED, XAS, and RIXS
 steps select the SciPy backend. Temperature (300 K), photon geometry,
 polarization, and lifetime broadening are supplied to the spectrum routines.
 

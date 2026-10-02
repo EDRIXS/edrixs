@@ -57,13 +57,13 @@ def make_rixs(v_cfmat, thin, thout, loc_axis=None, scatter_axis=None):
             loc_axis=loc_axis, c_soc=info['c_soc'], v_noccu=v_noccu,
             slater=slater,
         )
-    emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat = out
+    emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat, shift = out
 
     hmat_i, hmat_n, trans_ops = edrixs.get_ops(
         emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
         backend=backend,
     )
-    eval_i, evec_i = edrixs.ed(hmat_i, num_evals=3, backend=backend)
+    eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=3, backend=backend)
 
     eloss = np.arange(-1, 5, 0.01)
     rixs_all = edrixs.rixs(

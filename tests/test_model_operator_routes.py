@@ -86,9 +86,9 @@ def test_all_model_functions_return_compact_basis_metadata():
     ]
 
     expected_shapes = [
-        (((6, 1),), ((6, 2), (2, 1))),
-        (((4, 1),), ((4, 2), (6, 5))),
-        (((4, 1),), ((4, 2), (6, 5))),
+        (((6, 1), (2, 2)), ((6, 2), (2, 1))),
+        (((4, 1), (6, 6)), ((4, 2), (6, 5))),
+        (((4, 1), (6, 6)), ((4, 2), (6, 5))),
     ]
 
     for problem, (initial_shapes, intermediate_shapes) in zip(problems, expected_shapes):
@@ -117,13 +117,13 @@ def test_model_to_get_ops_all_eight_routes_are_numerically_consistent(
     problem = _small_1v1c_problem()
 
     reference_i, reference_n, reference_t = get_ops(
-        *problem,
+        *problem[:7],
         backend="scipy",
         basis_method="explicit",
         use_numba=False,
     )
     actual_i, actual_n, actual_t = get_ops(
-        *problem,
+        *problem[:7],
         backend=backend,
         basis_method=basis_method,
         use_numba=use_numba,

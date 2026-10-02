@@ -98,15 +98,6 @@ slater = ([F0_dd, F2_dd, F4_dd],  # initial
 Delta = 4.7
 
 ################################################################################
-# The wrapper recovers U_dd and U_dp from the Slater integrals and calls
-# :func:`~edrixs.utils.CT_imp_bath` and
-# :func:`~edrixs.utils.CT_imp_bath_core_hole` internally. These determine the
-# initial and intermediate shell centers using the same Delta. The initial
-# reference is :math:`E(d^{n_d}L^{10})=0`; the core-hole helper additionally
-# uses :math:`E(d^{n_d}L^{10}p^6)=0` and
-# :math:`E(d^{n_d+1}L^{10}p^5)=0` to determine the core energy.
-
-################################################################################
 # Orbital energies and hybridization
 # ------------------------------------------------------------------------------
 # Supply five real-harmonic orbital energies in the order
@@ -193,7 +184,11 @@ on_which = 'spin'
 # from the parameters above. It builds the one-body matrices, Coulomb tensors,
 # and Fock-basis metadata; diagonalization remains a separate step. The returned
 # i quantities describe initial/final states without a core hole, while the n
-# quantities describe the intermediate state with a core hole. trans_mat holds
+# quantities describe the intermediate state with a core hole. Both one-body
+# matrices have shape (26, 26), and both Coulomb tensors include core orbitals.
+# The initial basis is ((20, 18), (6, 6)); the occupancy nd+10 counts only
+# impurity and bath electrons. Initial core interactions are active when supplied.
+# trans_mat holds
 # the Cartesian dipole matrices. General bath or hopping matrices can instead
 # be supplied through :func:`~edrixs.models.model_siam`.
 out = edrixs.model_siam_2d1p(
@@ -202,7 +197,7 @@ out = edrixs.model_siam_2d1p(
     v_soc=v_soc, c_soc=c_soc, om_shift=om_shift,
     ext_B=ext_B, on_which=on_which,
 )
-emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat = out
+emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat, shift = out
 
 ################################################################################
 # Diagonalization
@@ -228,7 +223,7 @@ hmat_i, hmat_n, trans_ops = edrixs.get_ops(
 # :func:`~edrixs.solvers.ed` obtains the retained low-energy eigenpairs of the
 # Hamiltonian without a core hole. Here :code:`num_evals=3` states are
 # thermally populated at the temperature of interest.
-eval_i, evec_i = edrixs.ed(hmat_i, num_evals=3, backend=backend)
+eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=3, backend=backend)
 
 ################################################################################
 # Compute XAS

@@ -36,7 +36,7 @@ def test_fortran_xas_matches_existing_dense_solver(small_1v1c_problem, tmp_path,
         small_1v1c_problem
     )
     hmat_i, hmat_n, transitions = get_ops(
-        *small_1v1c_problem, backend='fortran'
+        *small_1v1c_problem[:7], backend='fortran'
     )
     fortran_eval_i, fortran_evec_i = ed(
         hmat_i, num_evals=1, backend_kws={'ed_solver': 0, 'nvector': 1}
@@ -71,7 +71,7 @@ def test_fortran_rixs_matches_existing_dense_solver(small_1v1c_problem, tmp_path
         small_1v1c_problem
     )
     hmat_i, hmat_n, transitions = get_ops(
-        *small_1v1c_problem, backend='fortran'
+        *small_1v1c_problem[:7], backend='fortran'
     )
     fortran_eval_i, fortran_evec_i = ed(
         hmat_i, num_evals=1, backend_kws={'ed_solver': 0, 'nvector': 1}

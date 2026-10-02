@@ -7,7 +7,6 @@ from numpy.testing import assert_allclose
 
 from edrixs.fock_basis import FockBasis
 from edrixs.scipy_backend.scipy_backend import (
-    _four_fermion_csr_from_sparse_umat,
     four_fermion_csr,
     four_fermion_csr_auto,
     two_fermion_csr,
@@ -41,10 +40,24 @@ def test_one_body_csr_matches_independent_jordan_wigner_oracle():
 
 def test_one_particle_sector_reproduces_orbital_matrix():
     """A one-particle Fock-space operator reproduces its orbital matrix."""
-    basis = FockBasis([0b10, 0b01], norbs=2)
+    basis = FockBasis([0b01, 0b10], norbs=2)
     emat = np.array([[1.2, 0.3 + 0.4j], [0.3 - 0.4j, -0.2]])
 
     assert_allclose(two_fermion_csr(emat, basis).toarray(), emat)
+
+
+def test_fermion_signs_above_64_orbitals():
+    """Fermion masks preserve high orbitals and their occupation parity."""
+    left = FockBasis([(1 << 69) | (1 << 68)], norbs=70)
+    right = FockBasis([(1 << 68) | 1], norbs=70)
+    emat = np.zeros((70, 70))
+    emat[69, 0] = 2.0
+    assert_allclose(two_fermion_csr(emat, left, right).toarray(), [[-2.0]])
+
+    umat = sp.coo_matrix(
+        ([2.0], ([69 * 70 + 68], [68 * 70])), shape=(4900, 4900)
+    )
+    assert_allclose(four_fermion_csr_auto(umat, left, right).toarray(), [[-2.0]])
 
 
 def test_four_body_dense_and_flat_sparse_paths_match_oracle():
@@ -79,8 +92,8 @@ def test_public_build_op_matches_backend_operator_construction():
 
 def test_public_build_op_constructs_transition_operator():
     """``build_op`` supports distinct left/right bases and no two-body part."""
-    left = FockBasis([0b10], norbs=2)
-    right = FockBasis([0b01], norbs=2)
+    left = FockBasis([0b01], norbs=2)
+    right = FockBasis([0b10], norbs=2)
     emat = np.array([[0.0, 2.0 - 0.5j], [0.0, 0.0]], dtype=complex)
 
     actual = build_op(emat, None, left, right, backend="scipy")
@@ -114,4 +127,4 @@ def test_sparse_u_shape_is_validated():
     basis = fixed_particle_basis(3, 2)
 
     with pytest.raises(ValueError, match="expected"):
-        _four_fermion_csr_from_sparse_umat(sp.eye(8), basis)
+        four_fermion_csr_auto(sp.eye(8), basis)

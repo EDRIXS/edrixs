@@ -77,9 +77,19 @@ def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
 
     Returns
     -------
-    emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
+    emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat, shift
         Backend-independent problem definition. ``basis_i`` and ``basis_n`` are
-        compact Fock-basis specifications; trans_mat has shape (npol, ntot, ntot).
+        compact Fock-basis specifications with a filled initial core and one
+        intermediate core hole. Occupancy arguments count valence electrons
+        only. Both one-body matrices have shape (ntot, ntot), both dense
+        Coulomb tensors have shape (ntot,) * 4, and trans_mat has shape
+        (npol, ntot, ntot). Initial core interactions are included.
+        ``shift`` is the filled core shell-level energy,
+        ``c_norb * shell_level[1]`` (zero if unspecified), excluding Coulomb
+        contributions.
+        Pass the first seven outputs to :func:`~edrixs.solvers.get_ops` and
+        ``shift`` to dense, SciPy, or PETSc :func:`~edrixs.solvers.ed`.
+        The returned integrals retain the full, unshifted energies.
     """
     if verbose:
         print("edrixs >>> Setting up 1v1c problem ...")
@@ -103,9 +113,8 @@ def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
     c_norb = info_shell[c_name][1]
     ntot = v_norb + c_norb
 
-    # Match the legacy Fortran initial Hilbert space: the core shell is not an
-    # explicit degree of freedom before the x-ray transition.
-    emat_i = np.zeros((v_norb, v_norb), dtype=complex)
+    # Both sectors explicitly include the core orbitals.
+    emat_i = np.zeros((ntot, ntot), dtype=complex)
     emat_n = np.zeros((ntot, ntot), dtype=complex)
 
     # Coulomb interaction.
@@ -130,12 +139,7 @@ def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
         _print_slater_summary(slater_name, slater_i, slater_n)
 
     case = v_name + c_name
-    umat_i_full = get_umat_slater(case, *slater_i)
-    # Legacy Fortran accepts initial core-related Slater integrals but they are
-    # ineffective because fock_i contains valence orbitals only.
-    umat_i = umat_i_full[
-        0:v_norb, 0:v_norb, 0:v_norb, 0:v_norb
-    ]
+    umat_i = get_umat_slater(case, *slater_i)
     umat_n = get_umat_slater(case, *slater_n)
 
     if sparse_U:
@@ -150,6 +154,7 @@ def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
     # For split core shells such as p12/p32, d32/d52, f52/f72, the SOC is
     # already encoded by the shell choice.
     if c_name in ['p', 'd', 'f']:
+        emat_i[v_norb:ntot, v_norb:ntot] += atom_hsoc(c_name, c_soc)
         emat_n[v_norb:ntot, v_norb:ntot] += atom_hsoc(c_name, c_soc)
 
     # Crystal field and additional one-body terms.
@@ -163,11 +168,10 @@ def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
 
     # Shell levels.
     if shell_level is not None:
-        eval_shift = shell_level[1] * c_norb / v_noccu
         emat_i[0:v_norb, 0:v_norb] += np.eye(v_norb) * shell_level[0]
-        emat_i[0:v_norb, 0:v_norb] += np.eye(v_norb) * eval_shift
 
         emat_n[0:v_norb, 0:v_norb] += np.eye(v_norb) * shell_level[0]
+        emat_i[v_norb:ntot, v_norb:ntot] += np.eye(c_norb) * shell_level[1]
         emat_n[v_norb:ntot, v_norb:ntot] += np.eye(c_norb) * shell_level[1]
 
     # External field on valence shell.
@@ -197,7 +201,7 @@ def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
         emat_n[0:v_norb, 0:v_norb] += zeeman
 
     # Fock-basis metadata.
-    basis_i = FockBasisSpec.from_args(v_norb, v_noccu)
+    basis_i = FockBasisSpec.from_args(v_norb, v_noccu, c_norb, c_norb)
     basis_n = FockBasisSpec.from_args(v_norb, v_noccu + 1, c_norb, c_norb - 1)
 
     if verbose:
@@ -238,7 +242,8 @@ def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
     if verbose:
         print("edrixs >>> 1v1c setup Done !")
 
-    return emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
+    shift = 0.0 if shell_level is None else float(c_norb * shell_level[1])
+    return emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat, shift
 
 
 def model_2v1c(
@@ -324,15 +329,15 @@ def model_2v1c(
     Returns
     -------
     emat_i : numpy.ndarray
-        Initial-state one-body matrix over both valence shells, with shape
-        ``(v1v2_norb, v1v2_norb)``.
+        Initial-state one-body matrix over both valence shells and the core,
+        with shape ``(ntot, ntot)``.
     umat_i : numpy.ndarray or scipy.sparse.csr_matrix
-        Initial-state Coulomb interaction over both valence shells.  The dense
-        representation has shape ``(v1v2_norb,) * 4``; the sparse
-        representation has shape ``(v1v2_norb**2, v1v2_norb**2)``.
+        Initial-state Coulomb interaction including core interactions. The dense
+        representation has shape ``(ntot,) * 4``; the sparse
+        representation has shape ``(ntot**2, ntot**2)``.
     basis_i : FockBasisSpec
         Initial-state Fock-basis specification with ``v_tot_noccu`` valence
-        electrons.
+        electrons and a fully occupied core shell.
     emat_n : numpy.ndarray
         Intermediate-state one-body matrix over both valence shells and the
         core shell, with shape ``(ntot, ntot)``.
@@ -347,8 +352,11 @@ def model_2v1c(
         Core-to-valence transition matrices in the global frame, with shape
         ``(npol, ntot, ntot)``.
 
-        The returned objects can be passed directly to
-        :func:`~edrixs.solvers.get_ops`.
+    shift : float
+        Filled core shell-level energy, ``c_norb * shell_level[2]`` (zero if
+        unspecified), excluding Coulomb contributions. Pass the first seven
+        outputs to :func:`~edrixs.solvers.get_ops` and ``shift`` to dense, SciPy, or
+        PETSc :func:`~edrixs.solvers.ed`. Integrals remain unshifted.
 
     See Also
     --------
@@ -364,7 +372,7 @@ def model_2v1c(
     Construct a model for two valence shells and build its SciPy operators:
 
     >>> import edrixs
-    >>> problem = edrixs.model_2v1c(
+    >>> *problem, shift = edrixs.model_2v1c(
     ...     ('d', 'p', 's'), v_tot_noccu=2, trans_to_which=2
     ... )
     >>> hmat_i, hmat_n, trans_ops = edrixs.get_ops(
@@ -425,13 +433,9 @@ def model_2v1c(
     if verbose:
         _print_slater_summary(slater_name, slater_i, slater_n)
 
-    umat_i_full = get_umat_slater_3shells(
+    umat_i = get_umat_slater_3shells(
         (v1_name, v2_name, c_name), *slater_i
     )
-    umat_i = umat_i_full[
-        0:v1v2_norb, 0:v1v2_norb,
-        0:v1v2_norb, 0:v1v2_norb
-    ]
     umat_n = get_umat_slater_3shells(
         (v1_name, v2_name, c_name), *slater_n
     )
@@ -440,7 +444,7 @@ def model_2v1c(
         umat_i = _umat_dense_to_sparse(umat_i, tol=tol)
         umat_n = _umat_dense_to_sparse(umat_n, tol=tol)
 
-    emat_i = np.zeros((v1v2_norb, v1v2_norb), dtype=complex)
+    emat_i = np.zeros((ntot, ntot), dtype=complex)
     emat_n = np.zeros((ntot, ntot), dtype=complex)
 
     # Spin-orbit coupling.
@@ -457,6 +461,9 @@ def model_2v1c(
         )
 
     if c_name in ['p', 'd', 'f']:
+        emat_i[v1v2_norb:ntot, v1v2_norb:ntot] += atom_hsoc(
+            c_name, c_soc
+        )
         emat_n[v1v2_norb:ntot, v1v2_norb:ntot] += atom_hsoc(
             c_name, c_soc
         )
@@ -487,25 +494,21 @@ def model_2v1c(
             v2_othermat
         )
 
-    # Shell levels.  Match the legacy Fortran convention: the filled core is
-    # absent from the initial basis and its one-body energy is redistributed
-    # uniformly over the fixed-total-occupancy valence sector.
+    # Shell levels, including the explicit filled core.
     if shell_level is not None:
-        eval_shift = shell_level[2] * c_norb / v_tot_noccu
         emat_i[0:v1_norb, 0:v1_norb] += np.eye(v1_norb) * shell_level[0]
-        emat_i[0:v1_norb, 0:v1_norb] += np.eye(v1_norb) * eval_shift
         emat_n[0:v1_norb, 0:v1_norb] += np.eye(v1_norb) * shell_level[0]
 
         emat_i[v1_norb:v1v2_norb, v1_norb:v1v2_norb] += (
             np.eye(v2_norb) * shell_level[1]
         )
-        emat_i[v1_norb:v1v2_norb, v1_norb:v1v2_norb] += (
-            np.eye(v2_norb) * eval_shift
-        )
         emat_n[v1_norb:v1v2_norb, v1_norb:v1v2_norb] += (
             np.eye(v2_norb) * shell_level[1]
         )
 
+        emat_i[v1v2_norb:ntot, v1v2_norb:ntot] += (
+            np.eye(c_norb) * shell_level[2]
+        )
         emat_n[v1v2_norb:ntot, v1v2_norb:ntot] += (
             np.eye(c_norb) * shell_level[2]
         )
@@ -538,7 +541,7 @@ def model_2v1c(
             np.transpose(hopping_v1v2)
         )
 
-    basis_i = FockBasisSpec.from_args(v1v2_norb, v_tot_noccu)
+    basis_i = FockBasisSpec.from_args(v1v2_norb, v_tot_noccu, c_norb, c_norb)
     basis_n = FockBasisSpec.from_args(
         v1v2_norb, v_tot_noccu + 1, c_norb, c_norb - 1
     )
@@ -563,7 +566,8 @@ def model_2v1c(
     if verbose:
         print("edrixs >>> 2v1c setup Done !")
 
-    return emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
+    shift = 0.0 if shell_level is None else float(c_norb * shell_level[2])
+    return emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat, shift
 
 
 def model_siam(
@@ -611,18 +615,16 @@ def model_siam(
     v_noccu : int, optional
         Total number of electrons in the impurity and bath orbitals in the
         initial state, excluding the filled core. Default is 1. Must satisfy
-        ``1 <= v_noccu < ntot_v`` so that the core-energy shift is defined
-        and the intermediate state can accommodate one additional electron.
+        ``0 <= v_noccu < ntot_v`` so that the intermediate state can
+        accommodate one additional electron.
     static_core_pot : float, optional
         Static core-hole potential, subtracted from every impurity diagonal
         element in the intermediate state. Positive values are attractive.
         This is added independently of the core-valence Slater interactions.
         Default is 0.
     c_level : float, optional
-        Core-shell energy level. In the initial state, the omitted filled
-        core is accounted for by adding ``c_level * c_norb / v_noccu`` to
-        every impurity and bath diagonal element. In the intermediate state,
-        ``c_level`` is added to each core diagonal element. Default is 0.
+        Core-shell energy level, added to each core diagonal element in both
+        states. Default is 0.
     c_soc : float, optional
         Core spin-orbit coupling strength, applied for unsplit 'p', 'd', and
         'f' core shells only. For split shells such as 'p32', the shell
@@ -673,8 +675,8 @@ def model_siam(
         omitted; entries beyond the required number are ignored. For
         example, d-impurity/p-core integrals begin with
         ``[F0_dd, F2_dd, F4_dd, F0_dp, F2_dp, G1_dp, G3_dp]``.
-        Initial-state terms involving the core are ineffective because the
-        initial basis omits the filled core. Default is all zeros.
+        Initial-state core-valence and core-core terms act on the explicit
+        filled core. Default is all zeros.
     ext_B : array_like of float, shape (3,), optional
         External Zeeman/exchange field components along the global x, y,
         and z axes, applied only to the impurity in both states. Components
@@ -703,15 +705,15 @@ def model_siam(
 
     Returns
     -------
-    emat_i : numpy.ndarray, shape (ntot_v, ntot_v)
-        Initial-state one-body matrix over impurity and bath orbitals.
+    emat_i : numpy.ndarray, shape (ntot, ntot)
+        Initial-state one-body matrix over impurity, bath, and core orbitals.
     umat_i : numpy.ndarray or scipy.sparse.csr_matrix
-        Initial-state Coulomb interaction, nonzero only on the impurity.
-        Dense shape is ``(ntot_v,) * 4``; sparse shape is
-        ``(ntot_v**2, ntot_v**2)``.
+        Initial-state Coulomb interaction on impurity and core orbitals.
+        Dense shape is ``(ntot,) * 4``; sparse shape is
+        ``(ntot**2, ntot**2)``.
     basis_i : FockBasisSpec
         Initial-state basis specification with ``v_noccu`` electrons in
-        the impurity and bath orbitals. The filled core is implicit.
+        the impurity and bath orbitals and ``c_norb`` core electrons.
     emat_n : numpy.ndarray, shape (ntot, ntot)
         Intermediate-state one-body matrix over impurity, bath, and core.
     umat_n : numpy.ndarray or scipy.sparse.csr_matrix
@@ -725,6 +727,11 @@ def model_siam(
         Core-to-impurity absorption matrices, with nonzero entries only in
         the impurity-row/core-column block. ``npol`` is 3 for dipole and 5
         for quadrupole transitions; components are in the global frame.
+    shift : float
+        Filled core shell-level energy, ``c_norb * c_level``, excluding
+        Coulomb contributions. Pass the first seven outputs to
+        :func:`~edrixs.solvers.get_ops` and ``shift`` to dense, SciPy, or PETSc
+        :func:`~edrixs.solvers.ed`. Integrals remain unshifted.
     """
     if verbose:
         print("edrixs >>> Setting up SIAM problem ...")
@@ -775,28 +782,22 @@ def model_siam(
     umat_tmp_i = get_umat_slater(v_name + c_name, *slater_i)
     umat_tmp_n = get_umat_slater(v_name + c_name, *slater_n)
 
-    # The legacy initial SIAM basis contains impurity+bath orbitals only.
-    # Consequently all initial Coulomb terms involving the core are ineffective.
-    umat_tmp_i = umat_tmp_i[
-        0:v_norb, 0:v_norb, 0:v_norb, 0:v_norb
-    ]
-
     if sparse_U:
         umat_i = _embed_impurity_core_umat_sparse(
-            umat_tmp_i, v_norb, 0, ntot_v, tol=tol
+            umat_tmp_i, v_norb, c_norb, ntot_v, tol=tol
         )
         umat_n = _embed_impurity_core_umat_sparse(
             umat_tmp_n, v_norb, c_norb, ntot_v, tol=tol
         )
     else:
         umat_i = _embed_impurity_core_umat(
-            umat_tmp_i, v_norb, 0, ntot_v
+            umat_tmp_i, v_norb, c_norb, ntot_v
         )
         umat_n = _embed_impurity_core_umat(
             umat_tmp_n, v_norb, c_norb, ntot_v
         )
 
-    emat_i = np.zeros((ntot_v, ntot_v), dtype=complex)
+    emat_i = np.zeros((ntot, ntot), dtype=complex)
     emat_n = np.zeros((ntot, ntot), dtype=complex)
 
     if siam_type == 1:
@@ -861,6 +862,7 @@ def model_siam(
         raise Exception("Unknown siam_type: ", siam_type)
 
     if c_name in ['p', 'd', 'f']:
+        emat_i[ntot_v:ntot, ntot_v:ntot] += atom_hsoc(c_name, c_soc)
         emat_n[ntot_v:ntot, ntot_v:ntot] += atom_hsoc(c_name, c_soc)
 
     # Static core-hole potential on the impurity in the intermediate state.
@@ -878,7 +880,7 @@ def model_siam(
             np.transpose(trans_c2n)
         )
 
-    emat_i[:, :] = cb_op(emat_i, tmat[0:ntot_v, 0:ntot_v])
+    emat_i[:, :] = cb_op(emat_i, tmat)
     emat_n[:, :] = cb_op(emat_n, tmat)
 
     if ext_B is not None:
@@ -886,12 +888,11 @@ def model_siam(
         emat_i[0:v_norb, 0:v_norb] += zeeman
         emat_n[0:v_norb, 0:v_norb] += zeeman
 
-    # Match the fixed-N legacy Fortran convention for the omitted filled core.
-    eval_shift = c_level * c_norb / v_noccu
-    emat_i[0:ntot_v, 0:ntot_v] += np.eye(ntot_v) * eval_shift
+    # Core levels in both sectors.
+    emat_i[ntot_v:ntot, ntot_v:ntot] += np.eye(c_norb) * c_level
     emat_n[ntot_v:ntot, ntot_v:ntot] += np.eye(c_norb) * c_level
 
-    basis_i = FockBasisSpec.from_args(ntot_v, v_noccu)
+    basis_i = FockBasisSpec.from_args(ntot_v, v_noccu, c_norb, c_norb)
     basis_n = FockBasisSpec.from_args(ntot_v, v_noccu + 1, c_norb, c_norb - 1)
 
     if verbose:
@@ -905,7 +906,8 @@ def model_siam(
     if verbose:
         print("edrixs >>> SIAM setup Done !")
 
-    return emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
+    shift = float(c_norb * c_level)
+    return emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat, shift
 
 
 def model_siam_2d1p(
@@ -959,11 +961,15 @@ def model_siam_2d1p(
 
     Returns
     -------
-    emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
-        The seven model_siam outputs, ready for :func:`~edrixs.solvers.get_ops`. One-body
-        matrices have shapes (20, 20) and (26, 26) and use complex spherical
+    emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat, shift
+        The eight model_siam outputs. Pass the first seven to
+        :func:`~edrixs.solvers.get_ops` and the final ``shift`` to dense, SciPy, or
+        PETSc :func:`~edrixs.solvers.ed`. Here ``shift = 6 * (-om_shift - 5*E_p)``;
+        it excludes Coulomb contributions and does not alter the integrals. One-body
+        matrices both have shape (26, 26) and use complex spherical
         harmonics. Basis metadata fixes initial valence occupancy to nd+10,
-        intermediate valence occupancy to nd+11, and core occupancy to five.
+        intermediate valence occupancy to nd+11, and core occupancies to six
+        and five, respectively.
         Coulomb tensors are dense unless sparse_U=True. No diagonalization
         or spectrum calculation is performed.
     """

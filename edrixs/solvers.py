@@ -26,7 +26,7 @@ from .photon_transition import (
 from .coulomb_utensor import get_umat_slater
 from .manybody_operator import two_fermion, four_fermion
 from .fock_basis import (
-    FockBasisSpec, build_fock_basis, get_fock_bin_by_N, write_fock_dec_by_N
+    build_fock_basis, get_fock_bin_by_N, write_fock_dec_by_N
 )
 from .basis_transform import cb_op2, tmat_r2c, cb_op
 from .utils import info_atomic_shell, slater_integrals_name, boltz_dist
@@ -35,6 +35,7 @@ from .poles import get_spectra_from_poles, merge_pole_dicts
 from .soc import atom_hsoc
 from .petsc_backend import petsc_backend
 from .scipy_backend import scipy_backend
+from .dense_backend import dense_backend
 from .fortran_backend import fortran_backend
 from ._solvers_helpers import (
     _ed_1or2_valence_1core,
@@ -102,7 +103,7 @@ def build_op(emat, umat, lb, rb=None, *, backend='scipy',
         case 'scipy':
             build_op_backend = scipy_backend.build_op_scipy
         case 'dense':
-            build_op_backend = scipy_backend.build_op_dense
+            build_op_backend = dense_backend.build_op_dense
         case 'petsc':
             build_op_backend = petsc_backend.build_op_petsc
         case 'fortran':
@@ -142,7 +143,8 @@ def get_ops(
     ----------
     emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat
         Backend-neutral problem definition returned by :mod:`edrixs.models`
-        model functions.
+        model functions. Both sectors use the full orbital space, with a
+        filled initial core. Transitions act directly between these bases.
     backend : {'scipy', 'dense', 'petsc', 'fortran'}, optional
         Backend used for the returned operators. The default is ``'scipy'``.
         The ``'fortran'`` backend writes the whole problem to native files in
@@ -189,35 +191,12 @@ def get_ops(
     if trans_mat.ndim != 3:
         raise ValueError("trans_mat must be a three-dimensional array")
 
-    # model_* follows the legacy Fortran Hilbert-space convention: the initial
-    # basis contains valence orbitals only, whereas the transition operator is
-    # defined in the full valence+core orbital space.  For operator construction
-    # only, lift the initial basis by appending one completely filled core
-    # sector.  Its dimension is one, so this preserves the initial basis
-    # dimension and column ordering exactly.
-    trans_basis_i = basis_i
-    if basis_n.norbs > basis_i.norbs:
-        core_norb = basis_n.norbs - basis_i.norbs
-        if getattr(basis_i, 'spec', None) is None:
-            raise ValueError(
-                "cannot construct a valence-to-core transition from an "
-                "unstructured initial Fock basis"
-            )
-        lifted_spec = FockBasisSpec(
-            basis_i.spec.shapes + ((core_norb, core_norb),)
-        )
-        trans_basis_i = build_fock_basis(lifted_spec, method=basis_method)
-    elif basis_n.norbs < basis_i.norbs:
-        raise ValueError(
-            "intermediate basis cannot have fewer orbitals than initial basis"
-        )
-
     trans_ops = [
         build_op(
             component,
             None,
             basis_n,
-            trans_basis_i,
+            basis_i,
             backend=backend,
             use_numba=use_numba, backend_kws=backend_kws,
         )
@@ -242,7 +221,7 @@ def get_ops_disk():
     return fortran_backend.get_ops_disk()
 
 
-def ed(hmat_i, num_evals=1, *, backend=None, backend_kws=None):
+def ed(hmat_i, num_evals=1, *, shift=0.0, backend=None, backend_kws=None):
     """
     Compute low-energy initial states through a numerical backend.
 
@@ -252,6 +231,11 @@ def ed(hmat_i, num_evals=1, *, backend=None, backend_kws=None):
         Initial/final Hamiltonian.
     num_evals : int, optional
         Number of lowest eigenpairs to return.
+    shift : float, optional
+        Real energy offset, normally the final output of a model
+        constructor. Dense, SciPy, and PETSc ED diagonalize ``hmat_i - shift * I``
+        and add the offset back to the returned eigenvalues. The supplied
+        Hamiltonian is not modified. Default zero; Fortran ED requires zero.
     backend : str or None, optional
         Backend name. When omitted, infer it from ``hmat_i``.
     backend_kws : mapping, optional
@@ -262,14 +246,15 @@ def ed(hmat_i, num_evals=1, *, backend=None, backend_kws=None):
     Returns
     -------
     eigenvalues, eigenvectors
-        Lowest retained eigenpairs.
+        Lowest retained eigenpairs, with eigenvalues on the original energy
+        reference even when a nonzero ``shift`` is supplied.
     """
     backend_name = backend if backend is not None else _infer_backend(hmat_i)
     match backend_name:
         case 'scipy':
             ed_backend = scipy_backend.ed_scipy
         case 'dense':
-            ed_backend = scipy_backend.ed_dense
+            ed_backend = dense_backend.ed_dense
         case 'petsc':
             ed_backend = petsc_backend.ed_petsc
         case 'fortran':
@@ -283,6 +268,7 @@ def ed(hmat_i, num_evals=1, *, backend=None, backend_kws=None):
     return ed_backend(
         hmat_i,
         num_evals=num_evals,
+        shift=shift,
         backend_kws=backend_kws,
     )
 
@@ -377,7 +363,7 @@ def xas(eval_i, evec_i, hmat_n, trans_op, ominc, *,
         case 'scipy':
             xas_backend = scipy_backend.xas_scipy
         case 'dense':
-            xas_backend = scipy_backend.xas_dense
+            xas_backend = dense_backend.xas_dense
         case 'petsc':
             xas_backend = petsc_backend.xas_petsc
         case 'fortran':
@@ -517,7 +503,7 @@ def rixs(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
         case 'scipy':
             rixs_backend = scipy_backend.rixs_scipy
         case 'dense':
-            rixs_backend = scipy_backend.rixs_dense
+            rixs_backend = dense_backend.rixs_dense
         case 'petsc':
             rixs_backend = petsc_backend.rixs_petsc
         case 'fortran':

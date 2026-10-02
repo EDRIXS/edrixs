@@ -140,11 +140,11 @@ def test_model_1v1c_sparse_u_matches_dense_u(small_1v1c_kwargs):
 def test_ops_scipy_backend_matches_dense_operator_action(small_1v1c_problem):
     """Compare dense and SciPy operators at the setup-to-solver boundary."""
     hmat_i_sp, hmat_n_sp, trans_sp = get_ops(
-        *small_1v1c_problem,
+        *small_1v1c_problem[:7],
         backend="scipy",
     )
     hmat_i, hmat_n, transitions = get_ops(
-        *small_1v1c_problem,
+        *small_1v1c_problem[:7],
         backend="dense",
     )
     rng = np.random.default_rng(5)

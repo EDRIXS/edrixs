@@ -67,7 +67,9 @@ slater = [slater_i, slater_n]
 # coupling and, below, the crystal field.
 # :code:`i` quantities describe the initial and final states without a core
 # hole, while the :code:`n` quantities describe the intermediate state with a
-# core hole.
+# core hole. Both orbital-space Hamiltonians include the core, and basis_i
+# explicitly fixes its occupancy to a full shell. The v_noccu argument counts
+# only valence electrons.
 #
 # :func:`~edrixs.solvers.get_ops` converts these backend-independent
 # ingredients into many-body initial/final and intermediate Hamiltonians, plus
@@ -93,7 +95,7 @@ out = edrixs.model_1v1c(
     shell_name, v_noccu=v_noccu, shell_level=(0, -off),
     v_othermat=imp_mat, slater=slater,
 )
-emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat = out
+emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat, shift = out
 
 hmat_i, hmat_n, trans_ops = edrixs.get_ops(
     emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
@@ -101,7 +103,7 @@ hmat_i, hmat_n, trans_ops = edrixs.get_ops(
 )
 
 
-eval_i, evec_i = edrixs.ed(hmat_i, num_evals=2, backend=backend)
+eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=2, backend=backend)
 
 ################################################################################
 # Compute XAS
@@ -233,12 +235,12 @@ out = edrixs.model_1v1c(
     ('d', 'p32'), v_noccu=v_noccu, shell_level=(0, -off),
     v_othermat=imp_mat, slater=slater,
 )
-emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat = out
+emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat, shift = out
 hmat_i, hmat_n, trans_ops = edrixs.get_ops(
     emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
     backend=backend,
 )
-eval_i, evec_i = edrixs.ed(hmat_i, num_evals=2, backend=backend)
+eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=2, backend=backend)
 
 xas_full_d_shell = edrixs.xas(
     eval_i, evec_i, hmat_n, trans_ops, ominc,

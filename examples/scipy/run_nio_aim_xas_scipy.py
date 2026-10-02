@@ -161,7 +161,7 @@ def run(output_dir: Path) -> None:
     exchange = 6 * 0.027
     ext_B = exchange / (2 * np.sqrt(6)) * np.array([1.0, 1.0, 2.0])
 
-    problem = model_siam(
+    *problem, shift = model_siam(
         parameters["shell_name"],
         parameters["nbath"],
         siam_type=0,
@@ -193,7 +193,7 @@ def run(output_dir: Path) -> None:
     )
 
     eval_all, evec_all = solve_ed(
-        hmat_i,
+        hmat_i, shift=shift,
         num_evals=neval,
         backend="scipy",
         backend_kws={

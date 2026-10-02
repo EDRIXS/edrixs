@@ -17,6 +17,7 @@ representation.
 
 import numpy as np
 import matplotlib.pyplot as plt
+from mpi4py import MPI
 import edrixs
 # sphinx_gallery_start_ignore
 # Importing the script re-executes example 3. Silence its prints and discard any
@@ -24,12 +25,12 @@ import edrixs
 import contextlib
 import io
 with contextlib.redirect_stdout(io.StringIO()):
-    from example_03_AIM_XAS import emat_i, basis_i, hmat_i, norb_d
+    from example_03_AIM_XAS import emat_i, basis_i, hmat_i, norb_d, shift
 plt.close('all')
 # sphinx_gallery_end_ignore
 
 backend = 'petsc'
-eval_i, evec_i = edrixs.ed(hmat_i, num_evals=len(basis_i), backend=backend)
+eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=len(basis_i), backend=backend)
 eval_i = eval_i - eval_i.min()
 
 ################################################################################
@@ -45,6 +46,7 @@ single_particle_Nd = np.zeros_like(emat_i)
 single_particle_Nd[:norb_d, :norb_d] = np.eye(norb_d)
 
 O = edrixs.build_op(single_particle_Nd, None, basis_i, backend=backend)
+comm = O.getComm().tompi4py()
 
 work = O.createVecLeft()
 nd_expect = np.empty(len(evec_i))
@@ -52,11 +54,11 @@ for k, psi in enumerate(evec_i):
     O.mult(psi, work)
     nd_expect[k] = work.dot(psi).real
 
-fig, ax = plt.subplots()
-
-ax.set_xlabel('Energy (eV)')
-ax.set_ylabel('$d$ electron count')
-ax.plot(eval_i, nd_expect)
+if comm.rank == 0:
+    fig, ax = plt.subplots()
+    ax.set_xlabel('Energy (eV)')
+    ax.set_ylabel('$d$ electron count')
+    ax.plot(eval_i, nd_expect)
 
 ################################################################################
 # Configuration weights alpha, beta, gamma
@@ -76,13 +78,20 @@ for k, psi in enumerate(evec_i):
     betas[k] = amp2[nd_per_component == 9].sum()
     gammas[k] = amp2[nd_per_component == 10].sum()
 
-print("Ground state\nalpha={:.3f}\tbeta={:.3f}\tgamma={:.3f}".format(
-    alphas[0], betas[0], gammas[0]))
+# getArray() exposes only this rank's components. Sum the local weights
+# across all ranks before displaying the complete configuration weights.
+weights = np.array([alphas, betas, gammas])
+comm.Allreduce(MPI.IN_PLACE, weights, op=MPI.SUM)
+alphas, betas, gammas = weights
 
-fig, ax = plt.subplots()
-ax.plot(eval_i, alphas, label=r'$\alpha$ $d^8L^{10}$')
-ax.plot(eval_i, betas, label=r'$\beta$ $d^9L^{9}$')
-ax.plot(eval_i, gammas, label=r'$\gamma$ $d^{10}L^{8}$')
-ax.set_xlabel('Energy (eV)')
-ax.set_ylabel('Population')
-ax.legend()
+if comm.rank == 0:
+    print("Ground state\nalpha={:.3f}\tbeta={:.3f}\tgamma={:.3f}".format(
+        alphas[0], betas[0], gammas[0]))
+
+    fig, ax = plt.subplots()
+    ax.plot(eval_i, alphas, label=r'$\alpha$ $d^8L^{10}$')
+    ax.plot(eval_i, betas, label=r'$\beta$ $d^9L^{9}$')
+    ax.plot(eval_i, gammas, label=r'$\gamma$ $d^{10}L^{8}$')
+    ax.set_xlabel('Energy (eV)')
+    ax.set_ylabel('Population')
+    ax.legend()

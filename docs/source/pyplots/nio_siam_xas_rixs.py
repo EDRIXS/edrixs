@@ -48,9 +48,9 @@ exchange = 6 * 0.027
 ext_B = exchange / (2 * np.sqrt(6)) * np.array([1.0, 1.0, 2.0])
 
 # Align the calculated spectrum with the Ni L edge. The wrapper handles
-# the CT-derived core energy and returns the seven standard model outputs.
+# the CT-derived core energy and returns the seven operator inputs plus the ED energy shift.
 edge_shift = 857.6
-problem = edrixs.model_siam_2d1p(
+*problem, shift = edrixs.model_siam_2d1p(
     slater=slater, nd=nd, Delta=Delta,
     impurity_levels=impurity_levels, bath_levels=bath_levels, hyb=hyb,
     v_soc=v_soc, c_soc=info['c_soc'], om_shift=edge_shift,
@@ -60,7 +60,7 @@ problem = edrixs.model_siam_2d1p(
 backend = 'scipy'
 hmat_i, hmat_n, trans_ops = edrixs.get_ops(*problem, backend=backend)
 eval_i, evec_i = edrixs.ed(
-    hmat_i,
+    hmat_i, shift=shift,
     num_evals=3,
     backend=backend
     )

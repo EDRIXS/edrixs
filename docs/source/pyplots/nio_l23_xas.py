@@ -26,7 +26,7 @@ exchange = 6 * 0.027
 ext_B = exchange / (2 * np.sqrt(6)) * np.array([1.0, 1.0, 2.0])
 
 edge_shift = 857.6
-problem = edrixs.model_1v1c(
+*problem, shift = edrixs.model_1v1c(
     ('d', 'p'),
     shell_level=(0.0, -edge_shift),
     v_soc=(zeta_3d, zeta_3d),
@@ -42,7 +42,7 @@ problem = edrixs.model_1v1c(
 backend = 'scipy'
 hmat_i, hmat_n, trans_ops = edrixs.get_ops(*problem, backend=backend)
 eval_i, evec_i = edrixs.ed(
-    hmat_i,
+    hmat_i, shift=shift,
     num_evals=3,
     backend=backend,
 )

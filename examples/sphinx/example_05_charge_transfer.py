@@ -29,7 +29,7 @@ from edrixs import FockBasisSpec
 import contextlib
 import io
 with contextlib.redirect_stdout(io.StringIO()):
-    from example_03_AIM_XAS import emat_i, umat_i, basis_i, norb_d, nd, nbath
+    from example_03_AIM_XAS import emat_i, umat_i, basis_i, norb_d, nd, nbath, shift
     from example_04_GS_analysis import O
 plt.close('all')
 # sphinx_gallery_end_ignore
@@ -39,7 +39,7 @@ emat_i[norb_d:(norb_d + nbath*norb_d), :norb_d] = 0
 
 backend = 'petsc'
 hmat_i = edrixs.build_op(emat_i, umat_i, basis_i, backend=backend)
-eval_i, evec_i = edrixs.ed(hmat_i, num_evals=len(basis_i), backend=backend)
+eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=len(basis_i), backend=backend)
 eval_i = eval_i - eval_i.min()
 
 work = O.createVecLeft()
@@ -77,21 +77,25 @@ print(f"Energy to lowest energy ligand state is {E_to_ligand:.3f} eV")
 # Diagonalizing by blocks
 # ------------------------------------------------------------------------------
 # When working on a problem with a large basis, one can take advantage of the
-# lack of hybridization and separately diagonalize the impurity and bath
-# states. With the staged interface, each block Hamiltonian is built from the
+# lack of hybridization and separately diagonalize the impurity-plus-core and
+# bath states. Keeping the filled core with the impurity retains its energy
+# and any initial core interactions. Each block Hamiltonian is built from the
 # relevant sub-blocks of :code:`emat_i` and :code:`umat_i` together with a
 # :class:`~edrixs.fock_basis.FockBasisSpec` fixing that block's occupancy. The
 # blocks are small, so we use the dense backend.
 
-d_block = slice(0, norb_d)
+core_start = (nbath + 1) * norb_d
+norb_c = emat_i.shape[0] - core_start
+d_core = np.r_[0:norb_d, core_start:emat_i.shape[0]]
+emat_d = emat_i[np.ix_(d_core, d_core)]
+umat_d = umat_i[np.ix_(d_core, d_core, d_core, d_core)]
 L_block = slice(norb_d, 2 * norb_d)
-umat_d = umat_i[d_block, d_block, d_block, d_block]
 
 energies = []
 for n_ligand_holes in [0, 1]:
-    basis_d = FockBasisSpec.from_args(norb_d, nd + n_ligand_holes)
-    Hd = edrixs.build_op(emat_i[d_block, d_block], umat_d, basis_d, backend='dense')
-    e_d = edrixs.ed(Hd, num_evals=1, backend='dense')[0][0]
+    basis_d = FockBasisSpec.from_args(norb_d, nd + n_ligand_holes, norb_c, norb_c)
+    Hd = edrixs.build_op(emat_d, umat_d, basis_d, backend='dense')
+    e_d = edrixs.ed(Hd, shift=shift, num_evals=1, backend='dense')[0][0]
 
     basis_L = FockBasisSpec.from_args(norb_d, norb_d - n_ligand_holes)
     HL = edrixs.build_op(emat_i[L_block, L_block], None, basis_L, backend='dense')

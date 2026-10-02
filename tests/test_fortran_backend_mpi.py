@@ -86,7 +86,7 @@ def test_parent_mpi_nonroot_does_not_write_problem_files(tmp_path, monkeypatch):
     monkeypatch.setattr(fortran_backend, 'write_emat', forbidden_write)
     problem = model_1v1c(('s', 's'), v_noccu=1)
     hmat_i, hmat_n, transitions = fortran_backend.write_problem(
-        *problem, backend_kws={'comm': comm},
+        *problem[:7], backend_kws={'comm': comm},
     )
     assert fortran_backend.owns_operator_fortran(hmat_i)
     assert fortran_backend.owns_operator_fortran(hmat_n)
@@ -122,7 +122,7 @@ from edrixs.solvers import ed, get_ops, rixs, xas
 
 comm = MPI.COMM_WORLD
 problem = model_1v1c(('s', 's'), v_noccu=1)
-hmat_i, hmat_n, transitions = get_ops(*problem, backend='fortran')
+hmat_i, hmat_n, transitions = get_ops(*problem[:7], backend='fortran')
 eval_i, evec_i = ed(hmat_i, num_evals=1)
 absorption = xas(
     eval_i, evec_i, hmat_n, transitions, np.array([0.0]),

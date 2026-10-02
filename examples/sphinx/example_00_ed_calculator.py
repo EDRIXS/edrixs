@@ -45,11 +45,13 @@ umat = edrixs.get_umat_slater('p', F0, F2)
 # The Fock basis is the simplest legitimate form for the basis and it consists
 # of a series of 1s and 0s where 1 means occupied and
 # 0 means empty. These are in order up, down, up, down, up, down.
-# For computational efficiency, these are encoded as integers
+# For computational efficiency, these are encoded as integers, with orbital
+# zero in the least significant bit. We print occupations in orbital order.
 basis = edrixs.get_fock_basis_int(norb, noccu)
-print("Integer\tBinary")
+print("Integer\tOccupations (orbital 0 first)")
 for state in basis.basis_int:
-    print("{:2d}\t{:0{width}b}".format(state, state, width=norb))
+    occupations = "".join(str((state >> orbital) & 1) for orbital in range(norb))
+    print(f"{state:2d}\t{occupations}")
 ################################################################################
 # We expect the number of these states to be given by the mathematical
 # combination of two electrons distributed among six states (three spin-orbitals

@@ -139,7 +139,7 @@ def run(output_dir: Path) -> None:
 
     # 1. Define the orbital-space model. trans_to_which=2 is essential:
     #    the L3 transition is 2p3/2 -> 6d, not 2p3/2 -> 5f.
-    problem = model_2v1c(
+    *problem, shift = model_2v1c(
         shell_name,
         shell_level=(0.0, 5.0, 0.0),
         v1_soc=parameters["v1_soc"],
@@ -165,7 +165,7 @@ def run(output_dir: Path) -> None:
     )
 
     eval_all, evec_all = solve_ed(
-        hmat_i,
+        hmat_i, shift=shift,
         num_evals=neval,
         backend="scipy",
         backend_kws={

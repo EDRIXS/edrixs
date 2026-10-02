@@ -158,7 +158,7 @@ def run(output_dir: Path) -> None:
     gamma_c = np.full(ominc_xas.shape, 0.48 / 2.0)
     poltype_xas = [("isotropic", 0.0)]
 
-    problem = model_siam(
+    *problem, shift = model_siam(
         parameters["shell_name"],
         parameters["nbath"],
         siam_type=0,
@@ -190,7 +190,7 @@ def run(output_dir: Path) -> None:
     )
 
     eval_all, evec_all = solve_ed(
-        hmat_i,
+        hmat_i, shift=shift,
         num_evals=neval,
         backend="scipy",
         backend_kws={

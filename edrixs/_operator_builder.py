@@ -57,8 +57,8 @@ def _operator_terms(emat, umat, norbs, tol_e, tol_u):
     return e_terms, e_vals, u_terms, u_vals
 
 
-def _sign_count(state, orbital, norbs):
-    prefix = int(state) >> (norbs - orbital)
+def _sign_count(state, orbital):
+    prefix = int(state) & ((1 << orbital) - 1)
     return 1 if prefix.bit_count() % 2 == 0 else -1
 
 
@@ -66,23 +66,22 @@ def _build_entries_python(lb, rb, e_terms, e_vals, u_terms, u_vals, cstart, cend
     rows = []
     cols = []
     vals = []
-    norbs = rb.norbs
 
     for column in range(cstart, cend):
         state0 = rb.decode(column)
 
         for term, value in zip(e_terms, e_vals):
             iorb, jorb = int(term[0]), int(term[1])
-            bit_j = 1 << (norbs - 1 - jorb)
+            bit_j = 1 << jorb
             if not state0 & bit_j:
                 continue
-            sign_1 = _sign_count(state0, jorb, norbs)
+            sign_1 = _sign_count(state0, jorb)
             state = state0 ^ bit_j
 
-            bit_i = 1 << (norbs - 1 - iorb)
+            bit_i = 1 << iorb
             if state & bit_i:
                 continue
-            sign_2 = _sign_count(state, iorb, norbs)
+            sign_2 = _sign_count(state, iorb)
             state |= bit_i
 
             try:
@@ -98,28 +97,28 @@ def _build_entries_python(lb, rb, e_terms, e_vals, u_terms, u_vals, cstart, cend
             if iorb == jorb or korb == lorb:
                 continue
 
-            bit_i = 1 << (norbs - 1 - iorb)
+            bit_i = 1 << iorb
             if not state0 & bit_i:
                 continue
-            sign_1 = _sign_count(state0, iorb, norbs)
+            sign_1 = _sign_count(state0, iorb)
             state = state0 ^ bit_i
 
-            bit_j = 1 << (norbs - 1 - jorb)
+            bit_j = 1 << jorb
             if not state & bit_j:
                 continue
-            sign_2 = _sign_count(state, jorb, norbs)
+            sign_2 = _sign_count(state, jorb)
             state ^= bit_j
 
-            bit_k = 1 << (norbs - 1 - korb)
+            bit_k = 1 << korb
             if state & bit_k:
                 continue
-            sign_3 = _sign_count(state, korb, norbs)
+            sign_3 = _sign_count(state, korb)
             state |= bit_k
 
-            bit_l = 1 << (norbs - 1 - lorb)
+            bit_l = 1 << lorb
             if state & bit_l:
                 continue
-            sign_4 = _sign_count(state, lorb, norbs)
+            sign_4 = _sign_count(state, lorb)
             state |= bit_l
 
             try:
@@ -178,7 +177,7 @@ def _get_numba_kernels():
         c = comb_jit(i, j)
         while i >= 0 and j > 0:
             if c <= rank:
-                state |= np.uint64(1) << np.uint64(i)
+                state |= np.uint64(1) << np.uint64(norb - 1 - i)
                 rank -= c
                 old_i, old_j = i, j
                 i -= 1
@@ -199,25 +198,15 @@ def _get_numba_kernels():
             state &= (np.uint64(1) << np.uint64(norb)) - np.uint64(1)
         rank = 0
         k = 1
-        while state != np.uint64(0):
-            lsb = state & (np.uint64(0) - state)
-            pos = 0
-            tmp = lsb
-            while tmp > np.uint64(1):
-                tmp >>= np.uint64(1)
-                pos += 1
-            rank += comb_jit(pos, k)
-            k += 1
-            state ^= lsb
+        for pos in range(norb - 1, -1, -1):
+            if state & (np.uint64(1) << np.uint64(pos)):
+                rank += comb_jit(norb - 1 - pos, k)
+                k += 1
         return rank
 
     @njit(inline='always')
-    def sign_count_u64(state, orbital, norbs):
-        bitpos = np.uint64(norbs - 1 - orbital)
-        if bitpos == np.uint64(63):
-            prefix = np.uint64(0)
-        else:
-            prefix = state >> (bitpos + np.uint64(1))
+    def sign_count_u64(state, orbital):
+        prefix = state & ((np.uint64(1) << np.uint64(orbital)) - np.uint64(1))
         return 1 if popcount_u64(prefix) % 2 == 0 else -1
 
     @njit(inline='always')
@@ -258,9 +247,6 @@ def _get_numba_kernels():
         rows = []
         cols = []
         vals = []
-        norbs = 0
-        for value in rb_norbs:
-            norbs += value
 
         for column in range(cstart, cend):
             state0 = decode_combinadic_jit(
@@ -270,16 +256,16 @@ def _get_numba_kernels():
             for t in range(e_terms.shape[0]):
                 iorb = int(e_terms[t, 0])
                 jorb = int(e_terms[t, 1])
-                bit_j = np.uint64(1) << np.uint64(norbs - 1 - jorb)
+                bit_j = np.uint64(1) << np.uint64(jorb)
                 if state0 & bit_j == 0:
                     continue
-                sign_1 = sign_count_u64(state0, jorb, norbs)
+                sign_1 = sign_count_u64(state0, jorb)
                 state = state0 ^ bit_j
 
-                bit_i = np.uint64(1) << np.uint64(norbs - 1 - iorb)
+                bit_i = np.uint64(1) << np.uint64(iorb)
                 if state & bit_i != 0:
                     continue
-                sign_2 = sign_count_u64(state, iorb, norbs)
+                sign_2 = sign_count_u64(state, iorb)
                 state |= bit_i
 
                 row = encode_combinadic_jit(
@@ -298,28 +284,28 @@ def _get_numba_kernels():
                 if iorb == jorb or korb == lorb:
                     continue
 
-                bit_i = np.uint64(1) << np.uint64(norbs - 1 - iorb)
+                bit_i = np.uint64(1) << np.uint64(iorb)
                 if state0 & bit_i == 0:
                     continue
-                sign_1 = sign_count_u64(state0, iorb, norbs)
+                sign_1 = sign_count_u64(state0, iorb)
                 state = state0 ^ bit_i
 
-                bit_j = np.uint64(1) << np.uint64(norbs - 1 - jorb)
+                bit_j = np.uint64(1) << np.uint64(jorb)
                 if state & bit_j == 0:
                     continue
-                sign_2 = sign_count_u64(state, jorb, norbs)
+                sign_2 = sign_count_u64(state, jorb)
                 state ^= bit_j
 
-                bit_k = np.uint64(1) << np.uint64(norbs - 1 - korb)
+                bit_k = np.uint64(1) << np.uint64(korb)
                 if state & bit_k != 0:
                     continue
-                sign_3 = sign_count_u64(state, korb, norbs)
+                sign_3 = sign_count_u64(state, korb)
                 state |= bit_k
 
-                bit_l = np.uint64(1) << np.uint64(norbs - 1 - lorb)
+                bit_l = np.uint64(1) << np.uint64(lorb)
                 if state & bit_l != 0:
                     continue
-                sign_4 = sign_count_u64(state, lorb, norbs)
+                sign_4 = sign_count_u64(state, lorb)
                 state |= bit_l
 
                 row = encode_combinadic_jit(
@@ -338,7 +324,7 @@ def _get_numba_kernels():
 
     @njit
     def build_explicit(
-        rb_states, lb_lookup, norbs,
+        rb_states, lb_lookup,
         e_terms, e_vals, u_terms, u_vals, cstart, cend,
     ):
         rows = []
@@ -351,16 +337,16 @@ def _get_numba_kernels():
             for t in range(e_terms.shape[0]):
                 iorb = int(e_terms[t, 0])
                 jorb = int(e_terms[t, 1])
-                bit_j = np.uint64(1) << np.uint64(norbs - 1 - jorb)
+                bit_j = np.uint64(1) << np.uint64(jorb)
                 if state0 & bit_j == 0:
                     continue
-                sign_1 = sign_count_u64(state0, jorb, norbs)
+                sign_1 = sign_count_u64(state0, jorb)
                 state = state0 ^ bit_j
 
-                bit_i = np.uint64(1) << np.uint64(norbs - 1 - iorb)
+                bit_i = np.uint64(1) << np.uint64(iorb)
                 if state & bit_i != 0:
                     continue
-                sign_2 = sign_count_u64(state, iorb, norbs)
+                sign_2 = sign_count_u64(state, iorb)
                 state |= bit_i
 
                 if state in lb_lookup:
@@ -377,28 +363,28 @@ def _get_numba_kernels():
                 if iorb == jorb or korb == lorb:
                     continue
 
-                bit_i = np.uint64(1) << np.uint64(norbs - 1 - iorb)
+                bit_i = np.uint64(1) << np.uint64(iorb)
                 if state0 & bit_i == 0:
                     continue
-                sign_1 = sign_count_u64(state0, iorb, norbs)
+                sign_1 = sign_count_u64(state0, iorb)
                 state = state0 ^ bit_i
 
-                bit_j = np.uint64(1) << np.uint64(norbs - 1 - jorb)
+                bit_j = np.uint64(1) << np.uint64(jorb)
                 if state & bit_j == 0:
                     continue
-                sign_2 = sign_count_u64(state, jorb, norbs)
+                sign_2 = sign_count_u64(state, jorb)
                 state ^= bit_j
 
-                bit_k = np.uint64(1) << np.uint64(norbs - 1 - korb)
+                bit_k = np.uint64(1) << np.uint64(korb)
                 if state & bit_k != 0:
                     continue
-                sign_3 = sign_count_u64(state, korb, norbs)
+                sign_3 = sign_count_u64(state, korb)
                 state |= bit_k
 
-                bit_l = np.uint64(1) << np.uint64(norbs - 1 - lorb)
+                bit_l = np.uint64(1) << np.uint64(lorb)
                 if state & bit_l != 0:
                     continue
-                sign_4 = sign_count_u64(state, lorb, norbs)
+                sign_4 = sign_count_u64(state, lorb)
                 state |= bit_l
 
                 if state in lb_lookup:
@@ -462,7 +448,7 @@ def _prepare_entries_kernel(
 
         def build_range(cstart, cend):
             return build_explicit(
-                rb_states, lb_lookup, rb.norbs,
+                rb_states, lb_lookup,
                 e_terms, e_vals, u_terms, u_vals, cstart, cend,
             )
 

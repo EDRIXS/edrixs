@@ -45,9 +45,9 @@ def test_expand_broadening_accepts_scalar_or_exact_length_array():
         helpers._expand_broadening([0.1], 2, "gamma")
 
 
-def test_infer_backend_recognizes_scipy_operators():
-    """NumPy and SciPy sparse operators infer the SciPy solver backend."""
-    assert helpers._infer_backend(np.eye(2)) == "scipy"
+def test_infer_backend_recognizes_dense_and_scipy_operators():
+    """NumPy and SciPy sparse operators infer their respective backends."""
+    assert helpers._infer_backend(np.eye(2)) == "dense"
     assert helpers._infer_backend(sp.eye(2, format="csr")) == "scipy"
 
 

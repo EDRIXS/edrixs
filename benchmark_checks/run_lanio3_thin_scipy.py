@@ -118,7 +118,7 @@ def run(output_dir: Path) -> None:
     # -------------------------------------------------------------------------
     # 1. Define the orbital-space physical problem.
     # -------------------------------------------------------------------------
-    problem = model_1v1c(
+    *problem, shift = model_1v1c(
         shell_name,
         shell_level=(0.0, -core_offset),
         v_soc=parameters["v_soc"],
@@ -151,7 +151,7 @@ def run(output_dir: Path) -> None:
     )
 
     eval_all, evec_all = solve_ed(
-        hmat_i,
+        hmat_i, shift=shift,
         num_evals=neval,
         backend="scipy",
         backend_kws={

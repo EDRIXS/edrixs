@@ -29,4 +29,4 @@ def small_1v1c_problem(small_1v1c_kwargs):
 @pytest.fixture(scope="module")
 def small_1v1c_operators(small_1v1c_problem):
     """Build SciPy Hamiltonians and transition operators for public-API tests."""
-    return get_ops(*small_1v1c_problem, backend="scipy")
+    return get_ops(*small_1v1c_problem[:7], backend="scipy")

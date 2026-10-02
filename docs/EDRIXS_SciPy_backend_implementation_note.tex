@@ -59,15 +59,7 @@ xas_scipy
 rixs_scipy
 \end{lstlisting}
 
-with the numerical implementations
-
-\begin{lstlisting}
-ed_krylov_scipy
-xas_krylov_scipy
-rixs_krylov_scipy
-\end{lstlisting}
-
-in the same backend module.
+Each solver entry point contains its numerical implementation in the same backend module.
 
 \section{Where the SciPy backend fits in EDRIXS}
 
@@ -97,10 +89,12 @@ The model layer produces backend-independent orbital-space information.  For exa
 \begin{lstlisting}
 emat_i, umat_i, basis_i,
 emat_n, umat_n, basis_n,
-trans_mat
+trans_mat, shift
 \end{lstlisting}
 
-where the suffixes \texttt{i} and \texttt{n} denote the initial/final and intermediate sectors, respectively.  The SciPy backend is responsible for converting these objects into many-body operators and then solving the requested spectroscopy problem.
+The first seven outputs are passed to \texttt{get\_ops}. The final scalar \texttt{shift} is the core shell level times its orbital count, excluding Coulomb contributions, and is passed explicitly to dense or SciPy \texttt{ed}. The integrals retain their original energies.
+
+The suffixes \texttt{i} and \texttt{n} denote the initial/final and intermediate sectors, respectively.  The SciPy backend is responsible for converting these objects into many-body operators and then solving the requested spectroscopy problem.
 
 \subsection{Backend dispatch}
 
@@ -137,7 +131,7 @@ eval_i, evec_i = ed(
 )
 \end{lstlisting}
 
-The public wrapper passes a copy of this dictionary to \texttt{ed\_scipy}.  The backend adapter then expands the dictionary into the arguments of \texttt{ed\_krylov\_scipy}.  XAS and RIXS work in the same way.
+The public wrapper passes a copy of this dictionary to \texttt{ed\_scipy}. The backend validates the options, applies defaults from its registry, and uses them directly in the calculation. XAS and RIXS work in the same way.
 
 This separation is important: physical arguments belong in the common interface; algorithm-specific controls belong in \texttt{backend\_kws}.
 
@@ -145,12 +139,12 @@ This separation is important: physical arguments belong in the common interface;
 
 \subsection{Integer encoding}
 
-Many-body basis states are represented by the shared \texttt{FockBasis} class in \texttt{fock\_basis.py}.  A basis state is encoded as an integer bit pattern.  Orbital zero is stored as the most significant bit.
+Many-body basis states are represented by the shared \texttt{FockBasis} class in \texttt{fock\_basis.py}.  A basis state is encoded as an integer bit pattern.  Orbital zero is stored as the least significant bit, matching native Fortran.
 
 For a basis with \(N_{\mathrm{orb}}\) spin-orbitals, the bit for orbital \(i\) is
 
 \begin{equation}
-  b_i = 2^{N_{\mathrm{orb}}-1-i}.
+  b_i = 2^i.
 \end{equation}
 
 A set bit means that the corresponding spin-orbital is occupied.  \texttt{FockBasis.decode(j)} returns the integer state stored at many-body basis position \(j\), while \texttt{FockBasis.encode(state)} returns the matrix index of an integer-encoded state.
@@ -309,27 +303,9 @@ and therefore has shape
 
 There is no separate transition-operator construction API in the staged implementation.
 
-\section{Backend adapters}
+\section{Backend entry points}
 
-The public SciPy entry points
-
-\begin{lstlisting}
-ed_scipy
-xas_scipy
-rixs_scipy
-\end{lstlisting}
-
-are deliberately thin.  Their main jobs are to receive the common physical arguments, validate/copy \texttt{backend\_kws}, and call the corresponding numerical implementation.
-
-Conceptually,
-
-\begin{lstlisting}
-ed_scipy   -> ed_krylov_scipy
-xas_scipy  -> xas_krylov_scipy
-rixs_scipy -> rixs_krylov_scipy
-\end{lstlisting}
-
-This is useful when comparing SciPy with another backend: the adapter signatures define the backend contract, while the lower-level routines document one concrete numerical realization of that contract.
+The SciPy functions \texttt{ed\_scipy}, \texttt{xas\_scipy}, and \texttt{rixs\_scipy} receive the common physical arguments, validate/copy \texttt{backend\_kws}, and run their numerical implementations directly. Their signatures define the backend contract. Numerical options and their defaults are defined in the backend option registry.
 
 \section{Ground-state diagonalization}
 
@@ -338,34 +314,22 @@ This is useful when comparing SciPy with another backend: the adapter signatures
 The public call is
 
 \begin{lstlisting}[language=Python]
-ed(hmat_i, num_evals=1, backend="scipy", backend_kws=None)
+ed(hmat_i, num_evals=1, shift=0.0, backend="scipy", backend_kws=None)
 \end{lstlisting}
 
-which dispatches to
+which passes the Hamiltonian and shift unchanged to
 
 \begin{lstlisting}[language=Python]
-ed_scipy(hmat_i, num_evals=1, backend_kws=None).
+ed_scipy(hmat_i, num_evals=1, shift=0.0, backend_kws=None).
 \end{lstlisting}
 
-\texttt{ed\_scipy} maps \texttt{num\_evals} to the retained-state count used by \texttt{ed\_krylov\_scipy}.
+The backend subtracts \(\mathrm{shift} I\) from a copy or operator wrapper before diagonalization and adds \texttt{shift} back to the returned eigenvalues, leaving eigenvectors and the original Hamiltonian unchanged. Sparse matrices stay sparse, and \texttt{LinearOperator} inputs remain matrix-free. The default zero shift preserves the existing solver path. Nonzero shifts are supported only for dense and SciPy ED.
+
+\texttt{ed\_scipy} retains the lowest \texttt{num\_evals} eigenpairs.
 
 \subsection{LOBPCG implementation}
 
-The current numerical solver is SciPy's LOBPCG routine.  The internal signature is
-
-\begin{lstlisting}[language=Python]
-ed_krylov_scipy(
-    hmat_i,
-    num_gs=1,
-    blocksize=None,
-    *,
-    tol=1e-10,
-    maxiter=200,
-    seed=None,
-    initial_guess=None,
-    suppress_lobpcg_warnings=True,
-)
-\end{lstlisting}
+The numerical solver in \texttt{ed\_scipy} is SciPy's LOBPCG routine. Its controls are supplied through \texttt{backend\_kws}, as listed below.
 
 The Hamiltonian is converted to a SciPy \texttt{LinearOperator}; it must be square.  If \texttt{blocksize} is not provided, it is set equal to the requested number of retained states.  A block larger than the retained count is allowed.  This is useful, for example, when low-energy degeneracies make a larger eigensolver block desirable.
 
@@ -375,7 +339,7 @@ If the caller does not provide \texttt{initial\_guess}, the routine constructs a
   (\dim\mathcal H_i,\,\mathrm{blocksize}).
 \end{equation}
 
-LOBPCG is called with \texttt{largest=False}.  The returned eigenpairs are explicitly sorted by increasing eigenvalue.  Only the first \texttt{num\_gs} states are retained if a larger block was solved.
+LOBPCG is called with \texttt{largest=False}.  The returned eigenpairs are explicitly sorted by increasing eigenvalue.  Only the first \texttt{num\_evals} states are retained if a larger block was solved.
 
 The output convention is
 
@@ -476,7 +440,7 @@ xas_scipy(
 )
 \end{lstlisting}
 
-It forwards the physical arguments to \texttt{xas\_krylov\_scipy} and expands the SciPy-specific backend dictionary.  The only current SciPy XAS numerical keyword is
+It runs the Lanczos calculation directly using the physical arguments and the SciPy-specific backend dictionary. The only current SciPy XAS numerical keyword is
 
 \begin{equation}
   \texttt{nkryl}=200
@@ -576,7 +540,7 @@ rixs_scipy(
 )
 \end{lstlisting}
 
-The SciPy numerical implementation is \texttt{rixs\_krylov\_scipy}.
+The SciPy numerical implementation is contained in \texttt{rixs\_scipy}.
 
 \subsection{Overall decomposition}
 
@@ -592,9 +556,6 @@ The calculation flow is
 
 \begin{lstlisting}
 rixs_scipy
-    |
-    v
-rixs_krylov_scipy
     |
     +-- _prepare_rixs
     |

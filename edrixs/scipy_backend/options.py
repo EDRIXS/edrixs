@@ -1,4 +1,4 @@
-"""Option registry for the SciPy and dense compatibility backends."""
+"""Option registry for the iterative SciPy backend."""
 
 from __future__ import annotations
 
@@ -52,7 +52,9 @@ RIXS_OPTIONS = {
         200, 'Maximum final-state Lanczos dimension.', positive_integer
     ),
     'linsys_tol': OptionSpec(
-        1e-9, 'GMRES convergence tolerance.', positive_real
+        1e-9,
+        'GMRES relative convergence tolerance (rtol; tol in older SciPy).',
+        positive_real,
     ),
     'linsys_maxiter': OptionSpec(
         50000, 'Maximum GMRES iterations.', positive_integer

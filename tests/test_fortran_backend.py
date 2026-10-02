@@ -108,7 +108,7 @@ def test_fortran_backend_uses_native_files_and_f2py_solvers(tmp_path, monkeypatc
         'edrixs.fortran_backend.fortran_backend._solver', fake_solver,
     )
     problem = model_1v1c(('s', 's'), v_noccu=1)
-    hmat_i, hmat_n, transitions = get_ops(*problem, backend='fortran')
+    hmat_i, hmat_n, transitions = get_ops(*problem[:7], backend='fortran')
     assert len(transitions) == 5
     handles = (hmat_i, hmat_n, *transitions)
     assert all(type(handle) is type(hmat_i) for handle in handles)
@@ -135,7 +135,7 @@ def test_fortran_backend_uses_native_files_and_f2py_solvers(tmp_path, monkeypatc
     scattering = rixs(
         eval_i, evec_i, hmat_i, hmat_n, transitions,
         np.array([0.0]), np.array([0.0]),
-        backend_kws={'linsys_maxiter': 17},
+        backend_kws={'linsys_max': 17},
     )
 
     assert absorption.shape == (1, 1)

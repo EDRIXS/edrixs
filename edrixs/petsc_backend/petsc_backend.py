@@ -132,7 +132,7 @@ def build_op_petsc(emat, umat, lb, rb=None, *, use_numba=False, backend_kws=None
 # -----------------------------------------------------------------------------
 
 
-def ed_petsc(hmat_i, num_evals=1, *, backend_kws=None):
+def ed_petsc(hmat_i, num_evals=1, *, shift=0.0, backend_kws=None):
     """Obtain the lowest-lying eigenpairs with SLEPc/PETSc.
 
     Diagonalize the Hermitian operator ``hmat_i`` for its ``num_evals``
@@ -145,10 +145,16 @@ def ed_petsc(hmat_i, num_evals=1, *, backend_kws=None):
         :func:`build_op_petsc`.
     num_evals : int, optional
         Number of lowest eigenpairs to return.
+    shift : float, optional
+        Real offset subtracted before diagonalization and restored to the
+        returned eigenvalues. The supplied distributed matrix is not modified.
+        A nonzero shift selects an absolute residual tolerance; with zero
+        shift the residual tolerance is relative to the eigenvalue magnitude.
     backend_kws : mapping, optional
         Extra options. Recognized keys:
 
-        - ``eigval_tol`` : convergence tolerance (default ``1e-8``).
+        - ``eigval_tol`` : residual tolerance (default ``1e-8``), relative
+          when ``shift`` is zero and absolute otherwise.
         - ``maxiter`` : maximum solver iterations (default ``1000``).
         - ``ncv`` : number of column vectors (Krylov subspace size).
         - ``verbose`` : print convergence diagnostics (default ``False``).
@@ -175,47 +181,62 @@ def ed_petsc(hmat_i, num_evals=1, *, backend_kws=None):
     comm = hmat_i.getComm()
     rank = comm.getRank()
 
+    centered = hmat_i
+    if shift != 0:
+        centered = hmat_i.copy()
+        centered.shift(-shift)
+
     eps = SLEPc.EPS().create(comm=comm)
-    eps.setOperators(hmat_i)
-    eps.setType(SLEPc.EPS.Type.KRYLOVSCHUR)
-    eps.setProblemType(SLEPc.EPS.ProblemType.HEP)
-    eps.setWhichEigenpairs(SLEPc.EPS.Which.SMALLEST_REAL)
-    eps.setTolerances(tol=eigval_tol, max_it=maxiter)
-    if ncv is not None:
-        eps.setDimensions(num_evals, int(ncv))
-    else:
-        eps.setDimensions(num_evals)
-
-    eps.solve()
-
-    nconv = eps.getConverged()
-    if verbose and rank == 0:
-        print("edrixs >>> PETSc ED converged {} of {} requested "
-              "(reason={})".format(nconv, num_evals, eps.getConvergedReason()),
-              flush=True)
-    if nconv < num_evals:
-        raise RuntimeError(
-            "SLEPc converged only {} of the requested {} eigenpairs".format(
-                nconv, num_evals
-            )
-        )
-
-    eval_i = np.zeros(num_evals, dtype=float)
-    evec_i = [None] * num_evals
-    errors = np.zeros(num_evals, dtype=float)
     vr = hmat_i.createVecLeft()
-    for index in range(num_evals):
-        eigenvalue = eps.getEigenpair(index, vr)
-        eval_i[index] = eigenvalue.real
-        evec_i[index] = vr.copy()  # copy is crucial; vr is reused each pass
-        errors[index] = eps.computeError(index, SLEPc.EPS.ErrorType.RELATIVE)
+    try:
+        eps.setOperators(centered)
+        if shift != 0:
+            eps.setConvergenceTest(SLEPc.EPS.Conv.ABS)
+        eps.setType(SLEPc.EPS.Type.KRYLOVSCHUR)
+        eps.setProblemType(SLEPc.EPS.ProblemType.HEP)
+        eps.setWhichEigenpairs(SLEPc.EPS.Which.SMALLEST_REAL)
+        eps.setTolerances(tol=eigval_tol, max_it=maxiter)
+        if ncv is not None:
+            eps.setDimensions(num_evals, int(ncv))
+        else:
+            eps.setDimensions(num_evals)
 
-    if np.any(errors > eigval_tol):
-        raise RuntimeError(
-            "PETSc ED residuals exceed tolerance {}: {}".format(eigval_tol, errors)
-        )
+        eps.solve()
 
-    return eval_i, evec_i
+        nconv = eps.getConverged()
+        if verbose and rank == 0:
+            print("edrixs >>> PETSc ED converged {} of {} requested "
+                  "(reason={})".format(nconv, num_evals, eps.getConvergedReason()),
+                  flush=True)
+        if nconv < num_evals:
+            raise RuntimeError(
+                "SLEPc converged only {} of the requested {} eigenpairs".format(
+                    nconv, num_evals
+                )
+            )
+
+        eval_i = np.zeros(num_evals, dtype=float)
+        evec_i = [None] * num_evals
+        errors = np.zeros(num_evals, dtype=float)
+        error_type = (SLEPc.EPS.ErrorType.ABSOLUTE if shift != 0
+                      else SLEPc.EPS.ErrorType.RELATIVE)
+        for index in range(num_evals):
+            eigenvalue = eps.getEigenpair(index, vr)
+            eval_i[index] = eigenvalue.real + shift
+            evec_i[index] = vr.copy()  # copy is crucial; vr is reused each pass
+            errors[index] = eps.computeError(index, error_type)
+
+        if np.any(errors > eigval_tol):
+            raise RuntimeError(
+                "PETSc ED residuals exceed tolerance {}: {}".format(eigval_tol, errors)
+            )
+
+        return eval_i, evec_i
+    finally:
+        vr.destroy()
+        eps.destroy()
+        if shift != 0:
+            centered.destroy()
 
 
 # -----------------------------------------------------------------------------
@@ -337,6 +358,10 @@ def xas_petsc(eval_i, evec_i, hmat_n, trans_op, ominc, *,
     the pole representation consumed by
     :func:`edrixs.poles.get_spectra_from_poles`.
 
+    The lowest initial energy and first incident energy center internal
+    matrix copies near resonance. Input matrices and public energy references
+    are preserved.
+
     Parameters
     ----------
     eval_i : 1d array
@@ -412,50 +437,61 @@ def xas_petsc(eval_i, evec_i, hmat_n, trans_op, ominc, *,
     gamma_core = _expand_broadening(gamma_c, n_om, 'gamma_c')
     kvec = unit_wavevector(thin, phi, scatter_axis, direction='in')
 
+    energy_ref = min(eval_i, default=0.0)
+    omega_ref = ominc[0] if n_om else 0.0
+    eval_i = eval_i - energy_ref
+    ominc = ominc - omega_ref
+    centered = hmat_n.copy()
+    centered.shift(-energy_ref)
+    centered.shift(-omega_ref)
+
     xas = np.zeros((n_om, len(pol_type)), dtype=float)
     poles = []
-    for it, (pt, alpha) in enumerate(pol_type):
-        kind = pt.strip().lower()
-        if kind == 'isotropic':
-            # Sum over the Cartesian (or spherical) components individually.
-            pole_dicts = []
-            for k in range(ntrans):
-                coeffs = np.zeros(ntrans, dtype=complex)
-                coeffs[k] = 1.0
+    try:
+        for it, (pt, alpha) in enumerate(pol_type):
+            kind = pt.strip().lower()
+            if kind == 'isotropic':
+                # Sum over the Cartesian (or spherical) components individually.
+                pole_dicts = []
+                for k in range(ntrans):
+                    coeffs = np.zeros(ntrans, dtype=complex)
+                    coeffs[k] = 1.0
+                    seeds = [
+                        _apply_trans_combination(trans_op, coeffs, evec_i[ig])
+                        for ig in range(num_gs)
+                    ]
+                    pole_dict = _xas_pole_dict(
+                        centered, seeds, eval_i, nkryl, lanczos_tridiagonal
+                    )
+                    xas[:, it] += get_spectra_from_poles(
+                        pole_dict, ominc, gamma_core, temperature
+                    ) / ntrans
+                    pole_dicts.append(pole_dict)
+                poles.append(merge_pole_dicts(pole_dicts))
+            elif kind in ('linear', 'left', 'right'):
+                pol = dipole_polvec_xas(thin, phi, alpha, scatter_axis, pt)
+                polvec = np.zeros(ntrans, dtype=complex)
+                if ntrans == 3:
+                    polvec[:] = pol
+                else:
+                    polvec[:] = quadrupole_polvec(pol, kvec)
                 seeds = [
-                    _apply_trans_combination(trans_op, coeffs, evec_i[ig])
+                    _apply_trans_combination(trans_op, polvec, evec_i[ig])
                     for ig in range(num_gs)
                 ]
                 pole_dict = _xas_pole_dict(
-                    hmat_n, seeds, eval_i, nkryl, lanczos_tridiagonal
+                    centered, seeds, eval_i, nkryl, lanczos_tridiagonal
                 )
-                xas[:, it] += get_spectra_from_poles(
+                poles.append(pole_dict)
+                xas[:, it] = get_spectra_from_poles(
                     pole_dict, ominc, gamma_core, temperature
-                ) / ntrans
-                pole_dicts.append(pole_dict)
-            poles.append(merge_pole_dicts(pole_dicts))
-        elif kind in ('linear', 'left', 'right'):
-            pol = dipole_polvec_xas(thin, phi, alpha, scatter_axis, pt)
-            polvec = np.zeros(ntrans, dtype=complex)
-            if ntrans == 3:
-                polvec[:] = pol
+                )
             else:
-                polvec[:] = quadrupole_polvec(pol, kvec)
-            seeds = [
-                _apply_trans_combination(trans_op, polvec, evec_i[ig])
-                for ig in range(num_gs)
-            ]
-            pole_dict = _xas_pole_dict(
-                hmat_n, seeds, eval_i, nkryl, lanczos_tridiagonal
-            )
-            poles.append(pole_dict)
-            xas[:, it] = get_spectra_from_poles(
-                pole_dict, ominc, gamma_core, temperature
-            )
-        else:
-            raise ValueError("Unknown XAS polarization type: {}".format(pt))
+                raise ValueError("Unknown XAS polarization type: {}".format(pt))
 
-    return xas
+        return xas
+    finally:
+        centered.destroy()
 
 
 def rixs_petsc(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
@@ -470,6 +506,10 @@ def rixs_petsc(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
     (GMRES), and a Lanczos tridiagonalization of ``hmat_i`` seeded by
     ``D_k'^dagger x`` produces the pole representation consumed by
     :func:`edrixs.poles.get_spectra_from_poles`.
+
+    The lowest initial energy and first incident energy center internal
+    matrix copies near resonance. Input matrices and public energy references
+    are preserved.
 
     Parameters
     ----------
@@ -505,9 +545,14 @@ def rixs_petsc(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
         Extra options. Recognized keys:
 
         - ``nkryl`` : maximum final-state Lanczos dimension (default ``200``).
-        - ``linsys_tol`` : KSP absolute tolerance (default ``1e-10``).
+        - ``linsys_tol`` : KSP absolute tolerance ``atol`` (default ``1e-10``).
+          The relative tolerance remains at PETSc's default unless overridden
+          through its options database.
         - ``linsys_maxiter`` : maximum KSP iterations (default ``1000``).
         - ``ksp_type`` : KSP method (default ``'gmres'``).
+
+        KSP ``setFromOptions()`` is called after applying these settings.
+        Corresponding PETSc options-database entries override ``backend_kws``.
 
     Returns
     -------
@@ -567,64 +612,87 @@ def rixs_petsc(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
         for incoming_kind, alpha, outgoing_kind, beta in pol_type
     ]
 
+    energy_ref = min(eval_i, default=0.0)
+    omega_ref = ominc[0] if n_om else 0.0
+    relative_evals = eval_i - energy_ref
+    centered_i = hmat_i.copy()
+    centered_i.shift(-energy_ref)
+    centered_n = hmat_n.copy()
+    centered_n.shift(-energy_ref)
+    centered_n.shift(-omega_ref)
+
     # Reusable shifted-system matrix and Krylov solver.
-    shifted = hmat_n.duplicate(copy=True)
+    shifted = centered_n.duplicate(copy=True)
     ksp = PETSc.KSP().create(hmat_n.getComm())
-    ksp.setType(ksp_type)
-    ksp.setTolerances(atol=linsys_tol, max_it=linsys_maxiter)
-    ksp.setFromOptions()
+    try:
+        ksp.setType(ksp_type)
+        ksp.setTolerances(atol=linsys_tol, max_it=linsys_maxiter)
+        ksp.setFromOptions()
 
-    rixs = np.zeros((n_om, neloss, len(pol_type)), dtype=float)
-    poles = []
-    for iom, omega in enumerate(ominc):
-        poles_per_om = []
-        for ip, (polvec_i, polvec_f) in enumerate(polarizations):
-            pole_dict = {'npoles': [], 'eigval': [], 'norm': [],
-                         'alpha': [], 'beta': []}
-            for ig in range(num_gs):
-                z = omega + eval_i[ig] + 1j * gamma_core[iom]
+        rixs = np.zeros((n_om, neloss, len(pol_type)), dtype=float)
+        poles = []
+        for iom, omega in enumerate(ominc):
+            poles_per_om = []
+            for ip, (polvec_i, polvec_f) in enumerate(polarizations):
+                pole_dict = {'npoles': [], 'eigval': [], 'norm': [],
+                             'alpha': [], 'beta': []}
+                for ig in range(num_gs):
+                    z = (omega - omega_ref) + relative_evals[ig] + 1j * gamma_core[iom]
 
-                # A = z*I - H_n
-                shifted.zeroEntries()
-                shifted.axpy(-1.0, hmat_n,
-                             structure=PETSc.Mat.Structure.SAME_NONZERO_PATTERN)
-                shifted.shift(z)
-                ksp.setOperators(shifted)
+                    # A = z*I - H_n
+                    shifted.zeroEntries()
+                    shifted.axpy(-1.0, centered_n,
+                                 structure=PETSc.Mat.Structure.SAME_NONZERO_PATTERN)
+                    shifted.shift(z)
+                    ksp.setOperators(shifted)
 
-                # RHS: D_k |i>  (initial -> intermediate)
-                rhs = _apply_trans_combination(trans_op, polvec_i, evec_i[ig])
-                sol = rhs.duplicate()
-                sol.zeroEntries()
-                ksp.solve(rhs, sol)
-                if ksp.getConvergedReason() < 0:
-                    raise RuntimeError(
-                        "KSP did not converge for omega={}, ig={}: reason={}".format(
-                            omega, ig, ksp.getConvergedReason()
+                    # RHS: D_k |i>  (initial -> intermediate)
+                    rhs = _apply_trans_combination(trans_op, polvec_i, evec_i[ig])
+                    sol = rhs.duplicate()
+                    sol.zeroEntries()
+                    ksp.solve(rhs, sol)
+                    if ksp.getConvergedReason() < 0:
+                        raise RuntimeError(
+                            "KSP did not converge for omega={}, ig={}: reason={}".format(
+                                omega, ig, ksp.getConvergedReason()
+                            )
                         )
+
+                    # Final-state seed: D_k'^dagger x  (intermediate -> initial)
+                    seed = _apply_trans_combination_adjoint(
+                        trans_op, np.conj(polvec_f), sol
                     )
 
-                # Final-state seed: D_k'^dagger x  (intermediate -> initial)
-                seed = _apply_trans_combination_adjoint(
-                    trans_op, np.conj(polvec_f), sol
+                    if skip_gs:
+                        for gs_vec in evec_i:
+                            # PETSc dot conjugates its second argument.
+                            seed.axpy(-seed.dot(gs_vec), gs_vec)
+
+                    alpha_i, beta_i, norm_i = lanczos_tridiagonal(
+                        centered_i, seed, nkryl=nkryl
+                    )
+                    pole_dict['npoles'].append(len(alpha_i))
+                    pole_dict['eigval'].append(relative_evals[ig])
+                    pole_dict['norm'].append(norm_i)
+                    pole_dict['alpha'].append(alpha_i)
+                    pole_dict['beta'].append(beta_i)
+
+                rixs[iom, :, ip] = get_spectra_from_poles(
+                    pole_dict, eloss, gamma_final, temperature
                 )
+                if return_poles:
+                    pole_dict['eigval'] = list(eval_i)
+                    pole_dict['alpha'] = [
+                        alpha + energy_ref if norm != 0 else alpha
+                        for alpha, norm in zip(pole_dict['alpha'], pole_dict['norm'])
+                    ]
+                    poles_per_om.append(pole_dict)
+            if return_poles:
+                poles.append(poles_per_om)
 
-                if skip_gs:
-                    for gs_vec in evec_i:
-                        seed.axpy(-gs_vec.dot(seed), gs_vec)
-
-                alpha_i, beta_i, norm_i = lanczos_tridiagonal(
-                    hmat_i, seed, nkryl=nkryl
-                )
-                pole_dict['npoles'].append(len(alpha_i))
-                pole_dict['eigval'].append(eval_i[ig])
-                pole_dict['norm'].append(norm_i)
-                pole_dict['alpha'].append(alpha_i)
-                pole_dict['beta'].append(beta_i)
-
-            poles_per_om.append(pole_dict)
-            rixs[iom, :, ip] = get_spectra_from_poles(
-                pole_dict, eloss, gamma_final, temperature
-            )
-        poles.append(poles_per_om)
-
-    return (rixs, poles) if return_poles else rixs
+        return (rixs, poles) if return_poles else rixs
+    finally:
+        ksp.destroy()
+        shifted.destroy()
+        centered_n.destroy()
+        centered_i.destroy()

@@ -18,7 +18,7 @@ from edrixs.solvers import build_op
 
 def _historical_integer_states(*args):
     return [
-        int("".join(map(str, state)), 2)
+        sum(occupied << orbital for orbital, occupied in enumerate(state))
         for state in get_fock_bin_by_N(*args)
     ]
 
@@ -116,3 +116,26 @@ def test_numba_is_only_required_when_explicitly_requested(monkeypatch):
             basis_method="combinadic",
             use_numba=True,
         )
+
+
+def test_little_endian_core_bits_and_bounds():
+    """Core orbitals occupy the high bits; row order still follows orbital lists."""
+    basis = build_fock_basis(FockBasisSpec.from_args(4, 2, 2, 2))
+    states = [basis.decode(i) for i in range(len(basis))]
+    assert states == [51, 53, 57, 54, 58, 60]
+    assert basis.offsets == (0, 4)
+    assert basis.min_decode == min(states)
+    assert basis.max_decode == max(states)
+    assert [state & 0b1111 for state in states] == [3, 5, 9, 6, 10, 12]
+
+
+def test_little_endian_round_trips_all_small_occupancies():
+    """Every occupancy, including empty/full shells, keeps the legacy row order."""
+    for norbs in range(1, 9):
+        for nocc in range(norbs + 1):
+            basis = build_fock_basis(FockBasisSpec.from_args(norbs, nocc))
+            expected = _historical_integer_states(norbs, nocc)
+            assert [basis.decode(i) for i in range(len(basis))] == expected
+            assert [basis.encode(state) for state in expected] == list(range(len(basis)))
+            assert basis.min_decode == min(expected)
+            assert basis.max_decode == max(expected)

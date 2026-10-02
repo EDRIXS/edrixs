@@ -119,7 +119,7 @@ def run(
     ]
 
     stage_start = time.perf_counter()
-    problem = model_1v1c(
+    *problem, shift = model_1v1c(
         shell_name,
         shell_level=(0.0, -om_shift),
         v_soc=parameters["v_soc"],
@@ -145,7 +145,7 @@ def run(
         + 1j * rng.standard_normal((hmat_i.shape[0], blocksize))
     )
     eval_all, evec_all = solve_ed(
-        hmat_i,
+        hmat_i, shift=shift,
         num_evals=neval,
         backend="scipy",
         backend_kws={

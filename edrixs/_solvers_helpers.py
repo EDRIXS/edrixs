@@ -22,10 +22,14 @@ from .soc import atom_hsoc
 
 def _infer_backend(*operators):
     """Infer which backend owns every supplied operator."""
+    from .dense_backend import dense_backend
     from .petsc_backend import petsc_backend
     from .scipy_backend import scipy_backend
     from .fortran_backend import fortran_backend
 
+    owned_by_dense = bool(operators) and all(
+        dense_backend.owns_operator_dense(operator) for operator in operators
+    )
     owned_by_scipy = bool(operators) and all(
         scipy_backend.owns_operator_scipy(operator) for operator in operators
     )
@@ -35,6 +39,9 @@ def _infer_backend(*operators):
     owned_by_fortran = bool(operators) and all(
         fortran_backend.owns_operator_fortran(operator) for operator in operators
     )
+
+    if owned_by_dense:
+        return 'dense'
 
     match owned_by_scipy, owned_by_petsc, owned_by_fortran:
         case True, False, False:
@@ -46,7 +53,8 @@ def _infer_backend(*operators):
         case False, False, False:
             raise TypeError(
                 "Could not infer a backend from the supplied operators; "
-                "pass backend='scipy', backend='petsc', or backend='fortran' explicitly"
+                "pass backend='dense', backend='scipy', backend='petsc', "
+                "or backend='fortran' explicitly"
             )
         case _:
             raise TypeError(

@@ -30,9 +30,9 @@ def _annihilation_operators(norbs):
     result = []
     for orbital in range(norbs):
         factors = (
-            [parity] * orbital
+            [identity] * (norbs - orbital - 1)
             + [annihilate]
-            + [identity] * (norbs - orbital - 1)
+            + [parity] * orbital
         )
         operator = factors[0]
         for factor in factors[1:]:
@@ -166,3 +166,22 @@ def test_dense_and_sparse_coulomb_inputs_are_numerically_identical(
     )
 
     assert_allclose(dense_operator.toarray(), sparse_operator.toarray(), atol=2e-13)
+
+
+@pytest.mark.parametrize('basis_method,use_numba', ROUTES)
+def test_little_endian_high_bit_and_fermionic_sign(basis_method, use_numba):
+    """Exercise bit 63 and parity across an occupied spectator orbital."""
+    _skip_missing_numba(use_numba)
+    # Orbital 1 is always occupied; hopping 0 <-> 63 crosses that electron.
+    left = FockBasisSpec.from_args(1, 0, 1, 1, 61, 0, 1, 1)
+    right = FockBasisSpec.from_args(1, 1, 1, 1, 61, 0, 1, 0)
+    emat = np.zeros((64, 64), dtype=complex)
+    emat[63, 0] = 0.4 + 0.7j
+    actual = build_op(emat, None, left, right, basis_method=basis_method,
+                      use_numba=use_numba).toarray()
+    assert_allclose(actual, [[-0.4 - 0.7j]], atol=1e-14)
+    # A single 64-orbital shell also exercises the full-width shell mask.
+    single = FockBasisSpec.from_args(64, 1)
+    actual = build_op(emat, None, single, basis_method=basis_method,
+                      use_numba=use_numba).toarray()
+    assert_allclose(actual, emat, atol=1e-14)

@@ -87,7 +87,9 @@ CONSTRUCTION_OPTIONS = {
 
 ED_OPTIONS = {
     'eigval_tol': OptionSpec(
-        1e-8, 'SLEPc eigensolver convergence tolerance.', positive_real
+        1e-8,
+        'SLEPc residual tolerance: relative when shift is zero, absolute otherwise.',
+        positive_real,
     ),
     'maxiter': OptionSpec(
         1000, 'Maximum SLEPc eigensolver iterations.', positive_integer
@@ -111,7 +113,9 @@ RIXS_OPTIONS = {
         200, 'Maximum final-state Lanczos dimension.', positive_integer
     ),
     'linsys_tol': OptionSpec(
-        1e-10, 'PETSc KSP absolute convergence tolerance.', positive_real
+        1e-10,
+        'PETSc KSP absolute tolerance (atol); the relative criterion remains active.',
+        positive_real,
     ),
     'linsys_maxiter': OptionSpec(
         1000, 'Maximum PETSc KSP iterations.', positive_integer

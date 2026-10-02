@@ -11,7 +11,7 @@ def fixed_particle_basis(norbs: int, nocc: int) -> FockBasis:
     """Build a small fixed-particle basis used by independent checks."""
     states = []
     for occupied in combinations(range(norbs), nocc):
-        state = sum(1 << (norbs - 1 - orbital) for orbital in occupied)
+        state = sum(1 << orbital for orbital in occupied)
         states.append(state)
     return FockBasis(states, norbs)
 
@@ -25,9 +25,9 @@ def annihilation_operators(norbs: int) -> list[np.ndarray]:
     operators = []
     for orbital in range(norbs):
         factors = (
-            [parity] * orbital
+            [identity] * (norbs - orbital - 1)
             + [annihilate]
-            + [identity] * (norbs - orbital - 1)
+            + [parity] * orbital
         )
         operator = factors[0]
         for factor in factors[1:]:
