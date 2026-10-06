@@ -237,7 +237,9 @@ def ed(hmat_i, num_evals=1, *, shift=0.0, backend=None, backend_kws=None):
         Real energy offset, normally the final output of a model
         constructor. Dense and SciPy ED diagonalize ``hmat_i - shift * I``
         and add the offset back to the returned eigenvalues. The supplied
-        Hamiltonian is not modified. Default zero; other backends require zero.
+        Hamiltonian is not modified. Default zero; PETSc requires zero.
+        Fortran ED warns and ignores nonzero shifts, continuing with the
+        original Hamiltonian.
     backend : str or None, optional
         Backend name. When omitted, infer it from ``hmat_i``.
     backend_kws : mapping, optional

@@ -150,8 +150,8 @@ Dense and SciPy ED accept ``shift=shift``, where ``shift`` is the eighth
 output of a model constructor. They diagonalize :math:`H - \mathrm{shift} I`
 and restore the offset in ``eval_i``. The Hamiltonian supplied by the caller
 remains unchanged, so XAS and RIXS continue using the same energy reference.
-Pass only the first seven model outputs to ``get_ops``. Fortran ED does not
-support nonzero ``shift``.
+Pass only the first seven model outputs to ``get_ops``. Fortran ED warns when
+``shift`` is nonzero and continues without applying the shift.
 
 .. _xas:
 

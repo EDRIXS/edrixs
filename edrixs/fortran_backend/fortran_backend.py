@@ -16,6 +16,7 @@ from __future__ import annotations
 
 from pathlib import Path
 import traceback
+import warnings
 
 import numpy as np
 import scipy.sparse as sp
@@ -267,7 +268,10 @@ def _run_solver(solver, comm, outputs=()):
 
 def ed_fortran(hmat_i, num_evals=1, *, shift=0.0, backend_kws=None):
     if shift != 0:
-        raise ValueError('nonzero shift is supported only by dense and scipy ED')
+        warnings.warn(
+            'Fortran ED ignores shift; continuing without applying the shift.',
+            UserWarning, stacklevel=2,
+        )
     options = validate_options('ed', backend_kws)
     nvector = int(options.get('nvector', num_evals))
     if nvector > num_evals:
