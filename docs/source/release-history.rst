@@ -5,9 +5,57 @@ Release History
 Unreleased
 ----------
 
-* Validate staged ``backend_kws`` by backend and operation, with typo
-  suggestions and documented value constraints.
-* Document all SciPy, dense, and Fortran staged-backend options.
+New calculation interface
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Introduce a staged workflow that separates physical model construction,
+  many-body operator construction, diagonalization, and spectral calculations:
+  ``model_*`` → ``get_ops`` → ``ed`` → ``xas`` / ``rixs``.
+* Add backend-independent ``model_1v1c``, ``model_2v1c``, ``model_siam``, and
+  ``model_siam_2d1p`` constructors, including sparse Coulomb tensors and a
+  charge-transfer parameterization for a d impurity, bath, and p core.
+* Make SciPy the default backend, with sparse operator construction and Krylov
+  methods for ED, XAS, and RIXS. Dense calculations and native Fortran/MPI
+  solvers are also available through the staged interface.
+* Add compact Fock-basis specifications with interchangeable combinadic and
+  explicit basis construction. Operator construction uses Numba by default;
+  ``use_numba=False`` selects Python construction.
+* Validate ``backend_kws`` by backend and operation, with typo suggestions,
+  documented defaults, and value constraints.
+
+Numerical methods and utilities
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Support an energy-reference shift for SciPy and dense diagonalization while
+  returning eigenvalues in the original reference. Models return the shift
+  alongside their operator inputs. The Fortran backend warns and continues
+  when a nonzero shift is supplied.
+* Reuse SciPy RIXS intermediate-state solves across outgoing polarization
+  channels sharing the same incoming polarization.
+* Add conversions between Racah parameters and d-shell Slater integrals.
+* Expand tests for model construction, basis ordering, fermionic signs,
+  backend consistency, and XAS/RIXS spectra.
+
+Compatibility and migration
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Deprecate the legacy model-specific Python and Fortran solver wrappers in
+  favor of the staged interface. Existing wrappers emit deprecation warnings.
+* Reject isotropic RIXS polarization; specify incoming and outgoing
+  polarization channels explicitly. Isotropic XAS remains supported.
+* Remove the ``tol`` keyword from model constructors.
+* PETSc calculations remain available on the ``petsc_edrixs`` branch; the
+  PETSc backend in ``master`` is a placeholder.
+
+Documentation and packaging
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+* Update the examples for the staged workflow and document the SciPy, dense,
+  and Fortran backend options and numerical-precision considerations.
+* Clarify Slater-integral normalization and add versioned documentation and
+  stricter documentation validation.
+* Correct the CMake extension name used by packaging, automate Docker Hub
+  release publishing, and update installation guidance and dependencies.
 
 This page summarizes the user-visible changes in each tagged release.  See the
 `GitHub releases page <https://github.com/EDRIXS/edrixs/releases>`_ for the
