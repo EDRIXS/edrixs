@@ -17,6 +17,7 @@ New calculation interface
 * Make SciPy the default backend, with sparse operator construction and Krylov
   methods for ED, XAS, and RIXS. Dense calculations and native Fortran/MPI
   solvers are also available through the staged interface.
+* A PETSc-based backend is under development
 * Add compact Fock-basis specifications with interchangeable combinadic and
   explicit basis construction. Operator construction uses Numba by default;
   ``use_numba=False`` selects Python construction.
@@ -43,9 +44,7 @@ Compatibility and migration
   favor of the staged interface. Existing wrappers emit deprecation warnings.
 * Reject isotropic RIXS polarization; specify incoming and outgoing
   polarization channels explicitly. Isotropic XAS remains supported.
-* Remove the ``tol`` keyword from model constructors.
-* PETSc calculations remain available on the ``petsc_edrixs`` branch; the
-  PETSc backend in ``master`` is a placeholder.
+
 
 Documentation and packaging
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
