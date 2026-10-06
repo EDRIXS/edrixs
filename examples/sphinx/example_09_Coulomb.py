@@ -70,9 +70,11 @@ umat_chb = edrixs.get_umat_slater('d', F0, F2, F4)
 # Harmonics as well as Clebsch-Gordon coefficients, Gaunt coefficients,
 # and Wigner 3J symbols. Textbooks such as [1]_ can be used for further
 # reference. If you are interested in the details of how
-# EDRIXS does this (and you probably aren't) function :func:`.umat_slater`,
+# EDRIXS does this (and you probably aren't) function
+# :func:`~edrixs.coulomb_utensor.umat_slater`,
 # constructs the required matrix via Gaunt coefficients from
-# :func:`.get_gaunt`. Two alternative parameterizations are common.
+# :func:`~edrixs.coulomb_utensor.get_gaunt`. Two alternative parameterizations
+# are common.
 # The first are the Racah parameters, which are
 #
 #   .. math::
