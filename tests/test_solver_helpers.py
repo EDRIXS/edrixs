@@ -8,21 +8,26 @@ from numpy.testing import assert_allclose
 import edrixs._solvers_helpers as helpers
 
 
-def test_dense_to_sparse_u_preserves_flattening_convention():
+@pytest.mark.parametrize("scale", [1.0, 1e-12])
+def test_dense_to_sparse_u_preserves_flattening_convention(scale):
     """Dense and flattened sparse Coulomb data must use the same ordering."""
     rng = np.random.default_rng(3)
     umat = rng.normal(size=(3, 3, 3, 3))
     umat[np.abs(umat) < 0.6] = 0
+    umat = umat.astype(complex) * scale * (1 + 1j)
 
     actual = helpers._umat_dense_to_sparse(umat).toarray()
 
-    assert_allclose(actual, umat.reshape(9, 9))
+    np.testing.assert_array_equal(actual, umat.reshape(9, 9))
 
 
-def test_sparse_siam_embedding_matches_dense_embedding():
+@pytest.mark.parametrize("scale", [1.0, 1e-12])
+def test_sparse_siam_embedding_matches_dense_embedding(scale):
     """Sparse SIAM embedding must match the dense reference placement."""
     rng = np.random.default_rng(8)
     compact = rng.normal(size=(4, 4, 4, 4))
+    compact[np.abs(compact) < 0.6] = 0
+    compact = compact.astype(complex) * scale * (1 + 1j)
     dense = helpers._embed_impurity_core_umat(
         compact, v_norb=2, c_norb=2, ntot_v=6
     )
@@ -30,7 +35,7 @@ def test_sparse_siam_embedding_matches_dense_embedding():
         compact, v_norb=2, c_norb=2, ntot_v=6
     )
 
-    assert_allclose(sparse.toarray(), dense.reshape(64, 64))
+    np.testing.assert_array_equal(sparse.toarray(), dense.reshape(64, 64))
 
 
 def test_expand_broadening_accepts_scalar_or_exact_length_array():

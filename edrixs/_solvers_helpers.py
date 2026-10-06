@@ -141,7 +141,7 @@ def _valence_zeeman_matrix(shell_name, orbl, ext_B, on_which):
     raise Exception("Unknown value of on_which", on_which)
 
 
-def _umat_dense_to_sparse(umat, tol=1E-10):
+def _umat_dense_to_sparse(umat):
     """
     Convert a dense rank-4 Coulomb tensor to a sparse flattened matrix.
 
@@ -161,7 +161,7 @@ def _umat_dense_to_sparse(umat, tol=1E-10):
     if umat.shape != (norbs, norbs, norbs, norbs):
         raise ValueError("dense umat must have shape (n, n, n, n)")
 
-    lorb, korb, jorb, iorb = np.nonzero(np.abs(umat) > tol)
+    lorb, korb, jorb, iorb = np.nonzero(umat)
 
     rows = lorb * norbs + korb
     cols = jorb * norbs + iorb
@@ -174,8 +174,7 @@ def _umat_dense_to_sparse(umat, tol=1E-10):
     ).tocsr()
 
 
-def _embed_impurity_core_umat_sparse(umat_tmp, v_norb, c_norb, ntot_v,
-                                     tol=1E-10):
+def _embed_impurity_core_umat_sparse(umat_tmp, v_norb, c_norb, ntot_v):
     """
     Embed an impurity+core Coulomb tensor into full SIAM space sparsely.
 
@@ -201,7 +200,7 @@ def _embed_impurity_core_umat_sparse(umat_tmp, v_norb, c_norb, ntot_v,
         dtype=int
     )
 
-    a, b, c, d = np.nonzero(np.abs(umat_tmp) > tol)
+    a, b, c, d = np.nonzero(umat_tmp)
 
     lorb = index_map[a]
     korb = index_map[b]

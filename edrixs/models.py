@@ -43,7 +43,7 @@ def _print_slater_summary(slater_name, slater_i, slater_n):
 def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
                v_noccu=1, slater=None, ext_B=None, on_which='spin',
                v_cfmat=None, v_othermat=None, loc_axis=None, verbose=False,
-               sparse_U=False, tol=1E-10):
+               sparse_U=False):
     """
     Set up orbital-space data and Fock-basis metadata for a 1v1c problem.
 
@@ -71,9 +71,6 @@ def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
         Coulomb tensor as a sparse matrix with shape (ntot*ntot, ntot*ntot),
         using the flattened convention
         row = lorb * ntot + korb and col = jorb * ntot + iorb.
-
-    tol : float, optional
-        Threshold used when converting dense Coulomb tensors to sparse format.
 
     Returns
     -------
@@ -143,8 +140,8 @@ def model_1v1c(shell_name, *, shell_level=None, v_soc=None, c_soc=0,
     umat_n = get_umat_slater(case, *slater_n)
 
     if sparse_U:
-        umat_i = _umat_dense_to_sparse(umat_i, tol=tol)
-        umat_n = _umat_dense_to_sparse(umat_n, tol=tol)
+        umat_i = _umat_dense_to_sparse(umat_i)
+        umat_n = _umat_dense_to_sparse(umat_n)
 
     # Spin-orbit coupling.
     if v_soc is not None:
@@ -252,7 +249,7 @@ def model_2v1c(
     v1_ext_B=None, v2_ext_B=None, v1_on_which='spin',
     v2_on_which='spin', v1_cfmat=None, v2_cfmat=None,
     v1_othermat=None, v2_othermat=None, hopping_v1v2=None,
-    trans_to_which=1, loc_axis=None, verbose=False, sparse_U=False, tol=1E-10
+    trans_to_which=1, loc_axis=None, verbose=False, sparse_U=False
 ):
     """
     Set up orbital-space data and Fock-basis metadata for a 2v1c problem.
@@ -322,9 +319,6 @@ def model_2v1c(
         matrices using the flattened convention
         ``row = lorb * norb + korb`` and ``col = jorb * norb + iorb``.
         Default is False.
-    tol : float, optional
-        Absolute-value threshold used when converting Coulomb tensors to
-        sparse form.  Default is ``1e-10``.
 
     Returns
     -------
@@ -441,8 +435,8 @@ def model_2v1c(
     )
 
     if sparse_U:
-        umat_i = _umat_dense_to_sparse(umat_i, tol=tol)
-        umat_n = _umat_dense_to_sparse(umat_n, tol=tol)
+        umat_i = _umat_dense_to_sparse(umat_i)
+        umat_n = _umat_dense_to_sparse(umat_n)
 
     emat_i = np.zeros((ntot, ntot), dtype=complex)
     emat_n = np.zeros((ntot, ntot), dtype=complex)
@@ -575,7 +569,7 @@ def model_siam(
     c_level=0, c_soc=0, trans_c2n=None, imp_mat=None, imp_mat_n=None,
     bath_level=None, bath_level_n=None, hyb=None, hyb_n=None,
     hopping=None, hopping_n=None, slater=None, ext_B=None,
-    on_which='spin', loc_axis=None, verbose=False, sparse_U=False, tol=1E-10
+    on_which='spin', loc_axis=None, verbose=False, sparse_U=False
 ):
     """
     Set up a single-impurity Anderson model (SIAM) for ED, XAS, and RIXS.
@@ -699,9 +693,6 @@ def model_siam(
         The flattened convention is ``row = lorb * norb + korb`` and
         ``col = jorb * norb + iorb``, where ``norb`` is ``ntot_v`` for the
         initial state and ``ntot`` for the intermediate state.
-    tol : float, optional
-        Keep Coulomb entries with absolute value greater than this threshold
-        when ``sparse_U=True``. Unused for dense tensors. Default is ``1e-10``.
 
     Returns
     -------
@@ -784,10 +775,10 @@ def model_siam(
 
     if sparse_U:
         umat_i = _embed_impurity_core_umat_sparse(
-            umat_tmp_i, v_norb, c_norb, ntot_v, tol=tol
+            umat_tmp_i, v_norb, c_norb, ntot_v
         )
         umat_n = _embed_impurity_core_umat_sparse(
-            umat_tmp_n, v_norb, c_norb, ntot_v, tol=tol
+            umat_tmp_n, v_norb, c_norb, ntot_v
         )
     else:
         umat_i = _embed_impurity_core_umat(
@@ -913,7 +904,7 @@ def model_siam(
 def model_siam_2d1p(
     *, slater, impurity_levels, bath_levels, hyb, Delta, nd,
     v_soc=None, c_soc=0, om_shift=0, ext_B=None, on_which='spin',
-    loc_axis=None, verbose=False, sparse_U=False, tol=1E-10
+    loc_axis=None, verbose=False, sparse_U=False
 ):
     """
     Set up the commonly used d-impurity, one-bath, p-core charge-transfer
@@ -955,7 +946,7 @@ def model_siam_2d1p(
         ``-om_shift - 5*E_p``, where E_p comes from the core-hole CT helper.
         Increasing om_shift raises transition energies by the same amount.
         Default zero; the filled-core reference convention is preserved.
-    ext_B, on_which, loc_axis, verbose, sparse_U, tol
+    ext_B, on_which, loc_axis, verbose, sparse_U
         Passed through to :func:`model_siam` with the same meaning and defaults.
         The magnetic field acts on the impurity only.
 
@@ -999,5 +990,5 @@ def model_siam_2d1p(
         bath_level=bath_offsets + E_L, bath_level_n=bath_offsets + E_Lc,
         hyb=np.repeat(hyb, 2)[None, :], slater=(slater_i, slater_n),
         ext_B=ext_B, on_which=on_which, loc_axis=loc_axis,
-        verbose=verbose, sparse_U=sparse_U, tol=tol,
+        verbose=verbose, sparse_U=sparse_U,
     )
