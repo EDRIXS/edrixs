@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hund’s Interactions in charge transfer insulators &mdash; edrixs 0.post1+geacad9a documentation</title>
+  <title>Hund’s Interactions in charge transfer insulators &mdash; EDRIXS 0.post1+g803cebb documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=6a3525d1"></script>
+      <script src="../_static/documentation_options.js?v=66d01fc2"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,7 +48,7 @@
           
           
           <a href="../index.html" class="icon icon-home">
-            edrixs
+            EDRIXS
               <img src="../_static/EDRIXS_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -60,7 +60,7 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../user/index.html">edrixs User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">EDRIXS User Guide</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Pedagogical examples</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="example_00_ed_calculator.html">Exact diagonalization</a></li>
 <li class="toctree-l2"><a class="reference internal" href="example_01_crystal_field.html">Crystal fields</a></li>
@@ -75,7 +75,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#diagonalization">Diagonalization</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#the-atomic-limit">The atomic limit</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#where-are-the-holes-for-large-hopping">Where are the holes for large hopping</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#connecton-between-atomic-and-charge-transfer-limits">Connecton between atomic and charge transfer limits</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#connection-between-atomic-and-charge-transfer-limits">Connection between atomic and charge transfer limits</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#charge-transfer-excitons">Charge transfer excitons</a></li>
 </ul>
 </li>
@@ -83,7 +83,7 @@
 <li class="toctree-l2"><a class="reference internal" href="example_10_geometry.html">Geometry</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">edrixs Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">EDRIXS Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../release-history.html">Release History</a></li>
 </ul>
 
@@ -93,7 +93,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">edrixs</a>
+          <a href="../index.html">EDRIXS</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -123,7 +123,7 @@ to download the full example code.</p>
 such as NiO or NiPS<sub>3</sub>. We are interested in better understanding the interplay between the
 Hund’s interactions and the charge transfer energy in terms of the energy of the triplet-singlet
 excitations of this model. These seem to act against each other in that the Hund’s interactions
-impose a energy cost for the triplet-singlet excitations whenever there are two holes on
+impose an energy cost for the triplet-singlet excitations whenever there are two holes on
 the Ni <span class="math notranslate nohighlight">\(d\)</span> orbitals. The charge transfer physics, on the other hand, will promote a
 <span class="math notranslate nohighlight">\(d^9\underline{L}\)</span> ground state in which the Hund’s interactions are not active.</p>
 <p>The simplest model that captures this physics requires four Ni spin-orbitals, representing the Ni
@@ -134,20 +134,19 @@ simplicity, we will treat all Ni and all ligand orbitals as equivalent, even tho
 realistic model would account for the different Coulomb and hopping of the <span class="math notranslate nohighlight">\(d_{3z^2-r^2}\)</span>
 and <span class="math notranslate nohighlight">\(d_{x^2-y^2}\)</span> orbitals. We therefore simply connect Ni and ligand orbitals via a constant
 hopping <span class="math notranslate nohighlight">\(t\)</span>. We also include the ligand energy parameter <span class="math notranslate nohighlight">\(e_L\)</span>.</p>
-<p>The easiest way to implement the requried Coulomb interactions is to use the so-called Kanamori
-Hamiltonian, which is a simplfied form for the interactions, which treats all orbitals as
+<p>The easiest way to implement the required Coulomb interactions is to use the so-called Kanamori
+Hamiltonian, which is a simplified form for the interactions that treats all orbitals as
 equivalent. Daniel Khomskii’s book provides a great explanation of this physics <a class="footnote-reference brackets" href="#id2" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>.  We
 parameterize the interactions via Coulomb repulsion parameter <span class="math notranslate nohighlight">\(U\)</span> and Hund’s exchange
-<span class="math notranslate nohighlight">\(J_H\)</span>. EDRIXS provides this functionality via the  more general
+<span class="math notranslate nohighlight">\(J_H\)</span>. EDRIXS provides this functionality via the more general
 <a class="reference internal" href="../reference/coulomb_utensor.html#edrixs.coulomb_utensor.get_umat_kanamori" title="edrixs.coulomb_utensor.get_umat_kanamori"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_umat_kanamori()</span></code></a> function.</p>
-<p>It’s also easiest to consider this problem in hole langauge, which means our eight spin-orbitals
+<p>It’s also easiest to consider this problem in hole language, which means our eight spin-orbitals
 are populated by two fermions.</p>
 <section id="setup">
 <h2>Setup<a class="headerlink" href="#setup" title="Link to this heading"></a></h2>
 <p>We start by loading the necessary modules, and defining the total number of
 orbitals and electrons.</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span><span class="w">
-</span><span class="kn">import</span><span class="w"> </span><span class="nn">scipy</span><span class="w">
 </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span><span class="w">
 </span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="nn">.</span><span class="nn">pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span><span class="w">
 </span><span class="w">
@@ -187,21 +186,23 @@ small effective spin interaction along <span class="math notranslate nohighlight
 </span>    <span class="c1"># add small effective field along z</span><span class="w">
 </span>    <span class="n">emat</span> <span class="o">+</span><span class="o">=</span> <span class="mf">1e-6</span><span class="o">*</span><span class="n">spin_mom</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w">
 </span><span class="w">
-</span>    <span class="c1"># Diagonalize</span><span class="w">
-</span>    <span class="n">basis</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_fock_bin_by_N</span><span class="p">(</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="int"><span class="n">norb</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="int"><span class="n">noccu</span></a><span class="p">)</span><span class="w">
-</span>    <span class="n">H</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">build_opers</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">emat</span><span class="p">,</span> <span class="n">basis</span><span class="p">)</span> <span class="o">+</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">build_opers</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">umat</span><span class="p">,</span> <span class="n">basis</span><span class="p">)</span><span class="w">
-</span>    <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">e</span></a><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <a class="sphx-glr-backref-module-scipy-linalg sphx-glr-backref-type-py-function reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.eigh.html#scipy.linalg.eigh" title="scipy.linalg.eigh"><span class="n">scipy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigh</span></a><span class="p">(</span><span class="n">H</span><span class="p">)</span><span class="w">
+</span>    <span class="c1"># Diagonalize. This problem is small, so we use the dense backend.</span><span class="w">
+</span>    <span class="n">basis</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_fock_basis_int</span><span class="p">(</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="int"><span class="n">norb</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="int"><span class="n">noccu</span></a><span class="p">)</span><span class="w">
+</span>    <span class="n">H</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">build_op</span><span class="p">(</span><span class="n">emat</span><span class="p">,</span> <span class="n">umat</span><span class="p">,</span> <span class="n">basis</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'</span><span class="s1">dense</span><span class="s1">'</span><span class="p">)</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">e</span></a><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">ed</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">num_evals</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">basis</span><span class="p">)</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'</span><span class="s1">dense</span><span class="s1">'</span><span class="p">)</span><span class="w">
 </span>    <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">e</span></a> <span class="o">-</span><span class="o">=</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">e</span></a><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Define ground state as zero energy</span><span class="w">
 </span><span class="w">
-</span>    <span class="c1"># Operator for holes on Ni</span><span class="w">
-</span>    <span class="n">basis</span> <span class="o">=</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="n">basis</span><span class="p">)</span><span class="w">
-</span>    <span class="n">num_d_electrons</span> <span class="o">=</span> <span class="n">basis</span><span class="p">[</span><span class="p">:</span><span class="p">,</span> <span class="p">:</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w">
+</span>    <span class="c1"># Operator for holes on Ni. The binary occupation vectors are in the same</span><span class="w">
+</span>    <span class="c1"># order as ``basis``.</span><span class="w">
+</span>    <span class="n">fock_vectors</span> <span class="o">=</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="n">edrixs</span><span class="o">.</span><span class="n">get_fock_bin_by_N</span><span class="p">(</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="int"><span class="n">norb</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="int"><span class="n">noccu</span></a><span class="p">)</span><span class="p">)</span><span class="w">
+</span>    <span class="n">num_d_electrons</span> <span class="o">=</span> <span class="n">fock_vectors</span><span class="p">[</span><span class="p">:</span><span class="p">,</span> <span class="p">:</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w">
 </span>    <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">d0</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.sum.html#numpy.sum" title="numpy.sum"><span class="n">np</span><span class="o">.</span><span class="n">sum</span></a><span class="p">(</span><a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ufunc.html#numpy.ufunc" title="numpy.ufunc"><span class="n">np</span><span class="o">.</span><span class="n">abs</span></a><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">num_d_electrons</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="p">:</span><span class="p">]</span><span class="p">)</span><span class="o">*</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="w">
 </span>    <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">d1</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.sum.html#numpy.sum" title="numpy.sum"><span class="n">np</span><span class="o">.</span><span class="n">sum</span></a><span class="p">(</span><a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ufunc.html#numpy.ufunc" title="numpy.ufunc"><span class="n">np</span><span class="o">.</span><span class="n">abs</span></a><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">num_d_electrons</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="p">:</span><span class="p">]</span><span class="p">)</span><span class="o">*</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="w">
 </span>    <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">d2</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.sum.html#numpy.sum" title="numpy.sum"><span class="n">np</span><span class="o">.</span><span class="n">sum</span></a><span class="p">(</span><a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ufunc.html#numpy.ufunc" title="numpy.ufunc"><span class="n">np</span><span class="o">.</span><span class="n">abs</span></a><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="n">num_d_electrons</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="p">]</span><span class="p">)</span><span class="o">*</span><span class="o">*</span><span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="w">
 </span><span class="w">
 </span>    <span class="c1"># S^2 and Sz operators</span><span class="w">
-</span>    <span class="n">opS</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">build_opers</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">spin_mom</span><span class="p">,</span> <span class="n">basis</span><span class="p">)</span><span class="w">
+</span>    <span class="n">opS</span> <span class="o">=</span> <span class="p">[</span><span class="n">edrixs</span><span class="o">.</span><span class="n">build_op</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">basis</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'</span><span class="s1">dense</span><span class="s1">'</span><span class="p">)</span><span class="w">
+</span>           <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">spin_mom</span><span class="p">]</span><span class="w">
 </span>    <span class="n">S_squared_op</span> <span class="o">=</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dot.html#numpy.dot" title="numpy.dot"><span class="n">np</span><span class="o">.</span><span class="n">dot</span></a><span class="p">(</span><span class="n">opS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="p">,</span> <span class="n">opS</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="p">)</span> <span class="o">+</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dot.html#numpy.dot" title="numpy.dot"><span class="n">np</span><span class="o">.</span><span class="n">dot</span></a><span class="p">(</span><span class="n">opS</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="p">,</span> <span class="n">opS</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="p">)</span> <span class="o">+</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.dot.html#numpy.dot" title="numpy.dot"><span class="n">np</span><span class="o">.</span><span class="n">dot</span></a><span class="p">(</span><span class="n">opS</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="p">,</span> <span class="n">opS</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="p">)</span><span class="w">
 </span>    <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">S_squared_exp</span></a> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">cb_op</span><span class="p">(</span><span class="n">S_squared_op</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">diagonal</span><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">real</span><span class="w">
 </span>    <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">S_z_exp</span></a> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">cb_op</span><span class="p">(</span><span class="n">opS</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">diagonal</span><span class="p">(</span><span class="p">)</span><span class="o">.</span><span class="n">real</span><span class="w">
@@ -282,12 +283,11 @@ reduced while observing the location of the ground state and exciton holes.</p>
 <img src="../_images/sphx_glr_example_08_Hunds_interactions_001.png" srcset="../_images/sphx_glr_example_08_Hunds_interactions_001.png" alt="Location of ground state holes, Location of exciton holes" class = "sphx-glr-single-img"/><p>For large <span class="math notranslate nohighlight">\(e_L\)</span>, we see that both holes are on nickel as expected. In
 the opposite limit of <span class="math notranslate nohighlight">\(|e_L| \ll t\)</span> and <span class="math notranslate nohighlight">\(U \ll t\)</span> the holes are
 shared in the ratio 0.25:0.5:0.25 as there are two ways to have one hole on
-Ni. In the limit of large <span class="math notranslate nohighlight">\(e_L\)</span>, all holes move onto Ni. Since
-<span class="math notranslate nohighlight">\(t\)</span> is large, this applies equally to both the ground state and the
-exciton.</p>
+Ni. Since <span class="math notranslate nohighlight">\(t\)</span> is large, the location of the holes is essentially the
+same for the ground state and the exciton.</p>
 </section>
-<section id="connecton-between-atomic-and-charge-transfer-limits">
-<h2>Connecton between atomic and charge transfer limits<a class="headerlink" href="#connecton-between-atomic-and-charge-transfer-limits" title="Link to this heading"></a></h2>
+<section id="connection-between-atomic-and-charge-transfer-limits">
+<h2>Connection between atomic and charge transfer limits<a class="headerlink" href="#connection-between-atomic-and-charge-transfer-limits" title="Link to this heading"></a></h2>
 <p>We now examine the quantum numbers during cross over between the two limits
 with <span class="math notranslate nohighlight">\(e_L\)</span>. Let’s first look at the how <span class="math notranslate nohighlight">\(&lt;S^2&gt;\)</span> changes for the
 ground state and exciton and then examine how the exciton energy changes.</p>
@@ -329,17 +329,17 @@ ground state and exciton and then examine how the exciton energy changes.</p>
 </span><a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><span class="p">)</span><span class="w">
 </span></pre></div></div>
 <img src="../_images/sphx_glr_example_08_Hunds_interactions_002.png" srcset="../_images/sphx_glr_example_08_Hunds_interactions_002.png" alt="Quantum numbers, Exciton energy vs. $d^2$ character" class = "sphx-glr-single-img"/><p>In the left panel, we see that the two limits are adiabatically connected
-as they preseve the same quantum numbers. This is because there is always
+as they preserve the same quantum numbers. This is because there is always
 an appreciable double occupancy under conditions where the
 <span class="math notranslate nohighlight">\(d^9\underline{L}\)</span> character is maximized and this continues to favor
-the high spin ground state. Other interactions such as strong tetragonal
+the high spin ground state. Other interactions such as a strong tetragonal
 crystal field would be needed to overcome the Hund’s interactions and break
 this paradigm. In the right panel, we see that the exciton energy simply
 scales with the double occupancy. Overall, even though
 Hund’s interactions are irrelevant for the <span class="math notranslate nohighlight">\(d^9\underline{L}\)</span>
-electronic configuration, whenever <span class="math notranslate nohighlight">\(t\)</span> is appreciable there is a
-strong mixing with the <span class="math notranslate nohighlight">\(d^8\)</span> component is always present, which
-dominates the energy of the exciton.</p>
+electronic configuration, whenever <span class="math notranslate nohighlight">\(t\)</span> is appreciable a strong mixing
+with the <span class="math notranslate nohighlight">\(d^8\)</span> component is always present, and this dominates the
+energy of the exciton.</p>
 </section>
 <section id="charge-transfer-excitons">
 <h2>Charge transfer excitons<a class="headerlink" href="#charge-transfer-excitons" title="Link to this heading"></a></h2>
@@ -376,7 +376,7 @@ atomic models. Let’s look at the <span class="math notranslate nohighlight">\(
 </span><a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.tight_layout.html#matplotlib.pyplot.tight_layout" title="matplotlib.pyplot.tight_layout"><span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span></a><span class="p">(</span><span class="p">)</span><span class="w">
 </span><a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><span class="p">)</span><span class="w">
 </span></pre></div></div>
-<img src="../_images/sphx_glr_example_08_Hunds_interactions_003.png" srcset="../_images/sphx_glr_example_08_Hunds_interactions_003.png" alt="Location of ground state holes, Location of exciton holes" class = "sphx-glr-single-img"/><p>Around <span class="math notranslate nohighlight">\(e_L = 7\)</span> the plot shows that the excition is primairly a
+<img src="../_images/sphx_glr_example_08_Hunds_interactions_003.png" srcset="../_images/sphx_glr_example_08_Hunds_interactions_003.png" alt="Location of ground state holes, Location of exciton holes" class = "sphx-glr-single-img"/><p>Around <span class="math notranslate nohighlight">\(e_L = 7\)</span> the plot shows that the exciton is primarily a
 <span class="math notranslate nohighlight">\(d^2 \rightarrow d^1\)</span> transition or a
 <span class="math notranslate nohighlight">\(d^8 \rightarrow d^{9}\underline{L}\)</span> transition in electron language.
 Let’s examine the energy and quantum numbers.</p>
@@ -414,7 +414,7 @@ in the ground state and exciton.</p>
 </ol>
 </aside>
 </aside>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.731 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.884 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-example-08-hunds-interactions-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/20b682f1d6466d1eb32b94d949353f80/example_08_Hunds_interactions.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">example_08_Hunds_interactions.ipynb</span></code></a></p>

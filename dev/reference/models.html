@@ -1,0 +1,573 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>models &mdash; EDRIXS 0.post1+g803cebb documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=c83e6b79" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/version-switcher.css?v=23edc989" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=66d01fc2"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
+      <script src="../_static/version-switcher.js?v=7c26ac8e"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="photon_transition" href="photon_transition.html" />
+    <link rel="prev" title="manybody_operator" href="manybody_operator.html" />
+   
+  <meta name="edrixs-doc-version" content="dev">
+  <meta name="edrixs-doc-site-root" content="/edrixs/">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            EDRIXS
+              <img src="../_static/EDRIXS_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">EDRIXS User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Pedagogical examples</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">EDRIXS Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="angular_momentum.html">angular_momentum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="basis_transform.html">basis_transform</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coulomb_utensor.html">coulomb_utensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fit_hyb.html">fit_hyb</a></li>
+<li class="toctree-l2"><a class="reference internal" href="fock_basis.html">fock_basis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="iostream.html">iostream</a></li>
+<li class="toctree-l2"><a class="reference internal" href="manybody_operator.html">manybody_operator</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">models</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.models.model_1v1c"><code class="docutils literal notranslate"><span class="pre">model_1v1c()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.models.model_2v1c"><code class="docutils literal notranslate"><span class="pre">model_2v1c()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.models.model_siam"><code class="docutils literal notranslate"><span class="pre">model_siam()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.models.model_siam_2d1p"><code class="docutils literal notranslate"><span class="pre">model_siam_2d1p()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="photon_transition.html">photon_transition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="poles.html">poles</a></li>
+<li class="toctree-l2"><a class="reference internal" href="plot_spectrum.html">plot_spectrum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="rixs_utils.html">rixs_utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="soc.html">soc</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers.html">solvers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="wannier_ham.html">wannier_ham</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">EDRIXS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">EDRIXS Reference</a></li>
+      <li class="breadcrumb-item active">models</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/reference/models.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="models">
+<h1>models<a class="headerlink" href="#models" title="Link to this heading"></a></h1>
+<p>Model constructors return eight values: seven orbital-space problem inputs
+and a scalar <code class="docutils literal notranslate"><span class="pre">shift</span></code> equal to the filled core’s shell-level energy. Coulomb
+contributions are excluded from this shift, and the integrals remain unshifted.
+Use it explicitly for dense or SciPy diagonalization:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span><span class="n">problem</span><span class="p">,</span> <span class="n">shift</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">model_1v1c</span><span class="p">((</span><span class="s1">'p'</span><span class="p">,</span> <span class="s1">'s'</span><span class="p">),</span> <span class="n">shell_level</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">))</span>
+<span class="n">hmat_i</span><span class="p">,</span> <span class="n">hmat_n</span><span class="p">,</span> <span class="n">trans_ops</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_ops</span><span class="p">(</span><span class="o">*</span><span class="n">problem</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'scipy'</span><span class="p">)</span>
+<span class="n">eval_i</span><span class="p">,</span> <span class="n">evec_i</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">ed</span><span class="p">(</span><span class="n">hmat_i</span><span class="p">,</span> <span class="n">shift</span><span class="o">=</span><span class="n">shift</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The returned eigenvalues retain their absolute energy reference. Fortran
+callers pass only <code class="docutils literal notranslate"><span class="pre">problem</span></code> to <code class="docutils literal notranslate"><span class="pre">get_ops</span></code> and omit <code class="docutils literal notranslate"><span class="pre">shift</span></code> from <code class="docutils literal notranslate"><span class="pre">ed</span></code>.</p>
+<p id="module-edrixs.models">Backend-independent physical model construction for EDRIXS.</p>
+<p>The model functions in this module describe orbital-space Hamiltonians,
+interactions, Fock-basis specifications, and photon-transition matrices without
+constructing backend-owned many-body operators.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.models.model_1v1c">
+<span class="sig-prename descclassname"><span class="pre">edrixs.models.</span></span><span class="sig-name descname"><span class="pre">model_1v1c</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shell_name</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">shell_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_soc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_soc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_noccu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slater</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext_B</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_which</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'spin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_cfmat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_othermat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse_U</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/models.html#model_1v1c"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.models.model_1v1c" title="Link to this definition"></a></dt>
+<dd><p>Set up orbital-space data and Fock-basis metadata for a 1v1c problem.</p>
+<p>This routine defines the physical one-valence-shell/one-core-shell problem
+independently of the numerical backend. It constructs the one-body orbital
+matrices, Coulomb tensors, Fock-basis specifications, and orbital-space
+transition matrices, but it does not build many-body Hamiltonians and does not
+diagonalize anything.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>shell_name</strong><span class="classifier">tuple of str</span></dt><dd><p>Names of the valence and core shells.</p>
+</dd>
+<dt><strong>shell_level, v_soc, c_soc, v_noccu, slater, ext_B, on_which,</strong></dt><dd></dd>
+<dt><strong>v_cfmat, v_othermat, loc_axis</strong></dt><dd><p>Same physical model parameters as ed_1v1c_py.</p>
+</dd>
+<dt><strong>verbose</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, print a setup summary (Slater integrals and Hilbert-space
+dimensions). Default False.</p>
+</dd>
+<dt><strong>sparse_U</strong><span class="classifier">bool, optional</span></dt><dd><p>If False, return dense rank-4 Coulomb tensors. If True, return each
+Coulomb tensor as a sparse matrix with shape (ntot*ntot, ntot*ntot),
+using the flattened convention
+row = lorb * ntot + korb and col = jorb * ntot + iorb.</p>
+</dd>
+<dt><strong>tol</strong><span class="classifier">float, optional</span></dt><dd><p>Threshold used when converting dense Coulomb tensors to sparse format.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat, shift</dt><dd><p>Backend-independent problem definition. <code class="docutils literal notranslate"><span class="pre">basis_i</span></code> and <code class="docutils literal notranslate"><span class="pre">basis_n</span></code> are
+compact Fock-basis specifications with a filled initial core and one
+intermediate core hole. Occupancy arguments count valence electrons
+only. Both one-body matrices have shape (ntot, ntot), both dense
+Coulomb tensors have shape (ntot,) * 4, and trans_mat has shape
+(npol, ntot, ntot). Initial core interactions are included.
+<code class="docutils literal notranslate"><span class="pre">shift</span></code> is the filled core shell-level energy,
+<code class="docutils literal notranslate"><span class="pre">c_norb</span> <span class="pre">*</span> <span class="pre">shell_level[1]</span></code> (zero if unspecified), excluding Coulomb
+contributions.
+Pass the first seven outputs to <a class="reference internal" href="solvers.html#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops()</span></code></a> and
+<code class="docutils literal notranslate"><span class="pre">shift</span></code> to dense or SciPy <a class="reference internal" href="solvers.html#edrixs.solvers.ed" title="edrixs.solvers.ed"><code class="xref py py-func docutils literal notranslate"><span class="pre">ed()</span></code></a>.
+The returned integrals retain the full, unshifted energies.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.models.model_2v1c">
+<span class="sig-prename descclassname"><span class="pre">edrixs.models.</span></span><span class="sig-name descname"><span class="pre">model_2v1c</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shell_name</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">shell_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v1_soc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v2_soc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_soc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_tot_noccu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slater</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v1_ext_B</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v2_ext_B</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v1_on_which</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'spin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v2_on_which</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'spin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v1_cfmat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v2_cfmat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v1_othermat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v2_othermat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hopping_v1v2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trans_to_which</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse_U</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/models.html#model_2v1c"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.models.model_2v1c" title="Link to this definition"></a></dt>
+<dd><p>Set up orbital-space data and Fock-basis metadata for a 2v1c problem.</p>
+<p>This is the backend-neutral setup analogue of the 2-valence-shell,
+1-core-shell Fortran ED/RIXS input construction.  It does not build
+many-body Hamiltonians and does not diagonalize anything. If sparse_U=True,
+the returned Coulomb tensors are sparse flattened matrices rather than
+dense rank-4 arrays.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>shell_name</strong><span class="classifier">tuple of str</span></dt><dd><p>Names of the first valence shell, second valence shell, and core shell,
+in that order.  Each valence shell must be one of <code class="docutils literal notranslate"><span class="pre">'s'</span></code>, <code class="docutils literal notranslate"><span class="pre">'p'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'t2g'</span></code>, <code class="docutils literal notranslate"><span class="pre">'d'</span></code>, or <code class="docutils literal notranslate"><span class="pre">'f'</span></code>.  The core shell may additionally be a
+spin-orbit-split shell such as <code class="docutils literal notranslate"><span class="pre">'p12'</span></code>, <code class="docutils literal notranslate"><span class="pre">'p32'</span></code>, <code class="docutils literal notranslate"><span class="pre">'d32'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'d52'</span></code>, <code class="docutils literal notranslate"><span class="pre">'f52'</span></code>, or <code class="docutils literal notranslate"><span class="pre">'f72'</span></code>.</p>
+</dd>
+<dt><strong>shell_level</strong><span class="classifier">sequence of three float or None, optional</span></dt><dd><p>One-body energy levels of the first valence, second valence, and core
+shells.  All levels default to zero.</p>
+</dd>
+<dt><strong>v1_soc, v2_soc</strong><span class="classifier">sequence of two float or None, optional</span></dt><dd><p>Spin-orbit coupling strengths for the corresponding valence shell in
+the initial and intermediate Hamiltonians, respectively.  Spin-orbit
+coupling is omitted when the value is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+<dt><strong>c_soc</strong><span class="classifier">float, optional</span></dt><dd><p>Core-shell spin-orbit coupling strength.  This is applied to unsplit
+<code class="docutils literal notranslate"><span class="pre">'p'</span></code>, <code class="docutils literal notranslate"><span class="pre">'d'</span></code>, and <code class="docutils literal notranslate"><span class="pre">'f'</span></code> core shells.  Default is zero.</p>
+</dd>
+<dt><strong>v_tot_noccu</strong><span class="classifier">int, optional</span></dt><dd><p>Total number of electrons occupying the two valence shells in the
+initial state.  Default is one.</p>
+</dd>
+<dt><strong>slater</strong><span class="classifier">tuple of two sequences of float or None, optional</span></dt><dd><p>Slater integrals for the initial and intermediate Hamiltonians.  Each
+sequence follows the order returned by
+<code class="docutils literal notranslate"><span class="pre">slater_integrals_name(shell_name,</span> <span class="pre">('v1',</span> <span class="pre">'v2',</span> <span class="pre">'c1'))</span></code>.  Missing
+trailing values and all values when <code class="docutils literal notranslate"><span class="pre">slater</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code> are treated
+as zero.</p>
+</dd>
+<dt><strong>v1_ext_B, v2_ext_B</strong><span class="classifier">array-like of float, shape (3,), or None, optional</span></dt><dd><p>Zeeman/exchange-field coefficients in the global Cartesian frame for
+the corresponding valence shell.  No field is applied when the value
+is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+<dt><strong>v1_on_which, v2_on_which</strong><span class="classifier">{‘spin’, ‘orbital’, ‘both’}, optional</span></dt><dd><p>Sector on which the corresponding external field acts.  Default is
+<code class="docutils literal notranslate"><span class="pre">'spin'</span></code>.</p>
+</dd>
+<dt><strong>v1_cfmat, v2_cfmat</strong><span class="classifier">array-like of complex or None, optional</span></dt><dd><p>Crystal-field matrix for the corresponding valence shell.  Its shape
+must match that shell’s number of spin-orbitals.  Defaults to zero.</p>
+</dd>
+<dt><strong>v1_othermat, v2_othermat</strong><span class="classifier">array-like of complex or None, optional</span></dt><dd><p>Additional one-body matrix for the corresponding valence shell.  Its
+shape must match that shell’s number of spin-orbitals.  Defaults to
+zero.</p>
+</dd>
+<dt><strong>hopping_v1v2</strong><span class="classifier">array-like of complex or None, optional</span></dt><dd><p>Hopping matrix from the second valence shell to the first, with shape
+<code class="docutils literal notranslate"><span class="pre">(v1_norb,</span> <span class="pre">v2_norb)</span></code>.  Its Hermitian conjugate is inserted
+automatically.  Defaults to zero.</p>
+</dd>
+<dt><strong>trans_to_which</strong><span class="classifier">{1, 2}, optional</span></dt><dd><p>Valence shell reached by the core-to-valence transition.  Default is
+the first valence shell.</p>
+</dd>
+<dt><strong>loc_axis</strong><span class="classifier">array-like of float, shape (3, 3), or None, optional</span></dt><dd><p>Rotation from local crystal-field coordinates to the global frame for
+the transition operators.  The identity rotation is used by default.</p>
+</dd>
+<dt><strong>verbose</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, print a setup summary (Slater integrals and Hilbert-space
+dimensions).  Default is False.</p>
+</dd>
+<dt><strong>sparse_U</strong><span class="classifier">bool, optional</span></dt><dd><p>If False, return dense rank-4 Coulomb tensors.  If True, return CSR
+matrices using the flattened convention
+<code class="docutils literal notranslate"><span class="pre">row</span> <span class="pre">=</span> <span class="pre">lorb</span> <span class="pre">*</span> <span class="pre">norb</span> <span class="pre">+</span> <span class="pre">korb</span></code> and <code class="docutils literal notranslate"><span class="pre">col</span> <span class="pre">=</span> <span class="pre">jorb</span> <span class="pre">*</span> <span class="pre">norb</span> <span class="pre">+</span> <span class="pre">iorb</span></code>.
+Default is False.</p>
+</dd>
+<dt><strong>tol</strong><span class="classifier">float, optional</span></dt><dd><p>Absolute-value threshold used when converting Coulomb tensors to
+sparse form.  Default is <code class="docutils literal notranslate"><span class="pre">1e-10</span></code>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>emat_i</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Initial-state one-body matrix over both valence shells and the core,
+with shape <code class="docutils literal notranslate"><span class="pre">(ntot,</span> <span class="pre">ntot)</span></code>.</p>
+</dd>
+<dt><strong>umat_i</strong><span class="classifier">numpy.ndarray or scipy.sparse.csr_matrix</span></dt><dd><p>Initial-state Coulomb interaction including core interactions. The dense
+representation has shape <code class="docutils literal notranslate"><span class="pre">(ntot,)</span> <span class="pre">*</span> <span class="pre">4</span></code>; the sparse
+representation has shape <code class="docutils literal notranslate"><span class="pre">(ntot**2,</span> <span class="pre">ntot**2)</span></code>.</p>
+</dd>
+<dt><strong>basis_i</strong><span class="classifier">FockBasisSpec</span></dt><dd><p>Initial-state Fock-basis specification with <code class="docutils literal notranslate"><span class="pre">v_tot_noccu</span></code> valence
+electrons and a fully occupied core shell.</p>
+</dd>
+<dt><strong>emat_n</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Intermediate-state one-body matrix over both valence shells and the
+core shell, with shape <code class="docutils literal notranslate"><span class="pre">(ntot,</span> <span class="pre">ntot)</span></code>.</p>
+</dd>
+<dt><strong>umat_n</strong><span class="classifier">numpy.ndarray or scipy.sparse.csr_matrix</span></dt><dd><p>Intermediate-state Coulomb interaction.  The dense representation has
+shape <code class="docutils literal notranslate"><span class="pre">(ntot,)</span> <span class="pre">*</span> <span class="pre">4</span></code>; the sparse representation has shape
+<code class="docutils literal notranslate"><span class="pre">(ntot**2,</span> <span class="pre">ntot**2)</span></code>.</p>
+</dd>
+<dt><strong>basis_n</strong><span class="classifier">FockBasisSpec</span></dt><dd><p>Intermediate-state Fock-basis specification with one additional
+valence electron and one core hole.</p>
+</dd>
+<dt><strong>trans_mat</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>Core-to-valence transition matrices in the global frame, with shape
+<code class="docutils literal notranslate"><span class="pre">(npol,</span> <span class="pre">ntot,</span> <span class="pre">ntot)</span></code>.</p>
+</dd>
+<dt><strong>shift</strong><span class="classifier">float</span></dt><dd><p>Filled core shell-level energy, <code class="docutils literal notranslate"><span class="pre">c_norb</span> <span class="pre">*</span> <span class="pre">shell_level[2]</span></code> (zero if
+unspecified), excluding Coulomb contributions. Pass the first seven
+outputs to <a class="reference internal" href="solvers.html#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops()</span></code></a> and <code class="docutils literal notranslate"><span class="pre">shift</span></code> to dense or
+SciPy <a class="reference internal" href="solvers.html#edrixs.solvers.ed" title="edrixs.solvers.ed"><code class="xref py py-func docutils literal notranslate"><span class="pre">ed()</span></code></a>. Integrals remain unshifted.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#edrixs.models.model_1v1c" title="edrixs.models.model_1v1c"><code class="xref py py-obj docutils literal notranslate"><span class="pre">edrixs.models.model_1v1c</span></code></a></dt><dd><p>Construct a model with one valence shell and one core shell.</p>
+</dd>
+<dt><a class="reference internal" href="#edrixs.models.model_siam" title="edrixs.models.model_siam"><code class="xref py py-obj docutils literal notranslate"><span class="pre">edrixs.models.model_siam</span></code></a></dt><dd><p>Construct a single-impurity Anderson model.</p>
+</dd>
+<dt><a class="reference internal" href="solvers.html#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-obj docutils literal notranslate"><span class="pre">edrixs.solvers.get_ops</span></code></a></dt><dd><p>Convert a model definition into backend-owned many-body operators.</p>
+</dd>
+</dl>
+</div>
+<p class="rubric">Examples</p>
+<p>Construct a model for two valence shells and build its SciPy operators:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="o">*</span><span class="n">problem</span><span class="p">,</span> <span class="n">shift</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">model_2v1c</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">(</span><span class="s1">'d'</span><span class="p">,</span> <span class="s1">'p'</span><span class="p">,</span> <span class="s1">'s'</span><span class="p">),</span> <span class="n">v_tot_noccu</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">trans_to_which</span><span class="o">=</span><span class="mi">2</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">hmat_i</span><span class="p">,</span> <span class="n">hmat_n</span><span class="p">,</span> <span class="n">trans_ops</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_ops</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="o">*</span><span class="n">problem</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'scipy'</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.models.model_siam">
+<span class="sig-prename descclassname"><span class="pre">edrixs.models.</span></span><span class="sig-name descname"><span class="pre">model_siam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shell_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbath</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">siam_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_noccu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">static_core_pot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_soc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trans_c2n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imp_mat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">imp_mat_n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bath_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bath_level_n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hyb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hyb_n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hopping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hopping_n</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slater</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext_B</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_which</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'spin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse_U</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/models.html#model_siam"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.models.model_siam" title="Link to this definition"></a></dt>
+<dd><p>Set up a single-impurity Anderson model (SIAM) for ED, XAS, and RIXS.</p>
+<p>Construct backend-independent one-body matrices, Coulomb interactions,
+Fock-basis specifications, and core-to-impurity transition matrices. This
+is the setup analogue of <a class="reference internal" href="solvers.html#edrixs.solvers.ed_siam_fort" title="edrixs.solvers.ed_siam_fort"><code class="xref py py-func docutils literal notranslate"><span class="pre">ed_siam_fort()</span></code></a> at fixed
+<code class="docutils literal notranslate"><span class="pre">v_noccu</span></code>; it does not search over occupancies, build many-body
+Hamiltonians, or diagonalize them. Pass the returned tuple to
+<a class="reference internal" href="solvers.html#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops()</span></code></a> to construct the many-body operators.</p>
+<p>All energies, Slater integrals, hybridizations, spin-orbit coupling
+constants, and magnetic-field components are in eV. Let <code class="docutils literal notranslate"><span class="pre">v_norb</span></code> and
+<code class="docutils literal notranslate"><span class="pre">c_norb</span></code> be the numbers of impurity and core spin-orbitals, respectively,
+<code class="docutils literal notranslate"><span class="pre">ntot_v</span> <span class="pre">=</span> <span class="pre">(nbath</span> <span class="pre">+</span> <span class="pre">1)</span> <span class="pre">*</span> <span class="pre">v_norb</span></code>, and <code class="docutils literal notranslate"><span class="pre">ntot</span> <span class="pre">=</span> <span class="pre">ntot_v</span> <span class="pre">+</span> <span class="pre">c_norb</span></code>.
+Orbitals are ordered as impurity, successive bath sites, then core.
+Each bath site has <code class="docutils literal notranslate"><span class="pre">v_norb</span></code> spin-orbitals and no Coulomb interaction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>shell_name</strong><span class="classifier">tuple of two str</span></dt><dd><p>Impurity valence and core shell names, in that order. The valence
+shell can be ‘s’, ‘p’, ‘t2g’, ‘d’, or ‘f’. The core shell can be
+‘s’, ‘p’, ‘p12’, ‘p32’, ‘t2g’, ‘d’, ‘d32’, ‘d52’, ‘f’, ‘f52’, or
+‘f72’. For example, <code class="docutils literal notranslate"><span class="pre">('d',</span> <span class="pre">'p32')</span></code> describes an L3-edge transition
+from a p3/2 core shell to a d impurity.</p>
+</dd>
+<dt><strong>nbath</strong><span class="classifier">int</span></dt><dd><p>Number of bath sites.</p>
+</dd>
+<dt><strong>siam_type</strong><span class="classifier">{0, 1}, optional</span></dt><dd><p>Parameterization of the impurity and bath one-body terms. For 0
+(default), use <code class="docutils literal notranslate"><span class="pre">imp_mat</span></code>, <code class="docutils literal notranslate"><span class="pre">bath_level</span></code>, and <code class="docutils literal notranslate"><span class="pre">hyb</span></code> to describe
+diagonal hybridization. For 1, use the full <code class="docutils literal notranslate"><span class="pre">hopping</span></code> matrix,
+allowing off-diagonal hybridization. The corresponding <code class="docutils literal notranslate"><span class="pre">*_n</span></code>
+parameters specify intermediate-state terms. Parameters belonging
+to the other parameterization are ignored.</p>
+</dd>
+<dt><strong>v_noccu</strong><span class="classifier">int, optional</span></dt><dd><p>Total number of electrons in the impurity and bath orbitals in the
+initial state, excluding the filled core. Default is 1. Must satisfy
+<code class="docutils literal notranslate"><span class="pre">0</span> <span class="pre">&lt;=</span> <span class="pre">v_noccu</span> <span class="pre">&lt;</span> <span class="pre">ntot_v</span></code> so that the intermediate state can
+accommodate one additional electron.</p>
+</dd>
+<dt><strong>static_core_pot</strong><span class="classifier">float, optional</span></dt><dd><p>Static core-hole potential, subtracted from every impurity diagonal
+element in the intermediate state. Positive values are attractive.
+This is added independently of the core-valence Slater interactions.
+Default is 0.</p>
+</dd>
+<dt><strong>c_level</strong><span class="classifier">float, optional</span></dt><dd><p>Core-shell energy level, added to each core diagonal element in both
+states. Default is 0.</p>
+</dd>
+<dt><strong>c_soc</strong><span class="classifier">float, optional</span></dt><dd><p>Core spin-orbit coupling strength, applied for unsplit ‘p’, ‘d’, and
+‘f’ core shells only. For split shells such as ‘p32’, the shell
+choice already selects the total-angular-momentum subspace.
+Default is 0.</p>
+</dd>
+<dt><strong>trans_c2n</strong><span class="classifier">array_like of complex, shape (v_norb, v_norb), optional</span></dt><dd><p>Unitary transformation from complex spherical harmonics to the
+basis used for the impurity and bath one-body input parameters.
+Its columns are the input basis vectors expressed in spherical
+harmonics. The same transformation is used on the impurity and
+every bath site to convert the one-body matrices back to spherical
+harmonics. Default is the identity.</p>
+</dd>
+<dt><strong>imp_mat</strong><span class="classifier">array_like of complex, shape (v_norb, v_norb), optional</span></dt><dd><p>Initial-state impurity one-body matrix for <code class="docutils literal notranslate"><span class="pre">siam_type=0</span></code>, including
+the impurity energy level, crystal field, and valence spin-orbit
+coupling as needed. Default is zero.</p>
+</dd>
+<dt><strong>imp_mat_n</strong><span class="classifier">array_like of complex, shape (v_norb, v_norb), optional</span></dt><dd><p>Intermediate-state impurity matrix for <code class="docutils literal notranslate"><span class="pre">siam_type=0</span></code>. If None,
+use <code class="docutils literal notranslate"><span class="pre">imp_mat</span></code>.</p>
+</dd>
+<dt><strong>bath_level</strong><span class="classifier">numpy.ndarray, shape (nbath, v_norb), optional</span></dt><dd><p>Initial-state bath energy levels for <code class="docutils literal notranslate"><span class="pre">siam_type=0</span></code>. The first
+index selects the bath site and the second its spin-orbital.
+Default is zero.</p>
+</dd>
+<dt><strong>bath_level_n</strong><span class="classifier">numpy.ndarray, shape (nbath, v_norb), optional</span></dt><dd><p>Intermediate-state bath levels for <code class="docutils literal notranslate"><span class="pre">siam_type=0</span></code>. If None, use
+<code class="docutils literal notranslate"><span class="pre">bath_level</span></code>.</p>
+</dd>
+<dt><strong>hyb</strong><span class="classifier">numpy.ndarray, shape (nbath, v_norb), optional</span></dt><dd><p>Initial-state hybridization amplitudes for <code class="docutils literal notranslate"><span class="pre">siam_type=0</span></code>.
+<code class="docutils literal notranslate"><span class="pre">hyb[i,</span> <span class="pre">j]</span></code> is the matrix element from spin-orbital <code class="docutils literal notranslate"><span class="pre">j</span></code> of bath
+site <code class="docutils literal notranslate"><span class="pre">i</span></code> to impurity spin-orbital <code class="docutils literal notranslate"><span class="pre">j</span></code>; its complex conjugate is
+inserted for the reverse hopping. Default is zero.</p>
+</dd>
+<dt><strong>hyb_n</strong><span class="classifier">numpy.ndarray, shape (nbath, v_norb), optional</span></dt><dd><p>Intermediate-state hybridization amplitudes for <code class="docutils literal notranslate"><span class="pre">siam_type=0</span></code>.
+If None, use <code class="docutils literal notranslate"><span class="pre">hyb</span></code>.</p>
+</dd>
+<dt><strong>hopping</strong><span class="classifier">array_like of complex, shape (ntot_v, ntot_v), optional</span></dt><dd><p>Full initial-state one-body matrix for <code class="docutils literal notranslate"><span class="pre">siam_type=1</span></code>, including
+impurity terms, bath levels, and hybridization. Supply a Hermitian
+matrix in impurity-then-bath order. Default is zero.</p>
+</dd>
+<dt><strong>hopping_n</strong><span class="classifier">array_like of complex, shape (ntot_v, ntot_v), optional</span></dt><dd><p>Full intermediate-state impurity and bath matrix for <code class="docutils literal notranslate"><span class="pre">siam_type=1</span></code>.
+If None, use <code class="docutils literal notranslate"><span class="pre">hopping</span></code>.</p>
+</dd>
+<dt><strong>slater</strong><span class="classifier">tuple of two lists, optional</span></dt><dd><p>Slater integrals for the initial and intermediate states, respectively.
+Each list is ordered as <code class="docutils literal notranslate"><span class="pre">[FX_vv,</span> <span class="pre">FX_vc,</span> <span class="pre">GX_vc,</span> <span class="pre">FX_cc]</span></code>, with ranks
+X in ascending order within each group; v denotes the impurity and
+c the core. Use <code class="docutils literal notranslate"><span class="pre">slater_integrals_name(shell_name,</span> <span class="pre">('v',</span> <span class="pre">'c'))</span></code>
+to obtain the names in the required order. Trailing zeros may be
+omitted; entries beyond the required number are ignored. For
+example, d-impurity/p-core integrals begin with
+<code class="docutils literal notranslate"><span class="pre">[F0_dd,</span> <span class="pre">F2_dd,</span> <span class="pre">F4_dd,</span> <span class="pre">F0_dp,</span> <span class="pre">F2_dp,</span> <span class="pre">G1_dp,</span> <span class="pre">G3_dp]</span></code>.
+Initial-state core-valence and core-core terms act on the explicit
+filled core. Default is all zeros.</p>
+</dd>
+<dt><strong>ext_B</strong><span class="classifier">array_like of float, shape (3,), optional</span></dt><dd><p>External Zeeman/exchange field components along the global x, y,
+and z axes, applied only to the impurity in both states. Components
+are energy coefficients, not magnetic fields in tesla. Default is
+zero.</p>
+</dd>
+<dt><strong>on_which</strong><span class="classifier">{‘spin’, ‘orbital’, ‘both’}, optional</span></dt><dd><p>Couple <code class="docutils literal notranslate"><span class="pre">ext_B</span></code> to <code class="docutils literal notranslate"><span class="pre">2S</span></code>, <code class="docutils literal notranslate"><span class="pre">L</span></code>, or <code class="docutils literal notranslate"><span class="pre">L</span> <span class="pre">+</span> <span class="pre">2S</span></code>, respectively,
+with a positive sign in the Hamiltonian. Default is ‘spin’.</p>
+</dd>
+<dt><strong>loc_axis</strong><span class="classifier">array_like of float, shape (3, 3), optional</span></dt><dd><p>Rotation from local crystal-field coordinates to the global frame
+for the transition operators. Columns are the local axes expressed
+in global coordinates. Default is the identity rotation.</p>
+</dd>
+<dt><strong>verbose</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, print Slater integrals and Hilbert-space dimensions.
+Default is False.</p>
+</dd>
+<dt><strong>sparse_U</strong><span class="classifier">bool, optional</span></dt><dd><p>If False (default), return dense rank-4 Coulomb tensors. If True,
+embed the impurity/core interactions directly as CSR matrices,
+avoiding dense rank-4 tensors over the full impurity and bath space.
+The flattened convention is <code class="docutils literal notranslate"><span class="pre">row</span> <span class="pre">=</span> <span class="pre">lorb</span> <span class="pre">*</span> <span class="pre">norb</span> <span class="pre">+</span> <span class="pre">korb</span></code> and
+<code class="docutils literal notranslate"><span class="pre">col</span> <span class="pre">=</span> <span class="pre">jorb</span> <span class="pre">*</span> <span class="pre">norb</span> <span class="pre">+</span> <span class="pre">iorb</span></code>, where <code class="docutils literal notranslate"><span class="pre">norb</span></code> is <code class="docutils literal notranslate"><span class="pre">ntot_v</span></code> for the
+initial state and <code class="docutils literal notranslate"><span class="pre">ntot</span></code> for the intermediate state.</p>
+</dd>
+<dt><strong>tol</strong><span class="classifier">float, optional</span></dt><dd><p>Keep Coulomb entries with absolute value greater than this threshold
+when <code class="docutils literal notranslate"><span class="pre">sparse_U=True</span></code>. Unused for dense tensors. Default is <code class="docutils literal notranslate"><span class="pre">1e-10</span></code>.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>emat_i</strong><span class="classifier">numpy.ndarray, shape (ntot, ntot)</span></dt><dd><p>Initial-state one-body matrix over impurity, bath, and core orbitals.</p>
+</dd>
+<dt><strong>umat_i</strong><span class="classifier">numpy.ndarray or scipy.sparse.csr_matrix</span></dt><dd><p>Initial-state Coulomb interaction on impurity and core orbitals.
+Dense shape is <code class="docutils literal notranslate"><span class="pre">(ntot,)</span> <span class="pre">*</span> <span class="pre">4</span></code>; sparse shape is
+<code class="docutils literal notranslate"><span class="pre">(ntot**2,</span> <span class="pre">ntot**2)</span></code>.</p>
+</dd>
+<dt><strong>basis_i</strong><span class="classifier">FockBasisSpec</span></dt><dd><p>Initial-state basis specification with <code class="docutils literal notranslate"><span class="pre">v_noccu</span></code> electrons in
+the impurity and bath orbitals and <code class="docutils literal notranslate"><span class="pre">c_norb</span></code> core electrons.</p>
+</dd>
+<dt><strong>emat_n</strong><span class="classifier">numpy.ndarray, shape (ntot, ntot)</span></dt><dd><p>Intermediate-state one-body matrix over impurity, bath, and core.</p>
+</dd>
+<dt><strong>umat_n</strong><span class="classifier">numpy.ndarray or scipy.sparse.csr_matrix</span></dt><dd><p>Intermediate-state Coulomb interaction on impurity and core orbitals.
+Dense shape is <code class="docutils literal notranslate"><span class="pre">(ntot,)</span> <span class="pre">*</span> <span class="pre">4</span></code>; sparse shape is
+<code class="docutils literal notranslate"><span class="pre">(ntot**2,</span> <span class="pre">ntot**2)</span></code>.</p>
+</dd>
+<dt><strong>basis_n</strong><span class="classifier">FockBasisSpec</span></dt><dd><p>Intermediate-state basis specification with <code class="docutils literal notranslate"><span class="pre">v_noccu</span> <span class="pre">+</span> <span class="pre">1</span></code> impurity
+and bath electrons and <code class="docutils literal notranslate"><span class="pre">c_norb</span> <span class="pre">-</span> <span class="pre">1</span></code> core electrons.</p>
+</dd>
+<dt><strong>trans_mat</strong><span class="classifier">numpy.ndarray, shape (npol, ntot, ntot)</span></dt><dd><p>Core-to-impurity absorption matrices, with nonzero entries only in
+the impurity-row/core-column block. <code class="docutils literal notranslate"><span class="pre">npol</span></code> is 3 for dipole and 5
+for quadrupole transitions; components are in the global frame.</p>
+</dd>
+<dt><strong>shift</strong><span class="classifier">float</span></dt><dd><p>Filled core shell-level energy, <code class="docutils literal notranslate"><span class="pre">c_norb</span> <span class="pre">*</span> <span class="pre">c_level</span></code>, excluding
+Coulomb contributions. Pass the first seven outputs to
+<a class="reference internal" href="solvers.html#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops()</span></code></a> and <code class="docutils literal notranslate"><span class="pre">shift</span></code> to dense or SciPy
+<a class="reference internal" href="solvers.html#edrixs.solvers.ed" title="edrixs.solvers.ed"><code class="xref py py-func docutils literal notranslate"><span class="pre">ed()</span></code></a>. Integrals remain unshifted.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.models.model_siam_2d1p">
+<span class="sig-prename descclassname"><span class="pre">edrixs.models.</span></span><span class="sig-name descname"><span class="pre">model_siam_2d1p</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">slater</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">impurity_levels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bath_levels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hyb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Delta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_soc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_soc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">om_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext_B</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_which</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'spin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">loc_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sparse_U</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/models.html#model_siam_2d1p"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.models.model_siam_2d1p" title="Link to this definition"></a></dt>
+<dd><p>Set up the commonly used d-impurity, one-bath, p-core charge-transfer
+model. This is a convenience wrapper around <a class="reference internal" href="#edrixs.models.model_siam" title="edrixs.models.model_siam"><code class="xref py py-func docutils literal notranslate"><span class="pre">model_siam()</span></code></a>.
+All energies, Slater integrals, hoppings, SOC constants, and magnetic-field
+components are in eV. The bath has ten spin-orbitals and no Coulomb interaction.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>slater</strong><span class="classifier">tuple of array_like</span></dt><dd><p>Initial <code class="docutils literal notranslate"><span class="pre">[F0_dd,</span> <span class="pre">F2_dd,</span> <span class="pre">F4_dd]</span></code> and intermediate
+<code class="docutils literal notranslate"><span class="pre">[F0_dd,</span> <span class="pre">F2_dd,</span> <span class="pre">F4_dd,</span> <span class="pre">F0_dp,</span> <span class="pre">F2_dp,</span> <span class="pre">G1_dp,</span> <span class="pre">G3_dp]</span></code>.
+Each state’s average Coulomb interactions are recovered by subtracting
+the corresponding <code class="docutils literal notranslate"><span class="pre">get_F0</span></code> contribution from its F0 integrals.</p>
+</dd>
+<dt><strong>impurity_levels, bath_levels</strong><span class="classifier">array_like, shape (5,)</span></dt><dd><p>Real orbital offsets in the order <code class="docutils literal notranslate"><span class="pre">(dz2,</span> <span class="pre">dzx,</span> <span class="pre">dzy,</span> <span class="pre">dx2-y2,</span> <span class="pre">dxy)</span></code>.
+The mean of each five-orbital array is subtracted before adding the
+charge-transfer-derived shell center. Each level applies to both spins;
+the input arrays are not modified.</p>
+</dd>
+<dt><strong>hyb</strong><span class="classifier">array_like, shape (5,)</span></dt><dd><p>Orbital-diagonal impurity-to-bath hoppings in the same order. Complex
+values are allowed. Both spins and both states use the same hoppings.</p>
+</dd>
+<dt><strong>Delta</strong><span class="classifier">float</span></dt><dd><p>Charge-transfer energy. This is defined in the atomic limit
+(without crystal field, hybridization, or multipolar Coulomb
+interactions) as the energy cost of transferring
+one electron from the bath to the impurity.
+Used for both states in <a class="reference internal" href="utils.html#edrixs.utils.CT_imp_bath" title="edrixs.utils.CT_imp_bath"><code class="xref py py-func docutils literal notranslate"><span class="pre">CT_imp_bath()</span></code></a> and
+<a class="reference internal" href="utils.html#edrixs.utils.CT_imp_bath_core_hole" title="edrixs.utils.CT_imp_bath_core_hole"><code class="xref py py-func docutils literal notranslate"><span class="pre">CT_imp_bath_core_hole()</span></code></a>.</p>
+</dd>
+<dt><strong>nd</strong><span class="classifier">int</span></dt><dd><p>Nominal impurity occupancy, from 0 through 9. The nominal bath is full;
+the initial total valence occupancy is <code class="docutils literal notranslate"><span class="pre">nd</span> <span class="pre">+</span> <span class="pre">10</span></code>.</p>
+</dd>
+<dt><strong>v_soc</strong><span class="classifier">pair of float, optional</span></dt><dd><p>Initial and intermediate impurity SOC constants. None means zero.</p>
+</dd>
+<dt><strong>c_soc</strong><span class="classifier">float, optional</span></dt><dd><p>Core SOC constant. Default zero.</p>
+</dd>
+<dt><strong>om_shift</strong><span class="classifier">float, optional</span></dt><dd><p>Overall XAS energy alignment. The core energy passed to model_siam is
+<code class="docutils literal notranslate"><span class="pre">-om_shift</span> <span class="pre">-</span> <span class="pre">5*E_p</span></code>, where E_p comes from the core-hole CT helper.
+Increasing om_shift raises transition energies by the same amount.
+Default zero; the filled-core reference convention is preserved.</p>
+</dd>
+<dt><strong>ext_B, on_which, loc_axis, verbose, sparse_U, tol</strong></dt><dd><p>Passed through to <a class="reference internal" href="#edrixs.models.model_siam" title="edrixs.models.model_siam"><code class="xref py py-func docutils literal notranslate"><span class="pre">model_siam()</span></code></a> with the same meaning and defaults.
+The magnetic field acts on the impurity only.</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat, shift</dt><dd><p>The eight model_siam outputs. Pass the first seven to
+<a class="reference internal" href="solvers.html#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops()</span></code></a> and the final <code class="docutils literal notranslate"><span class="pre">shift</span></code> to dense or
+SciPy <a class="reference internal" href="solvers.html#edrixs.solvers.ed" title="edrixs.solvers.ed"><code class="xref py py-func docutils literal notranslate"><span class="pre">ed()</span></code></a>. Here <code class="docutils literal notranslate"><span class="pre">shift</span> <span class="pre">=</span> <span class="pre">6</span> <span class="pre">*</span> <span class="pre">(-om_shift</span> <span class="pre">-</span> <span class="pre">5*E_p)</span></code>;
+it excludes Coulomb contributions and does not alter the integrals. One-body
+matrices both have shape (26, 26) and use complex spherical
+harmonics. Basis metadata fixes initial valence occupancy to nd+10,
+intermediate valence occupancy to nd+11, and core occupancies to six
+and five, respectively.
+Coulomb tensors are dense unless sparse_U=True. No diagonalization
+or spectrum calculation is performed.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="manybody_operator.html" class="btn btn-neutral float-left" title="manybody_operator" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="photon_transition.html" class="btn btn-neutral float-right" title="photon_transition" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Brookhaven National Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

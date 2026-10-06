@@ -70,7 +70,7 @@ excitedstate_vector = get_eigenvector(orbital_index, 1)
 # ------------------------------------------------------------------------------
 # Here we are considering the :math:`L_3`-edge. This means
 # a :math:`2p_{3/2} \rightarrow 3d`
-# absoprtion transition and a :math:`2p_{3/2} \rightarrow 3d`
+# absorption transition and a :math:`2p_{3/2} \rightarrow 3d`
 # emission transition. We can read the relevant matrix from the edrixs database,
 # keeping in mind that there are in fact three operations for
 # :math:`x, y,` & :math:`z` directions. Note that edrixs provides operators

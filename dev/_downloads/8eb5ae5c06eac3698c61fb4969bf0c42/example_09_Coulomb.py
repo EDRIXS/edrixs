@@ -42,7 +42,7 @@ that one might not anticipate. Our example is based on a :math:`d` atomic shell.
 #
 # where :math:`\alpha`, :math:`\beta`, :math:`\gamma`, :math:`\delta` are
 # orbital indices and :math:`\hat{f}^{\dagger}`
-# (:math:`\hat{f}`) are the creation (anihilation) operators.
+# (:math:`\hat{f}`) are the creation (annihilation) operators.
 # Notice that the indexing order of the last two elements of the tensor
 # is opposite to that of the operators because
 # these operators are associated with a ket state :math:`\ket{\gamma \delta}`,
@@ -53,14 +53,13 @@ that one might not anticipate. Our example is based on a :math:`d` atomic shell.
 # In EDRIXS the matrix can be created as follows:
 import edrixs
 import numpy as np
-import scipy
 import matplotlib.pyplot as plt
 import itertools
 
 F0, F2, F4 = 6.94, 14.7, 4.41
 umat_chb = edrixs.get_umat_slater('d', F0, F2, F4)
 ################################################################################
-# We stored this under variable :code:`umat_chb` where "cbh" stands for
+# We stored this under variable :code:`umat_chb` where "chb" stands for
 # complex harmonic basis, which is the default basis in EDRIXS.
 
 ################################################################################
@@ -73,7 +72,7 @@ umat_chb = edrixs.get_umat_slater('d', F0, F2, F4)
 # reference. If you are interested in the details of how
 # EDRIXS does this (and you probably aren't) function
 # :func:`~edrixs.coulomb_utensor.umat_slater`,
-# constructs the required matrix via Gaunt coeficents from
+# constructs the required matrix via Gaunt coefficients from
 # :func:`~edrixs.coulomb_utensor.get_gaunt`. Two alternative parameterizations
 # are common.
 # The first are the Racah parameters, which are
@@ -142,7 +141,7 @@ orbitals = ['3z^2-r^2', 'xz', 'yz', 'x^2-y^2', 'xy']
 # :math:`U_0` and :math:`J` as a shorthand for distinguishing these.
 #
 # Before we describe the different types of interactions, we note that since
-# the Coulomb interaction is real, and due to the spin symmmetry properties
+# the Coulomb interaction is real, and due to the spin symmetry properties
 # of the process :math:`U` always obeys
 #
 #   .. math::
@@ -179,7 +178,7 @@ for i in range(0, 5):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Direct Coulomb repulsion between different orbitals depends on terms like
 # :math:`U_{\alpha\sigma,\beta\sigma^\prime,\beta\sigma^\prime,\alpha\sigma}`.
-# Expresions for these parameters are provided in column :math:`U` in
+# Expressions for these parameters are provided in column :math:`U` in
 # :ref:`table_2_orbital`. We can print the values from :code:`umat`
 # like this:
 for i, j in itertools.combinations(range(5), 2):
@@ -191,7 +190,7 @@ for i, j in itertools.combinations(range(5), 2):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Exchange terms exist with the form
 # :math:`U_{\alpha\sigma,\beta\sigma^\prime,\alpha\sigma^\prime,\beta\sigma}`.
-# Expresions for these parameters are provided in column :math:`J` of
+# Expressions for these parameters are provided in column :math:`J` of
 # :ref:`table_2_orbital`. These come from terms like this in the matrix:
 for i, j in itertools.combinations(range(5), 2):
     val = umat[i*2, j*2 + 1, i*2 + 1, j*2].real
@@ -242,7 +241,7 @@ for i, j, k, l in ijkl:
 ################################################################################
 # 6. Four orbital
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# Futher multi-orbital terms include
+# Further multi-orbital terms include
 # :math:`U_{\alpha\sigma,\beta\sigma^\prime,\gamma\sigma^\prime,\delta\sigma}`.
 # We can find these here in the matrix:
 ijkl = [[0, 1, 2, 4],
@@ -265,7 +264,7 @@ for i, j, k, l in ijkl:
 # Effects of multi-orbital terms
 # ------------------------------------------------------------------------------
 # To test the effects of the multi-orbital terms, let's plot the eigenenergy
-# spectra with and without multi-orbital terms switched on for system with and
+# spectra with and without multi-orbital terms switched on for systems with and
 # without a cubic crystal field. We will use a :math:`d`-shell with two
 # electrons.
 ten_dqs = [0, 2, 4, 12]
@@ -273,12 +272,11 @@ ten_dqs = [0, 2, 4, 12]
 def diagonalize(ten_dq, umat):
     emat = edrixs.cb_op(edrixs.cf_cubic_d(ten_dq),
                         edrixs.tmat_c2r('d', ispin=True))
-    H = (edrixs.build_opers(4, umat, basis)
-         + edrixs.build_opers(2, emat, basis))
-    e, v = scipy.linalg.eigh(H)
+    H = edrixs.build_op(emat, umat, basis, backend='dense')
+    e = edrixs.ed(H, num_evals=len(basis), backend='dense')[0]
     return e - e.min()
 
-basis = edrixs.get_fock_bin_by_N(10, 2)
+basis = edrixs.get_fock_basis_int(10, 2)
 umat_no_multiorbital = np.copy(umat)
 for val in [np.sqrt(3)*B/2, np.sqrt(3)*B, 3*B/2]:
     umat_no_multiorbital[(np.abs(umat)- val) < 1e-6] = 0
@@ -305,11 +303,11 @@ plt.show()
 
 ################################################################################
 # On the left of the plot Coulomb interactions in spherical symmetry cause
-# substantial mxing between :math:`t_{2g}` and :math:`e_{g}` orbitals in the
-# eigenstates and 3 & 4 orbital orbital terms are crucial for obtaining the
-# the right eigenenergies. As :math:`10D_q` get large, this mixing is switched
+# substantial mixing between :math:`t_{2g}` and :math:`e_{g}` orbitals in the
+# eigenstates and the 3 & 4 orbital terms are crucial for obtaining the
+# right eigenenergies. As :math:`10D_q` gets large, this mixing is switched
 # off and the spectra start to become independent of whether the 3 & 4 orbital
-# orbital terms are included or not.
+# terms are included or not.
 #
 #
 #

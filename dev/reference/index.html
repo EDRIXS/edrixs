@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>edrixs Reference &mdash; edrixs 0.post1+geacad9a documentation</title>
+  <title>EDRIXS Reference &mdash; EDRIXS 0.post1+g803cebb documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=6a3525d1"></script>
+      <script src="../_static/documentation_options.js?v=66d01fc2"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -47,7 +47,7 @@
           
           
           <a href="../index.html" class="icon icon-home">
-            edrixs
+            EDRIXS
               <img src="../_static/EDRIXS_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -59,9 +59,9 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../user/index.html">edrixs User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">EDRIXS User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Pedagogical examples</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">edrixs Reference</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">EDRIXS Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="angular_momentum.html">angular_momentum</a></li>
 <li class="toctree-l2"><a class="reference internal" href="basis_transform.html">basis_transform</a></li>
 <li class="toctree-l2"><a class="reference internal" href="coulomb_utensor.html">coulomb_utensor</a></li>
@@ -69,7 +69,9 @@
 <li class="toctree-l2"><a class="reference internal" href="fock_basis.html">fock_basis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="iostream.html">iostream</a></li>
 <li class="toctree-l2"><a class="reference internal" href="manybody_operator.html">manybody_operator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html">models</a></li>
 <li class="toctree-l2"><a class="reference internal" href="photon_transition.html">photon_transition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="poles.html">poles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_spectrum.html">plot_spectrum</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rixs_utils.html">rixs_utils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="soc.html">soc</a></li>
@@ -88,7 +90,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">edrixs</a>
+          <a href="../index.html">EDRIXS</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -96,7 +98,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">edrixs Reference</li>
+      <li class="breadcrumb-item active">EDRIXS Reference</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/reference/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -107,13 +109,13 @@
            <div itemprop="articleBody">
              
   <section id="edrixs-reference">
-<span id="reference"></span><h1>edrixs Reference<a class="headerlink" href="#edrixs-reference" title="Link to this heading"></a></h1>
+<span id="reference"></span><h1>EDRIXS Reference<a class="headerlink" href="#edrixs-reference" title="Link to this heading"></a></h1>
 <dl class="field-list simple">
 <dt class="field-odd">Release<span class="colon">:</span></dt>
 <dd class="field-odd"><p>0.post1</p>
 </dd>
 <dt class="field-even">Date<span class="colon">:</span></dt>
-<dd class="field-even"><p>Oct 02, 2026</p>
+<dd class="field-even"><p>Oct 06, 2026</p>
 </dd>
 </dl>
 <p id="module-edrixs">This reference manual details functions, modules, and objects
@@ -173,25 +175,28 @@ included in EDRIXS, describing what they are and what they do.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="fock_basis.html">fock_basis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="fock_basis.html#edrixs.fock_basis.FockBasis"><code class="docutils literal notranslate"><span class="pre">FockBasis</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="fock_basis.html#edrixs.fock_basis.FockBasisSpec"><code class="docutils literal notranslate"><span class="pre">FockBasisSpec</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="fock_basis.html#edrixs.fock_basis.FockBinByN"><code class="docutils literal notranslate"><span class="pre">FockBinByN</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="fock_basis.html#edrixs.fock_basis.build_fock_basis"><code class="docutils literal notranslate"><span class="pre">build_fock_basis()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="fock_basis.html#edrixs.fock_basis.fock_bin"><code class="docutils literal notranslate"><span class="pre">fock_bin()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="fock_basis.html#edrixs.fock_basis.get_fock_basis_by_NJz"><code class="docutils literal notranslate"><span class="pre">get_fock_basis_by_NJz()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="fock_basis.html#edrixs.fock_basis.get_fock_basis_by_NLz"><code class="docutils literal notranslate"><span class="pre">get_fock_basis_by_NLz()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="fock_basis.html#edrixs.fock_basis.get_fock_basis_by_NSz"><code class="docutils literal notranslate"><span class="pre">get_fock_basis_by_NSz()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="fock_basis.html#edrixs.fock_basis.get_fock_basis_by_N_LzSz"><code class="docutils literal notranslate"><span class="pre">get_fock_basis_by_N_LzSz()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="fock_basis.html#edrixs.fock_basis.get_fock_basis_by_N_abelian"><code class="docutils literal notranslate"><span class="pre">get_fock_basis_by_N_abelian()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="fock_basis.html#edrixs.fock_basis.get_fock_basis_combinadic"><code class="docutils literal notranslate"><span class="pre">get_fock_basis_combinadic()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="fock_basis.html#edrixs.fock_basis.get_fock_basis_int"><code class="docutils literal notranslate"><span class="pre">get_fock_basis_int()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="fock_basis.html#edrixs.fock_basis.get_fock_bin_by_N"><code class="docutils literal notranslate"><span class="pre">get_fock_bin_by_N()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="fock_basis.html#edrixs.fock_basis.get_fock_full_N"><code class="docutils literal notranslate"><span class="pre">get_fock_full_N()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="fock_basis.html#edrixs.fock_basis.get_fock_half_N"><code class="docutils literal notranslate"><span class="pre">get_fock_half_N()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="fock_basis.html#edrixs.fock_basis.write_fock_dec_by_N"><code class="docutils literal notranslate"><span class="pre">write_fock_dec_by_N()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="iostream.html">iostream</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="iostream.html#edrixs.iostream.dump_poles"><code class="docutils literal notranslate"><span class="pre">dump_poles()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="iostream.html#edrixs.iostream.load_poles"><code class="docutils literal notranslate"><span class="pre">load_poles()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="iostream.html#edrixs.iostream.read_poles_from_file"><code class="docutils literal notranslate"><span class="pre">read_poles_from_file()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="iostream.html#edrixs.iostream.write_config"><code class="docutils literal notranslate"><span class="pre">write_config()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="iostream.html#edrixs.iostream.write_emat"><code class="docutils literal notranslate"><span class="pre">write_emat()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="iostream.html#edrixs.iostream.write_tensor"><code class="docutils literal notranslate"><span class="pre">write_tensor()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="iostream.html#edrixs.iostream.write_umat"><code class="docutils literal notranslate"><span class="pre">write_umat()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="manybody_operator.html">manybody_operator</a><ul>
@@ -200,6 +205,13 @@ included in EDRIXS, describing what they are and what they do.</p>
 <li class="toctree-l2"><a class="reference internal" href="manybody_operator.html#edrixs.manybody_operator.four_fermion"><code class="docutils literal notranslate"><span class="pre">four_fermion()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manybody_operator.html#edrixs.manybody_operator.one_fermion_annihilation"><code class="docutils literal notranslate"><span class="pre">one_fermion_annihilation()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="manybody_operator.html#edrixs.manybody_operator.two_fermion"><code class="docutils literal notranslate"><span class="pre">two_fermion()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="models.html">models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="models.html#edrixs.models.model_1v1c"><code class="docutils literal notranslate"><span class="pre">model_1v1c()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#edrixs.models.model_2v1c"><code class="docutils literal notranslate"><span class="pre">model_2v1c()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#edrixs.models.model_siam"><code class="docutils literal notranslate"><span class="pre">model_siam()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html#edrixs.models.model_siam_2d1p"><code class="docutils literal notranslate"><span class="pre">model_siam_2d1p()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="photon_transition.html">photon_transition</a><ul>
@@ -213,11 +225,13 @@ included in EDRIXS, describing what they are and what they do.</p>
 <li class="toctree-l2"><a class="reference internal" href="photon_transition.html#edrixs.photon_transition.wavevector_with_length"><code class="docutils literal notranslate"><span class="pre">wavevector_with_length()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="poles.html">poles</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="poles.html#edrixs.poles.get_spectra_from_poles"><code class="docutils literal notranslate"><span class="pre">get_spectra_from_poles()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="poles.html#edrixs.poles.merge_pole_dicts"><code class="docutils literal notranslate"><span class="pre">merge_pole_dicts()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="plot_spectrum.html">plot_spectrum</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="plot_spectrum.html#edrixs.plot_spectrum.get_spectra_from_poles"><code class="docutils literal notranslate"><span class="pre">get_spectra_from_poles()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_spectrum.html#edrixs.plot_spectrum.merge_pole_dicts"><code class="docutils literal notranslate"><span class="pre">merge_pole_dicts()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_spectrum.html#edrixs.plot_spectrum.plot_rixs_map"><code class="docutils literal notranslate"><span class="pre">plot_rixs_map()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="plot_spectrum.html#edrixs.plot_spectrum.plot_spectrum"><code class="docutils literal notranslate"><span class="pre">plot_spectrum()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="rixs_utils.html">rixs_utils</a><ul>
@@ -229,14 +243,20 @@ included in EDRIXS, describing what they are and what they do.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="solvers.html">solvers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="solvers.html#edrixs.solvers.build_op"><code class="docutils literal notranslate"><span class="pre">build_op()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers.html#edrixs.solvers.ed"><code class="docutils literal notranslate"><span class="pre">ed()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="solvers.html#edrixs.solvers.ed_1v1c_fort"><code class="docutils literal notranslate"><span class="pre">ed_1v1c_fort()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="solvers.html#edrixs.solvers.ed_1v1c_py"><code class="docutils literal notranslate"><span class="pre">ed_1v1c_py()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="solvers.html#edrixs.solvers.ed_2v1c_fort"><code class="docutils literal notranslate"><span class="pre">ed_2v1c_fort()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="solvers.html#edrixs.solvers.ed_siam_fort"><code class="docutils literal notranslate"><span class="pre">ed_siam_fort()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers.html#edrixs.solvers.get_ops"><code class="docutils literal notranslate"><span class="pre">get_ops()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers.html#edrixs.solvers.get_ops_disk"><code class="docutils literal notranslate"><span class="pre">get_ops_disk()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers.html#edrixs.solvers.rixs"><code class="docutils literal notranslate"><span class="pre">rixs()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="solvers.html#edrixs.solvers.rixs_1v1c_fort"><code class="docutils literal notranslate"><span class="pre">rixs_1v1c_fort()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="solvers.html#edrixs.solvers.rixs_1v1c_py"><code class="docutils literal notranslate"><span class="pre">rixs_1v1c_py()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="solvers.html#edrixs.solvers.rixs_2v1c_fort"><code class="docutils literal notranslate"><span class="pre">rixs_2v1c_fort()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="solvers.html#edrixs.solvers.rixs_siam_fort"><code class="docutils literal notranslate"><span class="pre">rixs_siam_fort()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="solvers.html#edrixs.solvers.xas"><code class="docutils literal notranslate"><span class="pre">xas()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="solvers.html#edrixs.solvers.xas_1v1c_fort"><code class="docutils literal notranslate"><span class="pre">xas_1v1c_fort()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="solvers.html#edrixs.solvers.xas_1v1c_py"><code class="docutils literal notranslate"><span class="pre">xas_1v1c_py()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="solvers.html#edrixs.solvers.xas_2v1c_fort"><code class="docutils literal notranslate"><span class="pre">xas_2v1c_fort()</span></code></a></li>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>edrixs User Guide &mdash; edrixs 0.post1+geacad9a documentation</title>
+  <title>EDRIXS User Guide &mdash; EDRIXS 0.post1+g803cebb documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=6a3525d1"></script>
+      <script src="../_static/documentation_options.js?v=66d01fc2"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -30,8 +30,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="What is edrixs?" href="whatisedrixs.html" />
-    <link rel="prev" title="edrixs Documentation" href="../index.html" />
+    <link rel="next" title="What is EDRIXS?" href="whatisedrixs.html" />
+    <link rel="prev" title="EDRIXS Documentation" href="../index.html" />
    
   <meta name="edrixs-doc-version" content="dev">
   <meta name="edrixs-doc-site-root" content="/edrixs/">
@@ -47,7 +47,7 @@
           
           
           <a href="../index.html" class="icon icon-home">
-            edrixs
+            EDRIXS
               <img src="../_static/EDRIXS_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -59,20 +59,20 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">edrixs User Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="whatisedrixs.html">What is edrixs?</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">EDRIXS User Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="whatisedrixs.html">What is EDRIXS?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="usedocker.html">edrixs and docker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usedocker.html">EDRIXS and docker</a></li>
 <li class="toctree-l2"><a class="reference internal" href="devcontainer.html">Dev Container</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart.html">Quickstart tutorial</a></li>
-<li class="toctree-l2"><a class="reference internal" href="basics.html">edrixs basics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pythontips.html">Tips for python and edrixs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html">Introduction to EDRIXS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conventions.html">Conventions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html">Backend</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="papers.html">EDRIXS papers</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Pedagogical examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">edrixs Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">EDRIXS Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../release-history.html">Release History</a></li>
 </ul>
 
@@ -82,7 +82,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">edrixs</a>
+          <a href="../index.html">EDRIXS</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -90,7 +90,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">edrixs User Guide</li>
+      <li class="breadcrumb-item active">EDRIXS User Guide</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/user/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -101,24 +101,24 @@
            <div itemprop="articleBody">
              
   <section id="edrixs-user-guide">
-<span id="user"></span><h1>edrixs User Guide<a class="headerlink" href="#edrixs-user-guide" title="Link to this heading"></a></h1>
+<span id="user"></span><h1>EDRIXS User Guide<a class="headerlink" href="#edrixs-user-guide" title="Link to this heading"></a></h1>
 <dl class="field-list simple">
 <dt class="field-odd">Release<span class="colon">:</span></dt>
 <dd class="field-odd"><p>0.post1</p>
 </dd>
 <dt class="field-even">Date<span class="colon">:</span></dt>
-<dd class="field-even"><p>Oct 02, 2026</p>
+<dd class="field-even"><p>Oct 06, 2026</p>
 </dd>
 </dl>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="whatisedrixs.html">What is edrixs?</a></li>
+<li class="toctree-l1"><a class="reference internal" href="whatisedrixs.html">What is EDRIXS?</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="usedocker.html">edrixs and docker</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usedocker.html">EDRIXS and docker</a></li>
 <li class="toctree-l1"><a class="reference internal" href="devcontainer.html">Dev Container</a></li>
-<li class="toctree-l1"><a class="reference internal" href="quickstart.html">Quickstart tutorial</a></li>
-<li class="toctree-l1"><a class="reference internal" href="basics.html">edrixs basics</a></li>
-<li class="toctree-l1"><a class="reference internal" href="pythontips.html">Tips for python and edrixs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction to EDRIXS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="conventions.html">Conventions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="backend.html">Backend</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="papers.html">EDRIXS papers</a></li>
 </ul>
@@ -129,8 +129,8 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../index.html" class="btn btn-neutral float-left" title="edrixs Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="whatisedrixs.html" class="btn btn-neutral float-right" title="What is edrixs?" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../index.html" class="btn btn-neutral float-left" title="EDRIXS Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="whatisedrixs.html" class="btn btn-neutral float-right" title="What is EDRIXS?" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

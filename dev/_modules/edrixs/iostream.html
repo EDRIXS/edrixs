@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>edrixs.iostream &mdash; edrixs 0.post1+geacad9a documentation</title>
+  <title>edrixs.iostream &mdash; EDRIXS 0.post1+g803cebb documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -19,7 +19,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=6a3525d1"></script>
+      <script src="../../_static/documentation_options.js?v=66d01fc2"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -44,7 +44,7 @@
           
           
           <a href="../../index.html" class="icon icon-home">
-            edrixs
+            EDRIXS
               <img src="../../_static/EDRIXS_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -56,9 +56,9 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">edrixs User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">EDRIXS User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Pedagogical examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">edrixs Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">EDRIXS Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../release-history.html">Release History</a></li>
 </ul>
 
@@ -68,7 +68,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">edrixs</a>
+          <a href="../../index.html">EDRIXS</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -87,8 +87,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for edrixs.iostream</h1><div class="highlight"><pre>
-<span></span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'write_tensor'</span><span class="p">,</span> <span class="s1">'write_emat'</span><span class="p">,</span> <span class="s1">'write_umat'</span><span class="p">,</span> <span class="s1">'write_config'</span><span class="p">,</span>
-           <span class="s1">'read_poles_from_file'</span><span class="p">,</span> <span class="s1">'dump_poles'</span><span class="p">,</span> <span class="s1">'load_poles'</span><span class="p">]</span>
+<span></span><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'write_tensor'</span><span class="p">,</span> <span class="s1">'dump_poles'</span><span class="p">,</span> <span class="s1">'load_poles'</span><span class="p">]</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
@@ -251,179 +250,6 @@
                        <span class="n">fmt_int</span><span class="o">=</span><span class="n">fmt_int</span><span class="p">,</span> <span class="n">fmt_float</span><span class="o">=</span><span class="n">fmt_float</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"error in write_tensor: ndim &gt;5, not implemented !"</span><span class="p">)</span></div>
-
-
-
-<div class="viewcode-block" id="write_emat">
-<a class="viewcode-back" href="../../reference/iostream.html#edrixs.iostream.write_emat">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">write_emat</span><span class="p">(</span><span class="n">emat</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1E-12</span><span class="p">,</span> <span class="n">fmt_int</span><span class="o">=</span><span class="s1">'</span><span class="si">{:10d}</span><span class="s1">'</span><span class="p">,</span> <span class="n">fmt_float</span><span class="o">=</span><span class="s1">'</span><span class="si">{:.15f}</span><span class="s1">'</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Write the nonzeros of the rank-2 hopping matrices to file.</span>
-<span class="sd">    The first line is the number of nonzeros, and the following lines are the nonzero elements.</span>
-<span class="sd">    This file will be read by ed.x, xas.x or rixs.x.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    emat: 2d complex array</span>
-<span class="sd">        The array to be written.</span>
-<span class="sd">    fname: str</span>
-<span class="sd">        File name.</span>
-<span class="sd">    tol: float</span>
-<span class="sd">        Precision.</span>
-<span class="sd">    fmt_int: str (default: '{:10d}')</span>
-<span class="sd">        Format for printing integer numbers.</span>
-<span class="sd">    fmt_float: str (default: '{:.15f}')</span>
-<span class="sd">        Format for printing float numbers.</span>
-<span class="sd">    """</span>
-
-    <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">emat</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">)</span>
-    <span class="n">nonzero</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-
-    <span class="n">space</span> <span class="o">=</span> <span class="s2">"    "</span>
-    <span class="n">fmt_string</span> <span class="o">=</span> <span class="p">(</span><span class="n">fmt_int</span> <span class="o">+</span> <span class="n">space</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">fmt_float</span> <span class="o">+</span> <span class="n">space</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nonzero</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"</span><span class="si">{:10d}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fmt_string</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"</span><span class="si">{:20d}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">nonzero</span><span class="p">)))</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">nonzero</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fmt_string</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">emat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="n">emat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="p">))</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
-
-
-
-<div class="viewcode-block" id="write_umat">
-<a class="viewcode-back" href="../../reference/iostream.html#edrixs.iostream.write_umat">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">write_umat</span><span class="p">(</span><span class="n">umat</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1E-12</span><span class="p">,</span> <span class="n">fmt_int</span><span class="o">=</span><span class="s1">'</span><span class="si">{:10d}</span><span class="s1">'</span><span class="p">,</span> <span class="n">fmt_float</span><span class="o">=</span><span class="s1">'</span><span class="si">{:.15f}</span><span class="s1">'</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Write the nonzeros of the rank-4 Coulomb U tensor to file.</span>
-<span class="sd">    The first line is the number of nonzeros, and the following lines are the nonzero elements.</span>
-<span class="sd">    This file will be read by ed.x, xas.x or rixs.x.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    umat: 4d complex array</span>
-<span class="sd">        The array to be written.</span>
-<span class="sd">    fname: str</span>
-<span class="sd">        File name.</span>
-<span class="sd">    tol: float (default: 1E-12)</span>
-<span class="sd">        Precision.</span>
-<span class="sd">    fmt_int: str (default: '{:10d}')</span>
-<span class="sd">        Format for printing integer numbers.</span>
-<span class="sd">    fmt_float: str (default: '{:.15f}')</span>
-<span class="sd">        Format for printing float numbers.</span>
-<span class="sd">    """</span>
-
-    <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">umat</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">tol</span><span class="p">)</span>
-    <span class="n">nonzero</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">((</span><span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">),</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-
-    <span class="n">space</span> <span class="o">=</span> <span class="s2">"    "</span>
-    <span class="n">fmt_string</span> <span class="o">=</span> <span class="p">(</span><span class="n">fmt_int</span> <span class="o">+</span> <span class="n">space</span><span class="p">)</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">+</span> <span class="p">(</span><span class="n">fmt_float</span> <span class="o">+</span> <span class="n">space</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="s1">'</span><span class="se">\n</span><span class="s1">'</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">nonzero</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"</span><span class="si">{:10d}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fmt_string</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">))</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">"</span><span class="si">{:20d}</span><span class="se">\n</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">nonzero</span><span class="p">)))</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">nonzero</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">fmt_string</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">l</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
-                                      <span class="n">umat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">]</span><span class="o">.</span><span class="n">real</span><span class="p">,</span> <span class="n">umat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">l</span><span class="p">]</span><span class="o">.</span><span class="n">imag</span><span class="p">))</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
-
-
-
-<div class="viewcode-block" id="write_config">
-<a class="viewcode-back" href="../../reference/iostream.html#edrixs.iostream.write_config">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">write_config</span><span class="p">(</span>
-        <span class="n">directory</span><span class="o">=</span><span class="s1">'.'</span><span class="p">,</span> <span class="n">ed_solver</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_val_orbs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">num_core_orbs</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-        <span class="n">neval</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nvector</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncv</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">idump</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">num_gs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">maxiter</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
-        <span class="n">linsys_max</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">min_ndim</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">nkryl</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">eigval_tol</span><span class="o">=</span><span class="mf">1e-8</span><span class="p">,</span>
-        <span class="n">linsys_tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span> <span class="n">omega_in</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">gamma_in</span><span class="o">=</span><span class="mf">0.1</span>
-        <span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Write control parameters in config.in file for ed_fsolver.</span>
-<span class="sd">    """</span>
-    <span class="k">if</span> <span class="n">idump</span><span class="p">:</span>
-        <span class="n">dump_vector</span> <span class="o">=</span> <span class="s1">'.true.'</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">dump_vector</span> <span class="o">=</span> <span class="s1">'.false.'</span>
-
-    <span class="n">config</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">"&amp;control"</span><span class="p">,</span>
-        <span class="s2">"ed_solver="</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ed_solver</span><span class="p">),</span>
-        <span class="s2">"num_val_orbs="</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">num_val_orbs</span><span class="p">),</span>
-        <span class="s2">"num_core_orbs="</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">num_core_orbs</span><span class="p">),</span>
-        <span class="s2">"neval="</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">neval</span><span class="p">),</span>
-        <span class="s2">"nvector="</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">nvector</span><span class="p">),</span>
-        <span class="s2">"ncv="</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">ncv</span><span class="p">),</span>
-        <span class="s2">"idump="</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">dump_vector</span><span class="p">),</span>
-        <span class="s2">"num_gs="</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">num_gs</span><span class="p">),</span>
-        <span class="s2">"maxiter="</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">maxiter</span><span class="p">),</span>
-        <span class="s2">"linsys_max="</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">linsys_max</span><span class="p">),</span>
-        <span class="s2">"min_ndim="</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">min_ndim</span><span class="p">),</span>
-        <span class="s2">"nkryl="</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">nkryl</span><span class="p">),</span>
-        <span class="s2">"eigval_tol="</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">eigval_tol</span><span class="p">),</span>
-        <span class="s2">"linsys_tol="</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">linsys_tol</span><span class="p">),</span>
-        <span class="s2">"omega_in="</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">omega_in</span><span class="p">),</span>
-        <span class="s2">"gamma_in="</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">gamma_in</span><span class="p">),</span>
-        <span class="s2">"&amp;end"</span>
-    <span class="p">]</span>
-
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">directory</span> <span class="o">+</span> <span class="s1">'/config.in'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">item</span> <span class="o">+</span> <span class="s2">"</span><span class="se">\n</span><span class="s2">"</span><span class="p">)</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
-
-
-
-<div class="viewcode-block" id="read_poles_from_file">
-<a class="viewcode-back" href="../../reference/iostream.html#edrixs.iostream.read_poles_from_file">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">read_poles_from_file</span><span class="p">(</span><span class="n">file_list</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Read informations in files xas_poles.n or rixs_poles.n to a dict.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    file_list: list of strings</span>
-<span class="sd">        Names of pole files.</span>
-
-<span class="sd">    pole_dict: dict</span>
-<span class="sd">        A dict containing information of poles.</span>
-<span class="sd">    """</span>
-    <span class="n">pole_dict</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">'npoles'</span><span class="p">:</span> <span class="p">[],</span>
-        <span class="s1">'eigval'</span><span class="p">:</span> <span class="p">[],</span>
-        <span class="s1">'norm'</span><span class="p">:</span> <span class="p">[],</span>
-        <span class="s1">'alpha'</span><span class="p">:</span> <span class="p">[],</span>
-        <span class="s1">'beta'</span><span class="p">:</span> <span class="p">[]</span>
-    <span class="p">}</span>
-    <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">file_list</span><span class="p">:</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span>
-        <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="n">neff</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
-        <span class="n">pole_dict</span><span class="p">[</span><span class="s1">'npoles'</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">neff</span><span class="p">)</span>
-
-        <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="n">eigval</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
-        <span class="n">pole_dict</span><span class="p">[</span><span class="s1">'eigval'</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">eigval</span><span class="p">)</span>
-
-        <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="n">norm</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()[</span><span class="mi">1</span><span class="p">])</span>
-        <span class="n">pole_dict</span><span class="p">[</span><span class="s1">'norm'</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">norm</span><span class="p">)</span>
-
-        <span class="n">alpha</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">beta</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">neff</span><span class="p">):</span>
-            <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-            <span class="n">alpha</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-            <span class="n">beta</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
-        <span class="n">pole_dict</span><span class="p">[</span><span class="s1">'alpha'</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">alpha</span><span class="p">)</span>
-        <span class="n">pole_dict</span><span class="p">[</span><span class="s1">'beta'</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">beta</span><span class="p">)</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
-    <span class="k">return</span> <span class="n">pole_dict</span></div>
 
 
 

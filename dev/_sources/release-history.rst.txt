@@ -2,6 +2,13 @@
 Release History
 ===============
 
+Unreleased
+----------
+
+* Validate staged ``backend_kws`` by backend and operation, with typo
+  suggestions and documented value constraints.
+* Document all SciPy, dense, and Fortran staged-backend options.
+
 This page summarizes the user-visible changes in each tagged release.  See the
 `GitHub releases page <https://github.com/EDRIXS/edrixs/releases>`_ for the
 complete release notes and downloadable artifacts.

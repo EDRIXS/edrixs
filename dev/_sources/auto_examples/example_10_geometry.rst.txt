@@ -45,7 +45,7 @@ As inputs, we include:
 * :code:`scatter_axis`: the matrix specifying how the x-ray geometry is set up
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 30-65
+.. GENERATED FROM PYTHON SOURCE LINES 30-80
 
 .. code-block:: Python
 
@@ -58,27 +58,42 @@ As inputs, we include:
 
     def make_rixs(v_cfmat, thin, thout, loc_axis=None, scatter_axis=None):
         v_noccu = 8
-        gs_list = [0, 1, 2]
         ominc = np.array([853])
         gamma_f = 0.1
         pol_type = [('linear', 0, 'linear', 0), ('linear', 0, 'linear', np.pi/2)]
         info = edrixs.utils.get_atom_data('Ni', '3d', v_noccu, edge='L3')
         slater = [[s[1] for s in info['slater_i']],
                   [s[1] for s in info['slater_n']]]
-        off = 871
+        off = 871  # core-level offset, tuned so the resonance sits near the Ni L3 edge
+        backend = 'scipy'
+
+        # :func:`~edrixs.models.model_1v1c` builds the backend-independent problem
+        # (one-body matrices, Coulomb tensors, Fock-basis specs and dipole
+        # matrices), :func:`~edrixs.solvers.get_ops` turns them into many-body
+        # operators, and :func:`~edrixs.solvers.ed` returns the low-energy initial
+        # states. The Ni
+        # :math:`d^8` ground state is a spin triplet, so we keep three states.
         with contextlib.redirect_stdout(io.StringIO()):
-            out = edrixs.ed_1v1c_py(('d', 'p32'), shell_level=(0, -off),
-                                    v_cfmat=v_cfmat, loc_axis=loc_axis,
-                                    c_soc=info['c_soc'], v_noccu=v_noccu, slater=slater)
-        eval_i, eval_n, trans_op = out
+            out = edrixs.model_1v1c(
+                ('d', 'p32'), shell_level=(0, -off), v_cfmat=v_cfmat,
+                loc_axis=loc_axis, c_soc=info['c_soc'], v_noccu=v_noccu,
+                slater=slater,
+            )
+        emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat, shift = out
+
+        hmat_i, hmat_n, trans_ops = edrixs.get_ops(
+            emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
+            backend=backend,
+        )
+        eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=3, backend=backend)
 
         eloss = np.arange(-1, 5, 0.01)
-        with contextlib.redirect_stdout(io.StringIO()):
-            rixs_all = edrixs.rixs_1v1c_py(
-                eval_i, eval_n, trans_op, ominc, eloss,
-                gamma_c=info['gamma_c'], gamma_f=gamma_f,
-                thin=thin, thout=thout, scatter_axis=scatter_axis,
-                pol_type=pol_type, gs_list=gs_list)
+        rixs_all = edrixs.rixs(
+            eval_i, evec_i, hmat_i, hmat_n, trans_ops, ominc, eloss,
+            gamma_c=info['gamma_c'], gamma_f=gamma_f,
+            thin=thin, thout=thout, scatter_axis=scatter_axis,
+            pol_type=pol_type, backend=backend,
+        )
 
         rixs = rixs_all.sum(axis=(0, 2))
         return eloss, rixs
@@ -91,7 +106,7 @@ As inputs, we include:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-71
+.. GENERATED FROM PYTHON SOURCE LINES 81-86
 
 Crystal field in a non-standard geometry
 ------------------------------------------------------------------------------
@@ -99,7 +114,7 @@ For an example, let's consider a :math:`d`-electron material with a tetragonal
 crystal field using :math:`L`-edge RIXS. The standard EDRIXS function for a
 tetragonal crystal field will use :math:`z` as the four-fold symmetry axis.
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-72
+.. GENERATED FROM PYTHON SOURCE LINES 86-87
 
 .. code-block:: Python
 
@@ -111,7 +126,7 @@ tetragonal crystal field will use :math:`z` as the four-fold symmetry axis.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-79
+.. GENERATED FROM PYTHON SOURCE LINES 88-94
 
 How can we deal with a case where the sample surface is, in fact, not parallel
 to the crystal field :math:`z`-axis?
@@ -120,7 +135,7 @@ within the scattering plane and the sample surface normal is the
 :math:`x`-axis. We have also defined our incoming and outgoing x-ray angles
 :code:`thin` and :code:`thout` with respect to the sample surface.
 
-.. GENERATED FROM PYTHON SOURCE LINES 79-81
+.. GENERATED FROM PYTHON SOURCE LINES 94-96
 
 .. code-block:: Python
 
@@ -133,18 +148,18 @@ within the scattering plane and the sample surface normal is the
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-83
+.. GENERATED FROM PYTHON SOURCE LINES 97-98
 
 There are several options to describe this situation:
 
-.. GENERATED FROM PYTHON SOURCE LINES 85-89
+.. GENERATED FROM PYTHON SOURCE LINES 100-104
 
 Re-define angles
 ^^^^^^^^^^^^^^^^
 A simple approach to the problem is to alter the angles so they are correct
 with respect to the orientation of the crystal field matrix.
 
-.. GENERATED FROM PYTHON SOURCE LINES 89-93
+.. GENERATED FROM PYTHON SOURCE LINES 104-108
 
 .. code-block:: Python
 
@@ -159,7 +174,7 @@ with respect to the orientation of the crystal field matrix.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 94-103
+.. GENERATED FROM PYTHON SOURCE LINES 109-118
 
 Set crystal field axes
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -171,7 +186,7 @@ should denote the axes used for the crystal field in the :math:`x`,
 consistency check between this matrix and what is expected from the
 :code:`angle_offset` variable.
 
-.. GENERATED FROM PYTHON SOURCE LINES 103-113
+.. GENERATED FROM PYTHON SOURCE LINES 118-128
 
 .. code-block:: Python
 
@@ -192,7 +207,7 @@ consistency check between this matrix and what is expected from the
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 114-120
+.. GENERATED FROM PYTHON SOURCE LINES 129-135
 
 Set geometry axes
 ^^^^^^^^^^^^^^^^^
@@ -201,7 +216,7 @@ emission operations. The columns of this matrix should express the local
 scattering axes in the same global :math:`x`, :math:`y`, :math:`z`
 coordinates used for the transition operators.
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-124
+.. GENERATED FROM PYTHON SOURCE LINES 135-139
 
 .. code-block:: Python
 
@@ -216,7 +231,7 @@ coordinates used for the transition operators.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 125-132
+.. GENERATED FROM PYTHON SOURCE LINES 140-147
 
 Redefine crystal field
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -226,7 +241,7 @@ angular rotations around the axes. The spin also needs to be rotated by a
 spinor matrix. In this case, we need to rotate 90 degrees
 around the :math:`y`-axis.
 
-.. GENERATED FROM PYTHON SOURCE LINES 132-139
+.. GENERATED FROM PYTHON SOURCE LINES 147-154
 
 .. code-block:: Python
 
@@ -244,13 +259,13 @@ around the :math:`y`-axis.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 140-143
+.. GENERATED FROM PYTHON SOURCE LINES 155-158
 
 Check consistency
 ------------------------------------------------------------------------------
 Let's show that all these methods are consistent.
 
-.. GENERATED FROM PYTHON SOURCE LINES 143-156
+.. GENERATED FROM PYTHON SOURCE LINES 158-171
 
 .. code-block:: Python
 
@@ -282,7 +297,7 @@ Let's show that all these methods are consistent.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 1.016 seconds)
+   **Total running time of the script:** (0 minutes 0.990 seconds)
 
 
 .. _sphx_glr_download_auto_examples_example_10_geometry.py:

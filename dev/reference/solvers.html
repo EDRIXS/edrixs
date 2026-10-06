@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>solvers &mdash; edrixs 0.post1+geacad9a documentation</title>
+  <title>solvers &mdash; EDRIXS 0.post1+g803cebb documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=6a3525d1"></script>
+      <script src="../_static/documentation_options.js?v=66d01fc2"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,7 +48,7 @@
           
           
           <a href="../index.html" class="icon icon-home">
-            edrixs
+            EDRIXS
               <img src="../_static/EDRIXS_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -60,9 +60,9 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../user/index.html">edrixs User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">EDRIXS User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Pedagogical examples</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">edrixs Reference</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">EDRIXS Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="angular_momentum.html">angular_momentum</a></li>
 <li class="toctree-l2"><a class="reference internal" href="basis_transform.html">basis_transform</a></li>
 <li class="toctree-l2"><a class="reference internal" href="coulomb_utensor.html">coulomb_utensor</a></li>
@@ -70,19 +70,27 @@
 <li class="toctree-l2"><a class="reference internal" href="fock_basis.html">fock_basis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="iostream.html">iostream</a></li>
 <li class="toctree-l2"><a class="reference internal" href="manybody_operator.html">manybody_operator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html">models</a></li>
 <li class="toctree-l2"><a class="reference internal" href="photon_transition.html">photon_transition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="poles.html">poles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_spectrum.html">plot_spectrum</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rixs_utils.html">rixs_utils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="soc.html">soc</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">solvers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.build_op"><code class="docutils literal notranslate"><span class="pre">build_op()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.ed"><code class="docutils literal notranslate"><span class="pre">ed()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.ed_1v1c_fort"><code class="docutils literal notranslate"><span class="pre">ed_1v1c_fort()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.ed_1v1c_py"><code class="docutils literal notranslate"><span class="pre">ed_1v1c_py()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.ed_2v1c_fort"><code class="docutils literal notranslate"><span class="pre">ed_2v1c_fort()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.ed_siam_fort"><code class="docutils literal notranslate"><span class="pre">ed_siam_fort()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.get_ops"><code class="docutils literal notranslate"><span class="pre">get_ops()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.get_ops_disk"><code class="docutils literal notranslate"><span class="pre">get_ops_disk()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.rixs"><code class="docutils literal notranslate"><span class="pre">rixs()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.rixs_1v1c_fort"><code class="docutils literal notranslate"><span class="pre">rixs_1v1c_fort()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.rixs_1v1c_py"><code class="docutils literal notranslate"><span class="pre">rixs_1v1c_py()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.rixs_2v1c_fort"><code class="docutils literal notranslate"><span class="pre">rixs_2v1c_fort()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.rixs_siam_fort"><code class="docutils literal notranslate"><span class="pre">rixs_siam_fort()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.xas"><code class="docutils literal notranslate"><span class="pre">xas()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.xas_1v1c_fort"><code class="docutils literal notranslate"><span class="pre">xas_1v1c_fort()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.xas_1v1c_py"><code class="docutils literal notranslate"><span class="pre">xas_1v1c_py()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.solvers.xas_2v1c_fort"><code class="docutils literal notranslate"><span class="pre">xas_2v1c_fort()</span></code></a></li>
@@ -103,7 +111,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">edrixs</a>
+          <a href="../index.html">EDRIXS</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -111,7 +119,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="index.html">edrixs Reference</a></li>
+          <li class="breadcrumb-item"><a href="index.html">EDRIXS Reference</a></li>
       <li class="breadcrumb-item active">solvers</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/reference/solvers.rst.txt" rel="nofollow"> View page source</a>
@@ -124,6 +132,87 @@
              
   <section id="module-edrixs.solvers">
 <span id="solvers"></span><h1>solvers<a class="headerlink" href="#module-edrixs.solvers" title="Link to this heading"></a></h1>
+<p>Backend-neutral solver interface and deprecated legacy workflows.</p>
+<p>Physical model construction lives in <a class="reference internal" href="models.html#module-edrixs.models" title="edrixs.models"><code class="xref py py-mod docutils literal notranslate"><span class="pre">edrixs.models</span></code></a>. Numerical operator
+construction and spectral solvers are implemented in <code class="docutils literal notranslate"><span class="pre">*_backend.py</span></code> modules.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.solvers.build_op">
+<span class="sig-prename descclassname"><span class="pre">edrixs.solvers.</span></span><span class="sig-name descname"><span class="pre">build_op</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">emat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">umat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rb</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'scipy'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'combinadic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_numba</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/solvers.html#build_op"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.solvers.build_op" title="Link to this definition"></a></dt>
+<dd><p>Build a many-body operator with the selected backend.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>emat</strong><span class="classifier">array-like or None</span></dt><dd><p>Coefficients of the one-body part. Pass <code class="docutils literal notranslate"><span class="pre">None</span></code> when the operator has
+no one-body contribution.</p>
+</dd>
+<dt><strong>umat</strong><span class="classifier">array-like, sparse matrix, or None</span></dt><dd><p>Coefficients of the two-body part. Pass <code class="docutils literal notranslate"><span class="pre">None</span></code> when the operator has
+no two-body contribution.</p>
+</dd>
+<dt><strong>lb</strong><span class="classifier">FockBasisSpec or FockBasis</span></dt><dd><p>Basis metadata or realized basis for the output (left) many-body space.</p>
+</dd>
+<dt><strong>rb</strong><span class="classifier">FockBasisSpec, FockBasis, or None, optional</span></dt><dd><p>Basis metadata or realized basis for the input (right) many-body space.
+When omitted, <code class="docutils literal notranslate"><span class="pre">lb</span></code> is
+used for both sides.</p>
+</dd>
+<dt><strong>backend</strong><span class="classifier">str, optional</span></dt><dd><p>Backend name. The default is <code class="docutils literal notranslate"><span class="pre">'scipy'</span></code>.</p>
+</dd>
+<dt><strong>basis_method</strong><span class="classifier">{‘combinadic’, ‘explicit’}, optional</span></dt><dd><p>Representation used when <code class="docutils literal notranslate"><span class="pre">lb</span></code>/<code class="docutils literal notranslate"><span class="pre">rb</span></code> are compact basis specifications.
+The default is the implicit combinadic representation.</p>
+</dd>
+<dt><strong>use_numba</strong><span class="classifier">bool, optional</span></dt><dd><p>JIT-compile matrix-entry construction. The default is True and requires
+Numba. Pass False to use Python construction without Numba.</p>
+</dd>
+<dt><strong>backend_kws</strong><span class="classifier">mapping, optional</span></dt><dd><p>Backend-specific construction options. Accepted names, defaults, and
+constraints are in the EDRIXS backend keyword reference:
+<a class="reference external" href="https://edrixs.github.io/edrixs/dev/user/backend.html#backend-options">https://edrixs.github.io/edrixs/dev/user/backend.html#backend-options</a></p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>operator</dt><dd><p>Many-body operator in the representation owned by <code class="docutils literal notranslate"><span class="pre">backend</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.solvers.ed">
+<span class="sig-prename descclassname"><span class="pre">edrixs.solvers.</span></span><span class="sig-name descname"><span class="pre">ed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hmat_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_evals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/solvers.html#ed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.solvers.ed" title="Link to this definition"></a></dt>
+<dd><p>Compute low-energy initial states through a numerical backend.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>hmat_i</strong><span class="classifier">backend-owned operator</span></dt><dd><p>Initial/final Hamiltonian.</p>
+</dd>
+<dt><strong>num_evals</strong><span class="classifier">int, optional</span></dt><dd><p>Number of lowest eigenpairs to return.</p>
+</dd>
+<dt><strong>shift</strong><span class="classifier">float, optional</span></dt><dd><p>Real energy offset, normally the final output of a model
+constructor. Dense and SciPy ED diagonalize <code class="docutils literal notranslate"><span class="pre">hmat_i</span> <span class="pre">-</span> <span class="pre">shift</span> <span class="pre">*</span> <span class="pre">I</span></code>
+and add the offset back to the returned eigenvalues. The supplied
+Hamiltonian is not modified. Default zero; PETSc requires zero.
+Fortran ED warns and ignores nonzero shifts, continuing with the
+original Hamiltonian.</p>
+</dd>
+<dt><strong>backend</strong><span class="classifier">str or None, optional</span></dt><dd><p>Backend name. When omitted, infer it from <code class="docutils literal notranslate"><span class="pre">hmat_i</span></code>.</p>
+</dd>
+<dt><strong>backend_kws</strong><span class="classifier">mapping, optional</span></dt><dd><p>Backend-specific eigensolver options. Accepted names, defaults, and
+constraints are in the EDRIXS backend keyword reference:
+<a class="reference external" href="https://edrixs.github.io/edrixs/dev/user/backend.html#backend-options">https://edrixs.github.io/edrixs/dev/user/backend.html#backend-options</a></p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>eigenvalues, eigenvectors</dt><dd><p>Lowest retained eigenpairs, with eigenvalues on the original energy
+reference even when a nonzero <code class="docutils literal notranslate"><span class="pre">shift</span></code> is supplied.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="edrixs.solvers.ed_1v1c_fort">
 <span class="sig-prename descclassname"><span class="pre">edrixs.solvers.</span></span><span class="sig-name descname"><span class="pre">ed_1v1c_fort</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shell_name</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">shell_level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_soc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c_soc</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_noccu</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">slater</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext_B</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">on_which</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'spin'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_cfmat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_othermat</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">do_ed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ed_solver</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nvector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ncv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idump</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eigval_tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-08</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_ndim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/solvers.html#ed_1v1c_fort"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.solvers.ed_1v1c_fort" title="Link to this definition"></a></dt>
@@ -188,8 +277,8 @@ order should be consistent with the type of the valence shell.</p>
 should be consistent with the type of the valence shell.</p>
 <p>They will be zeros if not provided.</p>
 </dd>
-<dt><strong>do_ed: logical</strong></dt><dd><p>If do_end=True, diagonalize the Hamitlonian to find a few lowest eigenstates, return the
-eigenvalues and density matirx, and write the eigenvectors in files eigvec.n, otherwise,
+<dt><strong>do_ed: logical</strong></dt><dd><p>If do_ed=True, diagonalize the Hamiltonian to find a few lowest eigenstates, return the
+eigenvalues and density matrix, and write the eigenvectors in files eigvec.n, otherwise,
 just write out the input files, do not perform the ED.</p>
 </dd>
 <dt><strong>ed_solver: int</strong></dt><dd><p>Type of ED solver, options can be 0, 1, 2</p>
@@ -198,7 +287,7 @@ just write out the input files, do not perform the ED.</p>
 <li><p>1: use standard Lanczos algorithm to find only a few lowest eigenvalues,
 no re-orthogonalization has been applied, so it is not very accurate.</p></li>
 <li><p>2: use parallel version of Arpack library to find a few lowest eigenvalues,
-it is accurate and is the recommeded choice in real calculations of XAS and RIXS.</p></li>
+it is accurate and is the recommended choice in real calculations of XAS and RIXS.</p></li>
 </ul>
 </dd>
 <dt><strong>neval: int</strong></dt><dd><p>Number of eigenvalues to be found. For ed_solver=2, the value should not be too small,
@@ -237,7 +326,7 @@ ed_solver=1 will be used.</p>
 <dd><p>Perform ED for the case of two atomic shells, one valence plus one Core
 shell with pure Python solver.
 For example, for Ni-<span class="math notranslate nohighlight">\(L_3\)</span> edge RIXS, they are 3d valence and 2p core shells.</p>
-<p>It will use scipy.linalag.eigh to exactly diagonalize both the initial and intermediate
+<p>It will use scipy.linalg.eigh to exactly diagonalize both the initial and intermediate
 Hamiltonians to get all the eigenvalues and eigenvectors, and the transition operators
 will be built in the many-body eigenvector basis.</p>
 <p>This solver is only suitable for small size of Hamiltonian, typically the dimension
@@ -296,7 +385,7 @@ should be consistent with the type of valence shell.</p>
 </ul>
 <p>It will be an identity matrix if not provided.</p>
 </dd>
-<dt><strong>verbose: int</strong></dt><dd><p>Level of writting data to files. Hopping matrices, Coulomb tensors, eigvenvalues
+<dt><strong>verbose: int</strong></dt><dd><p>Level of writing data to files. Hopping matrices, Coulomb tensors, eigenvalues
 will be written if verbose &gt; 0.</p>
 </dd>
 </dl>
@@ -406,8 +495,8 @@ should be consistent with the type of the 2nd valence shell.</p>
 valence shell.</p>
 <p>They will be zeros if not provided.</p>
 </dd>
-<dt><strong>do_ed: logical</strong></dt><dd><p>If do_end=True, diagonalize the Hamitlonian to find a few lowest eigenstates, return the
-eigenvalues and density matirx, and write the eigenvectors in files eigvec.n, otherwise,
+<dt><strong>do_ed: logical</strong></dt><dd><p>If do_ed=True, diagonalize the Hamiltonian to find a few lowest eigenstates, return the
+eigenvalues and density matrix, and write the eigenvectors in files eigvec.n, otherwise,
 just write out the input files, do not perform the ED.</p>
 </dd>
 <dt><strong>ed_solver: int</strong></dt><dd><p>Type of ED solver, options can be 0, 1, 2</p>
@@ -416,7 +505,7 @@ just write out the input files, do not perform the ED.</p>
 <li><p>1: use standard Lanczos algorithm to find only a few lowest eigenvalues,
 no re-orthogonalization has been applied, so it is not very accurate.</p></li>
 <li><p>2: use parallel version of Arpack library to find a few lowest eigenvalues,
-it is accurate and is the recommeded choice in real calculations of XAS and RIXS.</p></li>
+it is accurate and is the recommended choice in real calculations of XAS and RIXS.</p></li>
 </ul>
 </dd>
 <dt><strong>neval: int</strong></dt><dd><p>Number of eigenvalues to be found. For ed_solver=2, the value should not be too small,
@@ -536,7 +625,7 @@ just provide [F0_dd, F2_dd, F4_dd, 0, F2_dp]</p>
 <li><p>0: First, search the ground state in different subspaces of total occupancy
 <span class="math notranslate nohighlight">\(N\)</span> with ed_solver=1, and then do a more accurate ED in the subspace
 <span class="math notranslate nohighlight">\(N\)</span> where the ground state lies to find a few lowest eigenstates, return
-the eigenvalues and density matirx, and write the eigenvectors in files eigvec.n</p></li>
+the eigenvalues and density matrix, and write the eigenvectors in files eigvec.n</p></li>
 <li><p>1: Only do ED for given occupancy number <em>v_noccu</em>, return eigenvalues and
 density matrix, write eigenvectors to files eigvec.n</p></li>
 <li><p>2: Do not do ED, only write parameters into files: <em>hopping_i.in</em>, <em>hopping_n.in</em>,
@@ -549,7 +638,7 @@ density matrix, write eigenvectors to files eigvec.n</p></li>
 <li><p>1: use standard Lanczos algorithm to find only a few lowest eigenvalues,
 no re-orthogonalization has been applied, so it is not very accurate.</p></li>
 <li><p>2: use parallel version of Arpack library to find a few lowest eigenvalues,
-it is accurate and is the recommeded choice in real calculations of XAS and RIXS.</p></li>
+it is accurate and is the recommended choice in real calculations of XAS and RIXS.</p></li>
 </ul>
 </dd>
 <dt><strong>neval: int</strong></dt><dd><p>Number of eigenvalues to be found. For ed_solver=2, the value should not be too small,
@@ -582,6 +671,172 @@ ed_solver=1 will be used.</p>
 </dl>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.solvers.get_ops">
+<span class="sig-prename descclassname"><span class="pre">edrixs.solvers.</span></span><span class="sig-name descname"><span class="pre">get_ops</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">emat_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">umat_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emat_n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">umat_n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis_n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trans_mat</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'scipy'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">basis_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'combinadic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_numba</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/solvers.html#get_ops"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.solvers.get_ops" title="Link to this definition"></a></dt>
+<dd><p>Build initial/intermediate Hamiltonians and transition operators.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat</strong></dt><dd><p>Backend-neutral problem definition returned by <a class="reference internal" href="models.html#module-edrixs.models" title="edrixs.models"><code class="xref py py-mod docutils literal notranslate"><span class="pre">edrixs.models</span></code></a>
+model functions. Both sectors use the full orbital space, with a
+filled initial core. Transitions act directly between these bases.</p>
+</dd>
+<dt><strong>backend</strong><span class="classifier">{‘scipy’, ‘dense’, ‘petsc’, ‘fortran’}, optional</span></dt><dd><p>Backend used for the returned operators. The default is <code class="docutils literal notranslate"><span class="pre">'scipy'</span></code>.
+The <code class="docutils literal notranslate"><span class="pre">'fortran'</span></code> backend writes the whole problem to native files in
+the working directory and returns on-disk markers; <code class="docutils literal notranslate"><span class="pre">basis_method</span></code> and
+<code class="docutils literal notranslate"><span class="pre">use_numba</span></code> do not apply to it.</p>
+</dd>
+<dt><strong>basis_method</strong><span class="classifier">{‘combinadic’, ‘explicit’}, optional</span></dt><dd><p>Basis representation constructed from the model metadata. The default
+is <code class="docutils literal notranslate"><span class="pre">'combinadic'</span></code>.</p>
+</dd>
+<dt><strong>use_numba</strong><span class="classifier">bool, optional</span></dt><dd><p>JIT-compile matrix-entry construction. The default is True and requires
+Numba. Pass False to use Python construction without Numba.</p>
+</dd>
+<dt><strong>backend_kws</strong><span class="classifier">mapping, optional</span></dt><dd><p>Backend-specific operator-construction options. Accepted names,
+defaults, and constraints are in the EDRIXS backend keyword reference:
+<a class="reference external" href="https://edrixs.github.io/edrixs/dev/user/backend.html#backend-options">https://edrixs.github.io/edrixs/dev/user/backend.html#backend-options</a></p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>hmat_i, hmat_n, trans_ops</dt><dd><p>Initial/final Hamiltonian, intermediate Hamiltonian, and transition
+operators for the selected backend.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.solvers.get_ops_disk">
+<span class="sig-prename descclassname"><span class="pre">edrixs.solvers.</span></span><span class="sig-name descname"><span class="pre">get_ops_disk</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/solvers.html#get_ops_disk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.solvers.get_ops_disk" title="Link to this definition"></a></dt>
+<dd><p>Return handles for a staged Fortran problem in the current directory.</p>
+<p>This reconnects to native Fortran input files previously written by
+<a class="reference internal" href="#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops()</span></code></a> with <code class="docutils literal notranslate"><span class="pre">backend='fortran'</span></code>.  It does not read operator data
+into memory or modify the files.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt>hmat_i, hmat_n, trans_ops</dt><dd><p>Disk-backed Fortran handles for the initial/final Hamiltonian,
+intermediate Hamiltonian, and transition operators.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.solvers.rixs">
+<span class="sig-prename descclassname"><span class="pre">edrixs.solvers.</span></span><span class="sig-name descname"><span class="pre">rixs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eval_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evec_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hmat_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hmat_n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trans_op</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ominc</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eloss</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_f</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pol_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scatter_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_gs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_poles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/solvers.html#rixs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.solvers.rixs" title="Link to this definition"></a></dt>
+<dd><p>Calculate resonant inelastic X-ray scattering spectra through a backend.</p>
+<p>Backend-neutral physical arguments are passed directly. Numerical
+controls such as SciPy Lanczos and GMRES settings belong in
+<code class="docutils literal notranslate"><span class="pre">backend_kws</span></code>. When <code class="docutils literal notranslate"><span class="pre">backend</span></code> is omitted, it is inferred from the
+Hamiltonians and transition operators.</p>
+<p>If <code class="docutils literal notranslate"><span class="pre">skip_gs</span></code> is true, transitions into the retained initial-state
+subspace are omitted from the final-state spectrum, matching the legacy
+<code class="docutils literal notranslate"><span class="pre">skip_gs</span></code> behavior.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>eval_i</strong><span class="classifier">array-like of float, shape (nstate,)</span></dt><dd><p>Energies of the retained initial states, normally returned by
+<a class="reference internal" href="#edrixs.solvers.ed" title="edrixs.solvers.ed"><code class="xref py py-func docutils literal notranslate"><span class="pre">ed()</span></code></a>.</p>
+</dd>
+<dt><strong>evec_i</strong><span class="classifier">backend-owned eigenvector representation</span></dt><dd><p>Retained initial-state eigenvectors returned by
+<a class="reference internal" href="#edrixs.solvers.ed" title="edrixs.solvers.ed"><code class="xref py py-func docutils literal notranslate"><span class="pre">ed()</span></code></a>.  For the <code class="docutils literal notranslate"><span class="pre">'dense'</span></code> and <code class="docutils literal notranslate"><span class="pre">'scipy'</span></code>
+backends this is a two-dimensional array whose column <code class="docutils literal notranslate"><span class="pre">i</span></code> belongs to
+<code class="docutils literal notranslate"><span class="pre">eval_i[i]</span></code>.</p>
+</dd>
+<dt><strong>hmat_i</strong><span class="classifier">backend-owned operator</span></dt><dd><p>Initial- and final-state Hamiltonian.</p>
+</dd>
+<dt><strong>hmat_n</strong><span class="classifier">backend-owned operator</span></dt><dd><p>Intermediate-state Hamiltonian.  Both Hamiltonians are normally
+returned by <a class="reference internal" href="#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops()</span></code></a>.</p>
+</dd>
+<dt><strong>trans_op</strong><span class="classifier">sequence of backend-owned operators</span></dt><dd><p>Transition operators from the initial/final Hilbert space to the
+intermediate Hilbert space.  There must be three components for a
+dipole transition or five for a quadrupole transition.</p>
+</dd>
+<dt><strong>ominc</strong><span class="classifier">array-like of float, shape (n_ominc,)</span></dt><dd><p>Incident photon-energy grid.</p>
+</dd>
+<dt><strong>eloss</strong><span class="classifier">array-like of float, shape (n_eloss,)</span></dt><dd><p>Energy-loss grid.</p>
+</dd>
+<dt><strong>gamma_c</strong><span class="classifier">float or array-like of float, optional</span></dt><dd><p>Core-hole lifetime broadening.  An array must have the same shape as
+<code class="docutils literal notranslate"><span class="pre">ominc</span></code>.  Default is <code class="docutils literal notranslate"><span class="pre">0.1</span></code>.</p>
+</dd>
+<dt><strong>gamma_f</strong><span class="classifier">float or array-like of float, optional</span></dt><dd><p>Final-state broadening.  An array must have the same shape as
+<code class="docutils literal notranslate"><span class="pre">eloss</span></code>.  Default is <code class="docutils literal notranslate"><span class="pre">0.01</span></code>.</p>
+</dd>
+<dt><strong>thin, thout, phi</strong><span class="classifier">float, optional</span></dt><dd><p>Incident, scattered, and azimuthal angles in radians.  Defaults are
+<code class="docutils literal notranslate"><span class="pre">1.0</span></code>, <code class="docutils literal notranslate"><span class="pre">1.0</span></code>, and <code class="docutils literal notranslate"><span class="pre">0.0</span></code>, respectively.</p>
+</dd>
+<dt><strong>pol_type</strong><span class="classifier">sequence of tuple or None, optional</span></dt><dd><p>Polarization channels.  Each entry is
+<code class="docutils literal notranslate"><span class="pre">(in_kind,</span> <span class="pre">alpha,</span> <span class="pre">out_kind,</span> <span class="pre">beta)</span></code>, where each kind is <code class="docutils literal notranslate"><span class="pre">'linear'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'left'</span></code>, or <code class="docutils literal notranslate"><span class="pre">'right'</span></code> and <code class="docutils literal notranslate"><span class="pre">alpha</span></code> and <code class="docutils literal notranslate"><span class="pre">beta</span></code> are the linear
+polarization angles in radians.  The angles are ignored for circular
+polarization.  Isotropic RIXS polarization is not supported.  The
+default is <code class="docutils literal notranslate"><span class="pre">[('linear',</span> <span class="pre">0.0,</span> <span class="pre">'linear',</span> <span class="pre">0.0)]</span></code>.</p>
+</dd>
+<dt><strong>temperature</strong><span class="classifier">float, optional</span></dt><dd><p>Temperature in kelvin used for the Boltzmann weights of the retained
+initial states.  Default is <code class="docutils literal notranslate"><span class="pre">1.0</span></code>.</p>
+</dd>
+<dt><strong>scatter_axis</strong><span class="classifier">array-like of float, shape (3, 3), or None, optional</span></dt><dd><p>Cartesian axes defining the scattering frame.  The identity matrix is
+used by default.</p>
+</dd>
+<dt><strong>skip_gs</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, project the retained initial-state subspace out of the final
+states.  This option is not supported by the Fortran backend.  Default
+is False.</p>
+</dd>
+<dt><strong>return_poles</strong><span class="classifier">bool, optional</span></dt><dd><p>If True, also return the continued-fraction pole data.  Default is
+False.</p>
+</dd>
+<dt><strong>backend</strong><span class="classifier">{‘dense’, ‘scipy’, ‘fortran’, ‘petsc’} or None, optional</span></dt><dd><p>Numerical backend.  If omitted, infer it from the Hamiltonians and
+<code class="docutils literal notranslate"><span class="pre">trans_op</span></code>.  The PETSc backend is currently an unimplemented stub.</p>
+</dd>
+<dt><strong>backend_kws</strong><span class="classifier">mapping or None, optional</span></dt><dd><p>Backend-specific solver settings. Accepted names, defaults, and
+constraints are in the EDRIXS backend keyword reference:
+<a class="reference external" href="https://edrixs.github.io/edrixs/dev/user/backend.html#backend-options">https://edrixs.github.io/edrixs/dev/user/backend.html#backend-options</a></p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt><strong>spectrum</strong><span class="classifier">numpy.ndarray</span></dt><dd><p>RIXS intensity with shape
+<code class="docutils literal notranslate"><span class="pre">(len(ominc),</span> <span class="pre">len(eloss),</span> <span class="pre">len(pol_type))</span></code>.  When <code class="docutils literal notranslate"><span class="pre">pol_type</span></code> is
+<code class="docutils literal notranslate"><span class="pre">None</span></code>, the third dimension has length one.</p>
+</dd>
+<dt><strong>poles</strong><span class="classifier">list of list of dict, optional</span></dt><dd><p>Continued-fraction poles indexed first by incident energy and then by
+polarization.  Returned together with <code class="docutils literal notranslate"><span class="pre">spectrum</span></code> only when
+<code class="docutils literal notranslate"><span class="pre">return_poles</span></code> is True.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#edrixs.solvers.ed" title="edrixs.solvers.ed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">edrixs.solvers.ed</span></code></a></dt><dd><p>Compute the retained initial-state eigenpairs.</p>
+</dd>
+<dt><a class="reference internal" href="#edrixs.solvers.xas" title="edrixs.solvers.xas"><code class="xref py py-obj docutils literal notranslate"><span class="pre">edrixs.solvers.xas</span></code></a></dt><dd><p>Calculate an X-ray absorption spectrum.</p>
+</dd>
+</dl>
+</div>
+<p class="rubric">Examples</p>
+<p>After constructing the operators and retained eigenstates, calculate a
+linear-polarization RIXS spectrum:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ominc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mi">11</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">eloss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mi">501</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spectrum</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">rixs</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">eval_i</span><span class="p">,</span> <span class="n">evec_i</span><span class="p">,</span> <span class="n">hmat_i</span><span class="p">,</span> <span class="n">hmat_n</span><span class="p">,</span> <span class="n">trans_ops</span><span class="p">,</span> <span class="n">ominc</span><span class="p">,</span> <span class="n">eloss</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">pol_type</span><span class="o">=</span><span class="p">[(</span><span class="s1">'linear'</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">'linear'</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)],</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'scipy'</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">
@@ -725,8 +980,8 @@ the local <span class="math notranslate nohighlight">\(zx\)</span>-plane.</p>
 </ul>
 <p>It will be an identity matrix if not provided.</p>
 </dd>
-<dt><strong>skip_gs: bool</strong></dt><dd><p>If True, transitions to the ground state(s) (forming the elastic peak) are omitted from
-the calculation.</p>
+<dt><strong>skip_gs: bool</strong></dt><dd><p>If True, transitions to the ground state(s) (forming the elastic peak)
+are omitted from the calculation.</p>
 </dd>
 </dl>
 </dd>
@@ -921,6 +1176,92 @@ different polarizations.</p>
 </dl>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.solvers.xas">
+<span class="sig-prename descclassname"><span class="pre">edrixs.solvers.</span></span><span class="sig-name descname"><span class="pre">xas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eval_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evec_i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hmat_n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trans_op</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ominc</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">gamma_c</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thin</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">phi</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pol_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">temperature</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scatter_axis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend_kws</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/solvers.html#xas"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.solvers.xas" title="Link to this definition"></a></dt>
+<dd><p>Calculate X-ray absorption spectra through a numerical backend.</p>
+<p>Backend-neutral physical arguments are passed directly. Numerical
+controls such as the SciPy Lanczos dimension belong in <code class="docutils literal notranslate"><span class="pre">backend_kws</span></code>.
+When <code class="docutils literal notranslate"><span class="pre">backend</span></code> is omitted, it is inferred from <code class="docutils literal notranslate"><span class="pre">hmat_n</span></code> and the
+transition operators.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>eval_i</strong><span class="classifier">array-like of float, shape (nstate,)</span></dt><dd><p>Energies of the retained initial states, normally returned by
+<a class="reference internal" href="#edrixs.solvers.ed" title="edrixs.solvers.ed"><code class="xref py py-func docutils literal notranslate"><span class="pre">ed()</span></code></a>.</p>
+</dd>
+<dt><strong>evec_i</strong><span class="classifier">backend-owned eigenvector representation</span></dt><dd><p>Retained initial-state eigenvectors returned by
+<a class="reference internal" href="#edrixs.solvers.ed" title="edrixs.solvers.ed"><code class="xref py py-func docutils literal notranslate"><span class="pre">ed()</span></code></a>.  For the <code class="docutils literal notranslate"><span class="pre">'dense'</span></code> and <code class="docutils literal notranslate"><span class="pre">'scipy'</span></code>
+backends this is a two-dimensional array whose column <code class="docutils literal notranslate"><span class="pre">i</span></code> belongs to
+<code class="docutils literal notranslate"><span class="pre">eval_i[i]</span></code>.</p>
+</dd>
+<dt><strong>hmat_n</strong><span class="classifier">backend-owned operator</span></dt><dd><p>Intermediate-state Hamiltonian, normally returned by
+<a class="reference internal" href="#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops()</span></code></a>.</p>
+</dd>
+<dt><strong>trans_op</strong><span class="classifier">sequence of backend-owned operators</span></dt><dd><p>Transition operators from the initial to the intermediate Hilbert
+space.  There must be three components for a dipole transition or five
+for a quadrupole transition.</p>
+</dd>
+<dt><strong>ominc</strong><span class="classifier">array-like of float, shape (n_ominc,)</span></dt><dd><p>Incident photon-energy grid.</p>
+</dd>
+<dt><strong>gamma_c</strong><span class="classifier">float or array-like of float, optional</span></dt><dd><p>Core-hole lifetime broadening.  An array must have the same shape as
+<code class="docutils literal notranslate"><span class="pre">ominc</span></code>.  Default is <code class="docutils literal notranslate"><span class="pre">0.1</span></code>.</p>
+</dd>
+<dt><strong>thin, phi</strong><span class="classifier">float, optional</span></dt><dd><p>Incident and azimuthal angles in radians.  Defaults are <code class="docutils literal notranslate"><span class="pre">1.0</span></code> and
+<code class="docutils literal notranslate"><span class="pre">0.0</span></code>, respectively.</p>
+</dd>
+<dt><strong>pol_type</strong><span class="classifier">sequence of tuple or None, optional</span></dt><dd><p>Polarization channels.  Each entry is <code class="docutils literal notranslate"><span class="pre">(kind,</span> <span class="pre">alpha)</span></code>, where
+<code class="docutils literal notranslate"><span class="pre">kind</span></code> is <code class="docutils literal notranslate"><span class="pre">'linear'</span></code>, <code class="docutils literal notranslate"><span class="pre">'left'</span></code>, <code class="docutils literal notranslate"><span class="pre">'right'</span></code>, or <code class="docutils literal notranslate"><span class="pre">'isotropic'</span></code>
+and <code class="docutils literal notranslate"><span class="pre">alpha</span></code> is the linear-polarization angle in radians.  The angle
+is ignored for circular and isotropic polarization.  The default is
+<code class="docutils literal notranslate"><span class="pre">[('isotropic',</span> <span class="pre">0.0)]</span></code>.</p>
+</dd>
+<dt><strong>temperature</strong><span class="classifier">float, optional</span></dt><dd><p>Temperature in kelvin used for the Boltzmann weights of the retained
+initial states.  Default is <code class="docutils literal notranslate"><span class="pre">1.0</span></code>.</p>
+</dd>
+<dt><strong>scatter_axis</strong><span class="classifier">array-like of float, shape (3, 3), or None, optional</span></dt><dd><p>Cartesian axes defining the scattering frame.  The identity matrix is
+used by default.</p>
+</dd>
+<dt><strong>backend</strong><span class="classifier">{‘dense’, ‘scipy’, ‘fortran’, ‘petsc’} or None, optional</span></dt><dd><p>Numerical backend.  If omitted, infer it from <code class="docutils literal notranslate"><span class="pre">hmat_n</span></code> and
+<code class="docutils literal notranslate"><span class="pre">trans_op</span></code>.  The PETSc backend is currently an unimplemented stub.</p>
+</dd>
+<dt><strong>backend_kws</strong><span class="classifier">mapping or None, optional</span></dt><dd><p>Backend-specific solver settings. Accepted names, defaults, and
+constraints are in the EDRIXS backend keyword reference:
+<a class="reference external" href="https://edrixs.github.io/edrixs/dev/user/backend.html#backend-options">https://edrixs.github.io/edrixs/dev/user/backend.html#backend-options</a></p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><dl class="simple">
+<dt>numpy.ndarray</dt><dd><p>XAS intensity with shape <code class="docutils literal notranslate"><span class="pre">(len(ominc),</span> <span class="pre">len(pol_type))</span></code>.  When
+<code class="docutils literal notranslate"><span class="pre">pol_type</span></code> is <code class="docutils literal notranslate"><span class="pre">None</span></code>, the second dimension has length one.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#edrixs.solvers.ed" title="edrixs.solvers.ed"><code class="xref py py-obj docutils literal notranslate"><span class="pre">edrixs.solvers.ed</span></code></a></dt><dd><p>Compute the retained initial-state eigenpairs.</p>
+</dd>
+<dt><a class="reference internal" href="#edrixs.solvers.rixs" title="edrixs.solvers.rixs"><code class="xref py py-obj docutils literal notranslate"><span class="pre">edrixs.solvers.rixs</span></code></a></dt><dd><p>Calculate a resonant inelastic X-ray scattering spectrum.</p>
+</dd>
+</dl>
+</div>
+<p class="rubric">Examples</p>
+<p>After constructing the operators and retained eigenstates, calculate an
+isotropic spectrum on an incident-energy grid:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ominc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mf">5.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">,</span> <span class="mi">201</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">spectrum</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">xas</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">eval_i</span><span class="p">,</span> <span class="n">evec_i</span><span class="p">,</span> <span class="n">hmat_n</span><span class="p">,</span> <span class="n">trans_ops</span><span class="p">,</span> <span class="n">ominc</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">pol_type</span><span class="o">=</span><span class="p">[(</span><span class="s1">'isotropic'</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)],</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'scipy'</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">

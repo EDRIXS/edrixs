@@ -1,7 +1,7 @@
 .. _user:
 
 #################
-edrixs User Guide
+EDRIXS User Guide
 #################
 
 :Release: |version|
@@ -14,8 +14,8 @@ edrixs User Guide
    installation
    usedocker
    devcontainer
-   quickstart
-   basics
-   pythontips
+   introduction
+   conventions
+   backend
    examples
    papers

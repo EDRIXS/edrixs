@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>edrixs and docker &mdash; edrixs 0.post1+geacad9a documentation</title>
+  <title>EDRIXS and docker &mdash; EDRIXS 0.post1+g803cebb documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=6a3525d1"></script>
+      <script src="../_static/documentation_options.js?v=66d01fc2"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -47,7 +47,7 @@
           
           
           <a href="../index.html" class="icon icon-home">
-            edrixs
+            EDRIXS
               <img src="../_static/EDRIXS_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -59,25 +59,25 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">edrixs User Guide</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="whatisedrixs.html">What is edrixs?</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">EDRIXS User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="whatisedrixs.html">What is EDRIXS?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">edrixs and docker</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#run-edrixs-in-a-docker-container">Run edrixs in a docker container</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">EDRIXS and docker</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#run-edrixs-in-a-docker-container">Run EDRIXS in a docker container</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#use-the-docker-image-as-a-dev-container">Use the docker image as a Dev Container</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#sharing-your-code">Sharing your code</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="devcontainer.html">Dev Container</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quickstart.html">Quickstart tutorial</a></li>
-<li class="toctree-l2"><a class="reference internal" href="basics.html">edrixs basics</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pythontips.html">Tips for python and edrixs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html">Introduction to EDRIXS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conventions.html">Conventions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html">Backend</a></li>
 <li class="toctree-l2"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l2"><a class="reference internal" href="papers.html">EDRIXS papers</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Pedagogical examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">edrixs Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">EDRIXS Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../release-history.html">Release History</a></li>
 </ul>
 
@@ -87,7 +87,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">edrixs</a>
+          <a href="../index.html">EDRIXS</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -95,8 +95,8 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="index.html">edrixs User Guide</a></li>
-      <li class="breadcrumb-item active">edrixs and docker</li>
+          <li class="breadcrumb-item"><a href="index.html">EDRIXS User Guide</a></li>
+      <li class="breadcrumb-item active">EDRIXS and docker</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/user/usedocker.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -107,11 +107,11 @@
            <div itemprop="articleBody">
              
   <section id="edrixs-and-docker">
-<span id="edrixsanddocker"></span><h1>edrixs and docker<a class="headerlink" href="#edrixs-and-docker" title="Link to this heading"></a></h1>
+<span id="edrixsanddocker"></span><h1>EDRIXS and docker<a class="headerlink" href="#edrixs-and-docker" title="Link to this heading"></a></h1>
 <section id="run-edrixs-in-a-docker-container">
-<h2>Run edrixs in a docker container<a class="headerlink" href="#run-edrixs-in-a-docker-container" title="Link to this heading"></a></h2>
+<h2>Run EDRIXS in a docker container<a class="headerlink" href="#run-edrixs-in-a-docker-container" title="Link to this heading"></a></h2>
 <p>To make life easier, we have built a Docker image based on Ubuntu Linux 24.04
-for edrixs, so you do not need to install its compiler toolchain yourself.
+for EDRIXS, so you do not need to install its compiler toolchain yourself.
 The image is published for both AMD64 and ARM64 systems.
 The <code class="docutils literal notranslate"><span class="pre">latest</span></code> tag tracks the latest stable release. For reproducible work,
 pin a release tag such as <code class="docutils literal notranslate"><span class="pre">edrixs/edrixs:v0.1.3</span></code>.
@@ -151,7 +151,7 @@ Follow these steps to use the docker image:</p>
 </section>
 <section id="use-the-docker-image-as-a-dev-container">
 <h2>Use the docker image as a Dev Container<a class="headerlink" href="#use-the-docker-image-as-a-dev-container" title="Link to this heading"></a></h2>
-<p>You can use the edrixs docker image as a <a class="reference external" href="https://containers.readthedocs.io/">Dev Container</a> in VS Code or GitHub Codespaces without
+<p>You can use the EDRIXS docker image as a <a class="reference external" href="https://containers.readthedocs.io/">Dev Container</a> in VS Code or GitHub Codespaces without
 cloning the full repository. Create a file <code class="docutils literal notranslate"><span class="pre">.devcontainer/devcontainer.json</span></code>
 in your project with the following contents</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
@@ -162,7 +162,7 @@ in your project with the following contents</p>
 </div>
 <p>Open the project in VS Code with the <a class="reference external" href="https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers">Dev Containers</a>
 extension installed and choose <strong>Reopen in Container</strong> when prompted.</p>
-<p>See <a class="reference internal" href="devcontainer.html#devcontainer"><span class="std std-ref">Dev Container</span></a> for more details on using Dev Containers with edrixs.</p>
+<p>See <a class="reference internal" href="devcontainer.html#devcontainer"><span class="std std-ref">Dev Container</span></a> for more details on using Dev Containers with EDRIXS.</p>
 </section>
 <section id="sharing-your-code">
 <h2>Sharing your code<a class="headerlink" href="#sharing-your-code" title="Link to this heading"></a></h2>
@@ -170,7 +170,7 @@ extension installed and choose <strong>Reopen in Container</strong> when prompte
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">FROM</span> <span class="n">edrixs</span><span class="o">/</span><span class="n">edrixs</span>
 </pre></div>
 </div>
-<p>You might like to checkout the <a class="reference external" href="https://repo2docker.readthedocs.io/en/latest/">jupyter-repo2docker</a> project, which helps automate the process of building and connecting to docker images. The <a class="reference external" href="https://mybinder.org/">mybinder</a> project might also be helpful as this will open a github respository of notebooks in an executable environment, making your code immediately reproducible by anyone, anywhere.</p>
+<p>You might like to checkout the <a class="reference external" href="https://repo2docker.readthedocs.io/en/latest/">jupyter-repo2docker</a> project, which helps automate the process of building and connecting to docker images. The <a class="reference external" href="https://mybinder.org/">mybinder</a> project might also be helpful as this will open a github repository of notebooks in an executable environment, making your code immediately reproducible by anyone, anywhere.</p>
 </section>
 </section>
 

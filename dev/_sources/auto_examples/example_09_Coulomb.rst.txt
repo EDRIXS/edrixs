@@ -60,7 +60,7 @@ a tensor :math:`U`
 
 where :math:`\alpha`, :math:`\beta`, :math:`\gamma`, :math:`\delta` are
 orbital indices and :math:`\hat{f}^{\dagger}`
-(:math:`\hat{f}`) are the creation (anihilation) operators.
+(:math:`\hat{f}`) are the creation (annihilation) operators.
 Notice that the indexing order of the last two elements of the tensor
 is opposite to that of the operators because
 these operators are associated with a ket state :math:`\ket{\gamma \delta}`,
@@ -70,13 +70,12 @@ For a :math:`d`-electron system, we have :math:`10` distinct spin-orbitals
 :math:`10\times10\times10\times10` in total size.
 In EDRIXS the matrix can be created as follows:
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-62
+.. GENERATED FROM PYTHON SOURCE LINES 54-61
 
 .. code-block:: Python
 
     import edrixs
     import numpy as np
-    import scipy
     import matplotlib.pyplot as plt
     import itertools
 
@@ -89,12 +88,12 @@ In EDRIXS the matrix can be created as follows:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 63-65
+.. GENERATED FROM PYTHON SOURCE LINES 62-64
 
-We stored this under variable :code:`umat_chb` where "cbh" stands for
+We stored this under variable :code:`umat_chb` where "chb" stands for
 complex harmonic basis, which is the default basis in EDRIXS.
 
-.. GENERATED FROM PYTHON SOURCE LINES 67-101
+.. GENERATED FROM PYTHON SOURCE LINES 66-100
 
 Parameterizing interactions
 ------------------------------------------------------------------------------
@@ -105,7 +104,7 @@ and Wigner 3J symbols. Textbooks such as [1]_ can be used for further
 reference. If you are interested in the details of how
 EDRIXS does this (and you probably aren't) function
 :func:`~edrixs.coulomb_utensor.umat_slater`,
-constructs the required matrix via Gaunt coeficents from
+constructs the required matrix via Gaunt coefficients from
 :func:`~edrixs.coulomb_utensor.get_gaunt`. Two alternative parameterizations
 are common.
 The first are the Racah parameters, which are
@@ -131,7 +130,7 @@ EDRIXS converts between the Slater integrals and Racah parameters in both
 directions with :func:`~edrixs.utils.F0F2F4_to_ABC` and
 :func:`~edrixs.utils.ABC_to_F0F2F4`:
 
-.. GENERATED FROM PYTHON SOURCE LINES 101-108
+.. GENERATED FROM PYTHON SOURCE LINES 100-107
 
 .. code-block:: Python
 
@@ -149,7 +148,7 @@ directions with :func:`~edrixs.utils.F0F2F4_to_ABC` and
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 109-116
+.. GENERATED FROM PYTHON SOURCE LINES 108-115
 
 Basis transform
 ------------------------------------------------------------------------------
@@ -159,7 +158,7 @@ transformation, which imposes the following orbital order
 :math:`\uparrow, \downarrow` spin pairs. Let's perform this transformation and
 store a list of these orbitals.
 
-.. GENERATED FROM PYTHON SOURCE LINES 116-119
+.. GENERATED FROM PYTHON SOURCE LINES 115-118
 
 .. code-block:: Python
 
@@ -173,7 +172,7 @@ store a list of these orbitals.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 120-173
+.. GENERATED FROM PYTHON SOURCE LINES 119-172
 
 Interactions
 ------------------------------------------------------------------------------
@@ -200,7 +199,7 @@ and the later involve swapping orbital labels for electrons. We will use
 :math:`U_0` and :math:`J` as a shorthand for distinguishing these.
 
 Before we describe the different types of interactions, we note that since
-the Coulomb interaction is real, and due to the spin symmmetry properties
+the Coulomb interaction is real, and due to the spin symmetry properties
 of the process :math:`U` always obeys
 
   .. math::
@@ -229,7 +228,7 @@ elements are the same and equal to
 
 Let's print these to demonstrate where these live in the array
 
-.. GENERATED FROM PYTHON SOURCE LINES 173-177
+.. GENERATED FROM PYTHON SOURCE LINES 172-176
 
 .. code-block:: Python
 
@@ -254,17 +253,17 @@ Let's print these to demonstrate where these live in the array
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 178-185
+.. GENERATED FROM PYTHON SOURCE LINES 177-184
 
 2. Inter orbital Coulomb interactions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Direct Coulomb repulsion between different orbitals depends on terms like
 :math:`U_{\alpha\sigma,\beta\sigma^\prime,\beta\sigma^\prime,\alpha\sigma}`.
-Expresions for these parameters are provided in column :math:`U` in
+Expressions for these parameters are provided in column :math:`U` in
 :ref:`table_2_orbital`. We can print the values from :code:`umat`
 like this:
 
-.. GENERATED FROM PYTHON SOURCE LINES 185-189
+.. GENERATED FROM PYTHON SOURCE LINES 184-188
 
 .. code-block:: Python
 
@@ -294,16 +293,16 @@ like this:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 190-196
+.. GENERATED FROM PYTHON SOURCE LINES 189-195
 
 3. Inter-orbital exchange interactions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Exchange terms exist with the form
 :math:`U_{\alpha\sigma,\beta\sigma^\prime,\alpha\sigma^\prime,\beta\sigma}`.
-Expresions for these parameters are provided in column :math:`J` of
+Expressions for these parameters are provided in column :math:`J` of
 :ref:`table_2_orbital`. These come from terms like this in the matrix:
 
-.. GENERATED FROM PYTHON SOURCE LINES 196-200
+.. GENERATED FROM PYTHON SOURCE LINES 195-199
 
 .. code-block:: Python
 
@@ -333,7 +332,7 @@ Expresions for these parameters are provided in column :math:`J` of
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 201-208
+.. GENERATED FROM PYTHON SOURCE LINES 200-207
 
 4. Pair hopping term
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -343,7 +342,7 @@ and depend on exchange interactions column :math:`J` from
 :ref:`table_2_orbital`
 and here in the matrix.
 
-.. GENERATED FROM PYTHON SOURCE LINES 208-212
+.. GENERATED FROM PYTHON SOURCE LINES 207-211
 
 .. code-block:: Python
 
@@ -373,7 +372,7 @@ and here in the matrix.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 213-230
+.. GENERATED FROM PYTHON SOURCE LINES 212-229
 
 5. Three orbital
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -393,7 +392,7 @@ These are needed to maintain the rotational symmetry of the interations.
 See :ref:`table_3_orbital` for the expressions. We can print some of
 these via:
 
-.. GENERATED FROM PYTHON SOURCE LINES 230-242
+.. GENERATED FROM PYTHON SOURCE LINES 229-241
 
 .. code-block:: Python
 
@@ -427,15 +426,15 @@ these via:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 243-248
+.. GENERATED FROM PYTHON SOURCE LINES 242-247
 
 6. Four orbital
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Futher multi-orbital terms include
+Further multi-orbital terms include
 :math:`U_{\alpha\sigma,\beta\sigma^\prime,\gamma\sigma^\prime,\delta\sigma}`.
 We can find these here in the matrix:
 
-.. GENERATED FROM PYTHON SOURCE LINES 248-264
+.. GENERATED FROM PYTHON SOURCE LINES 247-263
 
 .. code-block:: Python
 
@@ -477,16 +476,16 @@ We can find these here in the matrix:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 265-271
+.. GENERATED FROM PYTHON SOURCE LINES 264-270
 
 Effects of multi-orbital terms
 ------------------------------------------------------------------------------
 To test the effects of the multi-orbital terms, let's plot the eigenenergy
-spectra with and without multi-orbital terms switched on for system with and
+spectra with and without multi-orbital terms switched on for systems with and
 without a cubic crystal field. We will use a :math:`d`-shell with two
 electrons.
 
-.. GENERATED FROM PYTHON SOURCE LINES 271-306
+.. GENERATED FROM PYTHON SOURCE LINES 270-304
 
 .. code-block:: Python
 
@@ -495,12 +494,11 @@ electrons.
     def diagonalize(ten_dq, umat):
         emat = edrixs.cb_op(edrixs.cf_cubic_d(ten_dq),
                             edrixs.tmat_c2r('d', ispin=True))
-        H = (edrixs.build_opers(4, umat, basis)
-             + edrixs.build_opers(2, emat, basis))
-        e, v = scipy.linalg.eigh(H)
+        H = edrixs.build_op(emat, umat, basis, backend='dense')
+        e = edrixs.ed(H, num_evals=len(basis), backend='dense')[0]
         return e - e.min()
 
-    basis = edrixs.get_fock_bin_by_N(10, 2)
+    basis = edrixs.get_fock_basis_int(10, 2)
     umat_no_multiorbital = np.copy(umat)
     for val in [np.sqrt(3)*B/2, np.sqrt(3)*B, 3*B/2]:
         umat_no_multiorbital[(np.abs(umat)- val) < 1e-6] = 0
@@ -537,14 +535,14 @@ electrons.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 307-396
+.. GENERATED FROM PYTHON SOURCE LINES 305-394
 
 On the left of the plot Coulomb interactions in spherical symmetry cause
-substantial mxing between :math:`t_{2g}` and :math:`e_{g}` orbitals in the
-eigenstates and 3 & 4 orbital orbital terms are crucial for obtaining the
-the right eigenenergies. As :math:`10D_q` get large, this mixing is switched
+substantial mixing between :math:`t_{2g}` and :math:`e_{g}` orbitals in the
+eigenstates and the 3 & 4 orbital terms are crucial for obtaining the
+right eigenenergies. As :math:`10D_q` gets large, this mixing is switched
 off and the spectra start to become independent of whether the 3 & 4 orbital
-orbital terms are included or not.
+terms are included or not.
 
 
 
@@ -632,7 +630,7 @@ orbital terms are included or not.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.210 seconds)
+   **Total running time of the script:** (0 minutes 0.193 seconds)
 
 
 .. _sphx_glr_download_auto_examples_example_09_Coulomb.py:

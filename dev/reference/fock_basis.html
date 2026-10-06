@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>fock_basis &mdash; edrixs 0.post1+geacad9a documentation</title>
+  <title>fock_basis &mdash; EDRIXS 0.post1+g803cebb documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=6a3525d1"></script>
+      <script src="../_static/documentation_options.js?v=66d01fc2"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -48,7 +48,7 @@
           
           
           <a href="../index.html" class="icon icon-home">
-            edrixs
+            EDRIXS
               <img src="../_static/EDRIXS_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -60,28 +60,51 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../user/index.html">edrixs User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">EDRIXS User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Pedagogical examples</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">edrixs Reference</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">EDRIXS Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="angular_momentum.html">angular_momentum</a></li>
 <li class="toctree-l2"><a class="reference internal" href="basis_transform.html">basis_transform</a></li>
 <li class="toctree-l2"><a class="reference internal" href="coulomb_utensor.html">coulomb_utensor</a></li>
 <li class="toctree-l2"><a class="reference internal" href="fit_hyb.html">fit_hyb</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">fock_basis</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.fock_basis.FockBasis"><code class="docutils literal notranslate"><span class="pre">FockBasis</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#edrixs.fock_basis.FockBasis.decode"><code class="docutils literal notranslate"><span class="pre">FockBasis.decode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edrixs.fock_basis.FockBasis.encode"><code class="docutils literal notranslate"><span class="pre">FockBasis.encode()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.fock_basis.FockBasisSpec"><code class="docutils literal notranslate"><span class="pre">FockBasisSpec</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#edrixs.fock_basis.FockBasisSpec.from_args"><code class="docutils literal notranslate"><span class="pre">FockBasisSpec.from_args()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edrixs.fock_basis.FockBasisSpec.norbs"><code class="docutils literal notranslate"><span class="pre">FockBasisSpec.norbs</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.fock_basis.FockBinByN"><code class="docutils literal notranslate"><span class="pre">FockBinByN</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#edrixs.fock_basis.FockBinByN.decode"><code class="docutils literal notranslate"><span class="pre">FockBinByN.decode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edrixs.fock_basis.FockBinByN.encode"><code class="docutils literal notranslate"><span class="pre">FockBinByN.encode()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edrixs.fock_basis.FockBinByN.from_spec"><code class="docutils literal notranslate"><span class="pre">FockBinByN.from_spec()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#edrixs.fock_basis.FockBinByN.jit_args"><code class="docutils literal notranslate"><span class="pre">FockBinByN.jit_args()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.fock_basis.build_fock_basis"><code class="docutils literal notranslate"><span class="pre">build_fock_basis()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.fock_basis.fock_bin"><code class="docutils literal notranslate"><span class="pre">fock_bin()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.fock_basis.get_fock_basis_by_NJz"><code class="docutils literal notranslate"><span class="pre">get_fock_basis_by_NJz()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.fock_basis.get_fock_basis_by_NLz"><code class="docutils literal notranslate"><span class="pre">get_fock_basis_by_NLz()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.fock_basis.get_fock_basis_by_NSz"><code class="docutils literal notranslate"><span class="pre">get_fock_basis_by_NSz()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.fock_basis.get_fock_basis_by_N_LzSz"><code class="docutils literal notranslate"><span class="pre">get_fock_basis_by_N_LzSz()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.fock_basis.get_fock_basis_by_N_abelian"><code class="docutils literal notranslate"><span class="pre">get_fock_basis_by_N_abelian()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.fock_basis.get_fock_basis_combinadic"><code class="docutils literal notranslate"><span class="pre">get_fock_basis_combinadic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.fock_basis.get_fock_basis_int"><code class="docutils literal notranslate"><span class="pre">get_fock_basis_int()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.fock_basis.get_fock_bin_by_N"><code class="docutils literal notranslate"><span class="pre">get_fock_bin_by_N()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.fock_basis.get_fock_full_N"><code class="docutils literal notranslate"><span class="pre">get_fock_full_N()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#edrixs.fock_basis.get_fock_half_N"><code class="docutils literal notranslate"><span class="pre">get_fock_half_N()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.fock_basis.write_fock_dec_by_N"><code class="docutils literal notranslate"><span class="pre">write_fock_dec_by_N()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="iostream.html">iostream</a></li>
 <li class="toctree-l2"><a class="reference internal" href="manybody_operator.html">manybody_operator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html">models</a></li>
 <li class="toctree-l2"><a class="reference internal" href="photon_transition.html">photon_transition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="poles.html">poles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_spectrum.html">plot_spectrum</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rixs_utils.html">rixs_utils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="soc.html">soc</a></li>
@@ -100,7 +123,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">edrixs</a>
+          <a href="../index.html">EDRIXS</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -108,7 +131,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="index.html">edrixs Reference</a></li>
+          <li class="breadcrumb-item"><a href="index.html">EDRIXS Reference</a></li>
       <li class="breadcrumb-item active">fock_basis</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/reference/fock_basis.rst.txt" rel="nofollow"> View page source</a>
@@ -121,6 +144,95 @@
              
   <section id="module-edrixs.fock_basis">
 <span id="fock-basis"></span><h1>fock_basis<a class="headerlink" href="#module-edrixs.fock_basis" title="Link to this heading"></a></h1>
+<p>Fock-basis construction and integer-encoded basis objects.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="edrixs.fock_basis.FockBasis">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">edrixs.fock_basis.</span></span><span class="sig-name descname"><span class="pre">FockBasis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">basis_int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norbs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/fock_basis.html#FockBasis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.fock_basis.FockBasis" title="Link to this definition"></a></dt>
+<dd><p>Integer-encoded Fock basis with constant-time state lookup.</p>
+<p>Orbital zero is stored as the least significant bit, as in native Fortran.
+Orbital <code class="docutils literal notranslate"><span class="pre">i</span></code> has mask <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">&lt;&lt;</span> <span class="pre">i</span></code>; occupation lists remain in orbital
+order, with orbital zero first.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><strong>basis_int</strong><span class="classifier">sequence of int</span></dt><dd><p>Integer encodings of the basis states in matrix-index order.</p>
+</dd>
+<dt><strong>norbs</strong><span class="classifier">int</span></dt><dd><p>Number of spin-orbitals represented by each state.</p>
+</dd>
+<dt><strong>spec</strong><span class="classifier">FockBasisSpec or None, optional</span></dt><dd><p>Structured sector description when the basis was generated from fixed
+shell occupancies. Arbitrary explicit bases may leave this as <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="edrixs.fock_basis.FockBasis.decode">
+<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">position</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/fock_basis.html#FockBasis.decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.fock_basis.FockBasis.decode" title="Link to this definition"></a></dt>
+<dd><p>Return the integer-encoded Fock state at <code class="docutils literal notranslate"><span class="pre">position</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edrixs.fock_basis.FockBasis.encode">
+<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/fock_basis.html#FockBasis.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.fock_basis.FockBasis.encode" title="Link to this definition"></a></dt>
+<dd><p>Return the basis position of an integer-encoded Fock state.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="edrixs.fock_basis.FockBasisSpec">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">edrixs.fock_basis.</span></span><span class="sig-name descname"><span class="pre">FockBasisSpec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shapes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/fock_basis.html#FockBasisSpec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.fock_basis.FockBasisSpec" title="Link to this definition"></a></dt>
+<dd><p>Compact description of fixed occupancies in one or more orbital shells.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="edrixs.fock_basis.FockBasisSpec.from_args">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/fock_basis.html#FockBasisSpec.from_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.fock_basis.FockBasisSpec.from_args" title="Link to this definition"></a></dt>
+<dd><p>Build a specification from <code class="docutils literal notranslate"><span class="pre">(norbs,</span> <span class="pre">nocc)</span></code> pairs.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="edrixs.fock_basis.FockBasisSpec.norbs">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">norbs</span></span><a class="headerlink" href="#edrixs.fock_basis.FockBasisSpec.norbs" title="Link to this definition"></a></dt>
+<dd><p>Total number of spin-orbitals.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="edrixs.fock_basis.FockBinByN">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">edrixs.fock_basis.</span></span><span class="sig-name descname"><span class="pre">FockBinByN</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shapes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="(in Python v3.14)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/fock_basis.html#FockBinByN"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.fock_basis.FockBinByN" title="Link to this definition"></a></dt>
+<dd><p>Implicit combinadic basis for a complete fixed-occupancy sector.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="edrixs.fock_basis.FockBinByN.decode">
+<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">index</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/fock_basis.html#FockBinByN.decode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.fock_basis.FockBinByN.decode" title="Link to this definition"></a></dt>
+<dd><p>Return the integer-encoded state at the canonical EDRIXS index.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edrixs.fock_basis.FockBinByN.encode">
+<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/fock_basis.html#FockBinByN.encode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.fock_basis.FockBinByN.encode" title="Link to this definition"></a></dt>
+<dd><p>Return the canonical EDRIXS index of <code class="docutils literal notranslate"><span class="pre">state</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edrixs.fock_basis.FockBinByN.from_spec">
+<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_spec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spec</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/fock_basis.html#FockBinByN.from_spec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.fock_basis.FockBinByN.from_spec" title="Link to this definition"></a></dt>
+<dd><p>Build an implicit basis from a <a class="reference internal" href="#edrixs.fock_basis.FockBasisSpec" title="edrixs.fock_basis.FockBasisSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">FockBasisSpec</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="edrixs.fock_basis.FockBinByN.jit_args">
+<span class="sig-name descname"><span class="pre">jit_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/fock_basis.html#FockBinByN.jit_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.fock_basis.FockBinByN.jit_args" title="Link to this definition"></a></dt>
+<dd><p>Return compact numeric metadata for an explicitly requested JIT path.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.fock_basis.build_fock_basis">
+<span class="sig-prename descclassname"><span class="pre">edrixs.fock_basis.</span></span><span class="sig-name descname"><span class="pre">build_fock_basis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">basis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'combinadic'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/fock_basis.html#build_fock_basis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.fock_basis.build_fock_basis" title="Link to this definition"></a></dt>
+<dd><p>Realize a compact basis specification with the requested representation.</p>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="edrixs.fock_basis.fock_bin">
 <span class="sig-prename descclassname"><span class="pre">edrixs.fock_basis.</span></span><span class="sig-name descname"><span class="pre">fock_bin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/fock_basis.html#fock_bin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.fock_basis.fock_bin" title="Link to this definition"></a></dt>
@@ -184,21 +296,9 @@ numbers <span class="math notranslate nohighlight">\(j_{z}\)</span>, the value i
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">edrixs</span><span class="o">.</span><span class="n">get_fock_basis_by_NJz</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
-<span class="go">{</span>
-<span class="go"> -6: [],</span>
-<span class="go"> -5: [],</span>
-<span class="go"> -4: [5, 12],</span>
-<span class="go"> -3: [],</span>
-<span class="go"> -2: [6, 9, 20],</span>
-<span class="go"> -1: [],</span>
-<span class="go">  0: [3, 10, 17, 36, 24],</span>
-<span class="go">  1: [],</span>
-<span class="go">  2: [18, 33, 40],</span>
-<span class="go">  3: [],</span>
-<span class="go">  4: [34, 48],</span>
-<span class="go">  5: [],</span>
-<span class="go">  6: []</span>
-<span class="go">}</span>
+<span class="go">{-6: [], -5: [], -4: [5, 12], -3: [], -2: [6, 9, 20], -1: [],</span>
+<span class="go"> 0: [3, 10, 17, 36, 24], 1: [], 2: [18, 33, 40], 3: [],</span>
+<span class="go"> 4: [34, 48], 5: [], 6: []}</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -232,13 +332,8 @@ quantum numbers <span class="math notranslate nohighlight">\(L_{z}\)</span>, the
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">edrixs</span><span class="o">.</span><span class="n">get_fock_basis_by_NLz</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
-<span class="go">{</span>
-<span class="go"> -2: [3],</span>
-<span class="go"> -1: [5, 6, 9, 10],</span>
-<span class="go">  0: [12, 17, 18, 33, 34],</span>
-<span class="go">  1: [20, 36, 24, 40],</span>
-<span class="go">  2: [48]</span>
-<span class="go">}</span>
+<span class="go">{-2: [3], -1: [5, 6, 9, 10], 0: [12, 17, 18, 33, 34],</span>
+<span class="go"> 1: [20, 36, 24, 40], 2: [48]}</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -272,13 +367,8 @@ numbers <span class="math notranslate nohighlight">\(S_{z}\)</span>, the value i
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">edrixs</span><span class="o">.</span><span class="n">get_fock_basis_by_NSz</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-<span class="go">{</span>
-<span class="go"> -2: [10, 34, 40],</span>
-<span class="go"> -1: [],</span>
-<span class="go">  0: [3, 6, 9, 12, 18, 33, 36, 24, 48],</span>
-<span class="go">  1: [],</span>
-<span class="go">  2: [5, 17, 20]</span>
-<span class="go">}</span>
+<span class="go">{-2: [10, 34, 40], -1: [],</span>
+<span class="go"> 0: [3, 6, 9, 12, 18, 33, 36, 24, 48], 1: [], 2: [5, 17, 20]}</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -306,42 +396,19 @@ numbers <span class="math notranslate nohighlight">\(S_{z}\)</span>, the value i
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>basis: dict</dt><dd><p>A dictionary containing the decimal digitals, the key is a tuple containing good quantum
-numbers ( <span class="math notranslate nohighlight">\(l_{z}\)</span>, <span class="math notranslate nohighlight">\(s_{z}\)</span>), the value is a list of int.</p>
+<dt>basis: dict</dt><dd><p>A dictionary containing the decimal digitals, the key is a tuple of
+good quantum numbers (<span class="math notranslate nohighlight">\(l_{z}\)</span>, <span class="math notranslate nohighlight">\(s_{z}\)</span>), and the value is
+a list of int.</p>
 </dd>
 </dl>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">edrixs</span><span class="o">.</span><span class="n">get_fock_basis_by_N_LzSz</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-<span class="go">{</span>
-<span class="go"> (-2, -2): [],</span>
-<span class="go"> (-2, -1): [],</span>
-<span class="go">  (-2, 0): [3],</span>
-<span class="go">  (-2, 1): [],</span>
-<span class="go">  (-2, 2): [],</span>
-<span class="go"> (-1, -2): [10],</span>
-<span class="go"> (-1, -1): [],</span>
-<span class="go">  (-1, 0): [6, 9],</span>
-<span class="go">  (-1, 1): [],</span>
-<span class="go">  (-1, 2): [5],</span>
-<span class="go">  (0, -2): [34],</span>
-<span class="go">  (0, -1): [],</span>
-<span class="go">   (0, 0): [12, 18, 33],</span>
-<span class="go">   (0, 1): [],</span>
-<span class="go">   (0, 2): [17],</span>
-<span class="go">  (1, -2): [40],</span>
-<span class="go">  (1, -1): [],</span>
-<span class="go">   (1, 0): [36, 24],</span>
-<span class="go">   (1, 1): [],</span>
-<span class="go">   (1, 2): [20],</span>
-<span class="go">  (2, -2): [],</span>
-<span class="go">  (2, -1): [],</span>
-<span class="go">   (2, 0): [48],</span>
-<span class="go">   (2, 1): [],</span>
-<span class="go">   (2, 2): []</span>
-<span class="go">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lz</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sz</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">edrixs</span><span class="o">.</span><span class="n">get_fock_basis_by_N_LzSz</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">lz</span><span class="p">,</span> <span class="n">sz</span><span class="p">)[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
+<span class="go">[12, 18, 33]</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -349,7 +416,8 @@ numbers ( <span class="math notranslate nohighlight">\(l_{z}\)</span>, <span cla
 <dl class="py function">
 <dt class="sig sig-object py" id="edrixs.fock_basis.get_fock_basis_by_N_abelian">
 <span class="sig-prename descclassname"><span class="pre">edrixs.fock_basis.</span></span><span class="sig-name descname"><span class="pre">get_fock_basis_by_N_abelian</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">norb</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a_list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/fock_basis.html#get_fock_basis_by_N_abelian"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.fock_basis.get_fock_basis_by_N_abelian" title="Link to this definition"></a></dt>
-<dd><p>Get decimal digitals to represent Fock states, use some Abelian good quantum number.</p>
+<dd><p>Get decimal digitals to represent Fock states, use some Abelian good
+quantum number.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><dl class="simple">
@@ -363,12 +431,26 @@ numbers ( <span class="math notranslate nohighlight">\(l_{z}\)</span>, <span cla
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>basis: dict</dt><dd><p>A dictionary containing the decimal digitals, the key is good quantum numbers,
-the value is a list of int.</p>
+<dt>basis: dict</dt><dd><p>A dictionary containing the decimal digitals, the key is good quantum
+numbers, the value is a list of int.</p>
 </dd>
 </dl>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.fock_basis.get_fock_basis_combinadic">
+<span class="sig-prename descclassname"><span class="pre">edrixs.fock_basis.</span></span><span class="sig-name descname"><span class="pre">get_fock_basis_combinadic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/fock_basis.html#get_fock_basis_combinadic"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.fock_basis.get_fock_basis_combinadic" title="Link to this definition"></a></dt>
+<dd><p>Build an implicit combinadic basis for fixed shell occupancies.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.fock_basis.get_fock_basis_int">
+<span class="sig-prename descclassname"><span class="pre">edrixs.fock_basis.</span></span><span class="sig-name descname"><span class="pre">get_fock_basis_int</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/fock_basis.html#get_fock_basis_int"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.fock_basis.get_fock_basis_int" title="Link to this definition"></a></dt>
+<dd><p>Build an explicit <a class="reference internal" href="#edrixs.fock_basis.FockBasis" title="edrixs.fock_basis.FockBasis"><code class="xref py py-class docutils literal notranslate"><span class="pre">FockBasis</span></code></a> for fixed shell occupancies.</p>
+<p>The state ordering is the historical EDRIXS ordering produced by
+<a class="reference internal" href="#edrixs.fock_basis.get_fock_bin_by_N" title="edrixs.fock_basis.get_fock_bin_by_N"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_fock_bin_by_N()</span></code></a>.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -445,7 +527,7 @@ the value is a list of int.</p>
 </dl>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">edrixs</span><span class="o">.</span><span class="n">fock_bin</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">edrixs</span><span class="o">.</span><span class="n">fock_bin</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="go">[[1, 1, 0, 0],</span>
 <span class="go"> [1, 0, 1, 0],</span>
 <span class="go"> [0, 1, 1, 0],</span>
@@ -454,11 +536,16 @@ the value is a list of int.</p>
 <span class="go"> [0, 0, 1, 1]]</span>
 </pre></div>
 </div>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">edrixs</span><span class="o">.</span><span class="n">get_fock_full_N</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">edrixs</span><span class="o">.</span><span class="n">get_fock_full_N</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
 <span class="go">[3, 5, 6, 9, 10, 12]</span>
 </pre></div>
 </div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="edrixs.fock_basis.get_fock_half_N">
+<span class="sig-prename descclassname"><span class="pre">edrixs.fock_basis.</span></span><span class="sig-name descname"><span class="pre">get_fock_half_N</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/edrixs/fock_basis.html#get_fock_half_N"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#edrixs.fock_basis.get_fock_half_N" title="Link to this definition"></a></dt>
+<dd><p>Group half-space integer states by particle number.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -479,7 +566,7 @@ ascending order and then write them to file.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
-<dt>ndim: int</dt><dd><p>The dimension of the Hilbert space</p>
+<dt>ndim: int</dt><dd><p>The dimension of the Hilbert space.</p>
 </dd>
 </dl>
 </dd>
@@ -487,27 +574,11 @@ ascending order and then write them to file.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">edrixs</span><span class="o">.</span><span class="n">write_fock_dec_by_N</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">'fock_i.in'</span><span class="p">)</span>
-<span class="go">file fock_i.in looks like</span>
-<span class="go">15</span>
-<span class="go">3</span>
-<span class="go">5</span>
 <span class="go">6</span>
-<span class="go">9</span>
-<span class="go">10</span>
-<span class="go">12</span>
-<span class="go">17</span>
-<span class="go">18</span>
-<span class="go">20</span>
-<span class="go">24</span>
-<span class="go">33</span>
-<span class="go">34</span>
-<span class="go">36</span>
-<span class="go">40</span>
-<span class="go">48</span>
 </pre></div>
 </div>
-<p>where, the first line is the total numer of Fock states,
-and the following lines are the Fock states in decimal form.</p>
+<p>The first line of <code class="docutils literal notranslate"><span class="pre">fock_i.in</span></code> is the total number of Fock states,
+followed by the states in decimal form: <code class="docutils literal notranslate"><span class="pre">3,</span> <span class="pre">5,</span> <span class="pre">6,</span> <span class="pre">9,</span> <span class="pre">10,</span> <span class="pre">12</span></code>.</p>
 </dd></dl>
 
 </section>

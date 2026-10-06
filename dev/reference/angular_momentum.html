@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>angular_momentum &mdash; edrixs 0.post1+geacad9a documentation</title>
+  <title>angular_momentum &mdash; EDRIXS 0.post1+g803cebb documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=6a3525d1"></script>
+      <script src="../_static/documentation_options.js?v=66d01fc2"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -32,7 +32,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="basis_transform" href="basis_transform.html" />
-    <link rel="prev" title="edrixs Reference" href="index.html" />
+    <link rel="prev" title="EDRIXS Reference" href="index.html" />
    
   <meta name="edrixs-doc-version" content="dev">
   <meta name="edrixs-doc-site-root" content="/edrixs/">
@@ -48,7 +48,7 @@
           
           
           <a href="../index.html" class="icon icon-home">
-            edrixs
+            EDRIXS
               <img src="../_static/EDRIXS_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -60,9 +60,9 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../user/index.html">edrixs User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">EDRIXS User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Pedagogical examples</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">edrixs Reference</a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">EDRIXS Reference</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">angular_momentum</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.angular_momentum.cf_cubic_d"><code class="docutils literal notranslate"><span class="pre">cf_cubic_d()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#edrixs.angular_momentum.cf_square_planar_d"><code class="docutils literal notranslate"><span class="pre">cf_square_planar_d()</span></code></a></li>
@@ -93,7 +93,9 @@
 <li class="toctree-l2"><a class="reference internal" href="fock_basis.html">fock_basis</a></li>
 <li class="toctree-l2"><a class="reference internal" href="iostream.html">iostream</a></li>
 <li class="toctree-l2"><a class="reference internal" href="manybody_operator.html">manybody_operator</a></li>
+<li class="toctree-l2"><a class="reference internal" href="models.html">models</a></li>
 <li class="toctree-l2"><a class="reference internal" href="photon_transition.html">photon_transition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="poles.html">poles</a></li>
 <li class="toctree-l2"><a class="reference internal" href="plot_spectrum.html">plot_spectrum</a></li>
 <li class="toctree-l2"><a class="reference internal" href="rixs_utils.html">rixs_utils</a></li>
 <li class="toctree-l2"><a class="reference internal" href="soc.html">soc</a></li>
@@ -112,7 +114,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">edrixs</a>
+          <a href="../index.html">EDRIXS</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -120,7 +122,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="index.html">edrixs Reference</a></li>
+          <li class="breadcrumb-item"><a href="index.html">EDRIXS Reference</a></li>
       <li class="breadcrumb-item active">angular_momentum</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/reference/angular_momentum.rst.txt" rel="nofollow"> View page source</a>
@@ -168,7 +170,7 @@ ten_dq and ds.</p>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>ten_dq: float scalar</strong></dt><dd><p>Parameter associated with eg-t2g splitting.</p>
 </dd>
-<dt><strong>ds: float scalar</strong></dt><dd><p>Paramter associated with splitting orbitals with
+<dt><strong>ds: float scalar</strong></dt><dd><p>Parameter associated with splitting orbitals with
 z-components.</p>
 </dd>
 </dl>
@@ -192,9 +194,9 @@ in the complex harmonics basis.</p>
 <dd class="field-odd"><dl class="simple">
 <dt><strong>ten_dq: float scalar</strong></dt><dd><p>Parameter used to label cubic crystal splitting.</p>
 </dd>
-<dt><strong>d1: float scalar</strong></dt><dd><p>Paramter used to label tetragonal splitting.</p>
+<dt><strong>d1: float scalar</strong></dt><dd><p>Parameter used to label tetragonal splitting.</p>
 </dd>
-<dt><strong>d3: float scalar</strong></dt><dd><p>Paramter used to label tetragonal splitting.</p>
+<dt><strong>d3: float scalar</strong></dt><dd><p>Parameter used to label tetragonal splitting.</p>
 </dd>
 </dl>
 </dd>
@@ -682,7 +684,7 @@ rotational matrix <span class="math notranslate nohighlight">\(R\)</span>.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="edrixs Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="EDRIXS Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="basis_transform.html" class="btn btn-neutral float-right" title="basis_transform" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

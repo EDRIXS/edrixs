@@ -19,7 +19,7 @@ Papers using EDRIXS
 
 * Enhanced hybridization in the electronic ground state of the intercalated honeycomb iridate Ag\ :sub:`3`\ LiIr\ :sub:`2`\ O\ :sub:`6`\ , A. de la Torre, B. Zager, F. Bahrami, M. DiScala, J. R. Chamorro, M. H. Upton, G. Fabbris, D. Haskel, D. Casa, T. M. McQueen, F. Tafti, and K. W. Plumb, `Phys. Rev. B 104, L100416 (2021) <https://doi.org/10.1103/PhysRevB.104.L100416>`_
 
-* Probing Physical Oxidation State by Resonant X-ray Emission Spectroscopy: Applications to Iron Model Complexes and Nitrogenase, Rebeca G. Castillo, Anselm W. Hahn,  Benjamin E. Van Kuiken, Justin T. Henthorn, Jeremy McGale, and Serena DeBeer, `Angew. Chem. Int. Ed. 60, 10112–1012 (2021) <https://doi.org/10.1002/ange.202015669>`_
+* Probing Physical Oxidation State by Resonant X-ray Emission Spectroscopy: Applications to Iron Model Complexes and Nitrogenase, Rebeca G. Castillo, Anselm W. Hahn,  Benjamin E. Van Kuiken, Justin T. Henthorn, Jeremy McGale, and Serena DeBeer, `Angew. Chem. Int. Ed. 60, 10112–10121 (2021) <https://doi.org/10.1002/ange.202015669>`_
 
 * Role of Oxygen States in the Low Valence Nickelate La\ :sub:`4`\ Ni\ :sub:`3`\ O\ :sub:`8`\ , Y. Shen, J. Sears, G. Fabbris, J. Li, J. Pelliciari, I. Jarrige, Xi He, I. Božović, M. Mitrano, Junjie Zhang, J. F. Mitchell, A. S. Botana, V. Bisogni, M. R. Norman, S. Johnston, and M. P. M. Dean, `Phys. Rev. X 12, 011055 (2022) <https://doi.org/10.1103/PhysRevX.12.011055>`_
 

@@ -1,0 +1,1133 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>edrixs.models &mdash; EDRIXS 0.post1+g803cebb documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery.css?v=c83e6b79" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/version-switcher.css?v=23edc989" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=66d01fc2"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../../_static/copybutton.js?v=f281be69"></script>
+      <script src="../../_static/sg-tags.js?v=d80f6fa4"></script>
+      <script src="../../_static/version-switcher.js?v=7c26ac8e"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <meta name="edrixs-doc-version" content="dev">
+  <meta name="edrixs-doc-site-root" content="/edrixs/">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            EDRIXS
+              <img src="../../_static/EDRIXS_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">EDRIXS User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Pedagogical examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">EDRIXS Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">EDRIXS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">edrixs.models</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for edrixs.models</h1><div class="highlight"><pre>
+<span></span><span class="sd">"""Backend-independent physical model construction for EDRIXS.</span>
+
+<span class="sd">The model functions in this module describe orbital-space Hamiltonians,</span>
+<span class="sd">interactions, Fock-basis specifications, and photon-transition matrices without</span>
+<span class="sd">constructing backend-owned many-body operators.</span>
+<span class="sd">"""</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.angular_momentum</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_lx</span><span class="p">,</span> <span class="n">get_ly</span><span class="p">,</span> <span class="n">get_lz</span><span class="p">,</span> <span class="n">get_sx</span><span class="p">,</span> <span class="n">get_sy</span><span class="p">,</span> <span class="n">get_sz</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.angular_momentum</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_wigner_dmat</span><span class="p">,</span> <span class="n">rmat_to_euler</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.basis_transform</span><span class="w"> </span><span class="kn">import</span> <span class="n">cb_op</span><span class="p">,</span> <span class="n">tmat_c2r</span><span class="p">,</span> <span class="n">tmat_r2c</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.coulomb_utensor</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_F0</span><span class="p">,</span> <span class="n">get_umat_slater</span><span class="p">,</span> <span class="n">get_umat_slater_3shells</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.fock_basis</span><span class="w"> </span><span class="kn">import</span> <span class="n">FockBasisSpec</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.photon_transition</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_trans_oper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.soc</span><span class="w"> </span><span class="kn">import</span> <span class="n">atom_hsoc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span><span class="n">CT_imp_bath</span><span class="p">,</span> <span class="n">CT_imp_bath_core_hole</span><span class="p">,</span> <span class="n">info_atomic_shell</span><span class="p">,</span>
+                    <span class="n">slater_integrals_name</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._solvers_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_embed_impurity_core_umat</span><span class="p">,</span>
+    <span class="n">_embed_impurity_core_umat_sparse</span><span class="p">,</span>
+    <span class="n">_rotated_transition_blocks</span><span class="p">,</span>
+    <span class="n">_umat_dense_to_sparse</span><span class="p">,</span>
+    <span class="n">_valence_zeeman_matrix</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'model_1v1c'</span><span class="p">,</span> <span class="s1">'model_2v1c'</span><span class="p">,</span> <span class="s1">'model_siam'</span><span class="p">,</span> <span class="s1">'model_siam_2d1p'</span><span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_print_slater_summary</span><span class="p">(</span><span class="n">slater_name</span><span class="p">,</span> <span class="n">slater_i</span><span class="p">,</span> <span class="n">slater_n</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Print the initial/intermediate Slater-integral table."""</span>
+    <span class="nb">print</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"    Summary of Slater integrals:"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"    ------------------------------"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"    Terms,   Initial Hamiltonian,  Intermediate Hamiltonian"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">s_i</span><span class="p">,</span> <span class="n">s_n</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">slater_name</span><span class="p">,</span> <span class="n">slater_i</span><span class="p">,</span> <span class="n">slater_n</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"    "</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="s2">":  </span><span class="si">{:20.10f}{:20.10f}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s_i</span><span class="p">,</span> <span class="n">s_n</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="model_1v1c">
+<a class="viewcode-back" href="../../reference/models.html#edrixs.models.model_1v1c">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">model_1v1c</span><span class="p">(</span><span class="n">shell_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">shell_level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">v_soc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">c_soc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+               <span class="n">v_noccu</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">slater</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ext_B</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">on_which</span><span class="o">=</span><span class="s1">'spin'</span><span class="p">,</span>
+               <span class="n">v_cfmat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">v_othermat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">loc_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+               <span class="n">sparse_U</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1E-10</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Set up orbital-space data and Fock-basis metadata for a 1v1c problem.</span>
+
+<span class="sd">    This routine defines the physical one-valence-shell/one-core-shell problem</span>
+<span class="sd">    independently of the numerical backend. It constructs the one-body orbital</span>
+<span class="sd">    matrices, Coulomb tensors, Fock-basis specifications, and orbital-space</span>
+<span class="sd">    transition matrices, but it does not build many-body Hamiltonians and does not</span>
+<span class="sd">    diagonalize anything.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    shell_name : tuple of str</span>
+<span class="sd">        Names of the valence and core shells.</span>
+
+<span class="sd">    shell_level, v_soc, c_soc, v_noccu, slater, ext_B, on_which,</span>
+<span class="sd">    v_cfmat, v_othermat, loc_axis</span>
+<span class="sd">        Same physical model parameters as ed_1v1c_py.</span>
+
+<span class="sd">    verbose : bool, optional</span>
+<span class="sd">        If True, print a setup summary (Slater integrals and Hilbert-space</span>
+<span class="sd">        dimensions). Default False.</span>
+
+<span class="sd">    sparse_U : bool, optional</span>
+<span class="sd">        If False, return dense rank-4 Coulomb tensors. If True, return each</span>
+<span class="sd">        Coulomb tensor as a sparse matrix with shape (ntot*ntot, ntot*ntot),</span>
+<span class="sd">        using the flattened convention</span>
+<span class="sd">        row = lorb * ntot + korb and col = jorb * ntot + iorb.</span>
+
+<span class="sd">    tol : float, optional</span>
+<span class="sd">        Threshold used when converting dense Coulomb tensors to sparse format.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat, shift</span>
+<span class="sd">        Backend-independent problem definition. ``basis_i`` and ``basis_n`` are</span>
+<span class="sd">        compact Fock-basis specifications with a filled initial core and one</span>
+<span class="sd">        intermediate core hole. Occupancy arguments count valence electrons</span>
+<span class="sd">        only. Both one-body matrices have shape (ntot, ntot), both dense</span>
+<span class="sd">        Coulomb tensors have shape (ntot,) * 4, and trans_mat has shape</span>
+<span class="sd">        (npol, ntot, ntot). Initial core interactions are included.</span>
+<span class="sd">        ``shift`` is the filled core shell-level energy,</span>
+<span class="sd">        ``c_norb * shell_level[1]`` (zero if unspecified), excluding Coulomb</span>
+<span class="sd">        contributions.</span>
+<span class="sd">        Pass the first seven outputs to :func:`~edrixs.solvers.get_ops` and</span>
+<span class="sd">        ``shift`` to dense or SciPy :func:`~edrixs.solvers.ed`.</span>
+<span class="sd">        The returned integrals retain the full, unshifted energies.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"edrixs &gt;&gt;&gt; Setting up 1v1c problem ..."</span><span class="p">)</span>
+
+    <span class="n">v_name_options</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'s'</span><span class="p">,</span> <span class="s1">'p'</span><span class="p">,</span> <span class="s1">'t2g'</span><span class="p">,</span> <span class="s1">'d'</span><span class="p">,</span> <span class="s1">'f'</span><span class="p">]</span>
+    <span class="n">c_name_options</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'s'</span><span class="p">,</span> <span class="s1">'p'</span><span class="p">,</span> <span class="s1">'p12'</span><span class="p">,</span> <span class="s1">'p32'</span><span class="p">,</span> <span class="s1">'t2g'</span><span class="p">,</span> <span class="s1">'d'</span><span class="p">,</span> <span class="s1">'d32'</span><span class="p">,</span> <span class="s1">'d52'</span><span class="p">,</span>
+                      <span class="s1">'f'</span><span class="p">,</span> <span class="s1">'f52'</span><span class="p">,</span> <span class="s1">'f72'</span><span class="p">]</span>
+
+    <span class="n">v_name</span> <span class="o">=</span> <span class="n">shell_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">c_name</span> <span class="o">=</span> <span class="n">shell_name</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">v_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">v_name_options</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"NOT supported type of valence shell: "</span><span class="p">,</span> <span class="n">v_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">c_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">c_name_options</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"NOT supported type of core shell: "</span><span class="p">,</span> <span class="n">c_name</span><span class="p">)</span>
+
+    <span class="n">info_shell</span> <span class="o">=</span> <span class="n">info_atomic_shell</span><span class="p">()</span>
+
+    <span class="n">v_orbl</span> <span class="o">=</span> <span class="n">info_shell</span><span class="p">[</span><span class="n">v_name</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">v_norb</span> <span class="o">=</span> <span class="n">info_shell</span><span class="p">[</span><span class="n">v_name</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">c_norb</span> <span class="o">=</span> <span class="n">info_shell</span><span class="p">[</span><span class="n">c_name</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">ntot</span> <span class="o">=</span> <span class="n">v_norb</span> <span class="o">+</span> <span class="n">c_norb</span>
+
+    <span class="c1"># Both sectors explicitly include the core orbitals.</span>
+    <span class="n">emat_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ntot</span><span class="p">,</span> <span class="n">ntot</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="n">emat_n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ntot</span><span class="p">,</span> <span class="n">ntot</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+
+    <span class="c1"># Coulomb interaction.</span>
+    <span class="n">slater_name</span> <span class="o">=</span> <span class="n">slater_integrals_name</span><span class="p">((</span><span class="n">v_name</span><span class="p">,</span> <span class="n">c_name</span><span class="p">),</span> <span class="p">(</span><span class="s1">'v'</span><span class="p">,</span> <span class="s1">'c'</span><span class="p">))</span>
+    <span class="n">nslat</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">slater_name</span><span class="p">)</span>
+
+    <span class="n">slater_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nslat</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">slater_n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nslat</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">slater</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">nslat</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">slater</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">slater_i</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">slater</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span> <span class="o">=</span> <span class="n">slater</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">slater_i</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">slater</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="n">nslat</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">nslat</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">slater</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">slater_n</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">slater</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span> <span class="o">=</span> <span class="n">slater</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">slater_n</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">slater</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="n">nslat</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">_print_slater_summary</span><span class="p">(</span><span class="n">slater_name</span><span class="p">,</span> <span class="n">slater_i</span><span class="p">,</span> <span class="n">slater_n</span><span class="p">)</span>
+
+    <span class="n">case</span> <span class="o">=</span> <span class="n">v_name</span> <span class="o">+</span> <span class="n">c_name</span>
+    <span class="n">umat_i</span> <span class="o">=</span> <span class="n">get_umat_slater</span><span class="p">(</span><span class="n">case</span><span class="p">,</span> <span class="o">*</span><span class="n">slater_i</span><span class="p">)</span>
+    <span class="n">umat_n</span> <span class="o">=</span> <span class="n">get_umat_slater</span><span class="p">(</span><span class="n">case</span><span class="p">,</span> <span class="o">*</span><span class="n">slater_n</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">sparse_U</span><span class="p">:</span>
+        <span class="n">umat_i</span> <span class="o">=</span> <span class="n">_umat_dense_to_sparse</span><span class="p">(</span><span class="n">umat_i</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+        <span class="n">umat_n</span> <span class="o">=</span> <span class="n">_umat_dense_to_sparse</span><span class="p">(</span><span class="n">umat_n</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+
+    <span class="c1"># Spin-orbit coupling.</span>
+    <span class="k">if</span> <span class="n">v_soc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">emat_i</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">atom_hsoc</span><span class="p">(</span><span class="n">v_name</span><span class="p">,</span> <span class="n">v_soc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">emat_n</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">atom_hsoc</span><span class="p">(</span><span class="n">v_name</span><span class="p">,</span> <span class="n">v_soc</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="c1"># For split core shells such as p12/p32, d32/d52, f52/f72, the SOC is</span>
+    <span class="c1"># already encoded by the shell choice.</span>
+    <span class="k">if</span> <span class="n">c_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'p'</span><span class="p">,</span> <span class="s1">'d'</span><span class="p">,</span> <span class="s1">'f'</span><span class="p">]:</span>
+        <span class="n">emat_i</span><span class="p">[</span><span class="n">v_norb</span><span class="p">:</span><span class="n">ntot</span><span class="p">,</span> <span class="n">v_norb</span><span class="p">:</span><span class="n">ntot</span><span class="p">]</span> <span class="o">+=</span> <span class="n">atom_hsoc</span><span class="p">(</span><span class="n">c_name</span><span class="p">,</span> <span class="n">c_soc</span><span class="p">)</span>
+        <span class="n">emat_n</span><span class="p">[</span><span class="n">v_norb</span><span class="p">:</span><span class="n">ntot</span><span class="p">,</span> <span class="n">v_norb</span><span class="p">:</span><span class="n">ntot</span><span class="p">]</span> <span class="o">+=</span> <span class="n">atom_hsoc</span><span class="p">(</span><span class="n">c_name</span><span class="p">,</span> <span class="n">c_soc</span><span class="p">)</span>
+
+    <span class="c1"># Crystal field and additional one-body terms.</span>
+    <span class="k">if</span> <span class="n">v_cfmat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">emat_i</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v_cfmat</span><span class="p">)</span>
+        <span class="n">emat_n</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v_cfmat</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">v_othermat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">emat_i</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v_othermat</span><span class="p">)</span>
+        <span class="n">emat_n</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v_othermat</span><span class="p">)</span>
+
+    <span class="c1"># Shell levels.</span>
+    <span class="k">if</span> <span class="n">shell_level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">emat_i</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">v_norb</span><span class="p">)</span> <span class="o">*</span> <span class="n">shell_level</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">emat_n</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">v_norb</span><span class="p">)</span> <span class="o">*</span> <span class="n">shell_level</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">emat_i</span><span class="p">[</span><span class="n">v_norb</span><span class="p">:</span><span class="n">ntot</span><span class="p">,</span> <span class="n">v_norb</span><span class="p">:</span><span class="n">ntot</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">c_norb</span><span class="p">)</span> <span class="o">*</span> <span class="n">shell_level</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">emat_n</span><span class="p">[</span><span class="n">v_norb</span><span class="p">:</span><span class="n">ntot</span><span class="p">,</span> <span class="n">v_norb</span><span class="p">:</span><span class="n">ntot</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">c_norb</span><span class="p">)</span> <span class="o">*</span> <span class="n">shell_level</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># External field on valence shell.</span>
+    <span class="k">if</span> <span class="n">v_name</span> <span class="o">==</span> <span class="s1">'t2g'</span><span class="p">:</span>
+        <span class="n">lx</span><span class="p">,</span> <span class="n">ly</span><span class="p">,</span> <span class="n">lz</span> <span class="o">=</span> <span class="n">get_lx</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span> <span class="n">get_ly</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span> <span class="n">get_lz</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">,</span> <span class="n">sz</span> <span class="o">=</span> <span class="n">get_sx</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">get_sy</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">get_sz</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">lx</span><span class="p">,</span> <span class="n">ly</span><span class="p">,</span> <span class="n">lz</span> <span class="o">=</span> <span class="o">-</span><span class="n">lx</span><span class="p">,</span> <span class="o">-</span><span class="n">ly</span><span class="p">,</span> <span class="o">-</span><span class="n">lz</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">lx</span><span class="p">,</span> <span class="n">ly</span><span class="p">,</span> <span class="n">lz</span> <span class="o">=</span> <span class="n">get_lx</span><span class="p">(</span><span class="n">v_orbl</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span> <span class="n">get_ly</span><span class="p">(</span><span class="n">v_orbl</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span> <span class="n">get_lz</span><span class="p">(</span><span class="n">v_orbl</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">,</span> <span class="n">sz</span> <span class="o">=</span> <span class="n">get_sx</span><span class="p">(</span><span class="n">v_orbl</span><span class="p">),</span> <span class="n">get_sy</span><span class="p">(</span><span class="n">v_orbl</span><span class="p">),</span> <span class="n">get_sz</span><span class="p">(</span><span class="n">v_orbl</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">ext_B</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">on_which</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'spin'</span><span class="p">:</span>
+            <span class="n">zeeman</span> <span class="o">=</span> <span class="n">ext_B</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sx</span><span class="p">)</span> <span class="o">+</span> <span class="n">ext_B</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sy</span><span class="p">)</span> <span class="o">+</span> <span class="n">ext_B</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sz</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">on_which</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'orbital'</span><span class="p">:</span>
+            <span class="n">zeeman</span> <span class="o">=</span> <span class="n">ext_B</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">lx</span> <span class="o">+</span> <span class="n">ext_B</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">ly</span> <span class="o">+</span> <span class="n">ext_B</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">lz</span>
+        <span class="k">elif</span> <span class="n">on_which</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="s1">'both'</span><span class="p">:</span>
+            <span class="n">zeeman</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">ext_B</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">lx</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">sx</span><span class="p">)</span>
+                <span class="o">+</span> <span class="n">ext_B</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">ly</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">sy</span><span class="p">)</span>
+                <span class="o">+</span> <span class="n">ext_B</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">lz</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">sz</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"Unknown value of on_which"</span><span class="p">,</span> <span class="n">on_which</span><span class="p">)</span>
+
+        <span class="n">emat_i</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">zeeman</span>
+        <span class="n">emat_n</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">zeeman</span>
+
+    <span class="c1"># Fock-basis metadata.</span>
+    <span class="n">basis_i</span> <span class="o">=</span> <span class="n">FockBasisSpec</span><span class="o">.</span><span class="n">from_args</span><span class="p">(</span><span class="n">v_norb</span><span class="p">,</span> <span class="n">v_noccu</span><span class="p">,</span> <span class="n">c_norb</span><span class="p">,</span> <span class="n">c_norb</span><span class="p">)</span>
+    <span class="n">basis_n</span> <span class="o">=</span> <span class="n">FockBasisSpec</span><span class="o">.</span><span class="n">from_args</span><span class="p">(</span><span class="n">v_norb</span><span class="p">,</span> <span class="n">v_noccu</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">c_norb</span><span class="p">,</span> <span class="n">c_norb</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"edrixs &gt;&gt;&gt; Dimension of the initial Hamiltonian: "</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">basis_i</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"edrixs &gt;&gt;&gt; Dimension of the intermediate Hamiltonian: "</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">basis_n</span><span class="p">))</span>
+
+    <span class="c1"># Transition operators in local coordinates, rotated to global coordinates.</span>
+    <span class="k">if</span> <span class="n">loc_axis</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">local_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">loc_axis</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">local_axis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">get_trans_oper</span><span class="p">(</span><span class="n">case</span><span class="p">)</span>
+    <span class="n">npol</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">tmp_g</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">npol</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">npol</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+                <span class="n">tmp_g</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">local_axis</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">tmp</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">npol</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span> <span class="o">=</span> <span class="n">rmat_to_euler</span><span class="p">(</span><span class="n">local_axis</span><span class="p">)</span>
+        <span class="n">wignerD</span> <span class="o">=</span> <span class="n">get_wigner_dmat</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">alpha</span><span class="p">,</span> <span class="n">beta</span><span class="p">,</span> <span class="n">gamma</span><span class="p">)</span>
+        <span class="n">rotmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">tmat_r2c</span><span class="p">(</span><span class="s1">'d'</span><span class="p">),</span> <span class="n">wignerD</span><span class="p">),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">tmat_r2c</span><span class="p">(</span><span class="s1">'d'</span><span class="p">)))</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+                <span class="n">tmp_g</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+=</span> <span class="n">rotmat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">tmp</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"Have NOT implemented this case: "</span><span class="p">,</span> <span class="n">npol</span><span class="p">)</span>
+
+    <span class="n">trans_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">npol</span><span class="p">,</span> <span class="n">ntot</span><span class="p">,</span> <span class="n">ntot</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">npol</span><span class="p">):</span>
+        <span class="n">trans_mat</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">,</span> <span class="n">v_norb</span><span class="p">:</span><span class="n">ntot</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp_g</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"edrixs &gt;&gt;&gt; 1v1c setup Done !"</span><span class="p">)</span>
+
+    <span class="n">shift</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="k">if</span> <span class="n">shell_level</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">c_norb</span> <span class="o">*</span> <span class="n">shell_level</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">emat_i</span><span class="p">,</span> <span class="n">umat_i</span><span class="p">,</span> <span class="n">basis_i</span><span class="p">,</span> <span class="n">emat_n</span><span class="p">,</span> <span class="n">umat_n</span><span class="p">,</span> <span class="n">basis_n</span><span class="p">,</span> <span class="n">trans_mat</span><span class="p">,</span> <span class="n">shift</span></div>
+
+
+
+<div class="viewcode-block" id="model_2v1c">
+<a class="viewcode-back" href="../../reference/models.html#edrixs.models.model_2v1c">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">model_2v1c</span><span class="p">(</span>
+    <span class="n">shell_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">shell_level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">v1_soc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">v2_soc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">c_soc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">v_tot_noccu</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">slater</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">v1_ext_B</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">v2_ext_B</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">v1_on_which</span><span class="o">=</span><span class="s1">'spin'</span><span class="p">,</span>
+    <span class="n">v2_on_which</span><span class="o">=</span><span class="s1">'spin'</span><span class="p">,</span> <span class="n">v1_cfmat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">v2_cfmat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">v1_othermat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">v2_othermat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hopping_v1v2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">trans_to_which</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">loc_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sparse_U</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1E-10</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Set up orbital-space data and Fock-basis metadata for a 2v1c problem.</span>
+
+<span class="sd">    This is the backend-neutral setup analogue of the 2-valence-shell,</span>
+<span class="sd">    1-core-shell Fortran ED/RIXS input construction.  It does not build</span>
+<span class="sd">    many-body Hamiltonians and does not diagonalize anything. If sparse_U=True,</span>
+<span class="sd">    the returned Coulomb tensors are sparse flattened matrices rather than</span>
+<span class="sd">    dense rank-4 arrays.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    shell_name : tuple of str</span>
+<span class="sd">        Names of the first valence shell, second valence shell, and core shell,</span>
+<span class="sd">        in that order.  Each valence shell must be one of ``'s'``, ``'p'``,</span>
+<span class="sd">        ``'t2g'``, ``'d'``, or ``'f'``.  The core shell may additionally be a</span>
+<span class="sd">        spin-orbit-split shell such as ``'p12'``, ``'p32'``, ``'d32'``,</span>
+<span class="sd">        ``'d52'``, ``'f52'``, or ``'f72'``.</span>
+<span class="sd">    shell_level : sequence of three float or None, optional</span>
+<span class="sd">        One-body energy levels of the first valence, second valence, and core</span>
+<span class="sd">        shells.  All levels default to zero.</span>
+<span class="sd">    v1_soc, v2_soc : sequence of two float or None, optional</span>
+<span class="sd">        Spin-orbit coupling strengths for the corresponding valence shell in</span>
+<span class="sd">        the initial and intermediate Hamiltonians, respectively.  Spin-orbit</span>
+<span class="sd">        coupling is omitted when the value is ``None``.</span>
+<span class="sd">    c_soc : float, optional</span>
+<span class="sd">        Core-shell spin-orbit coupling strength.  This is applied to unsplit</span>
+<span class="sd">        ``'p'``, ``'d'``, and ``'f'`` core shells.  Default is zero.</span>
+<span class="sd">    v_tot_noccu : int, optional</span>
+<span class="sd">        Total number of electrons occupying the two valence shells in the</span>
+<span class="sd">        initial state.  Default is one.</span>
+<span class="sd">    slater : tuple of two sequences of float or None, optional</span>
+<span class="sd">        Slater integrals for the initial and intermediate Hamiltonians.  Each</span>
+<span class="sd">        sequence follows the order returned by</span>
+<span class="sd">        ``slater_integrals_name(shell_name, ('v1', 'v2', 'c1'))``.  Missing</span>
+<span class="sd">        trailing values and all values when ``slater`` is ``None`` are treated</span>
+<span class="sd">        as zero.</span>
+<span class="sd">    v1_ext_B, v2_ext_B : array-like of float, shape (3,), or None, optional</span>
+<span class="sd">        Zeeman/exchange-field coefficients in the global Cartesian frame for</span>
+<span class="sd">        the corresponding valence shell.  No field is applied when the value</span>
+<span class="sd">        is ``None``.</span>
+<span class="sd">    v1_on_which, v2_on_which : {'spin', 'orbital', 'both'}, optional</span>
+<span class="sd">        Sector on which the corresponding external field acts.  Default is</span>
+<span class="sd">        ``'spin'``.</span>
+<span class="sd">    v1_cfmat, v2_cfmat : array-like of complex or None, optional</span>
+<span class="sd">        Crystal-field matrix for the corresponding valence shell.  Its shape</span>
+<span class="sd">        must match that shell's number of spin-orbitals.  Defaults to zero.</span>
+<span class="sd">    v1_othermat, v2_othermat : array-like of complex or None, optional</span>
+<span class="sd">        Additional one-body matrix for the corresponding valence shell.  Its</span>
+<span class="sd">        shape must match that shell's number of spin-orbitals.  Defaults to</span>
+<span class="sd">        zero.</span>
+<span class="sd">    hopping_v1v2 : array-like of complex or None, optional</span>
+<span class="sd">        Hopping matrix from the second valence shell to the first, with shape</span>
+<span class="sd">        ``(v1_norb, v2_norb)``.  Its Hermitian conjugate is inserted</span>
+<span class="sd">        automatically.  Defaults to zero.</span>
+<span class="sd">    trans_to_which : {1, 2}, optional</span>
+<span class="sd">        Valence shell reached by the core-to-valence transition.  Default is</span>
+<span class="sd">        the first valence shell.</span>
+<span class="sd">    loc_axis : array-like of float, shape (3, 3), or None, optional</span>
+<span class="sd">        Rotation from local crystal-field coordinates to the global frame for</span>
+<span class="sd">        the transition operators.  The identity rotation is used by default.</span>
+<span class="sd">    verbose : bool, optional</span>
+<span class="sd">        If True, print a setup summary (Slater integrals and Hilbert-space</span>
+<span class="sd">        dimensions).  Default is False.</span>
+<span class="sd">    sparse_U : bool, optional</span>
+<span class="sd">        If False, return dense rank-4 Coulomb tensors.  If True, return CSR</span>
+<span class="sd">        matrices using the flattened convention</span>
+<span class="sd">        ``row = lorb * norb + korb`` and ``col = jorb * norb + iorb``.</span>
+<span class="sd">        Default is False.</span>
+<span class="sd">    tol : float, optional</span>
+<span class="sd">        Absolute-value threshold used when converting Coulomb tensors to</span>
+<span class="sd">        sparse form.  Default is ``1e-10``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    emat_i : numpy.ndarray</span>
+<span class="sd">        Initial-state one-body matrix over both valence shells and the core,</span>
+<span class="sd">        with shape ``(ntot, ntot)``.</span>
+<span class="sd">    umat_i : numpy.ndarray or scipy.sparse.csr_matrix</span>
+<span class="sd">        Initial-state Coulomb interaction including core interactions. The dense</span>
+<span class="sd">        representation has shape ``(ntot,) * 4``; the sparse</span>
+<span class="sd">        representation has shape ``(ntot**2, ntot**2)``.</span>
+<span class="sd">    basis_i : FockBasisSpec</span>
+<span class="sd">        Initial-state Fock-basis specification with ``v_tot_noccu`` valence</span>
+<span class="sd">        electrons and a fully occupied core shell.</span>
+<span class="sd">    emat_n : numpy.ndarray</span>
+<span class="sd">        Intermediate-state one-body matrix over both valence shells and the</span>
+<span class="sd">        core shell, with shape ``(ntot, ntot)``.</span>
+<span class="sd">    umat_n : numpy.ndarray or scipy.sparse.csr_matrix</span>
+<span class="sd">        Intermediate-state Coulomb interaction.  The dense representation has</span>
+<span class="sd">        shape ``(ntot,) * 4``; the sparse representation has shape</span>
+<span class="sd">        ``(ntot**2, ntot**2)``.</span>
+<span class="sd">    basis_n : FockBasisSpec</span>
+<span class="sd">        Intermediate-state Fock-basis specification with one additional</span>
+<span class="sd">        valence electron and one core hole.</span>
+<span class="sd">    trans_mat : numpy.ndarray</span>
+<span class="sd">        Core-to-valence transition matrices in the global frame, with shape</span>
+<span class="sd">        ``(npol, ntot, ntot)``.</span>
+
+<span class="sd">    shift : float</span>
+<span class="sd">        Filled core shell-level energy, ``c_norb * shell_level[2]`` (zero if</span>
+<span class="sd">        unspecified), excluding Coulomb contributions. Pass the first seven</span>
+<span class="sd">        outputs to :func:`~edrixs.solvers.get_ops` and ``shift`` to dense or</span>
+<span class="sd">        SciPy :func:`~edrixs.solvers.ed`. Integrals remain unshifted.</span>
+
+<span class="sd">    See Also</span>
+<span class="sd">    --------</span>
+<span class="sd">    edrixs.models.model_1v1c</span>
+<span class="sd">        Construct a model with one valence shell and one core shell.</span>
+<span class="sd">    edrixs.models.model_siam</span>
+<span class="sd">        Construct a single-impurity Anderson model.</span>
+<span class="sd">    edrixs.solvers.get_ops</span>
+<span class="sd">        Convert a model definition into backend-owned many-body operators.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Construct a model for two valence shells and build its SciPy operators:</span>
+
+<span class="sd">    &gt;&gt;&gt; import edrixs</span>
+<span class="sd">    &gt;&gt;&gt; *problem, shift = edrixs.model_2v1c(</span>
+<span class="sd">    ...     ('d', 'p', 's'), v_tot_noccu=2, trans_to_which=2</span>
+<span class="sd">    ... )</span>
+<span class="sd">    &gt;&gt;&gt; hmat_i, hmat_n, trans_ops = edrixs.get_ops(</span>
+<span class="sd">    ...     *problem, backend='scipy'</span>
+<span class="sd">    ... )</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"edrixs &gt;&gt;&gt; Setting up 2v1c problem ..."</span><span class="p">)</span>
+
+    <span class="n">v_name_options</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'s'</span><span class="p">,</span> <span class="s1">'p'</span><span class="p">,</span> <span class="s1">'t2g'</span><span class="p">,</span> <span class="s1">'d'</span><span class="p">,</span> <span class="s1">'f'</span><span class="p">]</span>
+    <span class="n">c_name_options</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">'s'</span><span class="p">,</span> <span class="s1">'p'</span><span class="p">,</span> <span class="s1">'p12'</span><span class="p">,</span> <span class="s1">'p32'</span><span class="p">,</span> <span class="s1">'t2g'</span><span class="p">,</span> <span class="s1">'d'</span><span class="p">,</span> <span class="s1">'d32'</span><span class="p">,</span> <span class="s1">'d52'</span><span class="p">,</span>
+        <span class="s1">'f'</span><span class="p">,</span> <span class="s1">'f52'</span><span class="p">,</span> <span class="s1">'f72'</span>
+    <span class="p">]</span>
+
+    <span class="n">v1_name</span> <span class="o">=</span> <span class="n">shell_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">v2_name</span> <span class="o">=</span> <span class="n">shell_name</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">c_name</span> <span class="o">=</span> <span class="n">shell_name</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">v1_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">v_name_options</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"NOT supported type of valence shell: "</span><span class="p">,</span> <span class="n">v1_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">v2_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">v_name_options</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"NOT supported type of valence shell: "</span><span class="p">,</span> <span class="n">v2_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">c_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">c_name_options</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"NOT supported type of core shell: "</span><span class="p">,</span> <span class="n">c_name</span><span class="p">)</span>
+
+    <span class="n">info_shell</span> <span class="o">=</span> <span class="n">info_atomic_shell</span><span class="p">()</span>
+
+    <span class="n">v1_orbl</span> <span class="o">=</span> <span class="n">info_shell</span><span class="p">[</span><span class="n">v1_name</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">v2_orbl</span> <span class="o">=</span> <span class="n">info_shell</span><span class="p">[</span><span class="n">v2_name</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">v1_norb</span> <span class="o">=</span> <span class="n">info_shell</span><span class="p">[</span><span class="n">v1_name</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">v2_norb</span> <span class="o">=</span> <span class="n">info_shell</span><span class="p">[</span><span class="n">v2_name</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">c_norb</span> <span class="o">=</span> <span class="n">info_shell</span><span class="p">[</span><span class="n">c_name</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">v1v2_norb</span> <span class="o">=</span> <span class="n">v1_norb</span> <span class="o">+</span> <span class="n">v2_norb</span>
+    <span class="n">ntot</span> <span class="o">=</span> <span class="n">v1v2_norb</span> <span class="o">+</span> <span class="n">c_norb</span>
+
+    <span class="n">slater_name</span> <span class="o">=</span> <span class="n">slater_integrals_name</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">v1_name</span><span class="p">,</span> <span class="n">v2_name</span><span class="p">,</span> <span class="n">c_name</span><span class="p">),</span> <span class="p">(</span><span class="s1">'v1'</span><span class="p">,</span> <span class="s1">'v2'</span><span class="p">,</span> <span class="s1">'c1'</span><span class="p">)</span>
+    <span class="p">)</span>
+    <span class="n">nslat</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">slater_name</span><span class="p">)</span>
+
+    <span class="n">slater_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nslat</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">slater_n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nslat</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">slater</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">nslat</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">slater</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">slater_i</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">slater</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span> <span class="o">=</span> <span class="n">slater</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">slater_i</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">slater</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="n">nslat</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">nslat</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">slater</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">slater_n</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">slater</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span> <span class="o">=</span> <span class="n">slater</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">slater_n</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">slater</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="n">nslat</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">_print_slater_summary</span><span class="p">(</span><span class="n">slater_name</span><span class="p">,</span> <span class="n">slater_i</span><span class="p">,</span> <span class="n">slater_n</span><span class="p">)</span>
+
+    <span class="n">umat_i</span> <span class="o">=</span> <span class="n">get_umat_slater_3shells</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">v1_name</span><span class="p">,</span> <span class="n">v2_name</span><span class="p">,</span> <span class="n">c_name</span><span class="p">),</span> <span class="o">*</span><span class="n">slater_i</span>
+    <span class="p">)</span>
+    <span class="n">umat_n</span> <span class="o">=</span> <span class="n">get_umat_slater_3shells</span><span class="p">(</span>
+        <span class="p">(</span><span class="n">v1_name</span><span class="p">,</span> <span class="n">v2_name</span><span class="p">,</span> <span class="n">c_name</span><span class="p">),</span> <span class="o">*</span><span class="n">slater_n</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">sparse_U</span><span class="p">:</span>
+        <span class="n">umat_i</span> <span class="o">=</span> <span class="n">_umat_dense_to_sparse</span><span class="p">(</span><span class="n">umat_i</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+        <span class="n">umat_n</span> <span class="o">=</span> <span class="n">_umat_dense_to_sparse</span><span class="p">(</span><span class="n">umat_n</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+
+    <span class="n">emat_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ntot</span><span class="p">,</span> <span class="n">ntot</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="n">emat_n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ntot</span><span class="p">,</span> <span class="n">ntot</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+
+    <span class="c1"># Spin-orbit coupling.</span>
+    <span class="k">if</span> <span class="n">v1_soc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">v1_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'p'</span><span class="p">,</span> <span class="s1">'d'</span><span class="p">,</span> <span class="s1">'t2g'</span><span class="p">,</span> <span class="s1">'f'</span><span class="p">]:</span>
+        <span class="n">emat_i</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v1_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v1_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">atom_hsoc</span><span class="p">(</span><span class="n">v1_name</span><span class="p">,</span> <span class="n">v1_soc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">emat_n</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v1_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v1_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">atom_hsoc</span><span class="p">(</span><span class="n">v1_name</span><span class="p">,</span> <span class="n">v1_soc</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">v2_soc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">v2_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'p'</span><span class="p">,</span> <span class="s1">'d'</span><span class="p">,</span> <span class="s1">'t2g'</span><span class="p">,</span> <span class="s1">'f'</span><span class="p">]:</span>
+        <span class="n">emat_i</span><span class="p">[</span><span class="n">v1_norb</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">,</span> <span class="n">v1_norb</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">atom_hsoc</span><span class="p">(</span>
+            <span class="n">v2_name</span><span class="p">,</span> <span class="n">v2_soc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">emat_n</span><span class="p">[</span><span class="n">v1_norb</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">,</span> <span class="n">v1_norb</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">atom_hsoc</span><span class="p">(</span>
+            <span class="n">v2_name</span><span class="p">,</span> <span class="n">v2_soc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">c_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'p'</span><span class="p">,</span> <span class="s1">'d'</span><span class="p">,</span> <span class="s1">'f'</span><span class="p">]:</span>
+        <span class="n">emat_i</span><span class="p">[</span><span class="n">v1v2_norb</span><span class="p">:</span><span class="n">ntot</span><span class="p">,</span> <span class="n">v1v2_norb</span><span class="p">:</span><span class="n">ntot</span><span class="p">]</span> <span class="o">+=</span> <span class="n">atom_hsoc</span><span class="p">(</span>
+            <span class="n">c_name</span><span class="p">,</span> <span class="n">c_soc</span>
+        <span class="p">)</span>
+        <span class="n">emat_n</span><span class="p">[</span><span class="n">v1v2_norb</span><span class="p">:</span><span class="n">ntot</span><span class="p">,</span> <span class="n">v1v2_norb</span><span class="p">:</span><span class="n">ntot</span><span class="p">]</span> <span class="o">+=</span> <span class="n">atom_hsoc</span><span class="p">(</span>
+            <span class="n">c_name</span><span class="p">,</span> <span class="n">c_soc</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Crystal fields.</span>
+    <span class="k">if</span> <span class="n">v1_cfmat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">emat_i</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v1_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v1_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v1_cfmat</span><span class="p">)</span>
+        <span class="n">emat_n</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v1_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v1_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v1_cfmat</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">v2_cfmat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">emat_i</span><span class="p">[</span><span class="n">v1_norb</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">,</span> <span class="n">v1_norb</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+            <span class="n">v2_cfmat</span>
+        <span class="p">)</span>
+        <span class="n">emat_n</span><span class="p">[</span><span class="n">v1_norb</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">,</span> <span class="n">v1_norb</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+            <span class="n">v2_cfmat</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Other one-body terms.</span>
+    <span class="k">if</span> <span class="n">v1_othermat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">emat_i</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v1_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v1_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v1_othermat</span><span class="p">)</span>
+        <span class="n">emat_n</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v1_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v1_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">v1_othermat</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">v2_othermat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">emat_i</span><span class="p">[</span><span class="n">v1_norb</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">,</span> <span class="n">v1_norb</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+            <span class="n">v2_othermat</span>
+        <span class="p">)</span>
+        <span class="n">emat_n</span><span class="p">[</span><span class="n">v1_norb</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">,</span> <span class="n">v1_norb</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+            <span class="n">v2_othermat</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Shell levels, including the explicit filled core.</span>
+    <span class="k">if</span> <span class="n">shell_level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">emat_i</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v1_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v1_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">v1_norb</span><span class="p">)</span> <span class="o">*</span> <span class="n">shell_level</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">emat_n</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v1_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v1_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">v1_norb</span><span class="p">)</span> <span class="o">*</span> <span class="n">shell_level</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">emat_i</span><span class="p">[</span><span class="n">v1_norb</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">,</span> <span class="n">v1_norb</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">v2_norb</span><span class="p">)</span> <span class="o">*</span> <span class="n">shell_level</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">emat_n</span><span class="p">[</span><span class="n">v1_norb</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">,</span> <span class="n">v1_norb</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">v2_norb</span><span class="p">)</span> <span class="o">*</span> <span class="n">shell_level</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="p">)</span>
+
+        <span class="n">emat_i</span><span class="p">[</span><span class="n">v1v2_norb</span><span class="p">:</span><span class="n">ntot</span><span class="p">,</span> <span class="n">v1v2_norb</span><span class="p">:</span><span class="n">ntot</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">c_norb</span><span class="p">)</span> <span class="o">*</span> <span class="n">shell_level</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">emat_n</span><span class="p">[</span><span class="n">v1v2_norb</span><span class="p">:</span><span class="n">ntot</span><span class="p">,</span> <span class="n">v1v2_norb</span><span class="p">:</span><span class="n">ntot</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">c_norb</span><span class="p">)</span> <span class="o">*</span> <span class="n">shell_level</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Zeeman fields.</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">lval</span><span class="p">,</span> <span class="n">ext_B</span><span class="p">,</span> <span class="n">which</span><span class="p">,</span> <span class="n">i1</span><span class="p">,</span> <span class="n">i2</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">v1_name</span><span class="p">,</span> <span class="n">v1_orbl</span><span class="p">,</span> <span class="n">v1_ext_B</span><span class="p">,</span> <span class="n">v1_on_which</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">v1_norb</span><span class="p">),</span>
+        <span class="p">(</span>
+            <span class="n">v2_name</span><span class="p">,</span> <span class="n">v2_orbl</span><span class="p">,</span> <span class="n">v2_ext_B</span><span class="p">,</span> <span class="n">v2_on_which</span><span class="p">,</span>
+            <span class="n">v1_norb</span><span class="p">,</span> <span class="n">v1v2_norb</span>
+        <span class="p">)</span>
+    <span class="p">]:</span>
+        <span class="k">if</span> <span class="n">ext_B</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">zeeman</span> <span class="o">=</span> <span class="n">_valence_zeeman_matrix</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">lval</span><span class="p">,</span> <span class="n">ext_B</span><span class="p">,</span> <span class="n">which</span><span class="p">)</span>
+        <span class="n">emat_i</span><span class="p">[</span><span class="n">i1</span><span class="p">:</span><span class="n">i2</span><span class="p">,</span> <span class="n">i1</span><span class="p">:</span><span class="n">i2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">zeeman</span>
+        <span class="n">emat_n</span><span class="p">[</span><span class="n">i1</span><span class="p">:</span><span class="n">i2</span><span class="p">,</span> <span class="n">i1</span><span class="p">:</span><span class="n">i2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">zeeman</span>
+
+    <span class="c1"># Hopping between the two valence shells.</span>
+    <span class="k">if</span> <span class="n">hopping_v1v2</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">hopping_v1v2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">hopping_v1v2</span><span class="p">)</span>
+        <span class="n">emat_i</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v1_norb</span><span class="p">,</span> <span class="n">v1_norb</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">hopping_v1v2</span>
+        <span class="n">emat_i</span><span class="p">[</span><span class="n">v1_norb</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v1_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">hopping_v1v2</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="n">emat_n</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v1_norb</span><span class="p">,</span> <span class="n">v1_norb</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">hopping_v1v2</span>
+        <span class="n">emat_n</span><span class="p">[</span><span class="n">v1_norb</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v1_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">hopping_v1v2</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="n">basis_i</span> <span class="o">=</span> <span class="n">FockBasisSpec</span><span class="o">.</span><span class="n">from_args</span><span class="p">(</span><span class="n">v1v2_norb</span><span class="p">,</span> <span class="n">v_tot_noccu</span><span class="p">,</span> <span class="n">c_norb</span><span class="p">,</span> <span class="n">c_norb</span><span class="p">)</span>
+    <span class="n">basis_n</span> <span class="o">=</span> <span class="n">FockBasisSpec</span><span class="o">.</span><span class="n">from_args</span><span class="p">(</span>
+        <span class="n">v1v2_norb</span><span class="p">,</span> <span class="n">v_tot_noccu</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">c_norb</span><span class="p">,</span> <span class="n">c_norb</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"edrixs &gt;&gt;&gt; Dimension of the initial Hamiltonian: "</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">basis_i</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"edrixs &gt;&gt;&gt; Dimension of the intermediate Hamiltonian: "</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">basis_n</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">trans_to_which</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">case</span> <span class="o">=</span> <span class="n">v1_name</span> <span class="o">+</span> <span class="n">c_name</span>
+        <span class="n">tmp_g</span> <span class="o">=</span> <span class="n">_rotated_transition_blocks</span><span class="p">(</span><span class="n">case</span><span class="p">,</span> <span class="n">loc_axis</span><span class="p">)</span>
+        <span class="n">trans_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">tmp_g</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ntot</span><span class="p">,</span> <span class="n">ntot</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+        <span class="n">trans_mat</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v1_norb</span><span class="p">,</span> <span class="n">v1v2_norb</span><span class="p">:</span><span class="n">ntot</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp_g</span>
+    <span class="k">elif</span> <span class="n">trans_to_which</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="n">case</span> <span class="o">=</span> <span class="n">v2_name</span> <span class="o">+</span> <span class="n">c_name</span>
+        <span class="n">tmp_g</span> <span class="o">=</span> <span class="n">_rotated_transition_blocks</span><span class="p">(</span><span class="n">case</span><span class="p">,</span> <span class="n">loc_axis</span><span class="p">)</span>
+        <span class="n">trans_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">tmp_g</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ntot</span><span class="p">,</span> <span class="n">ntot</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+        <span class="n">trans_mat</span><span class="p">[:,</span> <span class="n">v1_norb</span><span class="p">:</span><span class="n">v1v2_norb</span><span class="p">,</span> <span class="n">v1v2_norb</span><span class="p">:</span><span class="n">ntot</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp_g</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"Unknown trans_to_which: "</span><span class="p">,</span> <span class="n">trans_to_which</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"edrixs &gt;&gt;&gt; 2v1c setup Done !"</span><span class="p">)</span>
+
+    <span class="n">shift</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="k">if</span> <span class="n">shell_level</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">c_norb</span> <span class="o">*</span> <span class="n">shell_level</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">emat_i</span><span class="p">,</span> <span class="n">umat_i</span><span class="p">,</span> <span class="n">basis_i</span><span class="p">,</span> <span class="n">emat_n</span><span class="p">,</span> <span class="n">umat_n</span><span class="p">,</span> <span class="n">basis_n</span><span class="p">,</span> <span class="n">trans_mat</span><span class="p">,</span> <span class="n">shift</span></div>
+
+
+
+<div class="viewcode-block" id="model_siam">
+<a class="viewcode-back" href="../../reference/models.html#edrixs.models.model_siam">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">model_siam</span><span class="p">(</span>
+    <span class="n">shell_name</span><span class="p">,</span> <span class="n">nbath</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">siam_type</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">v_noccu</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">static_core_pot</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">c_level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">c_soc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">trans_c2n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">imp_mat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">imp_mat_n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">bath_level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bath_level_n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hyb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hyb_n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">hopping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hopping_n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slater</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ext_B</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">on_which</span><span class="o">=</span><span class="s1">'spin'</span><span class="p">,</span> <span class="n">loc_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sparse_U</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1E-10</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Set up a single-impurity Anderson model (SIAM) for ED, XAS, and RIXS.</span>
+
+<span class="sd">    Construct backend-independent one-body matrices, Coulomb interactions,</span>
+<span class="sd">    Fock-basis specifications, and core-to-impurity transition matrices. This</span>
+<span class="sd">    is the setup analogue of :func:`~edrixs.solvers.ed_siam_fort` at fixed</span>
+<span class="sd">    ``v_noccu``; it does not search over occupancies, build many-body</span>
+<span class="sd">    Hamiltonians, or diagonalize them. Pass the returned tuple to</span>
+<span class="sd">    :func:`~edrixs.solvers.get_ops` to construct the many-body operators.</span>
+
+<span class="sd">    All energies, Slater integrals, hybridizations, spin-orbit coupling</span>
+<span class="sd">    constants, and magnetic-field components are in eV. Let ``v_norb`` and</span>
+<span class="sd">    ``c_norb`` be the numbers of impurity and core spin-orbitals, respectively,</span>
+<span class="sd">    ``ntot_v = (nbath + 1) * v_norb``, and ``ntot = ntot_v + c_norb``.</span>
+<span class="sd">    Orbitals are ordered as impurity, successive bath sites, then core.</span>
+<span class="sd">    Each bath site has ``v_norb`` spin-orbitals and no Coulomb interaction.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    shell_name : tuple of two str</span>
+<span class="sd">        Impurity valence and core shell names, in that order. The valence</span>
+<span class="sd">        shell can be 's', 'p', 't2g', 'd', or 'f'. The core shell can be</span>
+<span class="sd">        's', 'p', 'p12', 'p32', 't2g', 'd', 'd32', 'd52', 'f', 'f52', or</span>
+<span class="sd">        'f72'. For example, ``('d', 'p32')`` describes an L3-edge transition</span>
+<span class="sd">        from a p3/2 core shell to a d impurity.</span>
+<span class="sd">    nbath : int</span>
+<span class="sd">        Number of bath sites.</span>
+<span class="sd">    siam_type : {0, 1}, optional</span>
+<span class="sd">        Parameterization of the impurity and bath one-body terms. For 0</span>
+<span class="sd">        (default), use ``imp_mat``, ``bath_level``, and ``hyb`` to describe</span>
+<span class="sd">        diagonal hybridization. For 1, use the full ``hopping`` matrix,</span>
+<span class="sd">        allowing off-diagonal hybridization. The corresponding ``*_n``</span>
+<span class="sd">        parameters specify intermediate-state terms. Parameters belonging</span>
+<span class="sd">        to the other parameterization are ignored.</span>
+<span class="sd">    v_noccu : int, optional</span>
+<span class="sd">        Total number of electrons in the impurity and bath orbitals in the</span>
+<span class="sd">        initial state, excluding the filled core. Default is 1. Must satisfy</span>
+<span class="sd">        ``0 &lt;= v_noccu &lt; ntot_v`` so that the intermediate state can</span>
+<span class="sd">        accommodate one additional electron.</span>
+<span class="sd">    static_core_pot : float, optional</span>
+<span class="sd">        Static core-hole potential, subtracted from every impurity diagonal</span>
+<span class="sd">        element in the intermediate state. Positive values are attractive.</span>
+<span class="sd">        This is added independently of the core-valence Slater interactions.</span>
+<span class="sd">        Default is 0.</span>
+<span class="sd">    c_level : float, optional</span>
+<span class="sd">        Core-shell energy level, added to each core diagonal element in both</span>
+<span class="sd">        states. Default is 0.</span>
+<span class="sd">    c_soc : float, optional</span>
+<span class="sd">        Core spin-orbit coupling strength, applied for unsplit 'p', 'd', and</span>
+<span class="sd">        'f' core shells only. For split shells such as 'p32', the shell</span>
+<span class="sd">        choice already selects the total-angular-momentum subspace.</span>
+<span class="sd">        Default is 0.</span>
+<span class="sd">    trans_c2n : array_like of complex, shape (v_norb, v_norb), optional</span>
+<span class="sd">        Unitary transformation from complex spherical harmonics to the</span>
+<span class="sd">        basis used for the impurity and bath one-body input parameters.</span>
+<span class="sd">        Its columns are the input basis vectors expressed in spherical</span>
+<span class="sd">        harmonics. The same transformation is used on the impurity and</span>
+<span class="sd">        every bath site to convert the one-body matrices back to spherical</span>
+<span class="sd">        harmonics. Default is the identity.</span>
+<span class="sd">    imp_mat : array_like of complex, shape (v_norb, v_norb), optional</span>
+<span class="sd">        Initial-state impurity one-body matrix for ``siam_type=0``, including</span>
+<span class="sd">        the impurity energy level, crystal field, and valence spin-orbit</span>
+<span class="sd">        coupling as needed. Default is zero.</span>
+<span class="sd">    imp_mat_n : array_like of complex, shape (v_norb, v_norb), optional</span>
+<span class="sd">        Intermediate-state impurity matrix for ``siam_type=0``. If None,</span>
+<span class="sd">        use ``imp_mat``.</span>
+<span class="sd">    bath_level : numpy.ndarray, shape (nbath, v_norb), optional</span>
+<span class="sd">        Initial-state bath energy levels for ``siam_type=0``. The first</span>
+<span class="sd">        index selects the bath site and the second its spin-orbital.</span>
+<span class="sd">        Default is zero.</span>
+<span class="sd">    bath_level_n : numpy.ndarray, shape (nbath, v_norb), optional</span>
+<span class="sd">        Intermediate-state bath levels for ``siam_type=0``. If None, use</span>
+<span class="sd">        ``bath_level``.</span>
+<span class="sd">    hyb : numpy.ndarray, shape (nbath, v_norb), optional</span>
+<span class="sd">        Initial-state hybridization amplitudes for ``siam_type=0``.</span>
+<span class="sd">        ``hyb[i, j]`` is the matrix element from spin-orbital ``j`` of bath</span>
+<span class="sd">        site ``i`` to impurity spin-orbital ``j``; its complex conjugate is</span>
+<span class="sd">        inserted for the reverse hopping. Default is zero.</span>
+<span class="sd">    hyb_n : numpy.ndarray, shape (nbath, v_norb), optional</span>
+<span class="sd">        Intermediate-state hybridization amplitudes for ``siam_type=0``.</span>
+<span class="sd">        If None, use ``hyb``.</span>
+<span class="sd">    hopping : array_like of complex, shape (ntot_v, ntot_v), optional</span>
+<span class="sd">        Full initial-state one-body matrix for ``siam_type=1``, including</span>
+<span class="sd">        impurity terms, bath levels, and hybridization. Supply a Hermitian</span>
+<span class="sd">        matrix in impurity-then-bath order. Default is zero.</span>
+<span class="sd">    hopping_n : array_like of complex, shape (ntot_v, ntot_v), optional</span>
+<span class="sd">        Full intermediate-state impurity and bath matrix for ``siam_type=1``.</span>
+<span class="sd">        If None, use ``hopping``.</span>
+<span class="sd">    slater : tuple of two lists, optional</span>
+<span class="sd">        Slater integrals for the initial and intermediate states, respectively.</span>
+<span class="sd">        Each list is ordered as ``[FX_vv, FX_vc, GX_vc, FX_cc]``, with ranks</span>
+<span class="sd">        X in ascending order within each group; v denotes the impurity and</span>
+<span class="sd">        c the core. Use ``slater_integrals_name(shell_name, ('v', 'c'))``</span>
+<span class="sd">        to obtain the names in the required order. Trailing zeros may be</span>
+<span class="sd">        omitted; entries beyond the required number are ignored. For</span>
+<span class="sd">        example, d-impurity/p-core integrals begin with</span>
+<span class="sd">        ``[F0_dd, F2_dd, F4_dd, F0_dp, F2_dp, G1_dp, G3_dp]``.</span>
+<span class="sd">        Initial-state core-valence and core-core terms act on the explicit</span>
+<span class="sd">        filled core. Default is all zeros.</span>
+<span class="sd">    ext_B : array_like of float, shape (3,), optional</span>
+<span class="sd">        External Zeeman/exchange field components along the global x, y,</span>
+<span class="sd">        and z axes, applied only to the impurity in both states. Components</span>
+<span class="sd">        are energy coefficients, not magnetic fields in tesla. Default is</span>
+<span class="sd">        zero.</span>
+<span class="sd">    on_which : {'spin', 'orbital', 'both'}, optional</span>
+<span class="sd">        Couple ``ext_B`` to ``2S``, ``L``, or ``L + 2S``, respectively,</span>
+<span class="sd">        with a positive sign in the Hamiltonian. Default is 'spin'.</span>
+<span class="sd">    loc_axis : array_like of float, shape (3, 3), optional</span>
+<span class="sd">        Rotation from local crystal-field coordinates to the global frame</span>
+<span class="sd">        for the transition operators. Columns are the local axes expressed</span>
+<span class="sd">        in global coordinates. Default is the identity rotation.</span>
+<span class="sd">    verbose : bool, optional</span>
+<span class="sd">        If True, print Slater integrals and Hilbert-space dimensions.</span>
+<span class="sd">        Default is False.</span>
+<span class="sd">    sparse_U : bool, optional</span>
+<span class="sd">        If False (default), return dense rank-4 Coulomb tensors. If True,</span>
+<span class="sd">        embed the impurity/core interactions directly as CSR matrices,</span>
+<span class="sd">        avoiding dense rank-4 tensors over the full impurity and bath space.</span>
+<span class="sd">        The flattened convention is ``row = lorb * norb + korb`` and</span>
+<span class="sd">        ``col = jorb * norb + iorb``, where ``norb`` is ``ntot_v`` for the</span>
+<span class="sd">        initial state and ``ntot`` for the intermediate state.</span>
+<span class="sd">    tol : float, optional</span>
+<span class="sd">        Keep Coulomb entries with absolute value greater than this threshold</span>
+<span class="sd">        when ``sparse_U=True``. Unused for dense tensors. Default is ``1e-10``.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    emat_i : numpy.ndarray, shape (ntot, ntot)</span>
+<span class="sd">        Initial-state one-body matrix over impurity, bath, and core orbitals.</span>
+<span class="sd">    umat_i : numpy.ndarray or scipy.sparse.csr_matrix</span>
+<span class="sd">        Initial-state Coulomb interaction on impurity and core orbitals.</span>
+<span class="sd">        Dense shape is ``(ntot,) * 4``; sparse shape is</span>
+<span class="sd">        ``(ntot**2, ntot**2)``.</span>
+<span class="sd">    basis_i : FockBasisSpec</span>
+<span class="sd">        Initial-state basis specification with ``v_noccu`` electrons in</span>
+<span class="sd">        the impurity and bath orbitals and ``c_norb`` core electrons.</span>
+<span class="sd">    emat_n : numpy.ndarray, shape (ntot, ntot)</span>
+<span class="sd">        Intermediate-state one-body matrix over impurity, bath, and core.</span>
+<span class="sd">    umat_n : numpy.ndarray or scipy.sparse.csr_matrix</span>
+<span class="sd">        Intermediate-state Coulomb interaction on impurity and core orbitals.</span>
+<span class="sd">        Dense shape is ``(ntot,) * 4``; sparse shape is</span>
+<span class="sd">        ``(ntot**2, ntot**2)``.</span>
+<span class="sd">    basis_n : FockBasisSpec</span>
+<span class="sd">        Intermediate-state basis specification with ``v_noccu + 1`` impurity</span>
+<span class="sd">        and bath electrons and ``c_norb - 1`` core electrons.</span>
+<span class="sd">    trans_mat : numpy.ndarray, shape (npol, ntot, ntot)</span>
+<span class="sd">        Core-to-impurity absorption matrices, with nonzero entries only in</span>
+<span class="sd">        the impurity-row/core-column block. ``npol`` is 3 for dipole and 5</span>
+<span class="sd">        for quadrupole transitions; components are in the global frame.</span>
+<span class="sd">    shift : float</span>
+<span class="sd">        Filled core shell-level energy, ``c_norb * c_level``, excluding</span>
+<span class="sd">        Coulomb contributions. Pass the first seven outputs to</span>
+<span class="sd">        :func:`~edrixs.solvers.get_ops` and ``shift`` to dense or SciPy</span>
+<span class="sd">        :func:`~edrixs.solvers.ed`. Integrals remain unshifted.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"edrixs &gt;&gt;&gt; Setting up SIAM problem ..."</span><span class="p">)</span>
+
+    <span class="n">v_name_options</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'s'</span><span class="p">,</span> <span class="s1">'p'</span><span class="p">,</span> <span class="s1">'t2g'</span><span class="p">,</span> <span class="s1">'d'</span><span class="p">,</span> <span class="s1">'f'</span><span class="p">]</span>
+    <span class="n">c_name_options</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">'s'</span><span class="p">,</span> <span class="s1">'p'</span><span class="p">,</span> <span class="s1">'p12'</span><span class="p">,</span> <span class="s1">'p32'</span><span class="p">,</span> <span class="s1">'t2g'</span><span class="p">,</span> <span class="s1">'d'</span><span class="p">,</span> <span class="s1">'d32'</span><span class="p">,</span> <span class="s1">'d52'</span><span class="p">,</span>
+        <span class="s1">'f'</span><span class="p">,</span> <span class="s1">'f52'</span><span class="p">,</span> <span class="s1">'f72'</span>
+    <span class="p">]</span>
+
+    <span class="n">v_name</span> <span class="o">=</span> <span class="n">shell_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+    <span class="n">c_name</span> <span class="o">=</span> <span class="n">shell_name</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">v_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">v_name_options</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"NOT supported type of valence shell: "</span><span class="p">,</span> <span class="n">v_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">c_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">c_name_options</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"NOT supported type of core shell: "</span><span class="p">,</span> <span class="n">c_name</span><span class="p">)</span>
+
+    <span class="n">info_shell</span> <span class="o">=</span> <span class="n">info_atomic_shell</span><span class="p">()</span>
+
+    <span class="n">v_orbl</span> <span class="o">=</span> <span class="n">info_shell</span><span class="p">[</span><span class="n">v_name</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">v_norb</span> <span class="o">=</span> <span class="n">info_shell</span><span class="p">[</span><span class="n">v_name</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">c_norb</span> <span class="o">=</span> <span class="n">info_shell</span><span class="p">[</span><span class="n">c_name</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">ntot_v</span> <span class="o">=</span> <span class="n">v_norb</span> <span class="o">*</span> <span class="p">(</span><span class="n">nbath</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">ntot</span> <span class="o">=</span> <span class="n">ntot_v</span> <span class="o">+</span> <span class="n">c_norb</span>
+
+    <span class="n">slater_name</span> <span class="o">=</span> <span class="n">slater_integrals_name</span><span class="p">((</span><span class="n">v_name</span><span class="p">,</span> <span class="n">c_name</span><span class="p">),</span> <span class="p">(</span><span class="s1">'v'</span><span class="p">,</span> <span class="s1">'c'</span><span class="p">))</span>
+    <span class="n">nslat</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">slater_name</span><span class="p">)</span>
+
+    <span class="n">slater_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nslat</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+    <span class="n">slater_n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nslat</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">slater</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">nslat</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">slater</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">slater_i</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">slater</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span> <span class="o">=</span> <span class="n">slater</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">slater_i</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">slater</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="n">nslat</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">nslat</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">slater</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="n">slater_n</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">slater</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span> <span class="o">=</span> <span class="n">slater</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">slater_n</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">slater</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="n">nslat</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="n">_print_slater_summary</span><span class="p">(</span><span class="n">slater_name</span><span class="p">,</span> <span class="n">slater_i</span><span class="p">,</span> <span class="n">slater_n</span><span class="p">)</span>
+
+    <span class="n">umat_tmp_i</span> <span class="o">=</span> <span class="n">get_umat_slater</span><span class="p">(</span><span class="n">v_name</span> <span class="o">+</span> <span class="n">c_name</span><span class="p">,</span> <span class="o">*</span><span class="n">slater_i</span><span class="p">)</span>
+    <span class="n">umat_tmp_n</span> <span class="o">=</span> <span class="n">get_umat_slater</span><span class="p">(</span><span class="n">v_name</span> <span class="o">+</span> <span class="n">c_name</span><span class="p">,</span> <span class="o">*</span><span class="n">slater_n</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">sparse_U</span><span class="p">:</span>
+        <span class="n">umat_i</span> <span class="o">=</span> <span class="n">_embed_impurity_core_umat_sparse</span><span class="p">(</span>
+            <span class="n">umat_tmp_i</span><span class="p">,</span> <span class="n">v_norb</span><span class="p">,</span> <span class="n">c_norb</span><span class="p">,</span> <span class="n">ntot_v</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span>
+        <span class="p">)</span>
+        <span class="n">umat_n</span> <span class="o">=</span> <span class="n">_embed_impurity_core_umat_sparse</span><span class="p">(</span>
+            <span class="n">umat_tmp_n</span><span class="p">,</span> <span class="n">v_norb</span><span class="p">,</span> <span class="n">c_norb</span><span class="p">,</span> <span class="n">ntot_v</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">umat_i</span> <span class="o">=</span> <span class="n">_embed_impurity_core_umat</span><span class="p">(</span>
+            <span class="n">umat_tmp_i</span><span class="p">,</span> <span class="n">v_norb</span><span class="p">,</span> <span class="n">c_norb</span><span class="p">,</span> <span class="n">ntot_v</span>
+        <span class="p">)</span>
+        <span class="n">umat_n</span> <span class="o">=</span> <span class="n">_embed_impurity_core_umat</span><span class="p">(</span>
+            <span class="n">umat_tmp_n</span><span class="p">,</span> <span class="n">v_norb</span><span class="p">,</span> <span class="n">c_norb</span><span class="p">,</span> <span class="n">ntot_v</span>
+        <span class="p">)</span>
+
+    <span class="n">emat_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ntot</span><span class="p">,</span> <span class="n">ntot</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="n">emat_n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ntot</span><span class="p">,</span> <span class="n">ntot</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">siam_type</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">hopping</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">emat_i</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">ntot_v</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">ntot_v</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">hopping</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">hopping_n</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">emat_n</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">ntot_v</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">ntot_v</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">hopping_n</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">hopping</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">emat_n</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">ntot_v</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">ntot_v</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">hopping</span><span class="p">)</span>
+
+    <span class="k">elif</span> <span class="n">siam_type</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">imp_mat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">emat_i</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">imp_mat</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">imp_mat_n</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">emat_n</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">imp_mat_n</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">imp_mat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">emat_n</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">imp_mat</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">bath_level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbath</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">v_norb</span><span class="p">):</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">v_norb</span> <span class="o">+</span> <span class="n">j</span>
+                    <span class="n">emat_i</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">idx</span><span class="p">]</span> <span class="o">+=</span> <span class="n">bath_level</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">bath_level_n</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbath</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">v_norb</span><span class="p">):</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">v_norb</span> <span class="o">+</span> <span class="n">j</span>
+                    <span class="n">emat_n</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">idx</span><span class="p">]</span> <span class="o">+=</span> <span class="n">bath_level_n</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">bath_level</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbath</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">v_norb</span><span class="p">):</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">v_norb</span> <span class="o">+</span> <span class="n">j</span>
+                    <span class="n">emat_n</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">idx</span><span class="p">]</span> <span class="o">+=</span> <span class="n">bath_level</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">hyb</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbath</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">v_norb</span><span class="p">):</span>
+                    <span class="n">idx1</span> <span class="o">=</span> <span class="n">j</span>
+                    <span class="n">idx2</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">v_norb</span> <span class="o">+</span> <span class="n">j</span>
+                    <span class="n">emat_i</span><span class="p">[</span><span class="n">idx1</span><span class="p">,</span> <span class="n">idx2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">hyb</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+                    <span class="n">emat_i</span><span class="p">[</span><span class="n">idx2</span><span class="p">,</span> <span class="n">idx1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">hyb</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">hyb_n</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbath</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">v_norb</span><span class="p">):</span>
+                    <span class="n">idx1</span> <span class="o">=</span> <span class="n">j</span>
+                    <span class="n">idx2</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">v_norb</span> <span class="o">+</span> <span class="n">j</span>
+                    <span class="n">emat_n</span><span class="p">[</span><span class="n">idx1</span><span class="p">,</span> <span class="n">idx2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">hyb_n</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+                    <span class="n">emat_n</span><span class="p">[</span><span class="n">idx2</span><span class="p">,</span> <span class="n">idx1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">hyb_n</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">hyb</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbath</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">v_norb</span><span class="p">):</span>
+                    <span class="n">idx1</span> <span class="o">=</span> <span class="n">j</span>
+                    <span class="n">idx2</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">v_norb</span> <span class="o">+</span> <span class="n">j</span>
+                    <span class="n">emat_n</span><span class="p">[</span><span class="n">idx1</span><span class="p">,</span> <span class="n">idx2</span><span class="p">]</span> <span class="o">+=</span> <span class="n">hyb</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span>
+                    <span class="n">emat_n</span><span class="p">[</span><span class="n">idx2</span><span class="p">,</span> <span class="n">idx1</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span><span class="n">hyb</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">])</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">"Unknown siam_type: "</span><span class="p">,</span> <span class="n">siam_type</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">c_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'p'</span><span class="p">,</span> <span class="s1">'d'</span><span class="p">,</span> <span class="s1">'f'</span><span class="p">]:</span>
+        <span class="n">emat_i</span><span class="p">[</span><span class="n">ntot_v</span><span class="p">:</span><span class="n">ntot</span><span class="p">,</span> <span class="n">ntot_v</span><span class="p">:</span><span class="n">ntot</span><span class="p">]</span> <span class="o">+=</span> <span class="n">atom_hsoc</span><span class="p">(</span><span class="n">c_name</span><span class="p">,</span> <span class="n">c_soc</span><span class="p">)</span>
+        <span class="n">emat_n</span><span class="p">[</span><span class="n">ntot_v</span><span class="p">:</span><span class="n">ntot</span><span class="p">,</span> <span class="n">ntot_v</span><span class="p">:</span><span class="n">ntot</span><span class="p">]</span> <span class="o">+=</span> <span class="n">atom_hsoc</span><span class="p">(</span><span class="n">c_name</span><span class="p">,</span> <span class="n">c_soc</span><span class="p">)</span>
+
+    <span class="c1"># Static core-hole potential on the impurity in the intermediate state.</span>
+    <span class="n">emat_n</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">]</span> <span class="o">-=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">v_norb</span><span class="p">)</span> <span class="o">*</span> <span class="n">static_core_pot</span>
+
+    <span class="k">if</span> <span class="n">trans_c2n</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">trans_c2n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">v_norb</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">trans_c2n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">trans_c2n</span><span class="p">)</span>
+
+    <span class="n">tmat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">ntot</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nbath</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">off</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">v_norb</span>
+        <span class="n">tmat</span><span class="p">[</span><span class="n">off</span><span class="p">:</span><span class="n">off</span> <span class="o">+</span> <span class="n">v_norb</span><span class="p">,</span> <span class="n">off</span><span class="p">:</span><span class="n">off</span> <span class="o">+</span> <span class="n">v_norb</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">conj</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">trans_c2n</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="n">emat_i</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">cb_op</span><span class="p">(</span><span class="n">emat_i</span><span class="p">,</span> <span class="n">tmat</span><span class="p">)</span>
+    <span class="n">emat_n</span><span class="p">[:,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">cb_op</span><span class="p">(</span><span class="n">emat_n</span><span class="p">,</span> <span class="n">tmat</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">ext_B</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">zeeman</span> <span class="o">=</span> <span class="n">_valence_zeeman_matrix</span><span class="p">(</span><span class="n">v_name</span><span class="p">,</span> <span class="n">v_orbl</span><span class="p">,</span> <span class="n">ext_B</span><span class="p">,</span> <span class="n">on_which</span><span class="p">)</span>
+        <span class="n">emat_i</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">zeeman</span>
+        <span class="n">emat_n</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">]</span> <span class="o">+=</span> <span class="n">zeeman</span>
+
+    <span class="c1"># Core levels in both sectors.</span>
+    <span class="n">emat_i</span><span class="p">[</span><span class="n">ntot_v</span><span class="p">:</span><span class="n">ntot</span><span class="p">,</span> <span class="n">ntot_v</span><span class="p">:</span><span class="n">ntot</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">c_norb</span><span class="p">)</span> <span class="o">*</span> <span class="n">c_level</span>
+    <span class="n">emat_n</span><span class="p">[</span><span class="n">ntot_v</span><span class="p">:</span><span class="n">ntot</span><span class="p">,</span> <span class="n">ntot_v</span><span class="p">:</span><span class="n">ntot</span><span class="p">]</span> <span class="o">+=</span> <span class="n">np</span><span class="o">.</span><span class="n">eye</span><span class="p">(</span><span class="n">c_norb</span><span class="p">)</span> <span class="o">*</span> <span class="n">c_level</span>
+
+    <span class="n">basis_i</span> <span class="o">=</span> <span class="n">FockBasisSpec</span><span class="o">.</span><span class="n">from_args</span><span class="p">(</span><span class="n">ntot_v</span><span class="p">,</span> <span class="n">v_noccu</span><span class="p">,</span> <span class="n">c_norb</span><span class="p">,</span> <span class="n">c_norb</span><span class="p">)</span>
+    <span class="n">basis_n</span> <span class="o">=</span> <span class="n">FockBasisSpec</span><span class="o">.</span><span class="n">from_args</span><span class="p">(</span><span class="n">ntot_v</span><span class="p">,</span> <span class="n">v_noccu</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">c_norb</span><span class="p">,</span> <span class="n">c_norb</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"edrixs &gt;&gt;&gt; Dimension of the initial Hamiltonian: "</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">basis_i</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"edrixs &gt;&gt;&gt; Dimension of the intermediate Hamiltonian: "</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">basis_n</span><span class="p">))</span>
+
+    <span class="n">tmp_g</span> <span class="o">=</span> <span class="n">_rotated_transition_blocks</span><span class="p">(</span><span class="n">v_name</span> <span class="o">+</span> <span class="n">c_name</span><span class="p">,</span> <span class="n">loc_axis</span><span class="p">)</span>
+    <span class="n">trans_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">tmp_g</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ntot</span><span class="p">,</span> <span class="n">ntot</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
+    <span class="n">trans_mat</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="n">v_norb</span><span class="p">,</span> <span class="n">ntot_v</span><span class="p">:</span><span class="n">ntot</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp_g</span>
+
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"edrixs &gt;&gt;&gt; SIAM setup Done !"</span><span class="p">)</span>
+
+    <span class="n">shift</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">c_norb</span> <span class="o">*</span> <span class="n">c_level</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">emat_i</span><span class="p">,</span> <span class="n">umat_i</span><span class="p">,</span> <span class="n">basis_i</span><span class="p">,</span> <span class="n">emat_n</span><span class="p">,</span> <span class="n">umat_n</span><span class="p">,</span> <span class="n">basis_n</span><span class="p">,</span> <span class="n">trans_mat</span><span class="p">,</span> <span class="n">shift</span></div>
+
+
+
+<div class="viewcode-block" id="model_siam_2d1p">
+<a class="viewcode-back" href="../../reference/models.html#edrixs.models.model_siam_2d1p">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">model_siam_2d1p</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span> <span class="n">slater</span><span class="p">,</span> <span class="n">impurity_levels</span><span class="p">,</span> <span class="n">bath_levels</span><span class="p">,</span> <span class="n">hyb</span><span class="p">,</span> <span class="n">Delta</span><span class="p">,</span> <span class="n">nd</span><span class="p">,</span>
+    <span class="n">v_soc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">c_soc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">om_shift</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ext_B</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">on_which</span><span class="o">=</span><span class="s1">'spin'</span><span class="p">,</span>
+    <span class="n">loc_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sparse_U</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1E-10</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Set up the commonly used d-impurity, one-bath, p-core charge-transfer</span>
+<span class="sd">    model. This is a convenience wrapper around :func:`model_siam`.</span>
+<span class="sd">    All energies, Slater integrals, hoppings, SOC constants, and magnetic-field</span>
+<span class="sd">    components are in eV. The bath has ten spin-orbitals and no Coulomb interaction.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    slater : tuple of array_like</span>
+<span class="sd">        Initial ``[F0_dd, F2_dd, F4_dd]`` and intermediate</span>
+<span class="sd">        ``[F0_dd, F2_dd, F4_dd, F0_dp, F2_dp, G1_dp, G3_dp]``.</span>
+<span class="sd">        Each state's average Coulomb interactions are recovered by subtracting</span>
+<span class="sd">        the corresponding ``get_F0`` contribution from its F0 integrals.</span>
+<span class="sd">    impurity_levels, bath_levels : array_like, shape (5,)</span>
+<span class="sd">        Real orbital offsets in the order ``(dz2, dzx, dzy, dx2-y2, dxy)``.</span>
+<span class="sd">        The mean of each five-orbital array is subtracted before adding the</span>
+<span class="sd">        charge-transfer-derived shell center. Each level applies to both spins;</span>
+<span class="sd">        the input arrays are not modified.</span>
+<span class="sd">    hyb : array_like, shape (5,)</span>
+<span class="sd">        Orbital-diagonal impurity-to-bath hoppings in the same order. Complex</span>
+<span class="sd">        values are allowed. Both spins and both states use the same hoppings.</span>
+<span class="sd">    Delta : float</span>
+<span class="sd">        Charge-transfer energy. This is defined in the atomic limit</span>
+<span class="sd">        (without crystal field, hybridization, or multipolar Coulomb</span>
+<span class="sd">        interactions) as the energy cost of transferring</span>
+<span class="sd">        one electron from the bath to the impurity.</span>
+<span class="sd">        Used for both states in :func:`~edrixs.utils.CT_imp_bath` and</span>
+<span class="sd">        :func:`~edrixs.utils.CT_imp_bath_core_hole`.</span>
+<span class="sd">    nd : int</span>
+<span class="sd">        Nominal impurity occupancy, from 0 through 9. The nominal bath is full;</span>
+<span class="sd">        the initial total valence occupancy is ``nd + 10``.</span>
+<span class="sd">    v_soc : pair of float, optional</span>
+<span class="sd">        Initial and intermediate impurity SOC constants. None means zero.</span>
+<span class="sd">    c_soc : float, optional</span>
+<span class="sd">        Core SOC constant. Default zero.</span>
+<span class="sd">    om_shift : float, optional</span>
+<span class="sd">        Overall XAS energy alignment. The core energy passed to model_siam is</span>
+<span class="sd">        ``-om_shift - 5*E_p``, where E_p comes from the core-hole CT helper.</span>
+<span class="sd">        Increasing om_shift raises transition energies by the same amount.</span>
+<span class="sd">        Default zero; the filled-core reference convention is preserved.</span>
+<span class="sd">    ext_B, on_which, loc_axis, verbose, sparse_U, tol</span>
+<span class="sd">        Passed through to :func:`model_siam` with the same meaning and defaults.</span>
+<span class="sd">        The magnetic field acts on the impurity only.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat, shift</span>
+<span class="sd">        The eight model_siam outputs. Pass the first seven to</span>
+<span class="sd">        :func:`~edrixs.solvers.get_ops` and the final ``shift`` to dense or</span>
+<span class="sd">        SciPy :func:`~edrixs.solvers.ed`. Here ``shift = 6 * (-om_shift - 5*E_p)``;</span>
+<span class="sd">        it excludes Coulomb contributions and does not alter the integrals. One-body</span>
+<span class="sd">        matrices both have shape (26, 26) and use complex spherical</span>
+<span class="sd">        harmonics. Basis metadata fixes initial valence occupancy to nd+10,</span>
+<span class="sd">        intermediate valence occupancy to nd+11, and core occupancies to six</span>
+<span class="sd">        and five, respectively.</span>
+<span class="sd">        Coulomb tensors are dense unless sparse_U=True. No diagonalization</span>
+<span class="sd">        or spectrum calculation is performed.</span>
+<span class="sd">    """</span>
+    <span class="n">slater_i</span><span class="p">,</span> <span class="n">slater_n</span> <span class="o">=</span> <span class="n">slater</span>
+    <span class="k">if</span> <span class="n">v_soc</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">v_soc</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Center the orbital splittings before applying the CT-derived energies.</span>
+    <span class="n">impurity_levels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">impurity_levels</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">impurity_levels</span><span class="p">)</span>
+    <span class="n">bath_levels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">bath_levels</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">bath_levels</span><span class="p">)</span>
+    <span class="n">U_dd_i</span> <span class="o">=</span> <span class="n">slater_i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">get_F0</span><span class="p">(</span><span class="s1">'d'</span><span class="p">,</span> <span class="o">*</span><span class="n">slater_i</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">])</span>
+    <span class="n">U_dd_n</span> <span class="o">=</span> <span class="n">slater_n</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">get_F0</span><span class="p">(</span><span class="s1">'d'</span><span class="p">,</span> <span class="o">*</span><span class="n">slater_n</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">])</span>
+    <span class="n">U_dp</span> <span class="o">=</span> <span class="n">slater_n</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">get_F0</span><span class="p">(</span><span class="s1">'dp'</span><span class="p">,</span> <span class="o">*</span><span class="n">slater_n</span><span class="p">[</span><span class="mi">5</span><span class="p">:</span><span class="mi">7</span><span class="p">])</span>
+    <span class="n">E_d</span><span class="p">,</span> <span class="n">E_L</span> <span class="o">=</span> <span class="n">CT_imp_bath</span><span class="p">(</span><span class="n">U_dd_i</span><span class="p">,</span> <span class="n">Delta</span><span class="p">,</span> <span class="n">nd</span><span class="p">)</span>
+    <span class="n">E_dc</span><span class="p">,</span> <span class="n">E_Lc</span><span class="p">,</span> <span class="n">E_p</span> <span class="o">=</span> <span class="n">CT_imp_bath_core_hole</span><span class="p">(</span><span class="n">U_dd_n</span><span class="p">,</span> <span class="n">U_dp</span><span class="p">,</span> <span class="n">Delta</span><span class="p">,</span> <span class="n">nd</span><span class="p">)</span>
+
+    <span class="n">trans_c2n</span> <span class="o">=</span> <span class="n">tmat_c2r</span><span class="p">(</span><span class="s1">'d'</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">imp_mat</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">impurity_levels</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">E_d</span><span class="p">)</span>
+               <span class="o">+</span> <span class="n">cb_op</span><span class="p">(</span><span class="n">atom_hsoc</span><span class="p">(</span><span class="s1">'d'</span><span class="p">,</span> <span class="n">v_soc</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">trans_c2n</span><span class="p">))</span>
+    <span class="n">imp_mat_n</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">impurity_levels</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">E_dc</span><span class="p">)</span>
+                 <span class="o">+</span> <span class="n">cb_op</span><span class="p">(</span><span class="n">atom_hsoc</span><span class="p">(</span><span class="s1">'d'</span><span class="p">,</span> <span class="n">v_soc</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">trans_c2n</span><span class="p">))</span>
+    <span class="n">bath_offsets</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">bath_levels</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">return</span> <span class="n">model_siam</span><span class="p">(</span>
+        <span class="p">(</span><span class="s1">'d'</span><span class="p">,</span> <span class="s1">'p'</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="n">siam_type</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">v_noccu</span><span class="o">=</span><span class="n">nd</span> <span class="o">+</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="n">c_level</span><span class="o">=-</span><span class="n">om_shift</span> <span class="o">-</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">E_p</span><span class="p">,</span> <span class="n">c_soc</span><span class="o">=</span><span class="n">c_soc</span><span class="p">,</span> <span class="n">trans_c2n</span><span class="o">=</span><span class="n">trans_c2n</span><span class="p">,</span>
+        <span class="n">imp_mat</span><span class="o">=</span><span class="n">imp_mat</span><span class="p">,</span> <span class="n">imp_mat_n</span><span class="o">=</span><span class="n">imp_mat_n</span><span class="p">,</span>
+        <span class="n">bath_level</span><span class="o">=</span><span class="n">bath_offsets</span> <span class="o">+</span> <span class="n">E_L</span><span class="p">,</span> <span class="n">bath_level_n</span><span class="o">=</span><span class="n">bath_offsets</span> <span class="o">+</span> <span class="n">E_Lc</span><span class="p">,</span>
+        <span class="n">hyb</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">hyb</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:],</span> <span class="n">slater</span><span class="o">=</span><span class="p">(</span><span class="n">slater_i</span><span class="p">,</span> <span class="n">slater_n</span><span class="p">),</span>
+        <span class="n">ext_B</span><span class="o">=</span><span class="n">ext_B</span><span class="p">,</span> <span class="n">on_which</span><span class="o">=</span><span class="n">on_which</span><span class="p">,</span> <span class="n">loc_axis</span><span class="o">=</span><span class="n">loc_axis</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">sparse_U</span><span class="o">=</span><span class="n">sparse_U</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span>
+    <span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Brookhaven National Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

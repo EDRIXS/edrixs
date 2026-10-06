@@ -1,0 +1,286 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Conventions &mdash; EDRIXS 0.post1+g803cebb documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=c83e6b79" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/version-switcher.css?v=23edc989" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=66d01fc2"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+      <script src="../_static/version-switcher.js?v=7c26ac8e"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Backend" href="backend.html" />
+    <link rel="prev" title="Introduction to EDRIXS" href="introduction.html" />
+   
+  <meta name="edrixs-doc-version" content="dev">
+  <meta name="edrixs-doc-site-root" content="/edrixs/">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            EDRIXS
+              <img src="../_static/EDRIXS_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">EDRIXS User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="whatisedrixs.html">What is EDRIXS?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usedocker.html">EDRIXS and docker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devcontainer.html">Dev Container</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html">Introduction to EDRIXS</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Conventions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#energies-and-naming">Energies and naming</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#core-orbitals-and-energy-shifts">Core orbitals and energy shifts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#default-orbital-ordering-and-single-particle-bases">Default orbital ordering and single-particle bases</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fock-basis">Fock basis</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spectral-conventions">Spectral conventions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html">Backend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="papers.html">EDRIXS papers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Pedagogical examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">EDRIXS Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">EDRIXS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">EDRIXS User Guide</a></li>
+      <li class="breadcrumb-item active">Conventions</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/user/conventions.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="conventions">
+<span id="id1"></span><h1>Conventions<a class="headerlink" href="#conventions" title="Link to this heading"></a></h1>
+<p>This page summarizes the conventions used in EDRIXS: units and naming,
+orbital orderings and single-particle bases, Fock-state encoding, and the
+geometry, polarization, and broadening used to calculate spectra. The
+<a class="reference internal" href="introduction.html#introduction"><span class="std std-ref">Introduction to EDRIXS</span></a> describes the interface, and the
+<a class="reference internal" href="examples.html#examples"><span class="std std-ref">pedagogical examples</span></a> explore the underlying physics in
+more detail.</p>
+<section id="energies-and-naming">
+<h2>Energies and naming<a class="headerlink" href="#energies-and-naming" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Electron and hole language.</strong> EDRIXS uses electron language by default.
+Using hole language involves inverting the energy levels in <code class="docutils literal notranslate"><span class="pre">emat</span></code> and
+taking the conjugate transpose of the absorption and emission operators.</p></li>
+<li><p><strong>Units.</strong> All energies are in <strong>eV</strong>.</p></li>
+<li><p><strong>Initial and intermediate states.</strong> Throughout EDRIXS, an <code class="docutils literal notranslate"><span class="pre">_i</span></code> suffix
+labels the initial and final states, which have no core hole, while <code class="docutils literal notranslate"><span class="pre">_n</span></code>
+labels the intermediate state, which has one. Thus, <code class="docutils literal notranslate"><span class="pre">emat_i</span></code>, <code class="docutils literal notranslate"><span class="pre">umat_i</span></code>,
+<code class="docutils literal notranslate"><span class="pre">basis_i</span></code>, and <code class="docutils literal notranslate"><span class="pre">hmat_i</span></code> describe the problem without a core hole, while
+<code class="docutils literal notranslate"><span class="pre">emat_n</span></code>, <code class="docutils literal notranslate"><span class="pre">umat_n</span></code>, <code class="docutils literal notranslate"><span class="pre">basis_n</span></code>, and <code class="docutils literal notranslate"><span class="pre">hmat_n</span></code> describe the problem
+with a core hole.</p></li>
+<li><p><strong>Coulomb interactions.</strong> These interactions are parameterized using
+Slater integrals. EDRIXS provides Hartree-Fock values for these integrals
+through <a class="reference internal" href="../reference/utils.html#edrixs.utils.get_atom_data" title="edrixs.utils.get_atom_data"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_atom_data()</span></code></a> and conversions between Slater
+integrals and the common <span class="math notranslate nohighlight">\(U\)</span>, <span class="math notranslate nohighlight">\(J\)</span>, <span class="math notranslate nohighlight">\(U_d\)</span>, and <span class="math notranslate nohighlight">\(J_H\)</span>
+parameterizations through functions such as
+<a class="reference internal" href="../reference/utils.html#edrixs.utils.UdJH_to_F0F2F4" title="edrixs.utils.UdJH_to_F0F2F4"><code class="xref py py-func docutils literal notranslate"><span class="pre">UdJH_to_F0F2F4()</span></code></a> and
+<a class="reference internal" href="../reference/utils.html#edrixs.utils.F0F2F4_to_UdJH" title="edrixs.utils.F0F2F4_to_UdJH"><code class="xref py py-func docutils literal notranslate"><span class="pre">F0F2F4_to_UdJH()</span></code></a>. The Hartree-Fock values are usually
+<strong>scaled down</strong> to 70-90% of their atomic values to approximate screening in
+the solid.</p></li>
+<li><p><strong>Core-level energies.</strong> The absolute energy of a core level is not defined
+by the calculation. The resonance position is set through
+<code class="docutils literal notranslate"><span class="pre">shell_level</span></code> (or <code class="docutils literal notranslate"><span class="pre">c_level</span></code>) together with an offset chosen to match
+experiment.</p></li>
+</ul>
+</section>
+<section id="core-orbitals-and-energy-shifts">
+<h2>Core orbitals and energy shifts<a class="headerlink" href="#core-orbitals-and-energy-shifts" title="Link to this heading"></a></h2>
+<p>EDRIXS model constructors include the core orbitals in the initial Fock space.
+Because these orbitals are fully occupied, including them changes the state
+labels without increasing the number of states. This convention avoids the
+energy corrections needed when filled core orbitals are omitted and simplifies
+the construction of transition operators.</p>
+<p>Model constructors also return an energy offset, <code class="docutils literal notranslate"><span class="pre">shift</span></code>. Passing it to
+<a class="reference internal" href="../reference/solvers.html#edrixs.solvers.ed" title="edrixs.solvers.ed"><code class="xref py py-func docutils literal notranslate"><span class="pre">ed()</span></code></a> with the dense or SciPy backend subtracts the offset
+from the Hamiltonian diagonal before diagonalization and restores it to the
+returned eigenvalues. This preserves the physics while reducing numerical
+errors caused by subtracting large, nearly equal numbers.</p>
+</section>
+<section id="default-orbital-ordering-and-single-particle-bases">
+<h2>Default orbital ordering and single-particle bases<a class="headerlink" href="#default-orbital-ordering-and-single-particle-bases" title="Link to this heading"></a></h2>
+<p>Unless specified otherwise, EDRIXS uses these orderings.</p>
+<ul class="simple">
+<li><p><strong>Spin:</strong> interleaved, <code class="docutils literal notranslate"><span class="pre">up,</span> <span class="pre">dn,</span> <span class="pre">up,</span> <span class="pre">dn,</span> <span class="pre">...</span></code>.</p></li>
+<li><p><strong>Complex spherical harmonics</strong> <span class="math notranslate nohighlight">\(Y_l^m\)</span>: <code class="docutils literal notranslate"><span class="pre">m</span> <span class="pre">=</span> <span class="pre">-l,</span> <span class="pre">-l+1,</span> <span class="pre">...,</span> <span class="pre">l-1,</span> <span class="pre">l</span></code>.</p></li>
+<li><p><strong>Real spherical harmonics</strong> (the Wannier90 ordering):</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">p</span></code>:  <span class="math notranslate nohighlight">\(p_x, p_y, p_z\)</span></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">d</span></code>:  <span class="math notranslate nohighlight">\(d_{3z^2-r^2}, d_{xz}, d_{yz}, d_{x^2-y^2}, d_{xy}\)</span></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">t2g</span></code>:  <span class="math notranslate nohighlight">\(d_{xz}, d_{yz}, d_{xy}\)</span></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">f</span></code>:  <span class="math notranslate nohighlight">\(f_{z^3}, f_{xz^2}, f_{yz^2}, f_{z(x^2-y^2)}, f_{xyz},
+f_{x(x^2-3y^2)}, f_{y(3x^2-y^2)}\)</span></p></li>
+</ul>
+</li>
+<li><p><span class="math notranslate nohighlight">\(\lvert j, j_z \rangle\)</span> <strong>basis</strong> (SOC diagonal): the
+<span class="math notranslate nohighlight">\(j = l-1/2\)</span> block first, then the <span class="math notranslate nohighlight">\(j = l+1/2\)</span> block, each ordered
+<span class="math notranslate nohighlight">\(-j, -j+1, ..., j\)</span>.</p></li>
+</ul>
+<p>The <strong>default single-particle basis used to define the Fock basis</strong> is:</p>
+<ul class="simple">
+<li><p>complex spherical harmonics for <code class="docutils literal notranslate"><span class="pre">p</span></code>, <code class="docutils literal notranslate"><span class="pre">d</span></code>, <code class="docutils literal notranslate"><span class="pre">t2g</span></code>, and <code class="docutils literal notranslate"><span class="pre">f</span></code> (<code class="docutils literal notranslate"><span class="pre">p</span></code> and
+<code class="docutils literal notranslate"><span class="pre">t2g</span></code> share the same complex-harmonic basis);</p></li>
+<li><p>the <span class="math notranslate nohighlight">\(\lvert j, j_z \rangle\)</span> basis for <code class="docutils literal notranslate"><span class="pre">p12</span></code>, <code class="docutils literal notranslate"><span class="pre">p32</span></code>, <code class="docutils literal notranslate"><span class="pre">d32</span></code>,
+<code class="docutils literal notranslate"><span class="pre">d52</span></code>, <code class="docutils literal notranslate"><span class="pre">f52</span></code>, and <code class="docutils literal notranslate"><span class="pre">f72</span></code>.</p></li>
+</ul>
+<p>Helper functions that return matrices or tensors – <code class="docutils literal notranslate"><span class="pre">get_umat_slater</span></code>,
+<code class="docutils literal notranslate"><span class="pre">get_trans_oper</span></code>, <code class="docutils literal notranslate"><span class="pre">cf_cubic_d</span></code>, <code class="docutils literal notranslate"><span class="pre">cf_tetragonal_d</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">cf_trigonal_t2g</span></code>, for example – return them <strong>in this default basis</strong>.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>You may express <code class="code docutils literal notranslate"><span class="pre">emat</span></code> and <code class="code docutils literal notranslate"><span class="pre">umat</span></code> in any single-particle basis,
+but everything entering the Hamiltonian must be expressed in that
+<em>same</em> basis. Transform one-body matrices with
+<a class="reference internal" href="../reference/basis_transform.html#edrixs.basis_transform.cb_op" title="edrixs.basis_transform.cb_op"><code class="xref py py-func docutils literal notranslate"><span class="pre">cb_op()</span></code></a> and Coulomb tensors with
+<a class="reference internal" href="../reference/basis_transform.html#edrixs.basis_transform.transform_utensor" title="edrixs.basis_transform.transform_utensor"><code class="xref py py-func docutils literal notranslate"><span class="pre">transform_utensor()</span></code></a>. The recommended
+practice is to keep the default basis and only transform the extra matrices
+you supply (for example, a crystal-field matrix) into it. <code class="docutils literal notranslate"><span class="pre">cb_op</span></code> applies</p>
+<div class="math notranslate nohighlight">
+\[\hat{O}^{\prime} = T^{\dagger}\, \hat{O}\, T ,\]</div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">T</span> <span class="pre">=</span> <span class="pre">edrixs.tmat_c2r('d',</span> <span class="pre">ispin=True)</span></code> to transform from complex to
+real harmonics, or <code class="docutils literal notranslate"><span class="pre">edrixs.tmat_r2c</span></code> for the reverse transformation.</p>
+</div>
+</section>
+<section id="fock-basis">
+<h2>Fock basis<a class="headerlink" href="#fock-basis" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Valence orbitals come first.</strong> When a problem has both valence and core
+electrons, all valence spin-orbitals are indexed before all core
+spin-orbitals.</p></li>
+<li><p><strong>Encoding.</strong> A Fock state is a string of 1s (occupied) and 0s (empty) over
+the single-particle spin-orbitals, stored as an integer for efficiency.
+Orbital zero occupies the least significant bit:
+orbital <code class="docutils literal notranslate"><span class="pre">i</span></code> has mask <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">&lt;&lt;</span> <span class="pre">i</span></code>. Occupation lists remain in increasing
+orbital order; ordinary binary integer displays place orbital zero at the
+right. Basis row ordering is unchanged.</p></li>
+<li><p><strong>Specification.</strong> A basis is described compactly by
+<a class="reference internal" href="../reference/fock_basis.html#edrixs.fock_basis.FockBasisSpec" title="edrixs.fock_basis.FockBasisSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">FockBasisSpec</span></code></a>, built from <code class="docutils literal notranslate"><span class="pre">(norb,</span> <span class="pre">nocc)</span></code> pairs
+– one per shell, each with fixed occupancy. For a single shell,
+<a class="reference internal" href="../reference/fock_basis.html#edrixs.fock_basis.get_fock_basis_int" title="edrixs.fock_basis.get_fock_basis_int"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_fock_basis_int()</span></code></a> returns a realized
+integer-encoded basis directly. <a class="reference internal" href="../reference/solvers.html#edrixs.solvers.build_op" title="edrixs.solvers.build_op"><code class="xref py py-func docutils literal notranslate"><span class="pre">build_op()</span></code></a> and
+<a class="reference internal" href="../reference/solvers.html#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops()</span></code></a> accept either the specification or a realized
+basis.</p></li>
+</ul>
+</section>
+<section id="spectral-conventions">
+<h2>Spectral conventions<a class="headerlink" href="#spectral-conventions" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Geometry</strong> follows Figure 1 of Y. Wang <em>et al.</em>,
+<a class="reference external" href="https://doi.org/10.1016/j.cpc.2019.04.018">Comput. Phys. Commun. 243, 151 (2019)</a>. The incident and scattered
+beam angles are set by <code class="docutils literal notranslate"><span class="pre">thin</span></code> and <code class="docutils literal notranslate"><span class="pre">thout</span></code>, and the azimuth by <code class="docutils literal notranslate"><span class="pre">phi</span></code>.
+All angles are in radians and relative to the sample axes. By default, the
+crystal-field <span class="math notranslate nohighlight">\(x, y, z\)</span> axes coincide with the lab frame; use
+<code class="docutils literal notranslate"><span class="pre">loc_axis</span></code> (model) or <code class="docutils literal notranslate"><span class="pre">scatter_axis</span></code> (solver) to change this.</p></li>
+<li><p><strong>Polarization</strong> is given as a list of channels. For XAS, each entry is
+<code class="docutils literal notranslate"><span class="pre">(kind,</span> <span class="pre">angle)</span></code> with <code class="docutils literal notranslate"><span class="pre">kind</span></code> one of <code class="docutils literal notranslate"><span class="pre">'linear'</span></code>, <code class="docutils literal notranslate"><span class="pre">'left'</span></code>, <code class="docutils literal notranslate"><span class="pre">'right'</span></code>
+or <code class="docutils literal notranslate"><span class="pre">'isotropic'</span></code> (the last for powders). For RIXS, each entry is a 4-tuple
+<code class="docutils literal notranslate"><span class="pre">(in_kind,</span> <span class="pre">in_angle,</span> <span class="pre">out_kind,</span> <span class="pre">out_angle)</span></code>; sum the two outgoing channels
+when the experiment does not resolve emitted polarization.</p></li>
+<li><p><strong>Broadening</strong> is a Lorentzian half width at half maximum. <code class="docutils literal notranslate"><span class="pre">gamma_c</span></code> is the
+inverse core-hole lifetime (it dominates XAS and the incident-energy axis of
+RIXS); <code class="docutils literal notranslate"><span class="pre">gamma_f</span></code> is the final-state or resolution width on the RIXS
+energy-loss axis. <code class="docutils literal notranslate"><span class="pre">gamma_c</span></code> may be a scalar or an array with the same
+shape as <code class="docutils literal notranslate"><span class="pre">ominc</span></code>; <code class="docutils literal notranslate"><span class="pre">gamma_f</span></code> may be a scalar or an array with the same
+shape as <code class="docutils literal notranslate"><span class="pre">eloss</span></code>.</p></li>
+<li><p><strong>Temperature</strong> (in K) sets Boltzmann weights over the retained low-energy
+initial states, so <code class="docutils literal notranslate"><span class="pre">num_evals</span></code> in <code class="docutils literal notranslate"><span class="pre">ed</span></code> must be large enough to cover all
+thermally populated states.</p></li>
+<li><p>Returned array shapes: <code class="docutils literal notranslate"><span class="pre">xas</span></code> has shape <code class="docutils literal notranslate"><span class="pre">(len(ominc),</span> <span class="pre">len(pol_type))</span></code>;
+<code class="docutils literal notranslate"><span class="pre">rixs</span></code> has shape <code class="docutils literal notranslate"><span class="pre">(len(ominc),</span> <span class="pre">len(eloss),</span> <span class="pre">len(pol_type))</span></code>.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="introduction.html" class="btn btn-neutral float-left" title="Introduction to EDRIXS" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="backend.html" class="btn btn-neutral float-right" title="Backend" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Brookhaven National Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

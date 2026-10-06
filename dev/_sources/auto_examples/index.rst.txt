@@ -70,7 +70,7 @@ Below are some examples illustrating the concepts behind and usage of EDRIXS.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="When defining the bath states, it is useful to use the so-called symmetry adapted linear combinations of orbitals as the basis. These states take into account the symmetry relationships between the different bath atom orbitals and the fact that there are bath orbital combinations that do not interact with the impurity by symmetry. By doing this the problem can be represented with fewer orbitals, which makes the calculation far more efficient. The standard EDRIXS solver that we will use assumes that the bath states are represented by an integer number of bath sites set by nbath, each of which hosts the same number of spin-orbits as the impurity e.g. 10 for a d-electron material.">
+    <div class="sphx-glr-thumbcontainer" tooltip="When defining the bath states, it is useful to use the so-called symmetry adapted linear combinations of orbitals as the basis. These states take into account the symmetry relationships between the different bath atom orbitals and the fact that there are bath orbital combinations that do not interact with the impurity by symmetry. By doing this the problem can be represented with fewer orbitals, which makes the calculation far more efficient. The standard EDRIXS solver that we will use assumes that the bath states are represented by an integer number of bath sites set by nbath, each of which hosts the same number of spin-orbitals as the impurity e.g. 10 for a d-electron material.">
 
 .. only:: html
 
@@ -87,7 +87,7 @@ Below are some examples illustrating the concepts behind and usage of EDRIXS.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="In doing this we will go through the exercise of building and diagonalizing the Hamiltonian in a way that hopefully clarifies how to analyze other properties of the model.">
+    <div class="sphx-glr-thumbcontainer" tooltip="Ground state analysis for NiO">
 
 .. only:: html
 

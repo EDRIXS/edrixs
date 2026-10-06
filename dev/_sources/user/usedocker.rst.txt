@@ -1,14 +1,14 @@
 .. _edrixsanddocker:
 
 *********************
-edrixs and docker
+EDRIXS and docker
 *********************
 
-Run edrixs in a docker container
+Run EDRIXS in a docker container
 --------------------------------
 
 To make life easier, we have built a Docker image based on Ubuntu Linux 24.04
-for edrixs, so you do not need to install its compiler toolchain yourself.
+for EDRIXS, so you do not need to install its compiler toolchain yourself.
 The image is published for both AMD64 and ARM64 systems.
 The ``latest`` tag tracks the latest stable release. For reproducible work,
 pin a release tag such as ``edrixs/edrixs:v0.1.3``.
@@ -48,7 +48,7 @@ Follow these steps to use the docker image:
 Use the docker image as a Dev Container
 ----------------------------------------
 
-You can use the edrixs docker image as a `Dev Container
+You can use the EDRIXS docker image as a `Dev Container
 <https://containers.readthedocs.io/>`_ in VS Code or GitHub Codespaces without
 cloning the full repository. Create a file ``.devcontainer/devcontainer.json``
 in your project with the following contents ::
@@ -62,7 +62,7 @@ Open the project in VS Code with the `Dev Containers
 <https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers>`_
 extension installed and choose **Reopen in Container** when prompted.
 
-See :ref:`devcontainer` for more details on using Dev Containers with edrixs.
+See :ref:`devcontainer` for more details on using Dev Containers with EDRIXS.
 
 Sharing your code
 -----------------
@@ -72,4 +72,4 @@ Using Docker is a nice way to straightforwardly share your code with others. The
     FROM edrixs/edrixs
 
 You might like to checkout the `jupyter-repo2docker
-<https://repo2docker.readthedocs.io/en/latest/>`_ project, which helps automate the process of building and connecting to docker images. The `mybinder <https://mybinder.org/>`_ project might also be helpful as this will open a github respository of notebooks in an executable environment, making your code immediately reproducible by anyone, anywhere.
+<https://repo2docker.readthedocs.io/en/latest/>`_ project, which helps automate the process of building and connecting to docker images. The `mybinder <https://mybinder.org/>`_ project might also be helpful as this will open a github repository of notebooks in an executable environment, making your code immediately reproducible by anyone, anywhere.

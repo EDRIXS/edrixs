@@ -1,7 +1,7 @@
 .. _reference:
 
 ################
-edrixs Reference
+EDRIXS Reference
 ################
 
 :Release: |version|
@@ -23,7 +23,9 @@ included in EDRIXS, describing what they are and what they do.
    fock_basis
    iostream
    manybody_operator
+   models
    photon_transition
+   poles
    plot_spectrum
    rixs_utils
    soc

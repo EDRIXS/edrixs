@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>edrixs.fock_basis &mdash; edrixs 0.post1+geacad9a documentation</title>
+  <title>edrixs.fock_basis &mdash; EDRIXS 0.post1+g803cebb documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -19,7 +19,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=6a3525d1"></script>
+      <script src="../../_static/documentation_options.js?v=66d01fc2"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -44,7 +44,7 @@
           
           
           <a href="../../index.html" class="icon icon-home">
-            edrixs
+            EDRIXS
               <img src="../../_static/EDRIXS_logo.png" class="logo" alt="Logo"/>
           </a>
 <div role="search">
@@ -56,9 +56,9 @@
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">edrixs User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/index.html">EDRIXS User Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../auto_examples/index.html">Pedagogical examples</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">edrixs Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/index.html">EDRIXS Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../release-history.html">Release History</a></li>
 </ul>
 
@@ -68,7 +68,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../../index.html">edrixs</a>
+          <a href="../../index.html">EDRIXS</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -88,14 +88,331 @@
              
   <h1>Source code for edrixs.fock_basis</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python</span>
+<span class="sd">"""Fock-basis construction and integer-encoded basis objects."""</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'fock_bin'</span><span class="p">,</span> <span class="s1">'get_fock_bin_by_N'</span><span class="p">,</span> <span class="s1">'get_fock_half_N'</span><span class="p">,</span>
-           <span class="s1">'get_fock_full_N'</span><span class="p">,</span> <span class="s1">'get_fock_basis_by_NLz'</span><span class="p">,</span> <span class="s1">'get_fock_basis_by_NSz'</span><span class="p">,</span>
-           <span class="s1">'get_fock_basis_by_NJz'</span><span class="p">,</span> <span class="s1">'get_fock_basis_by_N_abelian'</span><span class="p">,</span>
-           <span class="s1">'get_fock_basis_by_N_LzSz'</span><span class="p">,</span> <span class="s1">'write_fock_dec_by_N'</span><span class="p">]</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">math</span><span class="w"> </span><span class="kn">import</span> <span class="n">comb</span><span class="p">,</span> <span class="n">prod</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">'FockBasisSpec'</span><span class="p">,</span> <span class="s1">'FockBasis'</span><span class="p">,</span> <span class="s1">'FockBinByN'</span><span class="p">,</span>
+    <span class="s1">'build_fock_basis'</span><span class="p">,</span> <span class="s1">'get_fock_basis_int'</span><span class="p">,</span> <span class="s1">'get_fock_basis_combinadic'</span><span class="p">,</span>
+    <span class="s1">'fock_bin'</span><span class="p">,</span> <span class="s1">'get_fock_bin_by_N'</span><span class="p">,</span> <span class="s1">'get_fock_half_N'</span><span class="p">,</span>
+    <span class="s1">'get_fock_full_N'</span><span class="p">,</span> <span class="s1">'get_fock_basis_by_NLz'</span><span class="p">,</span> <span class="s1">'get_fock_basis_by_NSz'</span><span class="p">,</span>
+    <span class="s1">'get_fock_basis_by_NJz'</span><span class="p">,</span> <span class="s1">'get_fock_basis_by_N_abelian'</span><span class="p">,</span>
+    <span class="s1">'get_fock_basis_by_N_LzSz'</span><span class="p">,</span> <span class="s1">'write_fock_dec_by_N'</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="FockBasisSpec">
+<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.FockBasisSpec">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">frozen</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FockBasisSpec</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Compact description of fixed occupancies in one or more orbital shells."""</span>
+
+    <span class="n">shapes</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">shapes</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">norb</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">nocc</span><span class="p">))</span> <span class="k">for</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nocc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shapes</span><span class="p">)</span>
+        <span class="nb">object</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">'shapes'</span><span class="p">,</span> <span class="n">shapes</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FockBasisSpec.from_args">
+<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.FockBasisSpec.from_args">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_args</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Build a specification from ``(norbs, nocc)`` pairs."""</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"number of basis arguments must be even"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">::</span><span class="mi">2</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">])))</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">norbs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Total number of spin-orbitals."""</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">norb</span> <span class="k">for</span> <span class="n">norb</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shapes</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">prod</span><span class="p">(</span><span class="n">comb</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">nocc</span><span class="p">)</span> <span class="k">for</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nocc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shapes</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="FockBasis">
+<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.FockBasis">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">FockBasis</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Integer-encoded Fock basis with constant-time state lookup.</span>
+
+<span class="sd">    Orbital zero is stored as the least significant bit, as in native Fortran.</span>
+<span class="sd">    Orbital ``i`` has mask ``1 &lt;&lt; i``; occupation lists remain in orbital</span>
+<span class="sd">    order, with orbital zero first.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    basis_int : sequence of int</span>
+<span class="sd">        Integer encodings of the basis states in matrix-index order.</span>
+<span class="sd">    norbs : int</span>
+<span class="sd">        Number of spin-orbitals represented by each state.</span>
+<span class="sd">    spec : FockBasisSpec or None, optional</span>
+<span class="sd">        Structured sector description when the basis was generated from fixed</span>
+<span class="sd">        shell occupancies. Arbitrary explicit bases may leave this as ``None``.</span>
+<span class="sd">    """</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">basis_int</span><span class="p">,</span> <span class="n">norbs</span><span class="p">,</span> <span class="n">spec</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">basis_int</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">basis_int</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">norbs</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">norbs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spec</span> <span class="o">=</span> <span class="n">spec</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lookup</span> <span class="o">=</span> <span class="p">{</span><span class="n">value</span><span class="p">:</span> <span class="n">index</span> <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basis_int</span><span class="p">)}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">basis_int</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FockBasis.encode">
+<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.FockBasis.encode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Return the basis position of an integer-encoded Fock state."""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lookup</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="FockBasis.decode">
+<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.FockBasis.decode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">position</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Return the integer-encoded Fock state at ``position``."""</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">basis_int</span><span class="p">[</span><span class="n">position</span><span class="p">]</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="FockBinByN">
+<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.FockBinByN">[docs]</a>
+<span class="nd">@dataclass</span><span class="p">(</span><span class="n">slots</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">FockBinByN</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Implicit combinadic basis for a complete fixed-occupancy sector."""</span>
+
+    <span class="n">shapes</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="o">...</span><span class="p">]</span>
+    <span class="n">spec</span><span class="p">:</span> <span class="n">FockBasisSpec</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">shell_norbs</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">norbs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">noccus</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">sizes</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">num_subspaces</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">num_orbitals</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">offsets</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">strides</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="o">...</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">min_decode</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">max_decode</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spec</span> <span class="o">=</span> <span class="n">FockBasisSpec</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shapes</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shapes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">shapes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shell_norbs</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">norb</span> <span class="k">for</span> <span class="n">norb</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shapes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">norbs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">norbs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">noccus</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">nocc</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">nocc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shapes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sizes</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">comb</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">nocc</span><span class="p">)</span> <span class="k">for</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nocc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shapes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_subspaces</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shapes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_orbitals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">norbs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dim</span> <span class="o">=</span> <span class="n">prod</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">)</span>
+
+        <span class="n">running</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">offsets</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">norb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell_norbs</span><span class="p">:</span>
+            <span class="n">offsets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">running</span><span class="p">)</span>
+            <span class="n">running</span> <span class="o">+=</span> <span class="n">norb</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">offsets</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">offsets</span><span class="p">)</span>
+
+        <span class="c1"># The first shell varies fastest, matching get_fock_bin_by_N.</span>
+        <span class="n">stride</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">strides</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">size</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">:</span>
+            <span class="n">strides</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stride</span><span class="p">)</span>
+            <span class="n">stride</span> <span class="o">*=</span> <span class="n">size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">strides</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">strides</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_decode</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_decode</span> <span class="o">=</span> <span class="n">_min_max_decode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shapes</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FockBinByN.from_spec">
+<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.FockBinByN.from_spec">[docs]</a>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_spec</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Build an implicit basis from a :class:`FockBasisSpec`."""</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">shapes</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span>
+
+<div class="viewcode-block" id="FockBinByN.encode">
+<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.FockBinByN.encode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">encode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Return the canonical EDRIXS index of ``state``."""</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">_encode_combinadic</span><span class="p">(</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">state</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell_norbs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">noccus</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">offsets</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">strides</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">state</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">index</span></div>
+
+
+<div class="viewcode-block" id="FockBinByN.decode">
+<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.FockBinByN.decode">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Return the integer-encoded state at the canonical EDRIXS index."""</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">index</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">index</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dim</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_decode_combinadic</span><span class="p">(</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell_norbs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">noccus</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">offsets</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sizes</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FockBinByN.jit_args">
+<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.FockBinByN.jit_args">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">jit_args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">"""Return compact numeric metadata for an explicitly requested JIT path."""</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shell_norbs</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">noccus</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">offsets</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sizes</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strides</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min_decode</span><span class="p">),</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_decode</span><span class="p">),</span>
+        <span class="p">)</span></div>
+</div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_hash_decoder</span><span class="p">(</span><span class="n">rank</span><span class="p">,</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nocc</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Decode a reflected colex rank with orbital zero in the low bit."""</span>
+    <span class="k">if</span> <span class="n">nocc</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">nocc</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">norb</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">comb</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">j</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">c</span> <span class="o">&lt;=</span> <span class="n">rank</span><span class="p">:</span>
+            <span class="n">state</span> <span class="o">|=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">norb</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">i</span><span class="p">)</span>
+            <span class="n">rank</span> <span class="o">-=</span> <span class="n">c</span>
+            <span class="n">old_i</span><span class="p">,</span> <span class="n">old_j</span> <span class="o">=</span> <span class="n">i</span><span class="p">,</span> <span class="n">j</span>
+            <span class="n">i</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="n">j</span> <span class="o">-=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">j</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="p">(</span><span class="n">c</span> <span class="o">*</span> <span class="n">old_j</span><span class="p">)</span> <span class="o">//</span> <span class="n">old_i</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">c</span> <span class="o">=</span> <span class="p">(</span><span class="n">c</span> <span class="o">*</span> <span class="p">(</span><span class="n">i</span> <span class="o">-</span> <span class="n">j</span><span class="p">))</span> <span class="o">//</span> <span class="n">i</span>
+            <span class="n">i</span> <span class="o">-=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">state</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_hash_encoder</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">norb</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Encode one shell into its reflected colex combinadic rank."""</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">state</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">((</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">norb</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">rank</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1"># Reflect orbital positions for the historical occupation-list ordering.</span>
+    <span class="k">while</span> <span class="n">state</span><span class="p">:</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">state</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">rank</span> <span class="o">+=</span> <span class="n">comb</span><span class="p">(</span><span class="n">norb</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">pos</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="n">k</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">state</span> <span class="o">^=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">pos</span>
+    <span class="k">return</span> <span class="n">rank</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_decode_combinadic</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="n">norbs</span><span class="p">,</span> <span class="n">noccus</span><span class="p">,</span> <span class="n">offsets</span><span class="p">,</span> <span class="n">sizes</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Decode using the historical EDRIXS shell and state ordering."""</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nocc</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">size</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">norbs</span><span class="p">,</span> <span class="n">noccus</span><span class="p">,</span> <span class="n">offsets</span><span class="p">,</span> <span class="n">sizes</span><span class="p">):</span>
+        <span class="n">shell_rank</span> <span class="o">=</span> <span class="n">index</span> <span class="o">%</span> <span class="n">size</span>
+        <span class="n">index</span> <span class="o">//=</span> <span class="n">size</span>
+        <span class="n">colex_rank</span> <span class="o">=</span> <span class="n">size</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">shell_rank</span>
+        <span class="n">state</span> <span class="o">|=</span> <span class="n">_hash_decoder</span><span class="p">(</span><span class="n">colex_rank</span><span class="p">,</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nocc</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">offset</span>
+    <span class="k">return</span> <span class="n">state</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_encode_combinadic</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">norbs</span><span class="p">,</span> <span class="n">noccus</span><span class="p">,</span> <span class="n">offsets</span><span class="p">,</span> <span class="n">sizes</span><span class="p">,</span> <span class="n">strides</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Encode using the historical EDRIXS shell and state ordering."""</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nocc</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">stride</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+            <span class="n">norbs</span><span class="p">,</span> <span class="n">noccus</span><span class="p">,</span> <span class="n">offsets</span><span class="p">,</span> <span class="n">sizes</span><span class="p">,</span> <span class="n">strides</span><span class="p">):</span>
+        <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">norb</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">shell_state</span> <span class="o">=</span> <span class="p">(</span><span class="n">state</span> <span class="o">&gt;&gt;</span> <span class="n">offset</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">mask</span>
+        <span class="k">if</span> <span class="n">shell_state</span><span class="o">.</span><span class="n">bit_count</span><span class="p">()</span> <span class="o">!=</span> <span class="n">nocc</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="n">shell_rank</span> <span class="o">=</span> <span class="n">size</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">_hash_encoder</span><span class="p">(</span><span class="n">shell_state</span><span class="p">,</span> <span class="n">norb</span><span class="p">)</span>
+        <span class="n">index</span> <span class="o">+=</span> <span class="n">shell_rank</span> <span class="o">*</span> <span class="n">stride</span>
+    <span class="k">return</span> <span class="n">index</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_min_max_decode</span><span class="p">(</span><span class="n">shapes</span><span class="p">):</span>
+    <span class="n">state_min</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">state_max</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">running</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">norb</span><span class="p">,</span> <span class="n">nocc</span> <span class="ow">in</span> <span class="n">shapes</span><span class="p">:</span>
+        <span class="n">shell_min</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">nocc</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">shell_max</span> <span class="o">=</span> <span class="n">shell_min</span> <span class="o">&lt;&lt;</span> <span class="p">(</span><span class="n">norb</span> <span class="o">-</span> <span class="n">nocc</span><span class="p">)</span>
+        <span class="n">state_min</span> <span class="o">|=</span> <span class="n">shell_min</span> <span class="o">&lt;&lt;</span> <span class="n">running</span>
+        <span class="n">state_max</span> <span class="o">|=</span> <span class="n">shell_max</span> <span class="o">&lt;&lt;</span> <span class="n">running</span>
+        <span class="n">running</span> <span class="o">+=</span> <span class="n">norb</span>
+    <span class="k">return</span> <span class="n">state_min</span><span class="p">,</span> <span class="n">state_max</span>
+
+
+<div class="viewcode-block" id="get_fock_basis_int">
+<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.get_fock_basis_int">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_fock_basis_int</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Build an explicit :class:`FockBasis` for fixed shell occupancies.</span>
+
+<span class="sd">    The state ordering is the historical EDRIXS ordering produced by</span>
+<span class="sd">    :func:`get_fock_bin_by_N`.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Error: number of arguments is not even"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="n">spec</span> <span class="o">=</span> <span class="n">FockBasisSpec</span><span class="o">.</span><span class="n">from_args</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="n">combinadic_basis</span> <span class="o">=</span> <span class="n">FockBinByN</span><span class="o">.</span><span class="n">from_spec</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+    <span class="n">basis_int</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">combinadic_basis</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">combinadic_basis</span><span class="p">))</span>
+    <span class="p">]</span>
+    <span class="k">return</span> <span class="n">FockBasis</span><span class="p">(</span><span class="n">basis_int</span><span class="p">,</span> <span class="n">spec</span><span class="o">.</span><span class="n">norbs</span><span class="p">,</span> <span class="n">spec</span><span class="o">=</span><span class="n">spec</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="get_fock_basis_combinadic">
+<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.get_fock_basis_combinadic">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_fock_basis_combinadic</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Build an implicit combinadic basis for fixed shell occupancies."""</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"Error: number of arguments is not even"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">FockBinByN</span><span class="o">.</span><span class="n">from_spec</span><span class="p">(</span><span class="n">FockBasisSpec</span><span class="o">.</span><span class="n">from_args</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">))</span></div>
+
+
+
+<div class="viewcode-block" id="build_fock_basis">
+<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.build_fock_basis">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_fock_basis</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">'combinadic'</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Realize a compact basis specification with the requested representation."""</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="p">(</span><span class="n">FockBasis</span><span class="p">,</span> <span class="n">FockBinByN</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="n">basis</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">basis</span><span class="p">,</span> <span class="n">FockBasisSpec</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">"basis must be a FockBasisSpec or a realized Fock basis"</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">'combinadic'</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">FockBinByN</span><span class="o">.</span><span class="n">from_spec</span><span class="p">(</span><span class="n">basis</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">'explicit'</span><span class="p">:</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">value</span> <span class="k">for</span> <span class="n">shape</span> <span class="ow">in</span> <span class="n">basis</span><span class="o">.</span><span class="n">shapes</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">shape</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">get_fock_basis_int</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"basis method must be 'combinadic' or 'explicit'"</span><span class="p">)</span></div>
+
 
 
 <div class="viewcode-block" id="fock_bin">
@@ -127,19 +444,17 @@
 <span class="sd">     [0, 1, 1, 0],</span>
 <span class="sd">     [0, 1, 0, 1],</span>
 <span class="sd">     [0, 0, 1, 1]]</span>
-
 <span class="sd">    """</span>
-
     <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[[</span><span class="mi">0</span><span class="p">]]</span>
 
-    <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">bits</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)),</span> <span class="n">k</span><span class="p">):</span>
-        <span class="n">s</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span>
-        <span class="k">for</span> <span class="n">bit</span> <span class="ow">in</span> <span class="n">bits</span><span class="p">:</span>
-            <span class="n">s</span><span class="p">[</span><span class="n">bit</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-        <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">res</span></div>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">occupied</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="n">k</span><span class="p">):</span>
+        <span class="n">state</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span>
+        <span class="k">for</span> <span class="n">orbital</span> <span class="ow">in</span> <span class="n">occupied</span><span class="p">:</span>
+            <span class="n">state</span><span class="p">[</span><span class="n">orbital</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span></div>
 
 
 
@@ -195,34 +510,34 @@
 <span class="sd">     [0, 1, 1, 0, 0, 1],</span>
 <span class="sd">     [0, 1, 0, 1, 0, 1],</span>
 <span class="sd">     [0, 0, 1, 1, 0, 1]]</span>
-
 <span class="sd">    """</span>
-
-    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">n</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="n">narg</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">narg</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">"Error: number of arguments is not even"</span><span class="p">)</span>
-        <span class="k">return</span>
+        <span class="k">return</span> <span class="kc">None</span>
 
-    <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">narg</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">fock_bin</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">res1</span> <span class="o">=</span> <span class="n">fock_bin</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-        <span class="n">res2</span> <span class="o">=</span> <span class="n">get_fock_bin_by_N</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
-        <span class="k">for</span> <span class="n">ifock</span> <span class="ow">in</span> <span class="n">res2</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">jfock</span> <span class="ow">in</span> <span class="n">res1</span><span class="p">:</span>
-                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">jfock</span> <span class="o">+</span> <span class="n">ifock</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">result</span></div>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">first_shell</span> <span class="o">=</span> <span class="n">fock_bin</span><span class="p">(</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">remaining_shells</span> <span class="o">=</span> <span class="n">get_fock_bin_by_N</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">[</span><span class="mi">2</span><span class="p">:])</span>
+    <span class="k">for</span> <span class="n">remaining</span> <span class="ow">in</span> <span class="n">remaining_shells</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">first</span> <span class="ow">in</span> <span class="n">first_shell</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">first</span> <span class="o">+</span> <span class="n">remaining</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span></div>
 
 
 
+<div class="viewcode-block" id="get_fock_half_N">
+<a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.get_fock_half_N">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_fock_half_N</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
-    <span class="n">res</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">N</span><span class="p">):</span>
-        <span class="n">occu</span> <span class="o">=</span> <span class="nb">bin</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">'1'</span><span class="p">)</span>
-        <span class="n">res</span><span class="p">[</span><span class="n">occu</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">res</span>
+<span class="w">    </span><span class="sd">"""Group half-space integer states by particle number."""</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+    <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="o">**</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">result</span><span class="p">[</span><span class="nb">bin</span><span class="p">(</span><span class="n">state</span><span class="p">)</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">'1'</span><span class="p">)]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span></div>
+
 
 
 <div class="viewcode-block" id="get_fock_full_N">
@@ -246,7 +561,7 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; import edrixs</span>
-<span class="sd">    &gt;&gt;&gt; edrixs.fock_bin(4,2)</span>
+<span class="sd">    &gt;&gt;&gt; edrixs.fock_bin(4, 2)</span>
 <span class="sd">    [[1, 1, 0, 0],</span>
 <span class="sd">     [1, 0, 1, 0],</span>
 <span class="sd">     [0, 1, 1, 0],</span>
@@ -254,19 +569,20 @@
 <span class="sd">     [0, 1, 0, 1],</span>
 <span class="sd">     [0, 0, 1, 1]]</span>
 
-<span class="sd">    &gt;&gt;&gt; import edrixs</span>
-<span class="sd">    &gt;&gt;&gt; edrixs.get_fock_full_N(4,2)</span>
+<span class="sd">    &gt;&gt;&gt; edrixs.get_fock_full_N(4, 2)</span>
 <span class="sd">    [3, 5, 6, 9, 10, 12]</span>
-
 <span class="sd">    """</span>
-
-    <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">half_N</span> <span class="o">=</span> <span class="n">get_fock_half_N</span><span class="p">(</span><span class="n">norb</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">norb</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="n">n</span> <span class="o">=</span> <span class="n">N</span> <span class="o">-</span> <span class="n">m</span>
-        <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="n">norb</span> <span class="o">//</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="n">res</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">i</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">norb</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">j</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">half_N</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">half_N</span><span class="p">[</span><span class="n">n</span><span class="p">]])</span>
-    <span class="k">return</span> <span class="n">res</span></div>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">half_basis</span> <span class="o">=</span> <span class="n">get_fock_half_N</span><span class="p">(</span><span class="n">norb</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">left_occupancy</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">norb</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">right_occupancy</span> <span class="o">=</span> <span class="n">N</span> <span class="o">-</span> <span class="n">left_occupancy</span>
+        <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">right_occupancy</span> <span class="o">&lt;=</span> <span class="n">norb</span> <span class="o">//</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="n">left</span> <span class="o">*</span> <span class="mi">2</span><span class="o">**</span><span class="p">(</span><span class="n">norb</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">right</span>
+                <span class="k">for</span> <span class="n">left</span> <span class="ow">in</span> <span class="n">half_basis</span><span class="p">[</span><span class="n">left_occupancy</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">right</span> <span class="ow">in</span> <span class="n">half_basis</span><span class="p">[</span><span class="n">right_occupancy</span><span class="p">]</span>
+            <span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span></div>
 
 
 
@@ -297,17 +613,10 @@
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; import edrixs</span>
 <span class="sd">    &gt;&gt;&gt; edrixs.get_fock_basis_by_NLz(6, 2, [-1, -1, 0, 0, 1, 1])</span>
-<span class="sd">    {</span>
-<span class="sd">     -2: [3],</span>
-<span class="sd">     -1: [5, 6, 9, 10],</span>
-<span class="sd">      0: [12, 17, 18, 33, 34],</span>
-<span class="sd">      1: [20, 36, 24, 40],</span>
-<span class="sd">      2: [48]</span>
-<span class="sd">    }</span>
+<span class="sd">    {-2: [3], -1: [5, 6, 9, 10], 0: [12, 17, 18, 33, 34],</span>
+<span class="sd">     1: [20, 36, 24, 40], 2: [48]}</span>
 <span class="sd">    """</span>
-
-    <span class="n">res</span> <span class="o">=</span> <span class="n">get_fock_basis_by_N_abelian</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">lz_list</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">res</span></div>
+    <span class="k">return</span> <span class="n">get_fock_basis_by_N_abelian</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">lz_list</span><span class="p">)</span></div>
 
 
 
@@ -338,17 +647,10 @@
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; import edrixs</span>
 <span class="sd">    &gt;&gt;&gt; edrixs.get_fock_basis_by_NSz(6, 2, [1, -1, 1, -1, 1, -1])</span>
-<span class="sd">    {</span>
-<span class="sd">     -2: [10, 34, 40],</span>
-<span class="sd">     -1: [],</span>
-<span class="sd">      0: [3, 6, 9, 12, 18, 33, 36, 24, 48],</span>
-<span class="sd">      1: [],</span>
-<span class="sd">      2: [5, 17, 20]</span>
-<span class="sd">    }</span>
+<span class="sd">    {-2: [10, 34, 40], -1: [],</span>
+<span class="sd">     0: [3, 6, 9, 12, 18, 33, 36, 24, 48], 1: [], 2: [5, 17, 20]}</span>
 <span class="sd">    """</span>
-
-    <span class="n">res</span> <span class="o">=</span> <span class="n">get_fock_basis_by_N_abelian</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">sz_list</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">res</span></div>
+    <span class="k">return</span> <span class="n">get_fock_basis_by_N_abelian</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">sz_list</span><span class="p">)</span></div>
 
 
 
@@ -379,25 +681,11 @@
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; import edrixs</span>
 <span class="sd">    &gt;&gt;&gt; edrixs.get_fock_basis_by_NJz(6, 2, [-1, 1, -3, -1, 1, 3])</span>
-<span class="sd">    {</span>
-<span class="sd">     -6: [],</span>
-<span class="sd">     -5: [],</span>
-<span class="sd">     -4: [5, 12],</span>
-<span class="sd">     -3: [],</span>
-<span class="sd">     -2: [6, 9, 20],</span>
-<span class="sd">     -1: [],</span>
-<span class="sd">      0: [3, 10, 17, 36, 24],</span>
-<span class="sd">      1: [],</span>
-<span class="sd">      2: [18, 33, 40],</span>
-<span class="sd">      3: [],</span>
-<span class="sd">      4: [34, 48],</span>
-<span class="sd">      5: [],</span>
-<span class="sd">      6: []</span>
-<span class="sd">    }</span>
+<span class="sd">    {-6: [], -5: [], -4: [5, 12], -3: [], -2: [6, 9, 20], -1: [],</span>
+<span class="sd">     0: [3, 10, 17, 36, 24], 1: [], 2: [18, 33, 40], 3: [],</span>
+<span class="sd">     4: [34, 48], 5: [], 6: []}</span>
 <span class="sd">    """</span>
-
-    <span class="n">res</span> <span class="o">=</span> <span class="n">get_fock_basis_by_N_abelian</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">jz_list</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">res</span></div>
+    <span class="k">return</span> <span class="n">get_fock_basis_by_N_abelian</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">jz_list</span><span class="p">)</span></div>
 
 
 
@@ -405,7 +693,8 @@
 <a class="viewcode-back" href="../../reference/fock_basis.html#edrixs.fock_basis.get_fock_basis_by_N_abelian">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">get_fock_basis_by_N_abelian</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">a_list</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Get decimal digitals to represent Fock states, use some Abelian good quantum number.</span>
+<span class="sd">    Get decimal digitals to represent Fock states, use some Abelian good</span>
+<span class="sd">    quantum number.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -419,18 +708,19 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    basis: dict</span>
-<span class="sd">        A dictionary containing the decimal digitals, the key is good quantum numbers,</span>
-<span class="sd">        the value is a list of int.</span>
+<span class="sd">        A dictionary containing the decimal digitals, the key is good quantum</span>
+<span class="sd">        numbers, the value is a list of int.</span>
 <span class="sd">    """</span>
-
     <span class="n">result</span> <span class="o">=</span> <span class="n">get_fock_full_N</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
-    <span class="n">min_a</span><span class="p">,</span> <span class="n">max_a</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">a_list</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">a_list</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span>
-    <span class="n">basis</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">min_a</span><span class="p">,</span> <span class="n">max_a</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="n">basis</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
-        <span class="n">a</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">a_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">bit_length</span><span class="p">())</span> <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&gt;&gt;</span> <span class="n">i</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)])</span>
-        <span class="n">basis</span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">minimum</span><span class="p">,</span> <span class="n">maximum</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">a_list</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">a_list</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span>
+    <span class="n">basis</span> <span class="o">=</span> <span class="p">{</span><span class="n">value</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">minimum</span><span class="p">,</span> <span class="n">maximum</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)}</span>
+    <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+        <span class="n">quantum_number</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="n">a_list</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">bit_length</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">state</span> <span class="o">&gt;&gt;</span> <span class="n">index</span> <span class="o">&amp;</span> <span class="mi">1</span>
+        <span class="p">)</span>
+        <span class="n">basis</span><span class="p">[</span><span class="n">quantum_number</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">basis</span></div>
 
 
@@ -458,52 +748,34 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    basis: dict</span>
-<span class="sd">        A dictionary containing the decimal digitals, the key is a tuple containing good quantum</span>
-<span class="sd">        numbers ( :math:`l_{z}`, :math:`s_{z}`), the value is a list of int.</span>
+<span class="sd">        A dictionary containing the decimal digitals, the key is a tuple of</span>
+<span class="sd">        good quantum numbers (:math:`l_{z}`, :math:`s_{z}`), and the value is</span>
+<span class="sd">        a list of int.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; import edrixs</span>
-<span class="sd">    &gt;&gt;&gt; edrixs.get_fock_basis_by_N_LzSz(6, 2, [-1, -1, 0, 0, 1, 1], [1, -1, 1, -1, 1, -1])</span>
-<span class="sd">    {</span>
-<span class="sd">     (-2, -2): [],</span>
-<span class="sd">     (-2, -1): [],</span>
-<span class="sd">      (-2, 0): [3],</span>
-<span class="sd">      (-2, 1): [],</span>
-<span class="sd">      (-2, 2): [],</span>
-<span class="sd">     (-1, -2): [10],</span>
-<span class="sd">     (-1, -1): [],</span>
-<span class="sd">      (-1, 0): [6, 9],</span>
-<span class="sd">      (-1, 1): [],</span>
-<span class="sd">      (-1, 2): [5],</span>
-<span class="sd">      (0, -2): [34],</span>
-<span class="sd">      (0, -1): [],</span>
-<span class="sd">       (0, 0): [12, 18, 33],</span>
-<span class="sd">       (0, 1): [],</span>
-<span class="sd">       (0, 2): [17],</span>
-<span class="sd">      (1, -2): [40],</span>
-<span class="sd">      (1, -1): [],</span>
-<span class="sd">       (1, 0): [36, 24],</span>
-<span class="sd">       (1, 1): [],</span>
-<span class="sd">       (1, 2): [20],</span>
-<span class="sd">      (2, -2): [],</span>
-<span class="sd">      (2, -1): [],</span>
-<span class="sd">       (2, 0): [48],</span>
-<span class="sd">       (2, 1): [],</span>
-<span class="sd">       (2, 2): []</span>
-<span class="sd">    }</span>
+<span class="sd">    &gt;&gt;&gt; lz = [-1, -1, 0, 0, 1, 1]</span>
+<span class="sd">    &gt;&gt;&gt; sz = [1, -1, 1, -1, 1, -1]</span>
+<span class="sd">    &gt;&gt;&gt; edrixs.get_fock_basis_by_N_LzSz(6, 2, lz, sz)[(0, 0)]</span>
+<span class="sd">    [12, 18, 33]</span>
 <span class="sd">    """</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">get_fock_full_N</span><span class="p">(</span><span class="n">norb</span><span class="p">,</span> <span class="n">N</span><span class="p">)</span>
-    <span class="n">min_Lz</span><span class="p">,</span> <span class="n">max_Lz</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">lz_list</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">lz_list</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span>
-    <span class="n">min_Sz</span><span class="p">,</span> <span class="n">max_Sz</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">sz_list</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">sz_list</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span>
-    <span class="n">basis</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">min_Lz</span><span class="p">,</span> <span class="n">max_Lz</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">min_Sz</span><span class="p">,</span> <span class="n">max_Sz</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="n">basis</span><span class="p">[(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">)]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
-        <span class="n">Lz</span><span class="p">,</span> <span class="n">Sz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([[</span><span class="n">lz_list</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">sz_list</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span><span class="o">.</span><span class="n">bit_length</span><span class="p">())</span>
-                         <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">&gt;&gt;</span> <span class="n">i</span> <span class="o">&amp;</span> <span class="mi">1</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">basis</span><span class="p">[(</span><span class="n">Lz</span><span class="p">,</span> <span class="n">Sz</span><span class="p">)]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+    <span class="n">min_lz</span><span class="p">,</span> <span class="n">max_lz</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">lz_list</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">lz_list</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span>
+    <span class="n">min_sz</span><span class="p">,</span> <span class="n">max_sz</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">sz_list</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">sz_list</span><span class="p">)</span> <span class="o">*</span> <span class="n">N</span>
+    <span class="n">basis</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="p">(</span><span class="n">lz</span><span class="p">,</span> <span class="n">sz</span><span class="p">):</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">lz</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">min_lz</span><span class="p">,</span> <span class="n">max_lz</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">sz</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">min_sz</span><span class="p">,</span> <span class="n">max_sz</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+        <span class="n">occupied</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">index</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">bit_length</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">state</span> <span class="o">&gt;&gt;</span> <span class="n">index</span> <span class="o">&amp;</span> <span class="mi">1</span>
+        <span class="p">]</span>
+        <span class="n">lz</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">lz_list</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">occupied</span><span class="p">)</span>
+        <span class="n">sz</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">sz_list</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">occupied</span><span class="p">)</span>
+        <span class="n">basis</span><span class="p">[(</span><span class="n">lz</span><span class="p">,</span> <span class="n">sz</span><span class="p">)]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">basis</span></div>
 
 
@@ -527,43 +799,24 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    ndim: int</span>
-<span class="sd">        The dimension of the Hilbert space</span>
+<span class="sd">        The dimension of the Hilbert space.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; import edrixs</span>
 <span class="sd">    &gt;&gt;&gt; edrixs.write_fock_dec_by_N(4, 2, 'fock_i.in')</span>
-<span class="sd">    file fock_i.in looks like</span>
-<span class="sd">    15</span>
-<span class="sd">    3</span>
-<span class="sd">    5</span>
 <span class="sd">    6</span>
-<span class="sd">    9</span>
-<span class="sd">    10</span>
-<span class="sd">    12</span>
-<span class="sd">    17</span>
-<span class="sd">    18</span>
-<span class="sd">    20</span>
-<span class="sd">    24</span>
-<span class="sd">    33</span>
-<span class="sd">    34</span>
-<span class="sd">    36</span>
-<span class="sd">    40</span>
-<span class="sd">    48</span>
 
-<span class="sd">    where, the first line is the total numer of Fock states,</span>
-<span class="sd">    and the following lines are the Fock states in decimal form.</span>
+<span class="sd">    The first line of ``fock_i.in`` is the total number of Fock states,</span>
+<span class="sd">    followed by the states in decimal form: ``3, 5, 6, 9, 10, 12``.</span>
 <span class="sd">    """</span>
-
-    <span class="n">res</span> <span class="o">=</span> <span class="n">get_fock_full_N</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
-    <span class="n">res</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
-    <span class="n">ndim</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
-    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">ndim</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">res</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
-    <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">ndim</span></div>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">get_fock_full_N</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">),</span> <span class="n">file</span><span class="o">=</span><span class="n">stream</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">stream</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">)</span></div>
 
 </pre></div>
 
