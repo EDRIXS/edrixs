@@ -27,7 +27,7 @@ def test_incoming_groups_use_exact_coefficients_and_preserve_indices():
     assert _group_rixs_incoming([]) == []
 
 
-@pytest.fixture(params=['scipy', 'petsc'])
+@pytest.fixture(params=['scipy', 'petsc', 'shifted_pminres'])
 def runner(request, monkeypatch):
     """Run a small dense input problem through either backend; count real solves."""
     if request.param == 'scipy':
@@ -63,6 +63,9 @@ def runner(request, monkeypatch):
     initial_count = event.getPerfInfo(stage.id)['count']
 
     def run(energies, vectors, hi, hn, transitions, ominc, eloss, **kwargs):
+        if request.param == 'petsc':
+            kwargs['backend_kws'] = dict(kwargs.get('backend_kws', {}),
+                                         ksp_type='gmres')
         objects = []
 
         def matrix(array):

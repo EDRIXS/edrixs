@@ -44,6 +44,10 @@ def _create_matrix(PETSc, comm, nl, nr, preallocation):
     hmat = PETSc.Mat().create(comm=comm)
     hmat.setSizes(((None, nl), (None, nr)))
     hmat.setType(PETSc.Mat.Type.AIJ)
+    if hmat.getComm().getSize() > 1:
+        # MPI AIJ stores local and remote columns in separate sparse blocks.
+        # A scalar hint leaves the remote block at PETSc's small default.
+        preallocation = (preallocation, preallocation)
     hmat.setPreallocationNNZ(preallocation)
     hmat.setOption(PETSc.Mat.Option.NEW_NONZERO_ALLOCATION_ERR, False)
     hmat.setUp()

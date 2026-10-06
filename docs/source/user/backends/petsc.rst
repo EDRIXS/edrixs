@@ -34,7 +34,11 @@ Options are specific to the stage where they are supplied.
 .. backend-options:: petsc get_ops
 
 ``nnz_guess_per_row`` controls PETSc matrix preallocation.  Leaving it unset
-uses an estimate from the retained one- and two-body coefficients.  A
+uses an estimate from the retained one- and two-body coefficients. With multiple
+MPI ranks, the hint is applied separately to the local-column and remote-column
+blocks of each rank's matrix rows. With one rank it applies to the sequential
+matrix. Larger hints reserve more memory but can avoid reallocations during
+assembly; they do not change the matrix values. A
 ``mat_type`` such as ``'aijcusparse'`` can select an accelerated matrix format;
 see PETSc's `matrix type overview
 <https://petsc.org/release/manual/mat/#basic-matrix-operations>`__.
@@ -73,10 +77,10 @@ Input matrices are unchanged.
 
 .. backend-options:: petsc rixs
 
-``linsys_tol`` sets KSP's absolute tolerance, ``atol``. The relative tolerance
-remains at PETSc's default unless overridden through its options database;
-the solver can therefore converge through the relative criterion before
-reaching the absolute tolerance.
+The default solver is ``shifted_pminres``. ``linsys_tol`` sets KSP's absolute
+tolerance, ``atol``, and the default relative tolerance is zero. Other KSP
+types retain PETSc's default relative tolerance unless overridden through
+its options database.
 
 EDRIXS calls KSP's ``setFromOptions()`` after applying ``backend_kws``.
 Corresponding PETSc options-database entries, such as ``ksp_atol``, ``ksp_rtol``,
@@ -85,3 +89,7 @@ Corresponding PETSc options-database entries, such as ``ksp_atol``, ``ksp_rtol``
 ``ksp_type`` accepts a PETSc KSP type such as ``'gmres'``; the available
 algorithms and their tradeoffs are listed in the `KSP solver table
 <https://petsc.org/release/manual/ksp/#tab-kspdefaults>`__.
+
+To select GMRES instead of the default shifted PMINRES, pass::
+
+    backend_kws={'ksp_type': 'gmres', 'linsys_tol': 1e-10}

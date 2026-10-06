@@ -283,7 +283,8 @@ def rixs_petsc(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
     For every incident energy, distinct incoming polarization, and retained
     initial state, the intermediate correction vector solves the shifted linear
     system ``(omega + E_i + i*gamma_c - H_n) x = D_k |i>`` with a PETSc KSP
-    (GMRES), and a Lanczos tridiagonalization of ``hmat_i`` seeded by
+    (shifted PMINRES by default), and a Lanczos tridiagonalization of
+    ``hmat_i`` seeded by
     ``D_k'^dagger x`` produces the pole representation consumed by
     :func:`edrixs.poles.get_spectra_from_poles`.
 
@@ -329,10 +330,15 @@ def rixs_petsc(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
 
         - ``nkryl`` : maximum final-state Lanczos dimension (default ``200``).
         - ``linsys_tol`` : KSP absolute tolerance ``atol`` (default ``1e-10``).
-          The relative tolerance remains at PETSc's default unless overridden
-          through its options database.
+          For standard KSP types the relative tolerance remains at PETSc's
+          default; shifted PMINRES defaults to ``rtol=0``. PETSc options
+          can override these tolerances.
         - ``linsys_maxiter`` : maximum KSP iterations (default ``1000``).
-        - ``ksp_type`` : KSP method (default ``'gmres'``).
+        - ``ksp_type`` : KSP method (default ``'shifted_pminres'``), using
+          the reusable Python shifted solver.
+          This selects PCNONE and ``rtol=0`` by default.
+        - ``pminres_library`` : optional native shifted-PMINRES library path.
+          Only valid with ``ksp_type='shifted_pminres'``.
 
         KSP ``setFromOptions()`` is called after applying these settings.
         Corresponding PETSc options-database entries override ``backend_kws``.
@@ -358,6 +364,9 @@ def rixs_petsc(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
         kws.pop('linsys_maxiter', OPTIONS['rixs']['linsys_maxiter'].default)
     )
     ksp_type = kws.pop('ksp_type', OPTIONS['rixs']['ksp_type'].default)
+    pminres_library = kws.pop('pminres_library', None)
+    if pminres_library is not None and ksp_type != 'shifted_pminres':
+        raise ValueError('pminres_library requires ksp_type=shifted_pminres')
 
     eval_i = np.asarray(eval_i, dtype=float)
     ominc = np.asarray(ominc, dtype=float)
@@ -408,10 +417,13 @@ def rixs_petsc(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
     # Reusable shifted-system matrix and Krylov solver.
     shifted = centered_n.duplicate(copy=True)
     ksp = PETSc.KSP().create(hmat_n.getComm())
+    solution = shifted.createVecRight()
+    rhs_buffer = shifted.createVecLeft()
+    rhs_work = rhs_buffer.duplicate()
     try:
-        ksp.setType(ksp_type)
-        ksp.setTolerances(atol=linsys_tol, max_it=linsys_maxiter)
-        ksp.setFromOptions()
+        _configure_rixs_ksp(
+            ksp, ksp_type, linsys_tol, linsys_maxiter, pminres_library,
+        )
 
         rixs = np.zeros((n_om, neloss, len(pol_type)), dtype=float)
         poles = []
@@ -434,49 +446,47 @@ def rixs_petsc(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
 
                 for polvec_i, channels in incoming_groups:
                     # RHS: D_k |i>  (initial -> intermediate)
-                    rhs = _apply_trans_combination(trans_op, polvec_i, evec_i[ig])
+                    rhs = _apply_trans_combination(
+                        trans_op, polvec_i, evec_i[ig],
+                        out=rhs_buffer, work=rhs_work,
+                    )
                     sol = None
-                    try:
-                        # Vec.norm is collective: every rank takes the same branch.
-                        if rhs.norm() != 0:
-                            sol = rhs.duplicate()
-                            sol.zeroEntries()
-                            ksp.solve(rhs, sol)
-                            if ksp.getConvergedReason() < 0:
-                                raise RuntimeError(
-                                    "KSP did not converge for omega={}, ig={}: reason={}".format(
-                                        omega, ig, ksp.getConvergedReason()
-                                    )
+                    # Vec.norm is collective: every rank takes the same branch.
+                    if rhs.norm() != 0:
+                        sol = solution
+                        sol.zeroEntries()
+                        ksp.solve(rhs, sol)
+                        if ksp.getConvergedReason() < 0:
+                            raise RuntimeError(
+                                "KSP did not converge for omega={}, ig={}: reason={}".format(
+                                    omega, ig, ksp.getConvergedReason()
                                 )
+                            )
 
-                        for ip, polvec_f in channels:
-                            alpha_i, beta_i, norm_i = np.array([0.0]), np.array([]), 0.0
-                            if sol is not None:
-                                # Emission and projection never modify the shared solution.
-                                seed = _apply_trans_combination_adjoint(
-                                    trans_op, np.conj(polvec_f), sol
-                                )
-                                try:
-                                    if skip_gs:
-                                        for gs_vec in evec_i:
-                                            # PETSc dot conjugates its second argument.
-                                            seed.axpy(-seed.dot(gs_vec), gs_vec)
-                                    alpha_i, beta_i, norm_i = lanczos_tridiagonal(
-                                        centered_i, seed, nkryl=nkryl
-                                    )
-                                finally:
-                                    seed.destroy()
-
-                            pole_dict = poles_per_om[ip]
-                            pole_dict['npoles'].append(len(alpha_i))
-                            pole_dict['eigval'].append(relative_evals[ig])
-                            pole_dict['norm'].append(norm_i)
-                            pole_dict['alpha'].append(alpha_i)
-                            pole_dict['beta'].append(beta_i)
-                    finally:
+                    for ip, polvec_f in channels:
+                        alpha_i, beta_i, norm_i = np.array([0.0]), np.array([]), 0.0
                         if sol is not None:
-                            sol.destroy()
-                        rhs.destroy()
+                            # Emission and projection never modify the shared solution.
+                            seed = _apply_trans_combination_adjoint(
+                                trans_op, np.conj(polvec_f), sol
+                            )
+                            try:
+                                if skip_gs:
+                                    for gs_vec in evec_i:
+                                        # PETSc dot conjugates its second argument.
+                                        seed.axpy(-seed.dot(gs_vec), gs_vec)
+                                alpha_i, beta_i, norm_i = lanczos_tridiagonal(
+                                    centered_i, seed, nkryl=nkryl
+                                )
+                            finally:
+                                seed.destroy()
+
+                        pole_dict = poles_per_om[ip]
+                        pole_dict['npoles'].append(len(alpha_i))
+                        pole_dict['eigval'].append(relative_evals[ig])
+                        pole_dict['norm'].append(norm_i)
+                        pole_dict['alpha'].append(alpha_i)
+                        pole_dict['beta'].append(beta_i)
 
             for ip, pole_dict in enumerate(poles_per_om):
                 rixs[iom, :, ip] = get_spectra_from_poles(
@@ -494,6 +504,9 @@ def rixs_petsc(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
         return (rixs, poles) if return_poles else rixs
     finally:
         ksp.destroy()
+        solution.destroy()
+        rhs_buffer.destroy()
+        rhs_work.destroy()
         shifted.destroy()
         centered_n.destroy()
         centered_i.destroy()
@@ -543,7 +556,9 @@ def build_op_petsc(emat, umat, lb, rb=None, *, use_numba=True, backend_kws=None)
         - ``comm`` : PETSc communicator (default ``PETSc.COMM_WORLD``).
         - ``tol_e`` : threshold for retaining ``emat`` entries.
         - ``tol_u`` : threshold for retaining ``umat`` entries.
-        - ``nnz_guess_per_row`` : preallocation hint.
+        - ``nnz_guess_per_row`` : nonzeros per row to reserve, separately for
+          local and remote column blocks under MPI. Larger hints use more
+          memory but can avoid reallocations during assembly.
         - ``mat_type`` : optional PETSc matrix type to convert to after
           assembly, e.g. ``'aijcusparse'``.
         - ``assembly_chunk_cols`` : number of owned basis columns generated
@@ -613,6 +628,26 @@ def _slepc_module():
     return SLEPc
 
 
+def _configure_rixs_ksp(ksp, ksp_type, atol, maxiter, pminres_library=None):
+    """Configure a newly created RIXS KSP, then apply PETSc option overrides.
+
+    Shifted PMINRES uses a Python context with no preconditioner and an
+    absolute residual tolerance. Other solver types retain PETSc defaults
+    for the preconditioner and relative tolerance. The caller owns the KSP
+    and must destroy it, including if configuration fails.
+    """
+    if ksp_type == 'shifted_pminres':
+        from .petsc_shifted_pminres import ShiftedPMINRES
+        ksp.setType('python')
+        ksp.setPythonContext(ShiftedPMINRES(pminres_library))
+        ksp.getPC().setType('none')
+        ksp.setTolerances(rtol=0)
+    else:
+        ksp.setType(ksp_type)
+    ksp.setTolerances(atol=atol, max_it=maxiter)
+    ksp.setFromOptions()
+
+
 def _rixs_polarization_vectors(
         ntrans, thin, thout, phi, incoming_kind, alpha,
         outgoing_kind, beta, scatter_axis):
@@ -647,25 +682,31 @@ def _rixs_polarization_vectors(
     return incoming_vector, outgoing_vector
 
 
-def _apply_trans_combination(operators, coefficients, vector):
+def _apply_trans_combination(operators, coefficients, vector, *, out=None, work=None):
+    """Apply a transition combination, optionally using caller-owned buffers.
+
+    Compute ``sum_k coefficients[k] * operators[k] @ vector``. ``out`` and
+    ``work`` must be distinct intermediate-space vectors and must not alias
+    ``vector``. Supplied buffers are overwritten but never destroyed. Without
+    ``out``, return a new vector owned by the caller; without ``work``, allocate
+    and release one temporary vector for this application.
     """
-    Apply ``sum_k coeff[k] * operators[k] @ vector`` (initial -> intermediate).
-    """
-    result = None
-    for coefficient, operator in zip(coefficients, operators):
-        if coefficient == 0:
-            continue
-        term = operator.createVecLeft()
-        operator.mult(vector, term)
-        term.scale(coefficient)
-        if result is None:
-            result = term
-        else:
-            result.axpy(1.0, term)
-    if result is None:
-        result = operators[0].createVecLeft()
-        result.zeroEntries()
-    return result
+    result = operators[0].createVecLeft() if out is None else out
+    temporary = operators[0].createVecLeft() if work is None else work
+    try:
+        result.set(0)
+        for coefficient, operator in zip(coefficients, operators):
+            if coefficient != 0:
+                operator.mult(vector, temporary)
+                result.axpy(coefficient, temporary)
+        return result
+    except Exception:
+        if out is None:
+            result.destroy()
+        raise
+    finally:
+        if work is None:
+            temporary.destroy()
 
 
 def _apply_trans_combination_adjoint(operators, coefficients, vector):

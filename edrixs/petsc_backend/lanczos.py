@@ -32,7 +32,7 @@ def lanczos_tridiagonal(H, v, nkryl):
     ----------
     H : (n,n) PETSc sparse matrix
         Hermitian operator for which the Lanczos projection is constructed.
-    v0 : (n,) PETSc sparse vector
+    v : (n,) PETSc sparse vector
         Initial seed vector :math:`v_0`, which will be normalized internally.
     nkryl : int
         Maximum number of Lanczos iterations (Krylov dimension).
@@ -49,29 +49,33 @@ def lanczos_tridiagonal(H, v, nkryl):
     """
     nkryl = min(nkryl, H.getSize()[0])
     v = v.copy()
-    norm = v.normalize()
-
-    alphas = np.zeros(nkryl, dtype=float)
-    betas = np.zeros(nkryl - 1, dtype=float)
-
     w = H.createVecLeft()
-    H.mult(v, w)
-    alphas[0] = v.dot(w).real
+    v_old = v.duplicate()
+    workspace = (v, w, v_old)
+    try:
+        norm = v.normalize()
+        alphas = np.zeros(nkryl, dtype=float)
+        betas = np.zeros(nkryl - 1, dtype=float)
 
-    w.axpy(-alphas[0], v)
+        H.mult(v, w)
+        alphas[0] = v.dot(w).real
+        w.axpy(-alphas[0], v)
 
-    neff = 1
-    for j in range(1, nkryl):
-        beta = w.norm()
-        if beta == 0:
-            # lucky breakdown: actual Krylov dimension < m
-            return alphas[:j], betas[:j-1], norm**2
-        betas[j-1] = beta
-        v_old = v.copy()
-        v = w.copy()
-        v.scale(1./beta)
-        w = H @ v - beta * v_old
-        alphas[j] = v.dot(w).real
-        w.axpy(-alphas[j], v)
-        neff += 1
-    return alphas, betas, norm**2
+        for j in range(1, nkryl):
+            beta = w.norm()
+            if beta == 0:
+                # Lucky breakdown: actual Krylov dimension < m.
+                return alphas[:j], betas[:j-1], norm**2
+            betas[j-1] = beta
+            # The residual becomes the next basis vector; recycle the oldest
+            # vector as the matrix-product destination without allocating.
+            v_old, v, w = v, w, v_old
+            v.scale(1. / beta)
+            H.mult(v, w)
+            w.axpy(-beta, v_old)
+            alphas[j] = v.dot(w).real
+            w.axpy(-alphas[j], v)
+        return alphas, betas, norm**2
+    finally:
+        for vector in workspace:
+            vector.destroy()

@@ -117,7 +117,8 @@ def _petsc_vector(matrix, values):
 
 
 @requires_petsc
-def test_petsc_lanczos_matches_scipy_lanczos_and_preserves_seed():
+@pytest.mark.parametrize('nkryl', [1, 3, 20])
+def test_petsc_lanczos_matches_scipy_lanczos_and_preserves_seed(nkryl):
     """Backend-specific Lanczos implementations must produce the same projection."""
     rng = np.random.default_rng(91)
     raw = rng.normal(size=(6, 6)) + 1j * rng.normal(size=(6, 6))
@@ -128,14 +129,30 @@ def test_petsc_lanczos_matches_scipy_lanczos_and_preserves_seed():
     vector = _petsc_vector(matrix, seed)
     vector_before = vector.copy()
 
-    alpha_p, beta_p, norm_p = lanczos_petsc(matrix, vector, nkryl=20)
-    alpha_s, beta_s, norm_s = lanczos_scipy(hermitian, seed, m=20)
+    alpha_p, beta_p, norm_p = lanczos_petsc(matrix, vector, nkryl=nkryl)
+    alpha_s, beta_s, norm_s = lanczos_scipy(hermitian, seed, m=nkryl)
 
     assert_allclose(alpha_p, alpha_s, rtol=0, atol=2e-12)
     assert_allclose(beta_p, beta_s, rtol=0, atol=2e-12)
     assert norm_p == pytest.approx(norm_s, abs=2e-12)
     vector.axpy(-1.0, vector_before)
     assert vector.norm() == pytest.approx(0.0, abs=1e-14)
+
+
+@requires_petsc
+def test_petsc_lanczos_eigenvector_seed_breaks_down_without_modifying_input():
+    matrix = _petsc_dense_matrix(np.diag([2., 3., 5.]))
+    vector = _petsc_vector(matrix, [0., 2., 0.])
+    try:
+        for _ in range(2):
+            alpha, beta, norm = lanczos_petsc(matrix, vector, nkryl=3)
+            assert_allclose(alpha, [3.], rtol=0, atol=0)
+            assert len(beta) == 0
+            assert norm == 4.
+            assert_allclose(vector.getArray(), [0., 2., 0.], rtol=0, atol=0)
+    finally:
+        vector.destroy()
+        matrix.destroy()
 
 
 @requires_petsc_slepc
@@ -207,3 +224,51 @@ def test_ed_petsc_rejects_too_many_requested(complex_hermitian_petsc_mat):
     mat, expected_eigenvalues = complex_hermitian_petsc_mat
     with pytest.raises((RuntimeError, ValueError)):
         backend.ed_petsc(mat, num_evals=len(expected_eigenvalues) + 5)
+
+
+@requires_petsc
+def test_shifted_pminres_reuses_workspace_and_reports_true_residual():
+    from petsc4py import PETSc
+    from edrixs.petsc_backend.petsc_shifted_pminres import ShiftedPMINRES
+
+    dense = np.array([[1., .2j], [-.2j, 2.]], dtype=complex)
+    matrix = _petsc_dense_matrix(dense + .3j * np.eye(2))
+    rhs = _petsc_vector(matrix, [1j, 2.])
+    solution = rhs.duplicate()
+    context = ShiftedPMINRES()
+    ksp = PETSc.KSP().createPython(context, comm=PETSc.COMM_SELF)
+    try:
+        ksp.getPC().setType('none')
+        ksp.setOperators(matrix)
+        ksp.setTolerances(rtol=0, atol=1e-12, max_it=20)
+        handles = None
+        for shift in [0., .4, -.1]:
+            matrix.shift(shift)
+            dense += shift * np.eye(2)
+            ksp.solve(rhs, solution)
+            expected = np.linalg.solve(dense + .3j * np.eye(2), [1j, 2.])
+            assert_allclose(solution.getArray(), expected, atol=1e-12)
+            assert ksp.getConvergedReason() > 0
+            assert ksp.getResidualNorm() <= 1e-12
+            current = [v.handle for v in context._vectors]
+            if handles is not None:
+                assert current == handles
+            handles = current
+        rhs.set(0)
+        ksp.solve(rhs, solution)
+        assert solution.norm() == 0
+        assert ksp.getIterationNumber() == 0
+        assert ksp.getResidualNorm() == 0
+        ksp.setInitialGuessNonzero(True)
+        with pytest.raises(ValueError, match='zero initial guess'):
+            context.solve(ksp, rhs, solution)
+        ksp.setInitialGuessNonzero(False)
+        ksp.getPC().setType('jacobi')
+        with pytest.raises(ValueError, match='PCNONE'):
+            context.solve(ksp, rhs, solution)
+    finally:
+        ksp.destroy()
+        solution.destroy()
+        rhs.destroy()
+        matrix.destroy()
+    assert context._vectors == []
