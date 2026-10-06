@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>edrixs.models &mdash; EDRIXS 0.post1+g803cebb documentation</title>
+  <title>edrixs.models &mdash; EDRIXS 0.post1+g19cce47 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -19,7 +19,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=66d01fc2"></script>
+      <script src="../../_static/documentation_options.js?v=88a3f26c"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -134,7 +134,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">model_1v1c</span><span class="p">(</span><span class="n">shell_name</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">shell_level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">v_soc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">c_soc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                <span class="n">v_noccu</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">slater</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ext_B</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">on_which</span><span class="o">=</span><span class="s1">'spin'</span><span class="p">,</span>
                <span class="n">v_cfmat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">v_othermat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">loc_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-               <span class="n">sparse_U</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1E-10</span><span class="p">):</span>
+               <span class="n">sparse_U</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Set up orbital-space data and Fock-basis metadata for a 1v1c problem.</span>
 
@@ -162,9 +162,6 @@
 <span class="sd">        Coulomb tensor as a sparse matrix with shape (ntot*ntot, ntot*ntot),</span>
 <span class="sd">        using the flattened convention</span>
 <span class="sd">        row = lorb * ntot + korb and col = jorb * ntot + iorb.</span>
-
-<span class="sd">    tol : float, optional</span>
-<span class="sd">        Threshold used when converting dense Coulomb tensors to sparse format.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -234,8 +231,8 @@
     <span class="n">umat_n</span> <span class="o">=</span> <span class="n">get_umat_slater</span><span class="p">(</span><span class="n">case</span><span class="p">,</span> <span class="o">*</span><span class="n">slater_n</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">sparse_U</span><span class="p">:</span>
-        <span class="n">umat_i</span> <span class="o">=</span> <span class="n">_umat_dense_to_sparse</span><span class="p">(</span><span class="n">umat_i</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
-        <span class="n">umat_n</span> <span class="o">=</span> <span class="n">_umat_dense_to_sparse</span><span class="p">(</span><span class="n">umat_n</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+        <span class="n">umat_i</span> <span class="o">=</span> <span class="n">_umat_dense_to_sparse</span><span class="p">(</span><span class="n">umat_i</span><span class="p">)</span>
+        <span class="n">umat_n</span> <span class="o">=</span> <span class="n">_umat_dense_to_sparse</span><span class="p">(</span><span class="n">umat_n</span><span class="p">)</span>
 
     <span class="c1"># Spin-orbit coupling.</span>
     <span class="k">if</span> <span class="n">v_soc</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -346,7 +343,7 @@
     <span class="n">v1_ext_B</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">v2_ext_B</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">v1_on_which</span><span class="o">=</span><span class="s1">'spin'</span><span class="p">,</span>
     <span class="n">v2_on_which</span><span class="o">=</span><span class="s1">'spin'</span><span class="p">,</span> <span class="n">v1_cfmat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">v2_cfmat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">v1_othermat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">v2_othermat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hopping_v1v2</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">trans_to_which</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">loc_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sparse_U</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1E-10</span>
+    <span class="n">trans_to_which</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">loc_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sparse_U</span><span class="o">=</span><span class="kc">False</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Set up orbital-space data and Fock-basis metadata for a 2v1c problem.</span>
@@ -416,9 +413,6 @@
 <span class="sd">        matrices using the flattened convention</span>
 <span class="sd">        ``row = lorb * norb + korb`` and ``col = jorb * norb + iorb``.</span>
 <span class="sd">        Default is False.</span>
-<span class="sd">    tol : float, optional</span>
-<span class="sd">        Absolute-value threshold used when converting Coulomb tensors to</span>
-<span class="sd">        sparse form.  Default is ``1e-10``.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -535,8 +529,8 @@
     <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">sparse_U</span><span class="p">:</span>
-        <span class="n">umat_i</span> <span class="o">=</span> <span class="n">_umat_dense_to_sparse</span><span class="p">(</span><span class="n">umat_i</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
-        <span class="n">umat_n</span> <span class="o">=</span> <span class="n">_umat_dense_to_sparse</span><span class="p">(</span><span class="n">umat_n</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">)</span>
+        <span class="n">umat_i</span> <span class="o">=</span> <span class="n">_umat_dense_to_sparse</span><span class="p">(</span><span class="n">umat_i</span><span class="p">)</span>
+        <span class="n">umat_n</span> <span class="o">=</span> <span class="n">_umat_dense_to_sparse</span><span class="p">(</span><span class="n">umat_n</span><span class="p">)</span>
 
     <span class="n">emat_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ntot</span><span class="p">,</span> <span class="n">ntot</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
     <span class="n">emat_n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">ntot</span><span class="p">,</span> <span class="n">ntot</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">complex</span><span class="p">)</span>
@@ -672,7 +666,7 @@
     <span class="n">c_level</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">c_soc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">trans_c2n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">imp_mat</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">imp_mat_n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">bath_level</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">bath_level_n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hyb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hyb_n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">hopping</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">hopping_n</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">slater</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ext_B</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">on_which</span><span class="o">=</span><span class="s1">'spin'</span><span class="p">,</span> <span class="n">loc_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sparse_U</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1E-10</span>
+    <span class="n">on_which</span><span class="o">=</span><span class="s1">'spin'</span><span class="p">,</span> <span class="n">loc_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sparse_U</span><span class="o">=</span><span class="kc">False</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Set up a single-impurity Anderson model (SIAM) for ED, XAS, and RIXS.</span>
@@ -795,9 +789,6 @@
 <span class="sd">        The flattened convention is ``row = lorb * norb + korb`` and</span>
 <span class="sd">        ``col = jorb * norb + iorb``, where ``norb`` is ``ntot_v`` for the</span>
 <span class="sd">        initial state and ``ntot`` for the intermediate state.</span>
-<span class="sd">    tol : float, optional</span>
-<span class="sd">        Keep Coulomb entries with absolute value greater than this threshold</span>
-<span class="sd">        when ``sparse_U=True``. Unused for dense tensors. Default is ``1e-10``.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -880,10 +871,10 @@
 
     <span class="k">if</span> <span class="n">sparse_U</span><span class="p">:</span>
         <span class="n">umat_i</span> <span class="o">=</span> <span class="n">_embed_impurity_core_umat_sparse</span><span class="p">(</span>
-            <span class="n">umat_tmp_i</span><span class="p">,</span> <span class="n">v_norb</span><span class="p">,</span> <span class="n">c_norb</span><span class="p">,</span> <span class="n">ntot_v</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span>
+            <span class="n">umat_tmp_i</span><span class="p">,</span> <span class="n">v_norb</span><span class="p">,</span> <span class="n">c_norb</span><span class="p">,</span> <span class="n">ntot_v</span>
         <span class="p">)</span>
         <span class="n">umat_n</span> <span class="o">=</span> <span class="n">_embed_impurity_core_umat_sparse</span><span class="p">(</span>
-            <span class="n">umat_tmp_n</span><span class="p">,</span> <span class="n">v_norb</span><span class="p">,</span> <span class="n">c_norb</span><span class="p">,</span> <span class="n">ntot_v</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span>
+            <span class="n">umat_tmp_n</span><span class="p">,</span> <span class="n">v_norb</span><span class="p">,</span> <span class="n">c_norb</span><span class="p">,</span> <span class="n">ntot_v</span>
         <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">umat_i</span> <span class="o">=</span> <span class="n">_embed_impurity_core_umat</span><span class="p">(</span>
@@ -1012,7 +1003,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">model_siam_2d1p</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span> <span class="n">slater</span><span class="p">,</span> <span class="n">impurity_levels</span><span class="p">,</span> <span class="n">bath_levels</span><span class="p">,</span> <span class="n">hyb</span><span class="p">,</span> <span class="n">Delta</span><span class="p">,</span> <span class="n">nd</span><span class="p">,</span>
     <span class="n">v_soc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">c_soc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">om_shift</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">ext_B</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">on_which</span><span class="o">=</span><span class="s1">'spin'</span><span class="p">,</span>
-    <span class="n">loc_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sparse_U</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">1E-10</span>
+    <span class="n">loc_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sparse_U</span><span class="o">=</span><span class="kc">False</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Set up the commonly used d-impurity, one-bath, p-core charge-transfer</span>
@@ -1054,7 +1045,7 @@
 <span class="sd">        ``-om_shift - 5*E_p``, where E_p comes from the core-hole CT helper.</span>
 <span class="sd">        Increasing om_shift raises transition energies by the same amount.</span>
 <span class="sd">        Default zero; the filled-core reference convention is preserved.</span>
-<span class="sd">    ext_B, on_which, loc_axis, verbose, sparse_U, tol</span>
+<span class="sd">    ext_B, on_which, loc_axis, verbose, sparse_U</span>
 <span class="sd">        Passed through to :func:`model_siam` with the same meaning and defaults.</span>
 <span class="sd">        The magnetic field acts on the impurity only.</span>
 
@@ -1098,7 +1089,7 @@
         <span class="n">bath_level</span><span class="o">=</span><span class="n">bath_offsets</span> <span class="o">+</span> <span class="n">E_L</span><span class="p">,</span> <span class="n">bath_level_n</span><span class="o">=</span><span class="n">bath_offsets</span> <span class="o">+</span> <span class="n">E_Lc</span><span class="p">,</span>
         <span class="n">hyb</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">hyb</span><span class="p">,</span> <span class="mi">2</span><span class="p">)[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:],</span> <span class="n">slater</span><span class="o">=</span><span class="p">(</span><span class="n">slater_i</span><span class="p">,</span> <span class="n">slater_n</span><span class="p">),</span>
         <span class="n">ext_B</span><span class="o">=</span><span class="n">ext_B</span><span class="p">,</span> <span class="n">on_which</span><span class="o">=</span><span class="n">on_which</span><span class="p">,</span> <span class="n">loc_axis</span><span class="o">=</span><span class="n">loc_axis</span><span class="p">,</span>
-        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">sparse_U</span><span class="o">=</span><span class="n">sparse_U</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="n">tol</span><span class="p">,</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span> <span class="n">sparse_U</span><span class="o">=</span><span class="n">sparse_U</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 </pre></div>
