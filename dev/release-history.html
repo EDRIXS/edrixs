@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Release History &mdash; EDRIXS 0.post1+g19cce47 documentation</title>
+  <title>Release History &mdash; EDRIXS 0.post1+gd4edfb1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=88a3f26c"></script>
+      <script src="_static/documentation_options.js?v=a565933e"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -62,7 +62,13 @@
 <li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Pedagogical examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reference/index.html">EDRIXS Reference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Release History</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#unreleased">Unreleased</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#unreleased">Unreleased</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#new-calculation-interface">New calculation interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#numerical-methods-and-utilities">Numerical methods and utilities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compatibility-and-migration">Compatibility and migration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#documentation-and-packaging">Documentation and packaging</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-1-3-2026-09-08">v0.1.3 (2026-09-08)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-1-2-2026-05-06">v0.1.2 (2026-05-06)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#v0-1-1-2024-06-05">v0.1.1 (2024-06-05)</a></li>
@@ -107,14 +113,63 @@
 <h1>Release History<a class="headerlink" href="#release-history" title="Link to this heading"></a></h1>
 <section id="unreleased">
 <h2>Unreleased<a class="headerlink" href="#unreleased" title="Link to this heading"></a></h2>
+<section id="new-calculation-interface">
+<h3>New calculation interface<a class="headerlink" href="#new-calculation-interface" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p>Validate staged <code class="docutils literal notranslate"><span class="pre">backend_kws</span></code> by backend and operation, with typo
-suggestions and documented value constraints.</p></li>
-<li><p>Document all SciPy, dense, and Fortran staged-backend options.</p></li>
+<li><p>Introduce a staged workflow that separates physical model construction,
+many-body operator construction, diagonalization, and spectral calculations:
+<code class="docutils literal notranslate"><span class="pre">model_*</span></code> → <code class="docutils literal notranslate"><span class="pre">get_ops</span></code> → <code class="docutils literal notranslate"><span class="pre">ed</span></code> → <code class="docutils literal notranslate"><span class="pre">xas</span></code> / <code class="docutils literal notranslate"><span class="pre">rixs</span></code>.</p></li>
+<li><p>Add backend-independent <code class="docutils literal notranslate"><span class="pre">model_1v1c</span></code>, <code class="docutils literal notranslate"><span class="pre">model_2v1c</span></code>, <code class="docutils literal notranslate"><span class="pre">model_siam</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">model_siam_2d1p</span></code> constructors, including sparse Coulomb tensors and a
+charge-transfer parameterization for a d impurity, bath, and p core.</p></li>
+<li><p>Make SciPy the default backend, with sparse operator construction and Krylov
+methods for ED, XAS, and RIXS. Dense calculations and native Fortran/MPI
+solvers are also available through the staged interface.</p></li>
+<li><p>A PETSc-based backend is under development</p></li>
+<li><p>Add compact Fock-basis specifications with interchangeable combinadic and
+explicit basis construction. Operator construction uses Numba by default;
+<code class="docutils literal notranslate"><span class="pre">use_numba=False</span></code> selects Python construction.</p></li>
+<li><p>Validate <code class="docutils literal notranslate"><span class="pre">backend_kws</span></code> by backend and operation, with typo suggestions,
+documented defaults, and value constraints.</p></li>
+</ul>
+</section>
+<section id="numerical-methods-and-utilities">
+<h3>Numerical methods and utilities<a class="headerlink" href="#numerical-methods-and-utilities" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Support an energy-reference shift for SciPy and dense diagonalization while
+returning eigenvalues in the original reference. Models return the shift
+alongside their operator inputs. The Fortran backend warns and continues
+when a nonzero shift is supplied.</p></li>
+<li><p>Reuse SciPy RIXS intermediate-state solves across outgoing polarization
+channels sharing the same incoming polarization.</p></li>
+<li><p>Add conversions between Racah parameters and d-shell Slater integrals.</p></li>
+<li><p>Expand tests for model construction, basis ordering, fermionic signs,
+backend consistency, and XAS/RIXS spectra.</p></li>
+</ul>
+</section>
+<section id="compatibility-and-migration">
+<h3>Compatibility and migration<a class="headerlink" href="#compatibility-and-migration" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Deprecate the legacy model-specific Python and Fortran solver wrappers in
+favor of the staged interface. Existing wrappers emit deprecation warnings.</p></li>
+<li><p>Reject isotropic RIXS polarization; specify incoming and outgoing
+polarization channels explicitly. Isotropic XAS remains supported.</p></li>
+</ul>
+</section>
+<section id="documentation-and-packaging">
+<h3>Documentation and packaging<a class="headerlink" href="#documentation-and-packaging" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Update the examples for the staged workflow and document the SciPy, dense,
+and Fortran backend options and numerical-precision considerations.</p></li>
+<li><p>Clarify Slater-integral normalization and add versioned documentation and
+stricter documentation validation.</p></li>
+<li><p>Correct the CMake extension name used by packaging, automate Docker Hub
+release publishing, and update installation guidance and dependencies.</p></li>
 </ul>
 <p>This page summarizes the user-visible changes in each tagged release.  See the
 <a class="reference external" href="https://github.com/EDRIXS/edrixs/releases">GitHub releases page</a> for the
 complete release notes and downloadable artifacts.</p>
+</section>
 </section>
 <section id="v0-1-3-2026-09-08">
 <h2>v0.1.3 (2026-09-08)<a class="headerlink" href="#v0-1-3-2026-09-08" title="Link to this heading"></a></h2>
