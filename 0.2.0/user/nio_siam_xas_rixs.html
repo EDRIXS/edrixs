@@ -1,0 +1,324 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NiO Anderson impurity model XAS and RIXS &mdash; EDRIXS 0.2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=c83e6b79" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/version-switcher.css?v=23edc989" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=938c9ccc"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+      <script src="../_static/version-switcher.js?v=7c26ac8e"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="EDRIXS papers" href="papers.html" />
+    <link rel="prev" title="NiO crystal-field \(L_{2,3}\) XAS &amp; RIXS" href="nio_l23_xas.html" />
+   
+  <meta name="edrixs-doc-version" content="0.2.0">
+  <meta name="edrixs-doc-site-root" content="/edrixs/">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            EDRIXS
+              <img src="../_static/EDRIXS_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">EDRIXS User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="whatisedrixs.html">What is EDRIXS?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usedocker.html">EDRIXS and docker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devcontainer.html">Dev Container</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html">Introduction to EDRIXS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conventions.html">Conventions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html">Backend</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="examples.html">Examples</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="examples.html#pedagogical-series">Pedagogical series</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="examples.html#nio-xas-and-rixs">NiO XAS and RIXS</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="nio_l23_xas.html">NiO crystal-field <span class="math notranslate nohighlight">\(L_{2,3}\)</span> XAS &amp; RIXS</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">NiO Anderson impurity model XAS and RIXS</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="papers.html">EDRIXS papers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Pedagogical examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">EDRIXS Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">EDRIXS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">EDRIXS User Guide</a></li>
+          <li class="breadcrumb-item"><a href="examples.html">Examples</a></li>
+      <li class="breadcrumb-item active">NiO Anderson impurity model XAS and RIXS</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/user/nio_siam_xas_rixs.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="nio-anderson-impurity-model-xas-and-rixs">
+<span id="nio-siam-xas-rixs"></span><h1>NiO Anderson impurity model XAS and RIXS<a class="headerlink" href="#nio-anderson-impurity-model-xas-and-rixs" title="Link to this heading"></a></h1>
+<p>This example uses <a class="reference internal" href="../reference/models.html#edrixs.models.model_siam_2d1p" title="edrixs.models.model_siam_2d1p"><code class="xref py py-func docutils literal notranslate"><span class="pre">model_siam_2d1p()</span></code></a> to calculate Ni
+<span class="math notranslate nohighlight">\(L_{2,3}\)</span>-edge XAS and RIXS for a NiO Anderson impurity model. The model
+contains a correlated Ni <span class="math notranslate nohighlight">\(3d\)</span> shell and one bath site representing ten
+symmetry-adapted O <span class="math notranslate nohighlight">\(2p\)</span> ligand spin-orbitals. Hybridization allows the
+calculation to include ligand-to-metal charge-transfer configurations.</p>
+<p>The nominal impurity occupancy is <code class="docutils literal notranslate"><span class="pre">nd=8</span></code>. The wrapper fixes one full
+bath, so the initial valence sector contains 18 electrons; the intermediate
+sector contains 19 valence electrons and five core electrons. The bath has
+no Coulomb interactions.</p>
+<p>The model parameters are specified before constructing the Hamiltonian:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">slater</span></code> contains the initial three d-d integrals and the intermediate
+seven d-d and d-p integrals. Atomic multipolar integrals are scaled to 80%,
+and the monopole integrals are specified directly.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Delta=4.7</span></code> eV is the configuration-average energy cost of transferring
+one bath electron to the impurity, without crystal field, hybridization,
+or multipolar Coulomb interactions. It is not a bare shell-center splitting.
+The wrapper recovers the average interactions from <code class="docutils literal notranslate"><span class="pre">slater</span></code> and uses
+<a class="reference internal" href="../reference/utils.html#edrixs.utils.CT_imp_bath" title="edrixs.utils.CT_imp_bath"><code class="xref py py-func docutils literal notranslate"><span class="pre">CT_imp_bath()</span></code></a> and
+<a class="reference internal" href="../reference/utils.html#edrixs.utils.CT_imp_bath_core_hole" title="edrixs.utils.CT_imp_bath_core_hole"><code class="xref py py-func docutils literal notranslate"><span class="pre">CT_imp_bath_core_hole()</span></code></a> to set the shell centers.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">impurity_levels</span></code> and <code class="docutils literal notranslate"><span class="pre">bath_levels</span></code> each contain five orbital energies
+ordered <code class="docutils literal notranslate"><span class="pre">(dz2,</span> <span class="pre">dzx,</span> <span class="pre">dzy,</span> <span class="pre">dx2-y2,</span> <span class="pre">dxy)</span></code>. The mean of each set is subtracted
+before setting its center according to the charge transfer energy. Each value
+applies to both spins.
+Cubic splittings are 0.56 eV on the impurity and 1.44 eV on the bath.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">hyb</span></code> gives five matching-orbital hoppings in that same order: 2.06 eV
+for the two eg orbitals and 1.21 eV for the three <span class="math notranslate nohighlight">\(t_{2g}\)</span> orbitals.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">v_soc</span></code> gives initial and intermediate impurity SOC; <code class="docutils literal notranslate"><span class="pre">c_soc</span></code> gives core
+SOC.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ext_B</span></code> applies an effective exchange field along [112], acting on spin.
+<code class="docutils literal notranslate"><span class="pre">om_shift=857.6</span></code> eV aligns the spectrum with the Ni L edge; the wrapper
+combines this with its internally derived core energy.</p></li>
+</ul>
+<p>The first seven outputs from
+<a class="reference internal" href="../reference/models.html#edrixs.models.model_siam_2d1p" title="edrixs.models.model_siam_2d1p"><code class="xref py py-func docutils literal notranslate"><span class="pre">model_siam_2d1p()</span></code></a> pass to
+<a class="reference internal" href="../reference/solvers.html#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops()</span></code></a>. Pass the eighth output, <code class="docutils literal notranslate"><span class="pre">shift</span></code>, to
+<a class="reference internal" href="../reference/solvers.html#edrixs.solvers.ed" title="edrixs.solvers.ed"><code class="xref py py-func docutils literal notranslate"><span class="pre">ed()</span></code></a> to subtract the core shell-level energy during
+diagonalization and restore it in the returned eigenvalues. The ED, XAS, and RIXS
+steps select the SciPy backend. Temperature (300 K), photon geometry,
+polarization, and lifetime broadening are supplied to the spectrum routines.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">"""Calculate NiO Anderson-impurity-model XAS and RIXS spectra."""</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span>
+
+
+<span class="c1"># Nominal d8 impurity; the wrapper fixes one full bath and a p core.</span>
+<span class="n">nd</span> <span class="o">=</span> <span class="mi">8</span>
+
+<span class="c1"># Screened Slater integrals in eV.</span>
+<span class="n">info</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_atom_data</span><span class="p">(</span><span class="s1">'Ni'</span><span class="p">,</span> <span class="s1">'3d'</span><span class="p">,</span> <span class="n">nd</span><span class="p">,</span> <span class="n">edge</span><span class="o">=</span><span class="s1">'L3'</span><span class="p">)</span>
+<span class="n">F0_dd</span> <span class="o">=</span> <span class="mf">7.8</span>
+<span class="n">F2_dd</span> <span class="o">=</span> <span class="mf">0.8</span> <span class="o">*</span> <span class="n">info</span><span class="p">[</span><span class="s1">'slater_i'</span><span class="p">][</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">F4_dd</span> <span class="o">=</span> <span class="mf">0.8</span> <span class="o">*</span> <span class="n">info</span><span class="p">[</span><span class="s1">'slater_i'</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">F0_dp</span> <span class="o">=</span> <span class="mf">8.9</span>
+<span class="n">F2_dp</span> <span class="o">=</span> <span class="mf">0.8</span> <span class="o">*</span> <span class="n">info</span><span class="p">[</span><span class="s1">'slater_n'</span><span class="p">][</span><span class="mi">4</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">G1_dp</span> <span class="o">=</span> <span class="mf">0.8</span> <span class="o">*</span> <span class="n">info</span><span class="p">[</span><span class="s1">'slater_n'</span><span class="p">][</span><span class="mi">5</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">G3_dp</span> <span class="o">=</span> <span class="mf">0.8</span> <span class="o">*</span> <span class="n">info</span><span class="p">[</span><span class="s1">'slater_n'</span><span class="p">][</span><span class="mi">6</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">slater</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="p">[</span><span class="n">F0_dd</span><span class="p">,</span> <span class="n">F2_dd</span><span class="p">,</span> <span class="n">F4_dd</span><span class="p">],</span>
+    <span class="p">[</span><span class="n">F0_dd</span><span class="p">,</span> <span class="n">F2_dd</span><span class="p">,</span> <span class="n">F4_dd</span><span class="p">,</span> <span class="n">F0_dp</span><span class="p">,</span> <span class="n">F2_dp</span><span class="p">,</span> <span class="n">G1_dp</span><span class="p">,</span> <span class="n">G3_dp</span><span class="p">],</span>
+<span class="p">)</span>
+
+<span class="c1"># Charge-transfer energy. This is defined in the atomic limit</span>
+<span class="c1"># (without crystal field, hybridization, or multipolar Coulomb</span>
+<span class="c1"># interactions) as the energy cost of transferring one electron</span>
+<span class="c1"># from the bath to the impurity.</span>
+<span class="n">Delta</span> <span class="o">=</span> <span class="mf">4.7</span>
+
+<span class="c1"># Five orbital energies in (dz2, dzx, dzy, dx2-y2, dxy) order, in eV.</span>
+<span class="c1"># Each set is recentered internally, then duplicated for the two spins.</span>
+<span class="n">ten_dq</span> <span class="o">=</span> <span class="mf">0.56</span>
+<span class="n">impurity_levels</span> <span class="o">=</span> <span class="n">ten_dq</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.4</span><span class="p">])</span>
+<span class="n">ten_dq_bath</span> <span class="o">=</span> <span class="mf">1.44</span>
+<span class="n">bath_levels</span> <span class="o">=</span> <span class="n">ten_dq_bath</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.4</span><span class="p">])</span>
+<span class="n">hyb</span> <span class="o">=</span> <span class="p">[</span><span class="mf">2.06</span><span class="p">,</span> <span class="mf">1.21</span><span class="p">,</span> <span class="mf">1.21</span><span class="p">,</span> <span class="mf">2.06</span><span class="p">,</span> <span class="mf">1.21</span><span class="p">]</span>
+
+<span class="c1"># Keep the original parameterization: equal impurity SOC in both states.</span>
+<span class="c1"># The second entry can instead be info['v_soc_n'][0].</span>
+<span class="n">v_soc</span> <span class="o">=</span> <span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="s1">'v_soc_i'</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">info</span><span class="p">[</span><span class="s1">'v_soc_i'</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="c1"># Effective exchange field along the [112] direction.</span>
+<span class="n">exchange</span> <span class="o">=</span> <span class="mi">6</span> <span class="o">*</span> <span class="mf">0.027</span>
+<span class="n">ext_B</span> <span class="o">=</span> <span class="n">exchange</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">6</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">])</span>
+
+<span class="c1"># Align the calculated spectrum with the Ni L edge. The wrapper handles</span>
+<span class="c1"># the CT-derived core energy and returns the seven operator inputs plus the ED energy shift.</span>
+<span class="n">edge_shift</span> <span class="o">=</span> <span class="mf">857.6</span>
+<span class="o">*</span><span class="n">problem</span><span class="p">,</span> <span class="n">shift</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">model_siam_2d1p</span><span class="p">(</span>
+    <span class="n">slater</span><span class="o">=</span><span class="n">slater</span><span class="p">,</span> <span class="n">nd</span><span class="o">=</span><span class="n">nd</span><span class="p">,</span> <span class="n">Delta</span><span class="o">=</span><span class="n">Delta</span><span class="p">,</span>
+    <span class="n">impurity_levels</span><span class="o">=</span><span class="n">impurity_levels</span><span class="p">,</span> <span class="n">bath_levels</span><span class="o">=</span><span class="n">bath_levels</span><span class="p">,</span> <span class="n">hyb</span><span class="o">=</span><span class="n">hyb</span><span class="p">,</span>
+    <span class="n">v_soc</span><span class="o">=</span><span class="n">v_soc</span><span class="p">,</span> <span class="n">c_soc</span><span class="o">=</span><span class="n">info</span><span class="p">[</span><span class="s1">'c_soc'</span><span class="p">],</span> <span class="n">om_shift</span><span class="o">=</span><span class="n">edge_shift</span><span class="p">,</span>
+    <span class="n">ext_B</span><span class="o">=</span><span class="n">ext_B</span><span class="p">,</span> <span class="n">on_which</span><span class="o">=</span><span class="s1">'spin'</span><span class="p">,</span> <span class="n">sparse_U</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">backend</span> <span class="o">=</span> <span class="s1">'scipy'</span>
+<span class="n">hmat_i</span><span class="p">,</span> <span class="n">hmat_n</span><span class="p">,</span> <span class="n">trans_ops</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_ops</span><span class="p">(</span><span class="o">*</span><span class="n">problem</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">)</span>
+<span class="n">eval_i</span><span class="p">,</span> <span class="n">evec_i</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">ed</span><span class="p">(</span>
+    <span class="n">hmat_i</span><span class="p">,</span> <span class="n">shift</span><span class="o">=</span><span class="n">shift</span><span class="p">,</span>
+    <span class="n">num_evals</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
+    <span class="n">backend_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">'tol'</span><span class="p">:</span> <span class="mf">1e-10</span><span class="p">,</span> <span class="s1">'maxiter'</span><span class="p">:</span> <span class="mi">1000</span><span class="p">,</span> <span class="s1">'seed'</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span>
+<span class="p">)</span>
+
+<span class="c1"># Isotropic XAS</span>
+<span class="n">temperature</span> <span class="o">=</span> <span class="mi">300</span>
+<span class="n">thin</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">phi</span> <span class="o">=</span> <span class="mf">0.0</span>
+<span class="n">energy</span> <span class="o">=</span> <span class="n">edge_shift</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">gamma_c</span> <span class="o">=</span> <span class="mf">0.48</span> <span class="o">/</span> <span class="mi">2</span>
+<span class="n">xas</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">xas</span><span class="p">(</span>
+    <span class="n">eval_i</span><span class="p">,</span> <span class="n">evec_i</span><span class="p">,</span> <span class="n">hmat_n</span><span class="p">,</span> <span class="n">trans_ops</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span>
+    <span class="n">gamma_c</span><span class="o">=</span><span class="n">gamma_c</span><span class="p">,</span>
+    <span class="n">thin</span><span class="o">=</span><span class="n">thin</span><span class="p">,</span>
+    <span class="n">phi</span><span class="o">=</span><span class="n">phi</span><span class="p">,</span>
+    <span class="n">pol_type</span><span class="o">=</span><span class="p">[(</span><span class="s1">'isotropic'</span><span class="p">,</span> <span class="mi">0</span><span class="p">)],</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
+    <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
+    <span class="n">backend_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">'nkryl'</span><span class="p">:</span> <span class="mi">120</span><span class="p">},</span>
+<span class="p">)[:,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="n">xas</span> <span class="o">/=</span> <span class="n">xas</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+<span class="c1"># Calculate RIXS at the isotropic L3 maximum. The incoming beam is linearly</span>
+<span class="c1"># polarized; the two outgoing polarization channels are summed below.</span>
+<span class="n">l3_window</span> <span class="o">=</span> <span class="n">energy</span> <span class="o">&lt;</span> <span class="n">edge_shift</span> <span class="o">+</span> <span class="mi">5</span>
+<span class="n">resonance_energy</span> <span class="o">=</span> <span class="n">energy</span><span class="p">[</span><span class="n">l3_window</span><span class="p">][</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">xas</span><span class="p">[</span><span class="n">l3_window</span><span class="p">])]</span>
+<span class="n">energy_loss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">)</span>
+<span class="n">rixs</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">rixs</span><span class="p">(</span>
+    <span class="n">eval_i</span><span class="p">,</span> <span class="n">evec_i</span><span class="p">,</span> <span class="n">hmat_i</span><span class="p">,</span> <span class="n">hmat_n</span><span class="p">,</span> <span class="n">trans_ops</span><span class="p">,</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">resonance_energy</span><span class="p">]),</span> <span class="n">energy_loss</span><span class="p">,</span>
+    <span class="n">gamma_c</span><span class="o">=</span><span class="n">gamma_c</span><span class="p">,</span>
+    <span class="n">gamma_f</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>
+    <span class="n">thin</span><span class="o">=</span><span class="n">thin</span><span class="p">,</span>
+    <span class="n">thout</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">phi</span><span class="o">=</span><span class="n">phi</span><span class="p">,</span>
+    <span class="n">pol_type</span><span class="o">=</span><span class="p">[</span>
+        <span class="p">(</span><span class="s1">'linear'</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'linear'</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">(</span><span class="s1">'linear'</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'linear'</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span>
+    <span class="p">],</span>
+    <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
+    <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
+    <span class="n">backend_kws</span><span class="o">=</span><span class="p">{</span>
+        <span class="s1">'nkryl'</span><span class="p">:</span> <span class="mi">190</span><span class="p">,</span>
+        <span class="s1">'linsys_tol'</span><span class="p">:</span> <span class="mf">1e-10</span><span class="p">,</span>
+        <span class="s1">'linsys_maxiter'</span><span class="p">:</span> <span class="mi">2000</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">)</span>
+<span class="n">rixs_spectrum</span> <span class="o">=</span> <span class="n">rixs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">rixs_spectrum</span> <span class="o">/=</span> <span class="n">rixs_spectrum</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+
+<span class="c1"># Plot XAS and the RIXS</span>
+<span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax_xas</span><span class="p">,</span> <span class="n">ax_rixs</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span>
+    <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="n">constrained_layout</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+<span class="n">ax_xas</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">xas</span><span class="p">)</span>
+<span class="n">ax_xas</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">resonance_energy</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'tab:red'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'--'</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">ax_xas</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Incident photon energy (eV)'</span><span class="p">)</span>
+<span class="n">ax_xas</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Normalized intensity'</span><span class="p">)</span>
+<span class="n">ax_xas</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'NiO SIAM XAS'</span><span class="p">)</span>
+
+<span class="n">ax_rixs</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">energy_loss</span><span class="p">,</span> <span class="n">rixs_spectrum</span><span class="p">)</span>
+<span class="n">ax_rixs</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Energy loss (eV)'</span><span class="p">)</span>
+<span class="n">ax_rixs</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Normalized intensity'</span><span class="p">)</span>
+<span class="n">ax_rixs</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">r</span><span class="s1">'RIXS at $E_</span><span class="si">{L_3}</span><span class="s1">=</span><span class="si">%.2f</span><span class="s1">$ eV'</span> <span class="o">%</span> <span class="n">resonance_energy</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>(<a class="reference download internal" download="" href="../_downloads/53380e1921db6b1a8076827ade5c2a7e/nio_siam_xas_rixs.py"><code class="xref download docutils literal notranslate"><span class="pre">Source</span> <span class="pre">code</span></code></a>)</p>
+<figure class="align-default">
+<img alt="../_images/nio_siam_xas_rixs.png" class="plot-directive" src="../_images/nio_siam_xas_rixs.png" />
+</figure>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="nio_l23_xas.html" class="btn btn-neutral float-left" title="NiO crystal-field \(L_{2,3}\) XAS &amp; RIXS" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="papers.html" class="btn btn-neutral float-right" title="EDRIXS papers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Brookhaven National Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

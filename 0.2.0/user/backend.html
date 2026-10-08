@@ -1,0 +1,194 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Backend &mdash; EDRIXS 0.2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=c83e6b79" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/version-switcher.css?v=23edc989" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=938c9ccc"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
+      <script src="../_static/version-switcher.js?v=7c26ac8e"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="SciPy keywords" href="backends/scipy.html" />
+    <link rel="prev" title="Conventions" href="conventions.html" />
+   
+  <meta name="edrixs-doc-version" content="0.2.0">
+  <meta name="edrixs-doc-site-root" content="/edrixs/">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            EDRIXS
+              <img src="../_static/EDRIXS_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">EDRIXS User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="whatisedrixs.html">What is EDRIXS?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usedocker.html">EDRIXS and docker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devcontainer.html">Dev Container</a></li>
+<li class="toctree-l2"><a class="reference internal" href="introduction.html">Introduction to EDRIXS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conventions.html">Conventions</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Backend</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#numerical-precision">Numerical precision</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#backend-keyword-reference">Backend keyword reference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="backends/scipy.html">SciPy keywords</a></li>
+<li class="toctree-l4"><a class="reference internal" href="backends/dense.html">Dense keywords</a></li>
+<li class="toctree-l4"><a class="reference internal" href="backends/fortran.html">Fortran keywords</a></li>
+<li class="toctree-l4"><a class="reference internal" href="backends/petsc.html">PETSc keywords</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="papers.html">EDRIXS papers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Pedagogical examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">EDRIXS Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">EDRIXS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">EDRIXS User Guide</a></li>
+      <li class="breadcrumb-item active">Backend</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/user/backend.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="backend">
+<span id="id1"></span><h1>Backend<a class="headerlink" href="#backend" title="Link to this heading"></a></h1>
+<p>The <a class="reference internal" href="introduction.html#introduction"><span class="std std-ref">Introduction to EDRIXS</span></a> describes the four stages of a calculation.  Stages two
+to four – building operators, diagonalizing, and assembling spectra –
+delegate their numerical work to a backend selected with <code class="docutils literal notranslate"><span class="pre">backend</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">'dense'</span></code> returns full NumPy matrices and uses exact dense
+diagonalization and explicit eigenstate sums.  It is intended for small
+problems, reference calculations, and pedagogy.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'scipy'</span></code> returns SciPy sparse matrices and uses LOBPCG, Lanczos, and GMRES.
+It is the default backend.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'fortran'</span></code> uses the native MPI solvers and communicates through files in
+the current working directory.  We provide the function
+<a class="reference internal" href="../reference/solvers.html#edrixs.solvers.get_ops_disk" title="edrixs.solvers.get_ops_disk"><code class="xref py py-func docutils literal notranslate"><span class="pre">edrixs.get_ops_disk</span></code></a> to load the setup
+from disk if desired.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'petsc'</span></code> reserves the PETSc backend contract but is not yet implemented.</p></li>
+</ul>
+<p>Backend-specific numerical controls belong in a <code class="docutils literal notranslate"><span class="pre">backend_kws</span></code> mapping.  The
+mapping is specific to both the backend <em>and the operation</em>.</p>
+<section id="numerical-precision">
+<h2>Numerical precision<a class="headerlink" href="#numerical-precision" title="Link to this heading"></a></h2>
+<p>XAS and RIXS thermally average over the retained initial eigenstates.  Request
+enough eigenpairs from <code class="docutils literal notranslate"><span class="pre">ed</span></code> to keep every thermally populated state in the
+ground-state manifold, including complete degenerate or nearly degenerate
+multiplets; otherwise the Boltzmann average is incomplete.</p>
+<p>EDRIXS uses established numerical linear-algebra packages, but floating-point
+and iterative solvers are not exact.  If numerical accuracy is a concern,
+repeat the calculation with varied solver settings and check that the result
+is unchanged.  Relevant settings include <code class="docutils literal notranslate"><span class="pre">tol</span></code> or <code class="docutils literal notranslate"><span class="pre">eigval_tol</span></code>,
+<code class="docutils literal notranslate"><span class="pre">maxiter</span></code>, <code class="docutils literal notranslate"><span class="pre">blocksize</span></code> or <code class="docutils literal notranslate"><span class="pre">ncv</span></code>, <code class="docutils literal notranslate"><span class="pre">nkryl</span></code>, and the RIXS <code class="docutils literal notranslate"><span class="pre">linsys_*</span></code>
+options documented below.</p>
+</section>
+<section id="backend-keyword-reference">
+<span id="backend-options"></span><h2>Backend keyword reference<a class="headerlink" href="#backend-keyword-reference" title="Link to this heading"></a></h2>
+<p>Choose the backend whose keywords you need:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="backends/scipy.html"><span class="doc">SciPy keywords</span></a></p></li>
+<li><p><a class="reference internal" href="backends/dense.html"><span class="doc">Dense keywords</span></a></p></li>
+<li><p><a class="reference internal" href="backends/fortran.html"><span class="doc">Fortran keywords</span></a></p></li>
+<li><p><a class="reference internal" href="backends/petsc.html"><span class="doc">PETSc status and keywords</span></a></p></li>
+</ul>
+<p>These references apply to the staged <code class="docutils literal notranslate"><span class="pre">get_ops</span></code> / <code class="docutils literal notranslate"><span class="pre">ed</span></code> / <code class="docutils literal notranslate"><span class="pre">xas</span></code> / <code class="docutils literal notranslate"><span class="pre">rixs</span></code>
+interface.  The legacy <code class="docutils literal notranslate"><span class="pre">ed_*_fort</span></code>, <code class="docutils literal notranslate"><span class="pre">xas_*_fort</span></code>, and <code class="docutils literal notranslate"><span class="pre">rixs_*_fort</span></code>
+functions retain their existing explicit parameters.</p>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="conventions.html" class="btn btn-neutral float-left" title="Conventions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="backends/scipy.html" class="btn btn-neutral float-right" title="SciPy keywords" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Brookhaven National Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

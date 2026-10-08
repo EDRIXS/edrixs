@@ -1,0 +1,317 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Introduction to EDRIXS &mdash; EDRIXS 0.2.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=c83e6b79" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/version-switcher.css?v=23edc989" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=938c9ccc"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+      <script src="../_static/version-switcher.js?v=7c26ac8e"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Conventions" href="conventions.html" />
+    <link rel="prev" title="Dev Container" href="devcontainer.html" />
+   
+  <meta name="edrixs-doc-version" content="0.2.0">
+  <meta name="edrixs-doc-site-root" content="/edrixs/">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            EDRIXS
+              <img src="../_static/EDRIXS_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">EDRIXS User Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="whatisedrixs.html">What is EDRIXS?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="usedocker.html">EDRIXS and docker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="devcontainer.html">Dev Container</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Introduction to EDRIXS</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#the-physical-model">The physical model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#many-body-operators">Many-body operators</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#exact-diagonalization">Exact diagonalization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#xas">XAS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rixs">RIXS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#where-to-go-next">Where to go next</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="conventions.html">Conventions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="backend.html">Backend</a></li>
+<li class="toctree-l2"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l2"><a class="reference internal" href="papers.html">EDRIXS papers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../auto_examples/index.html">Pedagogical examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">EDRIXS Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">EDRIXS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">EDRIXS User Guide</a></li>
+      <li class="breadcrumb-item active">Introduction to EDRIXS</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/user/introduction.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="introduction-to-edrixs">
+<span id="introduction"></span><h1>Introduction to EDRIXS<a class="headerlink" href="#introduction-to-edrixs" title="Link to this heading"></a></h1>
+<p>EDRIXS computes X-ray absorption (XAS) and resonant inelastic X-ray scattering
+(RIXS) spectra by exact diagonalization (ED) of model Hamiltonians for
+correlated electrons.</p>
+<p>Every calculation follows the same path, with the following four stages:</p>
+<ul class="simple">
+<li><p>Defining the <strong>physical model</strong> – constructing the single-particle matrices
+of the Hamiltonian, the Fock basis, and the transition operators for the
+excitations.</p></li>
+<li><p>Building the <strong>many-body operators</strong> – expressing those Hamiltonians and
+transition operators in the full Fock basis.</p></li>
+<li><p>Using <strong>exact diagonalization</strong> to obtain the low-energy eigenvalues and
+eigenstates of the Hamiltonians.</p></li>
+<li><p>Constructing the <strong>spectrum</strong> from the transition operators, eigenvalues and
+eigenvectors.</p></li>
+</ul>
+<p>Each stage is a thin layer of functions that can accommodate different
+backends.  We review each of them with the help of the flow chart below.</p>
+<figure class="align-center" id="id5">
+<a class="reference internal image-reference" href="../_images/calculation_structure.svg"><img alt="Flow chart of the stages of an EDRIXS calculation." src="../_images/calculation_structure.svg" style="width: 95%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">The stages of an EDRIXS calculation.  The quantities passed from one stage
+to the next are shown in gray to the right of the arrows.</span><a class="headerlink" href="#id5" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>The sections below follow the figure box by box.  The <a class="reference internal" href="backend.html#backend"><span class="std std-ref">Backend</span></a> that
+carries out the linear algebra for the last three stages is described on its
+own page.  The units, naming, orbital orderings, single-particle bases,
+Fock-basis encoding and spectral conventions are collected separately on the
+<a class="reference internal" href="conventions.html#conventions"><span class="std std-ref">Conventions</span></a> page, and the <a class="reference internal" href="examples.html#examples"><span class="std std-ref">pedagogical examples</span></a> work
+through the same material in more physical detail.</p>
+<p>If you prefer to begin with a complete calculation, skip ahead to either the
+<a class="reference internal" href="nio_l23_xas.html#nio-l23-xas"><span class="std std-ref">NiO crystal-field example</span></a> or the
+<a class="reference internal" href="nio_siam_xas_rixs.html#nio-siam-xas-rixs"><span class="std std-ref">NiO Anderson impurity example</span></a> and return to this
+overview as needed.</p>
+<section id="the-physical-model">
+<span id="physical-model"></span><h2>The physical model<a class="headerlink" href="#the-physical-model" title="Link to this heading"></a></h2>
+<p>There are (so far) three <code class="docutils literal notranslate"><span class="pre">edrixs.models</span></code> constructors:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="../reference/models.html#edrixs.models.model_1v1c" title="edrixs.models.model_1v1c"><code class="xref py py-func docutils literal notranslate"><span class="pre">model_1v1c()</span></code></a> – one valence shell and one core shell
+(for example, Cu <span class="math notranslate nohighlight">\(3d\)</span> and <span class="math notranslate nohighlight">\(2p\)</span>).</p></li>
+<li><p><a class="reference internal" href="../reference/models.html#edrixs.models.model_2v1c" title="edrixs.models.model_2v1c"><code class="xref py py-func docutils literal notranslate"><span class="pre">model_2v1c()</span></code></a> – two valence shells and one core shell.</p></li>
+<li><p><a class="reference internal" href="../reference/models.html#edrixs.models.model_siam" title="edrixs.models.model_siam"><code class="xref py py-func docutils literal notranslate"><span class="pre">model_siam()</span></code></a> – an Anderson impurity model.</p></li>
+</ul>
+<p>Each returns a description of the problem, building no operators itself:</p>
+<ul class="simple">
+<li><p>the one-body matrices <code class="docutils literal notranslate"><span class="pre">emat_i</span></code> / <code class="docutils literal notranslate"><span class="pre">emat_n</span></code>,</p></li>
+<li><p>the Coulomb tensors <code class="docutils literal notranslate"><span class="pre">umat_i</span></code> / <code class="docutils literal notranslate"><span class="pre">umat_n</span></code>,</p></li>
+<li><p>compact Fock-basis specifications <code class="docutils literal notranslate"><span class="pre">basis_i</span></code> / <code class="docutils literal notranslate"><span class="pre">basis_n</span></code>, and</p></li>
+<li><p>the Cartesian photon transition matrices <code class="docutils literal notranslate"><span class="pre">trans_mat</span></code>.</p></li>
+</ul>
+<p>The <code class="docutils literal notranslate"><span class="pre">_i</span></code> suffix marks the initial and final states, which have no core hole,
+and <code class="docutils literal notranslate"><span class="pre">_n</span></code> the intermediate state, which has one.</p>
+<p><code class="docutils literal notranslate"><span class="pre">emat</span></code> and <code class="docutils literal notranslate"><span class="pre">umat</span></code> are the coefficients of a second-quantized Hamiltonian</p>
+<div class="math notranslate nohighlight">
+\[\hat{H} = \sum_{ij} t_{ij}\, \hat{f}_i^{\dagger} \hat{f}_j
+        + \sum_{ijlk} U_{ijlk}\, \hat{f}_i^{\dagger} \hat{f}_j^{\dagger}
+          \hat{f}_k \hat{f}_l ,\]</div>
+<p>with the one-body coefficients <span class="math notranslate nohighlight">\(t_{ij}\)</span> passed as <code class="docutils literal notranslate"><span class="pre">emat</span></code> and the
+two-body coefficients <span class="math notranslate nohighlight">\(U_{ijkl}\)</span> as <code class="docutils literal notranslate"><span class="pre">umat</span></code>.  Their single-particle
+index runs over spin-orbitals in the default basis and orbital order set out in
+<a class="reference internal" href="conventions.html#conventions"><span class="std std-ref">Conventions</span></a>, where the units and the naming of these quantities are also
+collected.</p>
+<p><code class="docutils literal notranslate"><span class="pre">emat</span></code> carries all of the one-body physics, and the separate contributions
+simply add together:</p>
+<ul class="simple">
+<li><p>the <strong>on-site orbital energies</strong>, including any crystal-field splitting,</p></li>
+<li><p>the <strong>spin-orbit coupling</strong> of the valence and core shells,</p></li>
+<li><p>the <strong>hopping and hybridization</strong> between sites, or between an impurity and
+its bath, and</p></li>
+<li><p><strong>external field</strong> terms, such as the Zeeman coupling to an applied magnetic
+field.</p></li>
+</ul>
+<p>Because they are additive, a crystal-field, hopping or Zeeman matrix that you
+construct yourself is simply added into <code class="docutils literal notranslate"><span class="pre">emat</span></code> – after transforming it into
+the default single-particle basis if it is not already expressed there.</p>
+<p><code class="docutils literal notranslate"><span class="pre">umat</span></code> carries the two-body Coulomb interaction.  It is parameterized by
+Slater integrals <span class="math notranslate nohighlight">\(F^k\)</span>, with <span class="math notranslate nohighlight">\(G^k\)</span> for the core-valence terms.</p>
+</section>
+<section id="many-body-operators">
+<span id="id1"></span><h2>Many-body operators<a class="headerlink" href="#many-body-operators" title="Link to this heading"></a></h2>
+<p>The second stage picks the many-body Fock basis <span class="math notranslate nohighlight">\(\lvert \Phi \rangle\)</span>
+defined above and evaluates the Hamiltonian in it.</p>
+<p><a class="reference internal" href="../reference/solvers.html#edrixs.solvers.build_op" title="edrixs.solvers.build_op"><code class="xref py py-func docutils literal notranslate"><span class="pre">build_op()</span></code></a> builds one many-body operator:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">emat</span></code>, <code class="docutils literal notranslate"><span class="pre">umat</span></code> – the one- and two-body coefficients from the first
+stage.  Pass <code class="docutils literal notranslate"><span class="pre">None</span></code> for whichever of the two is absent.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">basis</span></code> – a Fock-basis specification, or a realized basis.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">backend</span></code> – the representation the operator is returned in.</p></li>
+</ul>
+<p>It returns the matrix <span class="math notranslate nohighlight">\(\langle \Phi_l \rvert \hat{H} \lvert \Phi_r
+\rangle\)</span> of the one- and two-body terms above.</p>
+<p><a class="reference internal" href="../reference/solvers.html#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops()</span></code></a> is the spectroscopy-oriented wrapper, which
+builds everything a XAS or RIXS calculation needs in one call:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">emat_i</span></code>, <code class="docutils literal notranslate"><span class="pre">umat_i</span></code>, <code class="docutils literal notranslate"><span class="pre">basis_i</span></code> and their <code class="docutils literal notranslate"><span class="pre">_n</span></code> counterparts – the two
+Fock spaces, without and with a core hole.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">trans_mat</span></code> – the Cartesian photon transition matrices from the model.</p></li>
+</ul>
+<p>It returns <code class="docutils literal notranslate"><span class="pre">hmat_i</span></code>, <code class="docutils literal notranslate"><span class="pre">hmat_n</span></code> and the many-body transition operators
+<code class="docutils literal notranslate"><span class="pre">trans_ops</span></code>.  Because XAS and RIXS connect states with no core hole to states
+with exactly one core hole, keeping the two Hamiltonians separate avoids the need to generate a Hamiltonain that spans both spaces and makes
+the calculation more efficient.</p>
+<p>The Fock-basis encoding and the valence-before-core orbital ordering that both
+functions assume are set out in <a class="reference internal" href="conventions.html#conventions"><span class="std std-ref">Conventions</span></a>.</p>
+</section>
+<section id="exact-diagonalization">
+<span id="id2"></span><h2>Exact diagonalization<a class="headerlink" href="#exact-diagonalization" title="Link to this heading"></a></h2>
+<p>The third stage finds the low-energy eigenstates of the many-body Hamiltonian.</p>
+<p><a class="reference internal" href="../reference/solvers.html#edrixs.solvers.ed" title="edrixs.solvers.ed"><code class="xref py py-func docutils literal notranslate"><span class="pre">ed()</span></code></a> diagonalizes a many-body Hamiltonian and returns its
+<code class="docutils literal notranslate"><span class="pre">num_evals</span></code> lowest eigenpairs as <code class="docutils literal notranslate"><span class="pre">eval_i</span></code>, <code class="docutils literal notranslate"><span class="pre">evec_i</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">eval_i</span></code> is a 1D real array ordered by increasing energy.</p></li>
+<li><p>For the <code class="docutils literal notranslate"><span class="pre">dense</span></code> and <code class="docutils literal notranslate"><span class="pre">scipy</span></code> backends <code class="docutils literal notranslate"><span class="pre">evec_i</span></code> is a 2D complex array; the
+eigenvector belonging to <code class="docutils literal notranslate"><span class="pre">eval_i[k]</span></code> is the column <code class="docutils literal notranslate"><span class="pre">evec_i[:,</span> <span class="pre">k]</span></code>.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">petsc</span></code> backend is currently an interface stub.  Requesting it raises
+<code class="docutils literal notranslate"><span class="pre">NotImplementedError</span></code> rather than returning eigenvectors.</p></li>
+</ul>
+<p>Dense and SciPy ED accept <code class="docutils literal notranslate"><span class="pre">shift=shift</span></code>, where <code class="docutils literal notranslate"><span class="pre">shift</span></code> is the eighth
+output of a model constructor. They diagonalize <span class="math notranslate nohighlight">\(H - \mathrm{shift} I\)</span>
+and restore the offset in <code class="docutils literal notranslate"><span class="pre">eval_i</span></code>. The Hamiltonian supplied by the caller
+remains unchanged, so XAS and RIXS continue using the same energy reference.
+Pass only the first seven model outputs to <code class="docutils literal notranslate"><span class="pre">get_ops</span></code>. Fortran ED warns when
+<code class="docutils literal notranslate"><span class="pre">shift</span></code> is nonzero and continues without applying the shift.</p>
+</section>
+<section id="xas">
+<span id="id3"></span><h2>XAS<a class="headerlink" href="#xas" title="Link to this heading"></a></h2>
+<p><a class="reference internal" href="../reference/solvers.html#edrixs.solvers.xas" title="edrixs.solvers.xas"><code class="xref py py-func docutils literal notranslate"><span class="pre">xas()</span></code></a> provides spectra as a function of the incident photon energy
+<code class="docutils literal notranslate"><span class="pre">ominc</span></code> and returns an array of shape
+<code class="docutils literal notranslate"><span class="pre">(len(ominc),</span> <span class="pre">len(pol_type))</span></code>.  Its main arguments are <code class="docutils literal notranslate"><span class="pre">gamma_c</span></code>,
+the inverse core-hole lifetime; <code class="docutils literal notranslate"><span class="pre">pol_type</span></code>, a list of <code class="docutils literal notranslate"><span class="pre">(kind,</span> <span class="pre">angle)</span></code>
+polarization channels; the incident-beam angle <code class="docutils literal notranslate"><span class="pre">thin</span></code> and azimuth <code class="docutils literal notranslate"><span class="pre">phi</span></code>;
+and <code class="docutils literal notranslate"><span class="pre">temperature</span></code>, which sets Boltzmann weights over the retained initial
+states (so <code class="docutils literal notranslate"><span class="pre">num_evals</span></code> in <code class="docutils literal notranslate"><span class="pre">ed</span></code> must cover every thermally populated one).
+The geometry and polarization conventions are on the <a class="reference internal" href="conventions.html#conventions"><span class="std std-ref">Conventions</span></a> page.</p>
+</section>
+<section id="rixs">
+<span id="id4"></span><h2>RIXS<a class="headerlink" href="#rixs" title="Link to this heading"></a></h2>
+<p>RIXS reuses <code class="docutils literal notranslate"><span class="pre">eval_i</span></code>, <code class="docutils literal notranslate"><span class="pre">evec_i</span></code>, <code class="docutils literal notranslate"><span class="pre">hmat_i</span></code>, <code class="docutils literal notranslate"><span class="pre">hmat_n</span></code> and <code class="docutils literal notranslate"><span class="pre">trans_ops</span></code>
+from the XAS setup unchanged.  In addition to <code class="docutils literal notranslate"><span class="pre">ominc</span></code> you supply the
+energy-loss grid <code class="docutils literal notranslate"><span class="pre">eloss</span></code>, the emitted-beam angle <code class="docutils literal notranslate"><span class="pre">thout</span></code>, the final-state /
+resolution width <code class="docutils literal notranslate"><span class="pre">gamma_f</span></code>, and 4-tuple
+<code class="docutils literal notranslate"><span class="pre">(in_kind,</span> <span class="pre">in_angle,</span> <span class="pre">out_kind,</span> <span class="pre">out_angle)</span></code> polarization channels.
+<a class="reference internal" href="../reference/solvers.html#edrixs.solvers.rixs" title="edrixs.solvers.rixs"><code class="xref py py-func docutils literal notranslate"><span class="pre">rixs()</span></code></a> returns an array of shape
+<code class="docutils literal notranslate"><span class="pre">(len(ominc),</span> <span class="pre">len(eloss),</span> <span class="pre">len(pol_type))</span></code>.  It is very common to compute two
+different emitted polarizations and sum them, since this is what happens for
+RIXS with no scattered-polarization analysis.</p>
+<p>See <a class="reference internal" href="../auto_examples/example_02_single_atom_RIXS.html#sphx-glr-auto-examples-example-02-single-atom-rixs-py"><span class="std std-ref">RIXS calculations for an atomic model</span></a> for a fully
+worked calculation of the
+<a class="reference internal" href="../reference/models.html#edrixs.models.model_1v1c" title="edrixs.models.model_1v1c"><code class="xref py py-func docutils literal notranslate"><span class="pre">model_1v1c()</span></code></a> model including plotting the
+incident-energy / energy-loss map. Other models have more parameters
+to pay attention to but are, in most ways, not fundamentally more complicated.</p>
+</section>
+<section id="where-to-go-next">
+<h2>Where to go next<a class="headerlink" href="#where-to-go-next" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="conventions.html#conventions"><span class="std std-ref">Conventions</span></a> – units and naming, orbital orderings, single-particle
+bases, the Fock-basis encoding, and the geometry / polarization / broadening
+conventions for spectra.</p></li>
+<li><p><a class="reference internal" href="backend.html#backend"><span class="std std-ref">Backend</span></a> – the interchangeable linear-algebra backends and their
+numerical options.</p></li>
+<li><p><a class="reference internal" href="examples.html#examples"><span class="std std-ref">Examples</span></a> – pedagogical scripts that build up each concept above with
+physical commentary.</p></li>
+<li><p><a class="reference internal" href="../reference/index.html#reference"><span class="std std-ref">EDRIXS Reference</span></a> – the full API reference.</p></li>
+</ul>
+<p>To put the complete workflow into practice, continue with the
+<a class="reference internal" href="nio_l23_xas.html#nio-l23-xas"><span class="std std-ref">NiO crystal-field example</span></a> or the
+<a class="reference internal" href="nio_siam_xas_rixs.html#nio-siam-xas-rixs"><span class="std std-ref">NiO Anderson impurity example</span></a>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="devcontainer.html" class="btn btn-neutral float-left" title="Dev Container" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="conventions.html" class="btn btn-neutral float-right" title="Conventions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Brookhaven National Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
