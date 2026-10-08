@@ -102,7 +102,7 @@ in each eigenvector is the :math:`d`-electron count of that state.
  .. code-block:: none
 
 
-    [<matplotlib.lines.Line2D object at 0x7f3003f49fa0>]
+    [<matplotlib.lines.Line2D object at 0x7fa3427202c0>]
 
 
 
@@ -152,14 +152,14 @@ eigenvectors returned by :func:`~edrixs.solvers.ed`.
     Ground state
     alpha=0.823     beta=0.172      gamma=0.004
 
-    <matplotlib.legend.Legend object at 0x7f3003e2d970>
+    <matplotlib.legend.Legend object at 0x7fa341d28f50>
 
 
 
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.244 seconds)
+   **Total running time of the script:** (0 minutes 0.261 seconds)
 
 
 .. _sphx_glr_download_auto_examples_example_04_GS_analysis.py:
