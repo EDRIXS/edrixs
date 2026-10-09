@@ -439,6 +439,12 @@ def CT_imp_bath_core_hole(U_dd, U_pd, Delta, n):
     appropriate for a :math:`d`-shell transition metal compound
     with a core hole.
 
+    .. warning::
+
+        This function is designed to account for models that omit core states
+        from the initial state Hamiltonian. It is retained here for use with
+        the legacy solvers.
+
     Parameters
     ----------
     U_dd: float
