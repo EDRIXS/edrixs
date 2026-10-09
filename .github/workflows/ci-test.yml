@@ -507,10 +507,21 @@ jobs:
           name: ${{ env.REPOSITORY_NAME }}-${{ matrix.python-version }}-${{ matrix.host-os }}-wheel
           path: dist/
 
-      - name: Publish wheels to PyPI
+      - name: Select distributions to publish
+        run: |
+          mkdir -p publish-dist
+          cp dist/*.whl publish-dist/
+          # Every build includes an sdist; publish it from only one matrix job.
+          if [[ "${{ matrix.python-version }}" == "3.12" ]]; then
+            cp dist/*.tar.gz publish-dist/
+          fi
+
+      - name: Publish distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
-          packages-dir: ./dist/
+          packages-dir: ./publish-dist/
+          # Allow retries after a release has been partially or fully uploaded.
+          skip-existing: true
 
   publish-docker:
     if: github.event_name == 'release' && github.event.action == 'published' && github.repository == 'EDRIXS/edrixs'
