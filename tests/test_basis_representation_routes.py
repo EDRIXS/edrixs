@@ -107,7 +107,7 @@ def test_numba_default_requires_numba_and_allows_opt_out(monkeypatch, numba_opti
         backend="scipy",
         basis_method="combinadic",
         use_numba=False,
-    )
+    )()
     np.testing.assert_allclose(operator.toarray(), emat)
 
     with pytest.raises(ImportError, match="use_numba=True requires numba"):
@@ -118,7 +118,7 @@ def test_numba_default_requires_numba_and_allows_opt_out(monkeypatch, numba_opti
             backend="scipy",
             basis_method="combinadic",
             **numba_options,
-        )
+        )()
 
 
 def test_little_endian_core_bits_and_bounds():

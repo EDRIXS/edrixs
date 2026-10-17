@@ -223,7 +223,7 @@ hmat_i, hmat_n, trans_ops = edrixs.get_ops(
 # :func:`~edrixs.solvers.ed` obtains the retained low-energy eigenpairs of the
 # Hamiltonian without a core hole. Here :code:`num_evals=3` states are
 # thermally populated at the temperature of interest.
-eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=3, backend=backend)
+eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=3)
 
 ################################################################################
 # Compute XAS
@@ -237,7 +237,7 @@ eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=3, backend=backend)
 xas = edrixs.xas(
     eval_i, evec_i, hmat_n, trans_ops, ominc_xas,
     gamma_c=gamma_c, thin=thin, phi=phi, pol_type=poltype_xas,
-    temperature=temperature, backend=backend,
+    temperature=temperature,
 )
 
 ################################################################################

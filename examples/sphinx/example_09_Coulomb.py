@@ -271,7 +271,7 @@ def diagonalize(ten_dq, umat):
     emat = edrixs.cb_op(edrixs.cf_cubic_d(ten_dq),
                         edrixs.tmat_c2r('d', ispin=True))
     H = edrixs.build_op(emat, umat, basis, backend='dense')
-    e = edrixs.ed(H, num_evals=len(basis), backend='dense')[0]
+    e = edrixs.ed(H, num_evals=len(basis))[0]
     return e - e.min()
 
 basis = edrixs.get_fock_basis_int(10, 2)

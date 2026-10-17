@@ -39,45 +39,34 @@ def _group_rixs_incoming(polarizations):
 
 
 def _infer_backend(*operators):
-    """Infer which backend owns every supplied operator."""
-    from .dense_backend import dense_backend
-    from .petsc_backend import petsc_backend
-    from .scipy_backend import scipy_backend
-    from .fortran_backend import fortran_backend
+    """Validate operator labels before any matrix construction."""
+    if not operators:
+        raise TypeError("Expected at least one labeled operator")
+    labels = []
+    for operator in operators:
+        if not hasattr(operator, 'backend'):
+            raise TypeError("Operators must have a .backend attribute; use build_op or get_ops")
+        backend = operator.backend
+        if backend not in ('dense', 'scipy', 'petsc', 'fortran'):
+            raise ValueError("Unknown backend {!r}".format(backend))
+        if backend != 'fortran' and not callable(operator):
+            raise TypeError("Numerical operators must be callable matrix factories")
+        labels.append(backend)
+    if any(label != labels[0] for label in labels):
+        raise ValueError("All operators must have the same backend")
+    return labels[0]
 
-    owned_by_dense = bool(operators) and all(
-        dense_backend.owns_operator_dense(operator) for operator in operators
-    )
-    owned_by_scipy = bool(operators) and all(
-        scipy_backend.owns_operator_scipy(operator) for operator in operators
-    )
-    owned_by_petsc = bool(operators) and all(
-        petsc_backend.owns_operator_petsc(operator) for operator in operators
-    )
-    owned_by_fortran = bool(operators) and all(
-        fortran_backend.owns_operator_fortran(operator) for operator in operators
-    )
 
-    if owned_by_dense:
-        return 'dense'
-
-    match owned_by_scipy, owned_by_petsc, owned_by_fortran:
-        case True, False, False:
-            return 'scipy'
-        case False, True, False:
-            return 'petsc'
-        case False, False, True:
-            return 'fortran'
-        case False, False, False:
-            raise TypeError(
-                "Could not infer a backend from the supplied operators; "
-                "pass backend='dense', backend='scipy', backend='petsc', "
-                "or backend='fortran' explicitly"
-            )
-        case _:
-            raise TypeError(
-                "Backend inference is ambiguous; pass backend explicitly"
-            )
+def _materialize_operators(backend, *operators):
+    """Build each distinct numerical factory once within a solver call."""
+    if backend == 'fortran':
+        return list(operators)
+    matrices = {}
+    for operator in operators:
+        key = id(operator)
+        if key not in matrices:
+            matrices[key] = operator()
+    return [matrices[id(operator)] for operator in operators]
 
 
 def _rotated_transition_blocks(case, loc_axis=None):

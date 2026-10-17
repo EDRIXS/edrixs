@@ -9,6 +9,10 @@ from numpy.testing import assert_allclose
 
 import edrixs
 
+from operator_factories import operator_factory, operator_factories
+
+from operator_factories import materialize_ops
+
 pytestmark = [
     pytest.mark.integration,
     pytest.mark.skipif(importlib.util.find_spec('edrixs.fedrixs') is None,
@@ -48,7 +52,7 @@ def test_fortran_ed_xas_rixs_matches_its_core_convention(kind, route, tmp_path, 
         valence_u = problem[1][:nv, :nv, :nv, :nv].copy()
         problem[1] = np.zeros_like(problem[1])
         problem[1][:nv, :nv, :nv, :nv] = valence_u
-    dense_i, dense_n, dense_t = edrixs.get_ops(*problem[:7], backend='dense')
+    dense_i, dense_n, dense_t = materialize_ops(edrixs.get_ops(*problem[:7], backend='dense'))
     exact_e, exact_v = np.linalg.eigh(dense_i)
     center = np.median(np.linalg.eigvalsh(dense_n)) - exact_e[0]
     ominc = np.array([center - 0.15, center + 0.2])
@@ -56,19 +60,48 @@ def test_fortran_ed_xas_rixs_matches_its_core_convention(kind, route, tmp_path, 
     xargs = dict(gamma_c=0.25, thin=0.7, phi=0.2, pol_type=[('isotropic', 0)])
     rargs = dict(gamma_c=0.25, gamma_f=0.1, thin=0.7, thout=1.1, phi=0.2,
                  pol_type=[('linear', 0.1, 'linear', -0.2)])
-    exact_x = edrixs.xas(exact_e[:1], exact_v[:, :1], dense_n, dense_t, ominc,
-                         backend='dense', **xargs)
-    exact_r = edrixs.rixs(exact_e[:1], exact_v[:, :1], dense_i, dense_n, dense_t,
-                          ominc, loss, backend='dense', **rargs)
+    exact_x = edrixs.xas(
+        exact_e[:1],
+        exact_v[:, :1],
+        operator_factory(dense_n, 'dense'),
+        operator_factories(dense_t, 'dense'),
+        ominc,
+        **xargs,
+    )
+    exact_r = edrixs.rixs(
+        exact_e[:1],
+        exact_v[:, :1],
+        operator_factory(dense_i, 'dense'),
+        operator_factory(dense_n, 'dense'),
+        operator_factories(dense_t, 'dense'),
+        ominc,
+        loss,
+        **rargs,
+    )
     if route == 'modern':
         hi, hn, trans = edrixs.get_ops(*problem[:7], backend='fortran')
-        energies, vectors = edrixs.ed(hi, num_evals=1,
+        energies, vectors = edrixs.ed(operator_factory(hi, 'scipy'), num_evals=1,
                                       backend_kws={'ed_solver': 0, 'nvector': 1})
-        absorption = edrixs.xas(energies, vectors, hn, trans, ominc,
-                                backend_kws={'nkryl': len(dense_n)}, **xargs)
+        absorption = edrixs.xas(
+            energies,
+            vectors,
+            operator_factory(hn, 'scipy'),
+            operator_factories(trans, 'scipy'),
+            ominc,
+            backend_kws={'nkryl': len(dense_n)},
+            **xargs,
+        )
         scattering = edrixs.rixs(
-            energies, vectors, hi, hn, trans, ominc, loss,
-            backend_kws={'nkryl': len(dense_n), 'linsys_tol': 1e-12}, **rargs)
+            energies,
+            vectors,
+            operator_factory(hi, 'scipy'),
+            operator_factory(hn, 'scipy'),
+            operator_factories(trans, 'scipy'),
+            ominc,
+            loss,
+            backend_kws={'nkryl': len(dense_n), 'linsys_tol': 1e-12},
+            **rargs,
+        )
     else:
         legacy_ed = getattr(edrixs, 'ed_' + kind + '_fort')
         result = legacy_ed(MPI.COMM_WORLD, **kwargs, do_ed=2 if kind == 'siam' else False)
@@ -121,7 +154,7 @@ def test_legacy_siam_occupancy_search_keeps_historical_core_convention(tmp_path,
         problem = edrixs.model_siam(**kwargs, v_noccu=nocc)
         hi = edrixs.build_op(
             problem[0][:4, :4], problem[1][:4, :4, :4, :4],
-            edrixs.FockBasisSpec.from_args(4, nocc), backend='dense')
+            edrixs.FockBasisSpec.from_args(4, nocc), backend='dense')()
         exact[nocc] = np.linalg.eigvalsh(hi)[0]
     assert min(exact, key=exact.get) == 4
     energies, density, nocc = edrixs.ed_siam_fort(

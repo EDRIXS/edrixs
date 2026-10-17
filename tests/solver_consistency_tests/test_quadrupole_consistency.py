@@ -8,6 +8,8 @@ from edrixs.solvers import rixs, rixs_1v1c_py, xas, xas_1v1c_py
 
 from ._helpers import random_hermitian
 
+from operator_factories import operator_factory, operator_factories
+
 pytestmark = [
     pytest.mark.integration,
     pytest.mark.filterwarnings(
@@ -44,15 +46,15 @@ def test_quadrupole_xas_matches_dense_reference_on_tiny_matrices():
     actual = xas(
         eval_i,
         evec_i,
-        hmat_n,
-        transitions,
+        operator_factory(hmat_n, "scipy"),
+        operator_factories(transitions, "scipy"),
         ominc,
         gamma_c=0.17,
         thin=0.6,
         phi=0.2,
         pol_type=pol_type,
         temperature=5000.0,
-        backend="scipy",
+
         backend_kws={"nkryl": 4},
     )
     expected = xas_1v1c_py(
@@ -100,9 +102,9 @@ def test_quadrupole_rixs_matches_dense_reference_on_tiny_matrices():
     actual = rixs(
         eval_i,
         evec_i,
-        hmat_i,
-        hmat_n,
-        transitions,
+        operator_factory(hmat_i, "scipy"),
+        operator_factory(hmat_n, "scipy"),
+        operator_factories(transitions, "scipy"),
         ominc,
         eloss,
         gamma_c=0.21,
@@ -112,7 +114,7 @@ def test_quadrupole_rixs_matches_dense_reference_on_tiny_matrices():
         phi=0.16,
         pol_type=pol_type,
         temperature=5000.0,
-        backend="scipy",
+
         backend_kws={
             "nkryl": 3,
             "linsys_tol": 1e-13,

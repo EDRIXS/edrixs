@@ -84,7 +84,8 @@ print(message.format(norb, noccu, comb(norb, noccu), len(basis)))
 #                      \hat{f}_{k}\hat{f}_{l}|F_r\rangle
 #
 # For now we just build the :code:`umat` piece. :code:`backend='dense'`
-# tells edrixs to build the full matrix including the zeros.
+# selects full matrices including the zeros. build_op returns a callable;
+# ed calls it to construct the matrix when needed.
 backend = 'dense'
 H = edrixs.build_op(None, umat, basis, backend=backend)
 
@@ -116,7 +117,7 @@ tot_mom = orb_mom + spin_mom
 # Each is a one-body operator, so it is passed as the :code:`emat` argument with
 # :code:`umat=None`. They have three Cartesian components, which we build one at
 # a time.
-opL, opS, opJ = [[edrixs.build_op(component, None, basis, backend=backend)
+opL, opS, opJ = [[edrixs.build_op(component, None, basis, backend=backend)()
                   for component in op]
                  for op in [orb_mom, spin_mom, tot_mom]]
 ################################################################################
@@ -201,7 +202,7 @@ plt.show()
 # small so that the LS coupling approximation is valid and we can
 # still track the states.
 soc = edrixs.atom_hsoc('p', 0.1)
-H2 = H + edrixs.build_op(soc, None, basis, backend=backend)
+H2 = edrixs.build_op(soc, umat, basis, backend=backend)
 
 ################################################################################
 # Then, we redo the diagonalization and print the results.

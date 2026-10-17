@@ -63,14 +63,14 @@ def make_rixs(v_cfmat, thin, thout, loc_axis=None, scatter_axis=None):
         emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
         backend=backend,
     )
-    eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=3, backend=backend)
+    eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=3)
 
     eloss = np.arange(-1, 5, 0.01)
     rixs_all = edrixs.rixs(
         eval_i, evec_i, hmat_i, hmat_n, trans_ops, ominc, eloss,
         gamma_c=info['gamma_c'], gamma_f=gamma_f,
         thin=thin, thout=thout, scatter_axis=scatter_axis,
-        pol_type=pol_type, backend=backend,
+        pol_type=pol_type,
     )
 
     rixs = rixs_all.sum(axis=(0, 2))

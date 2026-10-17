@@ -8,6 +8,10 @@ Unreleased
 New calculation interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+* Return labeled matrix factories from ``build_op`` and numerical ``get_ops``.
+  Call a factory explicitly for matrix arithmetic. ``ed``, ``xas``, and ``rixs``
+  now dispatch using ``.backend`` labels and no longer accept ``backend=``.
+
 * Introduce a staged workflow that separates physical model construction,
   many-body operator construction, diagonalization, and spectral calculations:
   ``model_*`` → ``get_ops`` → ``ed`` → ``xas`` / ``rixs``.
@@ -40,6 +44,11 @@ Numerical methods and utilities
 Compatibility and migration
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+* ``build_op`` and numerical ``get_ops`` now return factories rather than
+  matrices. Call a factory to obtain a matrix for arithmetic. Public ``ed``,
+  ``xas``, and ``rixs`` require labeled factories or Fortran disk handles and
+  reject the removed ``backend`` keyword. Use backend-specific solver functions
+  for raw matrix inputs. See :ref:`lazy-operators` for migration examples.
 * Deprecate the legacy model-specific Python and Fortran solver wrappers in
   favor of the staged interface. Existing wrappers emit deprecation warnings.
 * Reject isotropic RIXS polarization; specify incoming and outgoing

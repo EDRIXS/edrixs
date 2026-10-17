@@ -13,6 +13,8 @@ from edrixs.petsc_backend.options import validate_options
 from edrixs.scipy_backend.krylov import lanczos_tridiagonal as lanczos_scipy
 from edrixs.solvers import build_op, ed
 
+from operator_factories import operator_factory
+
 
 HAS_PETSC = importlib.util.find_spec("petsc4py") is not None
 HAS_SLEPC = importlib.util.find_spec("slepc4py") is not None
@@ -175,7 +177,7 @@ def test_public_ed_scipy_and_petsc_agree_on_constructed_operator():
         backend="scipy",
         basis_method="combinadic",
         use_numba=False,
-    )
+    )()
     petsc_matrix = build_op(
         emat,
         umat,
@@ -184,10 +186,10 @@ def test_public_ed_scipy_and_petsc_agree_on_constructed_operator():
         basis_method="combinadic",
         use_numba=False,
         backend_kws={"comm": PETSc.COMM_SELF},
-    )
+    )()
 
-    eval_s, _ = ed(scipy_matrix, num_evals=2, backend="scipy")
-    eval_p, _ = ed(petsc_matrix, num_evals=2, backend="petsc")
+    eval_s, _ = ed(operator_factory(scipy_matrix, "scipy"), num_evals=2)
+    eval_p, _ = ed(operator_factory(petsc_matrix, "petsc"), num_evals=2)
 
     assert_allclose(eval_p, eval_s, rtol=0, atol=1e-8)
 

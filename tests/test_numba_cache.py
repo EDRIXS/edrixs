@@ -22,7 +22,7 @@ from edrixs._operator_builder import _get_numba_kernels
 for method in ('combinadic', 'explicit'):
     operator = build_op(np.diag([1., 2.]), None,
                         FockBasisSpec.from_args(2, 1),
-                        backend='scipy', basis_method=method)
+                        backend='scipy', basis_method=method)()
     np.testing.assert_allclose(np.sort(operator.diagonal()), [1., 2.])
 for kernel in _get_numba_kernels():
     assert sum(kernel.stats.cache_hits.values()) == int(sys.argv[1])

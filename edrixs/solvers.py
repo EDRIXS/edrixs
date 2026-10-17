@@ -6,6 +6,7 @@ construction and spectral solvers are implemented in ``*_backend.py`` modules.
 
 from __future__ import annotations
 
+from functools import partial
 import warnings
 
 import numpy as np
@@ -40,6 +41,7 @@ from .fortran_backend import fortran_backend
 from ._solvers_helpers import (
     _ed_1or2_valence_1core,
     _infer_backend,
+    _materialize_operators,
     _rixs_1or2_valence_1core,
     _xas_1or2_valence_1core,
 )
@@ -66,7 +68,7 @@ __all__ = [
 def build_op(emat, umat, lb, rb=None, *, backend='scipy',
              basis_method='combinadic', use_numba=True, backend_kws=None):
     """
-    Build a many-body operator with the selected backend.
+    Prepare a labeled callable that builds a many-body operator.
 
     Parameters
     ----------
@@ -97,8 +99,11 @@ def build_op(emat, umat, lb, rb=None, *, backend='scipy',
 
     Returns
     -------
-    operator
-        Many-body operator in the representation owned by ``backend``.
+    functools.partial
+        Zero-argument matrix factory with a ``backend`` attribute. Each call
+        builds a fresh matrix. Coefficient arrays are retained by reference;
+        later edits affect subsequent builds. Matrix construction and its
+        backend-specific validation run when the factory is called.
     """
     match backend:
         case 'scipy':
@@ -122,7 +127,8 @@ def build_op(emat, umat, lb, rb=None, *, backend='scipy',
     if rb is not None:
         rb = build_fock_basis(rb, method=basis_method)
 
-    return build_op_backend(
+    factory = partial(
+        build_op_backend,
         emat,
         umat,
         lb,
@@ -130,6 +136,8 @@ def build_op(emat, umat, lb, rb=None, *, backend='scipy',
         use_numba=use_numba,
         backend_kws=backend_kws,
     )
+    factory.backend = backend
+    return factory
 
 
 def get_ops(
@@ -166,7 +174,8 @@ def get_ops(
     -------
     hmat_i, hmat_n, trans_ops
         Initial/final Hamiltonian, intermediate Hamiltonian, and transition
-        operators for the selected backend.
+        labeled factories for the selected numerical backend, or disk handles
+        for Fortran. Call a numerical factory to obtain its matrix.
     """
     if backend == 'fortran':
         trans_mat = np.asarray(trans_mat)
@@ -223,13 +232,16 @@ def get_ops_disk():
     return fortran_backend.get_ops_disk()
 
 
-def ed(hmat_i, num_evals=1, *, shift=0.0, backend=None, backend_kws=None):
+def ed(hmat_i, num_evals=1, *, shift=0.0, backend_kws=None):
     """
     Compute low-energy initial states through a numerical backend.
 
+    Read ``hmat_i.backend`` and call the factory before diagonalization.
+    Fortran disk handles are passed directly to the Fortran backend.
+
     Parameters
     ----------
-    hmat_i : backend-owned operator
+    hmat_i : labeled operator factory or Fortran disk handle
         Initial/final Hamiltonian.
     num_evals : int, optional
         Number of lowest eigenpairs to return.
@@ -239,9 +251,6 @@ def ed(hmat_i, num_evals=1, *, shift=0.0, backend=None, backend_kws=None):
         and add the offset back to the returned eigenvalues. The supplied
         Hamiltonian is not modified. Default zero; Fortran ED warns
         and ignores nonzero shifts, continuing with the original Hamiltonian.
-    backend : str or None, optional
-        Backend name. This must be compatible with the backend choice
-        for ``hmat_i``. When omitted, infer it from ``hmat_i``.
     backend_kws : mapping, optional
         Backend-specific eigensolver options. Accepted names, defaults, and
         constraints are in the EDRIXS backend keyword reference:
@@ -253,7 +262,8 @@ def ed(hmat_i, num_evals=1, *, shift=0.0, backend=None, backend_kws=None):
         Lowest retained eigenpairs, with eigenvalues on the original energy
         reference even when a nonzero ``shift`` is supplied.
     """
-    backend_name = backend if backend is not None else _infer_backend(hmat_i)
+    backend_name = _infer_backend(hmat_i)
+    hmat_i, = _materialize_operators(backend_name, hmat_i)
     match backend_name:
         case 'scipy':
             ed_backend = scipy_backend.ed_scipy
@@ -280,14 +290,14 @@ def ed(hmat_i, num_evals=1, *, shift=0.0, backend=None, backend_kws=None):
 def xas(eval_i, evec_i, hmat_n, trans_op, ominc, *,
         gamma_c=0.1, thin=1.0, phi=0.0, pol_type=None,
         temperature=1.0, scatter_axis=None,
-        backend=None, backend_kws=None):
+        backend_kws=None):
     """
     Calculate X-ray absorption spectra through a numerical backend.
 
     Backend-neutral physical arguments are passed directly. Numerical
     controls such as the SciPy Lanczos dimension belong in ``backend_kws``.
-    When ``backend`` is omitted, it is inferred from ``hmat_n`` and the
-    transition operators.
+    The backend is read from the operators' ``.backend`` labels. All labels
+    must agree; numerical factories are called once per distinct object.
 
     Parameters
     ----------
@@ -299,10 +309,10 @@ def xas(eval_i, evec_i, hmat_n, trans_op, ominc, *,
         :func:`~edrixs.solvers.ed`.  For the ``'dense'`` and ``'scipy'``
         backends this is a two-dimensional array whose column ``i`` belongs to
         ``eval_i[i]``.
-    hmat_n : backend-owned operator
+    hmat_n : labeled operator factory or Fortran disk handle
         Intermediate-state Hamiltonian, normally returned by
         :func:`~edrixs.solvers.get_ops`.
-    trans_op : sequence of backend-owned operators
+    trans_op : sequence of labeled operator factories or Fortran disk handles
         Transition operators from the initial to the intermediate Hilbert
         space.  There must be three components for a dipole transition or five
         for a quadrupole transition.
@@ -326,10 +336,6 @@ def xas(eval_i, evec_i, hmat_n, trans_op, ominc, *,
     scatter_axis : array-like of float, shape (3, 3), or None, optional
         Cartesian axes defining the scattering frame.  The identity matrix is
         used by default.
-    backend : {'dense', 'scipy', 'fortran', 'petsc'} or None, optional
-        Numerical backend.  This must be compatible with operators passed to
-        the function. If omitted, infer it from ``hmat_n`` and
-        ``trans_op``.
     backend_kws : mapping or None, optional
         Backend-specific solver settings. Accepted names, defaults, and
         constraints are in the EDRIXS backend keyword reference:
@@ -358,12 +364,12 @@ def xas(eval_i, evec_i, hmat_n, trans_op, ominc, *,
     >>> ominc = np.linspace(-5.0, 5.0, 201)
     >>> spectrum = edrixs.xas(  # doctest: +SKIP
     ...     eval_i, evec_i, hmat_n, trans_ops, ominc,
-    ...     pol_type=[('isotropic', 0.0)], backend='scipy'
+    ...     pol_type=[('isotropic', 0.0)]
     ... )
     """
-    backend_name = (
-        backend if backend is not None else _infer_backend(hmat_n, *trans_op)
-    )
+    trans_op = list(trans_op)
+    backend_name = _infer_backend(hmat_n, *trans_op)
+    hmat_n, *trans_op = _materialize_operators(backend_name, hmat_n, *trans_op)
     match backend_name:
         case 'scipy':
             xas_backend = scipy_backend.xas_scipy
@@ -394,14 +400,15 @@ def xas(eval_i, evec_i, hmat_n, trans_op, ominc, *,
 def rixs(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
          gamma_c=0.1, gamma_f=0.01, thin=1.0, thout=1.0, phi=0.0,
          pol_type=None, temperature=1.0, scatter_axis=None,
-         skip_gs=False, return_poles=False, backend=None, backend_kws=None):
+         skip_gs=False, return_poles=False, backend_kws=None):
     """
     Calculate resonant inelastic X-ray scattering spectra through a backend.
 
     Backend-neutral physical arguments are passed directly. Numerical
     controls such as SciPy Lanczos and GMRES settings belong in
-    ``backend_kws``. When ``backend`` is omitted, it is inferred from the
-    Hamiltonians and transition operators.
+    ``backend_kws``. The backend is read from the Hamiltonian and transition
+    operator ``.backend`` labels, which must all agree. Numerical factories
+    are called once per distinct object.
 
     If ``skip_gs`` is true, transitions into the retained initial-state
     subspace are omitted from the final-state spectrum, matching the legacy
@@ -417,12 +424,12 @@ def rixs(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
         :func:`~edrixs.solvers.ed`.  For the ``'dense'`` and ``'scipy'``
         backends this is a two-dimensional array whose column ``i`` belongs to
         ``eval_i[i]``.
-    hmat_i : backend-owned operator
+    hmat_i : labeled operator factory or Fortran disk handle
         Initial- and final-state Hamiltonian.
-    hmat_n : backend-owned operator
+    hmat_n : labeled operator factory or Fortran disk handle
         Intermediate-state Hamiltonian.  Both Hamiltonians are normally
         returned by :func:`~edrixs.solvers.get_ops`.
-    trans_op : sequence of backend-owned operators
+    trans_op : sequence of labeled operator factories or Fortran disk handles
         Transition operators from the initial/final Hilbert space to the
         intermediate Hilbert space.  There must be three components for a
         dipole transition or five for a quadrupole transition.
@@ -459,10 +466,6 @@ def rixs(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
     return_poles : bool, optional
         If True, also return the continued-fraction pole data.  Default is
         False.
-    backend : {'dense', 'scipy', 'fortran', 'petsc'} or None, optional
-        Numerical backend. This must be compatible with operators passed to
-        the function. If omitted, infer it from the Hamiltonians and
-        ``trans_op``.
     backend_kws : mapping or None, optional
         Backend-specific solver settings. Accepted names, defaults, and
         constraints are in the EDRIXS backend keyword reference:
@@ -497,13 +500,13 @@ def rixs(eval_i, evec_i, hmat_i, hmat_n, trans_op, ominc, eloss, *,
     >>> eloss = np.linspace(0.0, 5.0, 501)
     >>> spectrum = edrixs.rixs(  # doctest: +SKIP
     ...     eval_i, evec_i, hmat_i, hmat_n, trans_ops, ominc, eloss,
-    ...     pol_type=[('linear', 0.0, 'linear', 0.0)], backend='scipy'
+    ...     pol_type=[('linear', 0.0, 'linear', 0.0)]
     ... )
     """
-    backend_name = (
-        backend
-        if backend is not None
-        else _infer_backend(hmat_i, hmat_n, *trans_op)
+    trans_op = list(trans_op)
+    backend_name = _infer_backend(hmat_i, hmat_n, *trans_op)
+    hmat_i, hmat_n, *trans_op = _materialize_operators(
+        backend_name, hmat_i, hmat_n, *trans_op
     )
     match backend_name:
         case 'scipy':

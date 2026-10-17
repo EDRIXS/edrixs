@@ -84,7 +84,7 @@ def test_public_build_op_matches_backend_operator_construction():
     umat = np.zeros((3, 3, 3, 3), dtype=complex)
     umat[0, 1, 1, 0] = 0.7
 
-    actual = build_op(emat, umat, basis, backend="scipy")
+    actual = build_op(emat, umat, basis, backend="scipy")()
     expected = two_fermion_csr(emat, basis) + four_fermion_csr(umat, basis)
 
     assert_allclose(actual.toarray(), expected.toarray())
@@ -96,7 +96,7 @@ def test_public_build_op_constructs_transition_operator():
     right = FockBasis([0b10], norbs=2)
     emat = np.array([[0.0, 2.0 - 0.5j], [0.0, 0.0]], dtype=complex)
 
-    actual = build_op(emat, None, left, right, backend="scipy")
+    actual = build_op(emat, None, left, right, backend="scipy")()
 
     assert actual.shape == (1, 1)
     assert_allclose(actual.toarray(), [[2.0 - 0.5j]])

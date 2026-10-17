@@ -30,7 +30,7 @@ plt.close('all')
 # sphinx_gallery_end_ignore
 
 backend = 'petsc'
-eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=len(basis_i), backend=backend)
+eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=len(basis_i))
 eval_i = eval_i - eval_i.min()
 
 ################################################################################
@@ -45,7 +45,7 @@ eval_i = eval_i - eval_i.min()
 single_particle_Nd = np.zeros_like(emat_i)
 single_particle_Nd[:norb_d, :norb_d] = np.eye(norb_d)
 
-O = edrixs.build_op(single_particle_Nd, None, basis_i, backend=backend)
+O = edrixs.build_op(single_particle_Nd, None, basis_i, backend=backend)()
 comm = O.getComm().tompi4py()
 
 work = O.createVecLeft()

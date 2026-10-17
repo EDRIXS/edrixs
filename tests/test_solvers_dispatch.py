@@ -4,7 +4,9 @@ import numpy as np
 import pytest
 import scipy.sparse as sp
 
-from edrixs.solvers import build_op, ed, rixs, xas
+from edrixs.solvers import build_op, rixs, xas
+
+from operator_factories import operator_factory, operator_factories
 
 
 def test_build_op_rejects_unknown_backend():
@@ -20,22 +22,6 @@ def test_build_op_requires_exact_backend_name(backend):
         build_op(np.eye(2), np.zeros((2, 2, 2, 2)), object(), backend=backend)
 
 
-def test_ed_rejects_nonmapping_backend_options():
-    """Public wrappers require ``backend_kws`` to be a mapping or ``None``."""
-    with pytest.raises(TypeError, match="mapping"):
-        ed(np.eye(2), backend="scipy", backend_kws=[("tol", 1e-8)])
-
-
-def test_solver_entry_points_reject_unknown_explicit_backend():
-    """Every public solver rejects selectors outside the documented names."""
-    with pytest.raises(ValueError, match="Unknown backend"):
-        ed(np.eye(2), backend="SCIPY")
-    with pytest.raises(ValueError, match="Unknown backend"):
-        xas(None, None, None, [], None, backend="SCIPY")
-    with pytest.raises(ValueError, match="Unknown backend"):
-        rixs(None, None, None, None, [], None, None, backend="SCIPY")
-
-
 def test_public_xas_uses_inferred_scipy_backend():
     """XAS infers SciPy ownership from all supplied operators."""
     hmat_n = sp.diags([1.0, 2.0], format="csr")
@@ -48,8 +34,8 @@ def test_public_xas_uses_inferred_scipy_backend():
     spectrum = xas(
         np.array([0.0]),
         np.array([[1.0], [0.0]]),
-        hmat_n,
-        transitions,
+        operator_factory(hmat_n, 'scipy'),
+        operator_factories(transitions, 'scipy'),
         np.array([0.5, 1.0]),
         pol_type=[("isotropic", 0.0)],
         backend_kws={"nkryl": 2},
@@ -72,9 +58,9 @@ def test_public_rixs_uses_inferred_scipy_backend():
     spectrum = rixs(
         np.array([0.0]),
         np.array([[1.0], [0.0]]),
-        hmat_i,
-        hmat_n,
-        transitions,
+        operator_factory(hmat_i, 'scipy'),
+        operator_factory(hmat_n, 'scipy'),
+        operator_factories(transitions, 'scipy'),
         np.array([1.0]),
         np.array([0.0, 0.5]),
         gamma_c=0.2,
@@ -118,6 +104,9 @@ def test_public_rixs_skip_gs_removes_retained_final_states():
         },
     }
 
+    arguments = (*arguments[:2], operator_factory(arguments[2]),
+                 operator_factory(arguments[3]), operator_factories(arguments[4]),
+                 *arguments[5:])
     included = rixs(*arguments, **keywords)
     skipped = rixs(*arguments, skip_gs=True, **keywords)
 

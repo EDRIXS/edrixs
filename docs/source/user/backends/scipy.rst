@@ -11,8 +11,12 @@ About this backend
 
 The ``scipy`` backend builds operators as SciPy
 `CSR matrices <https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html>`__.
-The solver stages also accept a NumPy array, a SciPy sparse matrix, or a
-matrix-free
+``build_op`` and ``get_ops`` return labeled factories that construct these
+matrices when called. Pass the factories to public ``ed``, ``xas``, and ``rixs``;
+their ``.backend`` labels select SciPy. See :ref:`lazy-operators`.
+
+The backend-specific ``ed_scipy``, ``xas_scipy``, and ``rixs_scipy`` functions
+accept concrete operators: a NumPy array, a SciPy sparse matrix, or a matrix-free
 `LinearOperator <https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html>`__.
 ED uses SciPy's
 `LOBPCG eigensolver <https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.lobpcg.html>`__;

@@ -13,6 +13,8 @@ from edrixs.solvers import rixs, rixs_1v1c_py, xas, xas_1v1c_py
 
 from ._helpers import exact_1v1c_reference_data
 
+from operator_factories import operator_factory, operator_factories
+
 pytestmark = [
     pytest.mark.integration,
     pytest.mark.filterwarnings(
@@ -42,15 +44,15 @@ def test_xas_two_initial_states_and_energy_dependent_broadening_match_dense(
     actual = xas(
         eval_i[kept],
         evec_i[:, kept],
-        hmat_n,
-        transitions,
+        operator_factory(hmat_n, "scipy"),
+        operator_factories(transitions, "scipy"),
         ominc,
         gamma_c=gamma_c,
         thin=0.65,
         phi=0.17,
         pol_type=pol_type,
         temperature=3000.0,
-        backend="scipy",
+
         backend_kws={"nkryl": hmat_n.shape[0]},
     )
     expected = xas_1v1c_py(
@@ -93,9 +95,9 @@ def test_rixs_two_initial_states_match_dense(small_1v1c_problem):
     actual = rixs(
         eval_i[kept],
         evec_i[:, kept],
-        hmat_i,
-        hmat_n,
-        transitions,
+        operator_factory(hmat_i, "scipy"),
+        operator_factory(hmat_n, "scipy"),
+        operator_factories(transitions, "scipy"),
         ominc,
         eloss,
         gamma_c=gamma_c,
@@ -105,7 +107,7 @@ def test_rixs_two_initial_states_match_dense(small_1v1c_problem):
         phi=0.13,
         pol_type=pol_type,
         temperature=3000.0,
-        backend="scipy",
+
         backend_kws={
             "nkryl": hmat_i.shape[0],
             "linsys_tol": 1e-12,

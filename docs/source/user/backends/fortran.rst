@@ -45,6 +45,12 @@ current working directory, call :func:`~edrixs.solvers.get_ops_disk`.  It
 returns ``hmat_i``, ``hmat_n``, and ``trans_ops`` handles without rewriting
 the problem files.
 
+Both ``get_ops(..., backend='fortran')`` and ``get_ops_disk()`` return disk
+handles with ``.backend == 'fortran'``. Pass them directly to public ``ed``,
+``xas``, and ``rixs`` without a ``backend`` keyword. These handles are not
+callable matrix factories; the solvers pass them directly to the file-backed
+Fortran implementation. See :ref:`lazy-operators`.
+
 ``ed``
 ======
 

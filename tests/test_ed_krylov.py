@@ -7,6 +7,8 @@ from numpy.testing import assert_allclose
 
 from edrixs.solvers import ed
 
+from operator_factories import operator_factory
+
 
 def test_ed_returns_lowest_sorted_eigenpairs_and_infers_scipy():
     """The public ED interface returns matching low-energy eigenpairs."""
@@ -17,7 +19,7 @@ def test_ed_returns_lowest_sorted_eigenpairs_and_infers_scipy():
     hmat = sp.diags(diagonal, format="csr")
 
     evals, evecs = ed(
-        hmat,
+        operator_factory(hmat, 'scipy'),
         num_evals=2,
         backend_kws={
             "blocksize": 2,
@@ -48,8 +50,8 @@ def test_ed_validation_uses_public_backend_options(
     """Invalid backend-specific ED settings fail through the public interface."""
     with pytest.raises(ValueError, match=message):
         ed(
-            np.eye(8),
+            operator_factory(np.eye(8), "scipy"),
             num_evals=num_evals,
-            backend="scipy",
+
             backend_kws=backend_kws,
         )

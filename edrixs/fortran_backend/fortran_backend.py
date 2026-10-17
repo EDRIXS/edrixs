@@ -38,10 +38,12 @@ __all__ = [
 class FortranDiskOperator:
     """Stateless marker identifying the disk-backed Fortran backend.
 
-    The handle contains no operator data or path.  Subsequent calls using
-    ``backend='fortran'`` read the native input and output files from the
-    current working directory.
+    The handle contains no operator data or path. Its ``backend`` label
+    selects the Fortran solvers, which read native input and output files
+    from the current working directory.
     """
+
+    backend = 'fortran'
 
     def __repr__(self):
         return f"<Fortran disk handle: using files in {Path.cwd()}>"

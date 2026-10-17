@@ -13,6 +13,8 @@ from edrixs.solvers import (
     xas_1v1c_py,
 )
 
+from operator_factories import operator_factory, operator_factories
+
 
 def random_hermitian(rng, size):
     """Return a small random Hermitian matrix."""
@@ -47,7 +49,7 @@ def test_dense_ed_uses_exact_hermitian_diagonalization():
     hamiltonian = random_hermitian(rng, 6)
 
     eigenvalues, eigenvectors = ed(
-        hamiltonian, num_evals=3, backend='dense'
+        operator_factory(hamiltonian, 'dense'), num_evals=3
     )
 
     assert_allclose(eigenvalues, np.linalg.eigvalsh(hamiltonian)[:3])
@@ -73,9 +75,16 @@ def test_dense_xas_matches_legacy_exact_eigenstate_sum(ntrans):
     pol_type = [('linear', 0.24), ('left', 0.0), ('isotropic', 0.0)]
 
     actual = xas(
-        eval_i[kept], evec_i[:, kept], hmat_n, transitions, ominc,
-        gamma_c=gamma_c, thin=0.57, phi=0.19,
-        pol_type=pol_type, temperature=4200.0, backend='dense',
+        eval_i[kept],
+        evec_i[:, kept],
+        operator_factory(hmat_n, 'dense'),
+        operator_factories(transitions, 'dense'),
+        ominc,
+        gamma_c=gamma_c,
+        thin=0.57,
+        phi=0.19,
+        pol_type=pol_type,
+        temperature=4200.0,
     )
     expected = xas_1v1c_py(
         eval_i, eval_n, transitions_eigen, ominc,
@@ -107,10 +116,21 @@ def test_dense_rixs_matches_legacy_exact_eigenstate_sum(skip_gs, ntrans):
     ]
 
     actual = rixs(
-        eval_i[kept], evec_i[:, kept], hmat_i, hmat_n, transitions,
-        ominc, eloss, gamma_c=gamma_c, gamma_f=gamma_f,
-        thin=0.63, thout=1.07, phi=0.11, pol_type=pol_type,
-        temperature=3500.0, skip_gs=skip_gs, backend='dense',
+        eval_i[kept],
+        evec_i[:, kept],
+        operator_factory(hmat_i, 'dense'),
+        operator_factory(hmat_n, 'dense'),
+        operator_factories(transitions, 'dense'),
+        ominc,
+        eloss,
+        gamma_c=gamma_c,
+        gamma_f=gamma_f,
+        thin=0.63,
+        thout=1.07,
+        phi=0.11,
+        pol_type=pol_type,
+        temperature=3500.0,
+        skip_gs=skip_gs,
     )
     expected = rixs_1v1c_py(
         eval_i, eval_n, transitions_eigen, ominc, eloss,
@@ -130,11 +150,17 @@ def test_dense_rixs_preserves_optional_pole_contract():
     gamma_final = np.array([0.08, 0.11])
     kept = [1, 0]
     spectrum, poles = rixs(
-        eval_i[kept], evec_i[:, kept], hmat_i, hmat_n, transitions,
-        ominc=[0.2, 0.6], eloss=energy_loss, gamma_f=gamma_final,
+        eval_i[kept],
+        evec_i[:, kept],
+        operator_factory(hmat_i, 'dense'),
+        operator_factory(hmat_n, 'dense'),
+        operator_factories(transitions, 'dense'),
+        ominc=[0.2, 0.6],
+        eloss=energy_loss,
+        gamma_f=gamma_final,
         pol_type=[('linear', 0, 'linear', 0), ('left', 0, 'right', 0)],
-        return_poles=True, temperature=3000.0,
-        backend='dense',
+        return_poles=True,
+        temperature=3000.0,
     )
 
     assert spectrum.shape == (2, 2, 2)
@@ -164,13 +190,26 @@ def test_dense_real_inputs_match_single_level_response(array):
     denominator = (np.array(ominc) - 2)**2 + 0.2**2
 
     absorption = xas(
-        energies, vectors, hn, transitions, ominc, gamma_c=0.2,
-        backend='dense',
+        energies,
+        vectors,
+        operator_factory(hn, 'dense'),
+        operator_factories(transitions, 'dense'),
+        ominc,
+        gamma_c=0.2,
     )
     scattering = rixs(
-        energies, vectors, hi, hn, transitions, ominc, eloss,
-        gamma_c=0.2, gamma_f=0.05, thin=0, thout=0,
-        scatter_axis=np.eye(3).tolist(), backend='dense',
+        energies,
+        vectors,
+        operator_factory(hi, 'dense'),
+        operator_factory(hn, 'dense'),
+        operator_factories(transitions, 'dense'),
+        ominc,
+        eloss,
+        gamma_c=0.2,
+        gamma_f=0.05,
+        thin=0,
+        thout=0,
+        scatter_axis=np.eye(3).tolist(),
     )
     assert_allclose(absorption[:, 0], 0.2 / (np.pi * denominator))
     final_response = 0.05 / (np.pi * (np.array(eloss)**2 + 0.05**2))
@@ -184,8 +223,17 @@ def test_dense_zero_final_vector_returns_zero_poles(skip_gs):
     """Zero transitions and excluded final states produce empty responses."""
     transition = np.ones((1, 1)) if skip_gs else np.zeros((1, 1))
     spectrum, poles = rixs(
-        [0], [[1]], [[0]], [[2]], [transition] * 3, [2.0], [0.0],
-        thin=0, thout=0, skip_gs=skip_gs, return_poles=True, backend='dense',
+        [0],
+        [[1]],
+        operator_factory([[0]], 'dense'),
+        operator_factory([[2]], 'dense'),
+        operator_factories([transition] * 3, 'dense'),
+        [2.0],
+        [0.0],
+        thin=0,
+        thout=0,
+        skip_gs=skip_gs,
+        return_poles=True,
     )
     assert_allclose(spectrum, 0)
     assert poles[0][0]['norm'] == [0.0]

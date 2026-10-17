@@ -6,6 +6,10 @@ from numpy.testing import assert_allclose, assert_array_equal
 
 import edrixs
 
+from operator_factories import operator_factory, operator_factories
+
+from operator_factories import materialize_ops
+
 PETSc = pytest.importorskip('petsc4py.PETSc')
 pytest.importorskip('slepc4py.SLEPc')
 
@@ -42,17 +46,17 @@ def test_filled_core_model_build_and_shifted_ed(method, sparse_u, use_numba):
         slater=([0.5] * 10, [0.75] * 10), v_soc=(0.25, 0.5),
         v_othermat=np.diag(np.arange(6) / 8), sparse_U=sparse_u,
     )
-    hi, hn, transitions = edrixs.get_ops(
+    hi, hn, transitions = materialize_ops(edrixs.get_ops(
         *problem, backend='petsc', basis_method=method, use_numba=use_numba,
         backend_kws={'assembly_chunk_cols': 2},
-    )
-    reference = edrixs.get_ops(*problem, backend='scipy')
+    ))
+    reference = materialize_ops(edrixs.get_ops(*problem, backend='scipy'))
     for actual, expected in zip([hi, hn, *transitions], [*reference[:2], *reference[2]]):
         start, end = actual.getOwnershipRange()
         assert_allclose(_local_values(actual), expected.toarray()[start:end], atol=1e-12)
 
     before = _local_values(hi)
-    values, vectors = edrixs.ed(hi, num_evals=2, shift=shift)
+    values, vectors = edrixs.ed(operator_factory(hi, 'petsc'), num_evals=2, shift=shift)
     centered = reference[0].toarray() - shift * np.eye(hi.getSize()[0])
     expected, _ = np.linalg.eigh(centered)
     assert_allclose(values, expected[:2] + shift, rtol=0, atol=1e-9)
@@ -69,7 +73,7 @@ def test_filled_core_model_build_and_shifted_ed(method, sparse_u, use_numba):
 @pytest.mark.parametrize('shift', [-2.**30, 2.**30])
 def test_shifted_ed_accepts_zero_centered_eigenvalue(shift):
     matrix = _matrix(np.diag(np.arange(6) / 4 + shift))
-    values, vectors = edrixs.ed(matrix, num_evals=2, shift=shift)
+    values, vectors = edrixs.ed(operator_factory(matrix, 'petsc'), num_evals=2, shift=shift)
     assert_allclose(values, [shift, shift + .25], rtol=0, atol=1e-9)
     for obj in [matrix, *vectors]:
         obj.destroy()
@@ -109,19 +113,43 @@ def test_centered_petsc_spectra_match_scipy(ntrans, skip_gs, offset_i, offset_n)
     options = dict(gamma_c=[.125, .25], temperature=3000.,
                    thin=.4, phi=.2, backend_kws={'nkryl': 4})
     xpol = [('isotropic', 0), ('linear', .3), ('left', 0), ('right', 0)]
-    expected = edrixs.xas(energies, vectors, hn, transitions, ominc,
-                          pol_type=xpol, backend='scipy', **options)
-    actual = edrixs.xas(energies + offset_i, states, matrices[1], ops,
-                        ominc + (offset_n - offset_i), pol_type=xpol, **options)
+    expected = edrixs.xas(
+        energies,
+        vectors,
+        operator_factory(hn, 'scipy'),
+        operator_factories(transitions, 'scipy'),
+        ominc,
+        pol_type=xpol,
+        **options,
+    )
+    actual = edrixs.xas(
+        energies + offset_i,
+        states,
+        operator_factory(matrices[1], 'petsc'),
+        operator_factories(ops, 'petsc'),
+        ominc + (offset_n - offset_i),
+        pol_type=xpol,
+        **options,
+    )
     assert_allclose(actual, expected, rtol=1e-10, atol=1e-11)
 
     options.update(gamma_f=np.linspace(.04, .06, len(eloss)), skip_gs=skip_gs,
                    pol_type=[('linear', .2, 'left', 0), ('right', 0, 'linear', .7)])
     expected = edrixs.rixs(
-        energies, vectors, hi, hn, transitions, ominc, eloss, backend='scipy', **options,
+        energies,
+        vectors,
+        operator_factory(hi, 'scipy'),
+        operator_factory(hn, 'scipy'),
+        operator_factories(transitions, 'scipy'),
+        ominc,
+        eloss,
+        **options,
     )
     actual, poles = edrixs.rixs(
-        energies + offset_i, states, *matrices, ops, ominc + (offset_n - offset_i), eloss,
+        energies + offset_i, states,
+        operator_factory(matrices[0], 'petsc'),
+        operator_factory(matrices[1], 'petsc'), operator_factories(ops, 'petsc'),
+        ominc + (offset_n - offset_i), eloss,
         return_poles=True, **options,
     )
     assert_allclose(actual, expected, rtol=1e-9, atol=1e-10)
@@ -148,10 +176,23 @@ def test_centered_petsc_zero_transitions():
     start, end = state.getOwnershipRange()
     if start == 0 and end > 0:
         state.getArray()[0] = 1
-    xas = edrixs.xas([-100.], [state], hn, transitions, [20.])
+    xas = edrixs.xas(
+        [-100.],
+        [state],
+        operator_factory(hn, 'petsc'),
+        operator_factories(transitions, 'petsc'),
+        [20.],
+    )
     rixs, poles = edrixs.rixs(
-        [-100.], [state], hi, hn, transitions, [20.], [0., 1.],
-        skip_gs=True, return_poles=True,
+        [-100.],
+        [state],
+        operator_factory(hi, 'petsc'),
+        operator_factory(hn, 'petsc'),
+        operator_factories(transitions, 'petsc'),
+        [20.],
+        [0., 1.],
+        skip_gs=True,
+        return_poles=True,
     )
     assert_array_equal(xas, 0)
     assert_array_equal(rixs, 0)

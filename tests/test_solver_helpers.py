@@ -50,13 +50,12 @@ def test_expand_broadening_accepts_scalar_or_exact_length_array():
         helpers._expand_broadening([0.1], 2, "gamma")
 
 
-def test_infer_backend_recognizes_dense_and_scipy_operators():
-    """NumPy and SciPy sparse operators infer their respective backends."""
-    assert helpers._infer_backend(np.eye(2)) == "dense"
-    assert helpers._infer_backend(sp.eye(2, format="csr")) == "scipy"
+def test_infer_backend_recognizes_labels():
+    from operator_factories import operator_factory
+    assert helpers._infer_backend(operator_factory(np.eye(2), 'dense')) == 'dense'
+    assert helpers._infer_backend(operator_factory(sp.eye(2), 'scipy')) == 'scipy'
 
 
 def test_infer_backend_rejects_unknown_operator_types():
-    """Unrecognized operator types require an explicit backend selection."""
-    with pytest.raises(TypeError, match="Could not infer"):
+    with pytest.raises(TypeError, match="backend attribute"):
         helpers._infer_backend(object())

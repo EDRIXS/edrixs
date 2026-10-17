@@ -12,6 +12,8 @@ from edrixs.fock_basis import FockBasisSpec
 from edrixs.models import model_1v1c, model_2v1c, model_siam
 from edrixs.solvers import get_ops
 
+from operator_factories import materialize_ops
+
 
 HAS_NUMBA = importlib.util.find_spec("numba") is not None
 HAS_PETSC = importlib.util.find_spec("petsc4py") is not None
@@ -116,19 +118,19 @@ def test_model_to_get_ops_all_eight_routes_are_numerically_consistent(
     _skip_unavailable(backend, use_numba)
     problem = _small_1v1c_problem()
 
-    reference_i, reference_n, reference_t = get_ops(
+    reference_i, reference_n, reference_t = materialize_ops(get_ops(
         *problem[:7],
         backend="scipy",
         basis_method="explicit",
         use_numba=False,
-    )
-    actual_i, actual_n, actual_t = get_ops(
+    ))
+    actual_i, actual_n, actual_t = materialize_ops(get_ops(
         *problem[:7],
         backend=backend,
         basis_method=basis_method,
         use_numba=use_numba,
         **_route_kwargs(backend),
-    )
+    ))
 
     assert_allclose(_to_dense(actual_i), reference_i.toarray(), rtol=0, atol=2e-12)
     assert_allclose(_to_dense(actual_n), reference_n.toarray(), rtol=0, atol=2e-12)

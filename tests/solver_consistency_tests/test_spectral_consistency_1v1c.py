@@ -15,6 +15,8 @@ from edrixs.solvers import ed, get_ops, rixs, rixs_1v1c_py, xas, xas_1v1c_py
 
 from ._helpers import exact_1v1c_reference_data
 
+from operator_factories import operator_factory, operator_factories
+
 pytestmark = [
     pytest.mark.integration,
     pytest.mark.filterwarnings(
@@ -39,16 +41,23 @@ def test_fortran_xas_matches_existing_dense_solver(small_1v1c_problem, tmp_path,
         *small_1v1c_problem[:7], backend='fortran'
     )
     fortran_eval_i, fortran_evec_i = ed(
-        hmat_i, num_evals=1, backend_kws={'ed_solver': 0, 'nvector': 1}
+        operator_factory(hmat_i, 'scipy'), num_evals=1, backend_kws={'ed_solver': 0, 'nvector': 1}
     )
     center = float(np.median(eval_n) - eval_i[0])
     ominc = np.linspace(center - 0.8, center + 0.8, 9)
     pol_type = [('linear', 0.2), ('isotropic', 0.0)]
 
     fortran_result = xas(
-        fortran_eval_i, fortran_evec_i, hmat_n, transitions, ominc,
-        gamma_c=0.25, thin=0.7, phi=0.1, pol_type=pol_type,
-        temperature=20.0, backend='fortran',
+        fortran_eval_i,
+        fortran_evec_i,
+        operator_factory(hmat_n, 'fortran'),
+        operator_factories(transitions, 'fortran'),
+        ominc,
+        gamma_c=0.25,
+        thin=0.7,
+        phi=0.1,
+        pol_type=pol_type,
+        temperature=20.0,
         backend_kws={'num_gs': 1, 'nkryl': scipy_hmat_n.shape[0]},
     )
     dense_result = xas_1v1c_py(
@@ -74,7 +83,7 @@ def test_fortran_rixs_matches_existing_dense_solver(small_1v1c_problem, tmp_path
         *small_1v1c_problem[:7], backend='fortran'
     )
     fortran_eval_i, fortran_evec_i = ed(
-        hmat_i, num_evals=1, backend_kws={'ed_solver': 0, 'nvector': 1}
+        operator_factory(hmat_i, 'scipy'), num_evals=1, backend_kws={'ed_solver': 0, 'nvector': 1}
     )
     center = float(np.median(eval_n) - eval_i[0])
     ominc = np.array([center - 0.2, center + 0.25])
@@ -82,10 +91,20 @@ def test_fortran_rixs_matches_existing_dense_solver(small_1v1c_problem, tmp_path
     pol_type = [('linear', 0.1, 'linear', -0.3)]
 
     fortran_result = rixs(
-        fortran_eval_i, fortran_evec_i, hmat_i, hmat_n, transitions,
-        ominc, eloss, gamma_c=0.25, gamma_f=0.08, thin=0.7,
-        thout=1.1, phi=0.2, pol_type=pol_type, temperature=20.0,
-        backend='fortran',
+        fortran_eval_i,
+        fortran_evec_i,
+        operator_factory(hmat_i, 'fortran'),
+        operator_factory(hmat_n, 'fortran'),
+        operator_factories(transitions, 'fortran'),
+        ominc,
+        eloss,
+        gamma_c=0.25,
+        gamma_f=0.08,
+        thin=0.7,
+        thout=1.1,
+        phi=0.2,
+        pol_type=pol_type,
+        temperature=20.0,
         backend_kws={'num_gs': 1, 'nkryl': scipy_hmat_n.shape[0]},
     )
     dense_result = rixs_1v1c_py(
@@ -115,15 +134,15 @@ def test_public_xas_matches_existing_dense_solver(small_1v1c_problem):
     sparse_result = xas(
         eval_i[kept],
         evec_i[:, kept],
-        hmat_n,
-        transitions,
+        operator_factory(hmat_n, "scipy"),
+        operator_factories(transitions, "scipy"),
         ominc,
         gamma_c=0.25,
         thin=0.7,
         phi=0.1,
         pol_type=pol_type,
         temperature=20.0,
-        backend="scipy",
+
         backend_kws={"nkryl": hmat_n.shape[0]},
     )
     dense_result = xas_1v1c_py(
@@ -161,9 +180,9 @@ def test_public_rixs_matches_existing_dense_solver(small_1v1c_problem):
     sparse_result = rixs(
         eval_i[kept],
         evec_i[:, kept],
-        hmat_i,
-        hmat_n,
-        transitions,
+        operator_factory(hmat_i, "scipy"),
+        operator_factory(hmat_n, "scipy"),
+        operator_factories(transitions, "scipy"),
         ominc,
         eloss,
         gamma_c=0.25,
@@ -173,7 +192,7 @@ def test_public_rixs_matches_existing_dense_solver(small_1v1c_problem):
         phi=0.2,
         pol_type=pol_type,
         temperature=20.0,
-        backend="scipy",
+
         backend_kws={
             "nkryl": hmat_i.shape[0],
             "linsys_tol": 1e-12,
@@ -213,15 +232,15 @@ def test_rixs_return_poles_contract(small_1v1c_problem):
     spectrum, poles = rixs(
         eval_i[:1],
         evec_i[:, :1],
-        hmat_i,
-        hmat_n,
-        transitions,
+        operator_factory(hmat_i, "scipy"),
+        operator_factory(hmat_n, "scipy"),
+        operator_factories(transitions, "scipy"),
         ominc=[1.0],
         eloss=[0.0, 0.2],
         gamma_c=0.2,
         gamma_f=0.1,
         return_poles=True,
-        backend="scipy",
+
         backend_kws={
             "nkryl": hmat_i.shape[0],
         },

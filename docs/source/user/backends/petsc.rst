@@ -26,6 +26,12 @@ eigenpairs with SLEPc's Krylov--Schur method, and evaluates XAS and RIXS with
 distributed Lanczos and KSP solves.  Importing EDRIXS does not import PETSc;
 ``petsc4py`` and ``slepc4py`` are loaded only when this backend is used.
 
+``build_op`` and ``get_ops`` return factories labeled with
+``.backend == 'petsc'``. Calling a factory assembles its distributed matrix;
+public ``ed``, ``xas``, and ``rixs`` do this automatically and read the backend
+from the labels. All MPI ranks in the matrix communicator must participate
+in construction and solver calls. See :ref:`lazy-operators`.
+
 Options are specific to the stage where they are supplied.
 
 ``build_op`` and ``get_ops``

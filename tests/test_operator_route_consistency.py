@@ -105,7 +105,7 @@ def test_square_one_and_two_body_operator_matches_independent_oracle(
         backend="scipy",
         basis_method=basis_method,
         use_numba=use_numba,
-    ).toarray()
+    )().toarray()
 
     assert_allclose(actual, expected, rtol=0, atol=2e-13)
 
@@ -131,7 +131,7 @@ def test_rectangular_transition_operator_matches_independent_oracle(
         backend="scipy",
         basis_method=basis_method,
         use_numba=use_numba,
-    ).toarray()
+    )().toarray()
 
     assert actual.shape == expected.shape
     assert_allclose(actual, expected, rtol=0, atol=2e-13)
@@ -155,7 +155,7 @@ def test_dense_and_sparse_coulomb_inputs_are_numerically_identical(
         backend="scipy",
         basis_method=basis_method,
         use_numba=use_numba,
-    )
+    )()
     sparse_operator = build_op(
         None,
         sparse_u,
@@ -163,7 +163,7 @@ def test_dense_and_sparse_coulomb_inputs_are_numerically_identical(
         backend="scipy",
         basis_method=basis_method,
         use_numba=use_numba,
-    )
+    )()
 
     assert_allclose(dense_operator.toarray(), sparse_operator.toarray(), atol=2e-13)
 
@@ -178,10 +178,10 @@ def test_little_endian_high_bit_and_fermionic_sign(basis_method, use_numba):
     emat = np.zeros((64, 64), dtype=complex)
     emat[63, 0] = 0.4 + 0.7j
     actual = build_op(emat, None, left, right, basis_method=basis_method,
-                      use_numba=use_numba).toarray()
+                      use_numba=use_numba)().toarray()
     assert_allclose(actual, [[-0.4 - 0.7j]], atol=1e-14)
     # A single 64-orbital shell also exercises the full-width shell mask.
     single = FockBasisSpec.from_args(64, 1)
     actual = build_op(emat, None, single, basis_method=basis_method,
-                      use_numba=use_numba).toarray()
+                      use_numba=use_numba)().toarray()
     assert_allclose(actual, emat, atol=1e-14)

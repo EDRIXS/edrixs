@@ -7,17 +7,19 @@ from numpy.testing import assert_allclose
 from edrixs.fock_basis import FockBasisSpec
 from edrixs.solvers import get_ops
 
+from operator_factories import materialize_ops
+
 
 def exact_1v1c_reference_data(problem):
     """Return SciPy operators plus exact dense eigenbasis reference data."""
-    hmat_i_dense, hmat_n_dense, transitions_dense = get_ops(
+    hmat_i_dense, hmat_n_dense, transitions_dense = materialize_ops(get_ops(
         *problem[:7],
         backend="dense",
-    )
-    hmat_i, hmat_n, transitions = get_ops(
+    ))
+    hmat_i, hmat_n, transitions = materialize_ops(get_ops(
         *problem[:7],
         backend="scipy",
-    )
+    ))
     eval_i, evec_i = np.linalg.eigh(hmat_i_dense)
     eval_n, evec_n = np.linalg.eigh(hmat_n_dense)
     transitions_eigenbasis = np.stack(
@@ -60,11 +62,11 @@ def assert_problem_sparse_dense_equivalent(dense, sparse):
 
 def assert_dense_and_scipy_get_ops_match(dense_problem, sparse_problem, seed=0):
     """Compare dense and SciPy operator actions produced from the same model."""
-    hmat_i, hmat_n, transitions = get_ops(*dense_problem[:7], backend="dense")
-    hmat_i_sp, hmat_n_sp, transitions_sp = get_ops(
+    hmat_i, hmat_n, transitions = materialize_ops(get_ops(*dense_problem[:7], backend="dense"))
+    hmat_i_sp, hmat_n_sp, transitions_sp = materialize_ops(get_ops(
         *sparse_problem[:7],
         backend="scipy",
-    )
+    ))
 
     rng = np.random.default_rng(seed)
     vec_i = rng.normal(size=hmat_i.shape[1]) + 1j * rng.normal(

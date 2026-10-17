@@ -80,7 +80,7 @@ def diagonalize(U, JH, t, eL, n=1):
     # Diagonalize. This problem is small, so we use the dense backend.
     basis = edrixs.get_fock_basis_int(norb, noccu)
     H = edrixs.build_op(emat, umat, basis, backend='dense')
-    e, v = edrixs.ed(H, num_evals=len(basis), backend='dense')
+    e, v = edrixs.ed(H, num_evals=len(basis))
     e -= e[0]  # Define ground state as zero energy
 
     # Operator for holes on Ni. The binary occupation vectors are in the same
@@ -92,7 +92,7 @@ def diagonalize(U, JH, t, eL, n=1):
     d2 = np.sum(np.abs(v[num_d_electrons == 2, :])**2, axis=0)
 
     # S^2 and Sz operators
-    opS = [edrixs.build_op(component, None, basis, backend='dense')
+    opS = [edrixs.build_op(component, None, basis, backend='dense')()
            for component in spin_mom]
     S_squared_op = np.dot(opS[0], opS[0]) + np.dot(opS[1], opS[1]) + np.dot(opS[2], opS[2])
     S_squared_exp = edrixs.cb_op(S_squared_op, v).diagonal().real

@@ -44,7 +44,7 @@ def test_dense_one_electron_operator_preallocation(distributed, size, hint):
     matrix = build_op(
         expected, None, FockBasisSpec.from_args(size, 1), backend='petsc',
         use_numba=False, backend_kws={'comm': comm, 'nnz_guess_per_row': hint},
-    )
+    )()
     try:
         assert_matrix_values_and_allocations(matrix, expected)
     finally:

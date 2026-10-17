@@ -1,9 +1,11 @@
-"""Consistency check for explicit and inferred SciPy RIXS dispatch."""
+"""Consistency check for direct and labeled SciPy RIXS dispatch."""
 
 import pytest
 from numpy.testing import assert_allclose
 
 from edrixs.solvers import rixs
+from edrixs.scipy_backend.scipy_backend import rixs_scipy
+from operator_factories import operator_factory, operator_factories
 
 from ._helpers import exact_1v1c_reference_data
 
@@ -11,8 +13,8 @@ from ._helpers import exact_1v1c_reference_data
 pytestmark = pytest.mark.integration
 
 
-def test_explicit_and_inferred_scipy_rixs_match(small_1v1c_problem):
-    """Compare explicit and inferred backend dispatch through SciPy RIXS."""
+def test_direct_and_labeled_scipy_rixs_match(small_1v1c_problem):
+    """Compare direct and labeled backend dispatch through SciPy RIXS."""
     hmat_i, hmat_n, transitions, eval_i, evec_i, _, _ = (
         exact_1v1c_reference_data(small_1v1c_problem)
     )
@@ -34,7 +36,9 @@ def test_explicit_and_inferred_scipy_rixs_match(small_1v1c_problem):
         },
     )
 
-    explicit = rixs(**common, backend="scipy")
+    explicit = rixs_scipy(**common)
+    common.update(hmat_i=operator_factory(hmat_i), hmat_n=operator_factory(hmat_n),
+                  trans_op=operator_factories(transitions))
     inferred = rixs(**common)
 
     assert_allclose(inferred, explicit, rtol=1e-11, atol=1e-12)

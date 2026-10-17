@@ -11,6 +11,8 @@ import edrixs
 from edrixs.fortran_backend import fortran_backend as fort
 from edrixs.fortran_backend.iostream_fortran import write_emat, write_umat
 
+from operator_factories import materialize_ops
+
 
 def _integrals():
     rng = np.random.default_rng(214)
@@ -31,9 +33,9 @@ def test_reduction_matches_explicit_many_body_hamiltonian(nocc, sparse):
     h_before, u_before = h.copy(), u.copy()
     effective, valence_u, constant = fort._reduce_initial_integrals(h, u, 4)
     full = edrixs.build_op(
-        h, u, edrixs.FockBasisSpec.from_args(4, nocc, 2, 2), backend='dense')
+        h, u, edrixs.FockBasisSpec.from_args(4, nocc, 2, 2), backend='dense')()
     reduced = edrixs.build_op(
-        effective, valence_u, edrixs.FockBasisSpec.from_args(4, nocc), backend='dense')
+        effective, valence_u, edrixs.FockBasisSpec.from_args(4, nocc), backend='dense')()
     assert_allclose(full, reduced + constant * np.eye(len(reduced)), atol=2e-13)
     assert abs(constant) > 0.1
     assert np.max(np.abs(effective - h[:4, :4])) > 0.1
@@ -95,7 +97,7 @@ def test_native_basis_encoding_preserves_restricted_sectors(tmp_path, monkeypatc
 def test_zero_valence_native_limit(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     problem = edrixs.model_1v1c(('s', 's'), v_noccu=0, shell_level=(0, -2))
-    full = edrixs.get_ops(*problem[:7], backend='dense')[0]
+    full = materialize_ops(edrixs.get_ops(*problem[:7], backend='dense'))[0]
     assert_allclose(full, [[-4]])
     with pytest.raises(ValueError, match='nonzero core energy.*zero-valence'):
         fort.write_problem(*problem[:7])
