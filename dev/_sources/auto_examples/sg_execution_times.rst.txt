@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:03.306** total execution time for 11 files **from auto_examples**:
+**00:06.408** total execution time for 11 files **from auto_examples**:
 
 .. container::
 
@@ -32,36 +32,36 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_auto_examples_example_00_ed_calculator.py` (``example_00_ed_calculator.py``)
-     - 00:00.771
-     - 0.0
    * - :ref:`sphx_glr_auto_examples_example_02_single_atom_RIXS.py` (``example_02_single_atom_RIXS.py``)
-     - 00:00.644
+     - 00:01.242
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_10_geometry.py` (``example_10_geometry.py``)
-     - 00:00.513
+     - 00:01.015
      - 0.0
-   * - :ref:`sphx_glr_auto_examples_example_08_Hunds_interactions.py` (``example_08_Hunds_interactions.py``)
-     - 00:00.447
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_example_07_transitions.py` (``example_07_transitions.py``)
-     - 00:00.242
-     - 0.0
-   * - :ref:`sphx_glr_auto_examples_example_04_GS_analysis.py` (``example_04_GS_analysis.py``)
-     - 00:00.205
+   * - :ref:`sphx_glr_auto_examples_example_00_ed_calculator.py` (``example_00_ed_calculator.py``)
+     - 00:00.986
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_03_AIM_XAS.py` (``example_03_AIM_XAS.py``)
-     - 00:00.183
+     - 00:00.978
      - 0.0
-   * - :ref:`sphx_glr_auto_examples_example_05_charge_transfer.py` (``example_05_charge_transfer.py``)
-     - 00:00.111
+   * - :ref:`sphx_glr_auto_examples_example_08_Hunds_interactions.py` (``example_08_Hunds_interactions.py``)
+     - 00:00.875
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_example_07_transitions.py` (``example_07_transitions.py``)
+     - 00:00.415
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_example_04_GS_analysis.py` (``example_04_GS_analysis.py``)
+     - 00:00.360
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_09_Coulomb.py` (``example_09_Coulomb.py``)
-     - 00:00.110
+     - 00:00.193
+     - 0.0
+   * - :ref:`sphx_glr_auto_examples_example_05_charge_transfer.py` (``example_05_charge_transfer.py``)
+     - 00:00.193
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_06_Hubbard_dimer.py` (``example_06_Hubbard_dimer.py``)
-     - 00:00.048
+     - 00:00.087
      - 0.0
    * - :ref:`sphx_glr_auto_examples_example_01_crystal_field.py` (``example_01_crystal_field.py``)
-     - 00:00.032
+     - 00:00.062
      - 0.0
