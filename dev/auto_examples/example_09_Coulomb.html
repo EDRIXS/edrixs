@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Coulomb interactions &mdash; EDRIXS 0.post1+gda0121d documentation</title>
+  <title>Coulomb interactions &mdash; EDRIXS 0.post1+g7fef936 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=5b61a172"></script>
+      <script src="../_static/documentation_options.js?v=056513cc"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -136,13 +136,11 @@ that one might not anticipate. Our example is based on a <span class="math notra
 <p>The Coulomb interaction between two particles can be written as</p>
 <blockquote>
 <div><div class="math notranslate nohighlight">
-\[\begin{equation}
-\hat{H} = \frac{1}{2}
+\[\hat{H} = \frac{1}{2}
 \int d\mathbf{r} \int d\mathbf{r}^\prime
 \Sigma_{\sigma, \sigma^\prime}
 |\hat{\psi}^\sigma(\mathbf{r})|^2 \frac{e^2}{R}
-|\hat{\psi}^{\sigma^\prime}(\mathbf{r^\prime})|^2,
-\end{equation}\]</div>
+|\hat{\psi}^{\sigma^\prime}(\mathbf{r^\prime})|^2,\]</div>
 </div></blockquote>
 <p>where <span class="math notranslate nohighlight">\(\hat{\psi}^\sigma(\mathbf{r})\)</span> is the electron wavefunction, with
 spin <span class="math notranslate nohighlight">\(\sigma\)</span>, and <span class="math notranslate nohighlight">\(R=|r-r^\prime|\)</span> is the electron separation.
@@ -153,13 +151,11 @@ particle exchange statistics and write the equation in terms of
 a tensor <span class="math notranslate nohighlight">\(U\)</span></p>
 <blockquote>
 <div><div class="math notranslate nohighlight">
-\[\begin{equation}
-\hat{H} = \sum_{\alpha,\beta,\delta,\gamma,\sigma,\sigma^\prime}
+\[\hat{H} = \sum_{\alpha,\beta,\delta,\gamma,\sigma,\sigma^\prime}
 U_{\alpha\sigma,\beta\sigma^\prime,\delta\sigma^\prime,\gamma\sigma}
 \hat{f}^{\dagger}_{\alpha\sigma}
 \hat{f}^{\dagger}_{\beta\sigma^\prime}
-\hat{f}_{\gamma\sigma^\prime}\hat{f}_{\delta\sigma},
-\end{equation}\]</div>
+\hat{f}_{\gamma\sigma^\prime}\hat{f}_{\delta\sigma},\]</div>
 </div></blockquote>
 <p>where <span class="math notranslate nohighlight">\(\alpha\)</span>, <span class="math notranslate nohighlight">\(\beta\)</span>, <span class="math notranslate nohighlight">\(\gamma\)</span>, <span class="math notranslate nohighlight">\(\delta\)</span> are
 orbital indices and <span class="math notranslate nohighlight">\(\hat{f}^{\dagger}\)</span>
@@ -196,20 +192,16 @@ constructs the required matrix via Gaunt coefficients from
 The first are the Racah parameters, which are</p>
 <blockquote>
 <div><div class="math notranslate nohighlight">
-\[\begin{split}\begin{eqnarray}
-A &amp;=&amp; F^0 - \frac{49}{441} F^4 \\
-B &amp;=&amp; \frac{1}{49}F^2 - \frac{5}{441}F^4 \\
-C &amp;=&amp; \frac{35}{441}F^4.
-\end{eqnarray}\end{split}\]</div>
+\[\begin{split}A &amp;= F^0 - \frac{49}{441} F^4 \\
+B &amp;= \frac{1}{49}F^2 - \frac{5}{441}F^4 \\
+C &amp;= \frac{35}{441}F^4.\end{split}\]</div>
 </div></blockquote>
 <p>or an alternative form for the Slater integrals</p>
 <blockquote>
 <div><div class="math notranslate nohighlight">
-\[\begin{split}\begin{eqnarray}
-F_0 &amp;=&amp; F^0  \\
-F_2 &amp;=&amp; \frac{1}{49}F^2 \\
-F_4 &amp;=&amp; \frac{1}{441}F^4,
-\end{eqnarray}\end{split}\]</div>
+\[\begin{split}F_0 &amp;= F^0  \\
+F_2 &amp;= \frac{1}{49}F^2 \\
+F_4 &amp;= \frac{1}{441}F^4,\end{split}\]</div>
 </div></blockquote>
 <p>which involves different normalization parameters.
 EDRIXS converts between the Slater integrals and Racah parameters in both
@@ -240,11 +232,9 @@ store a list of these orbitals.</p>
 elements</p>
 <blockquote>
 <div><div class="math notranslate nohighlight">
-\[\begin{equation}
-\langle\psi_{\gamma,\delta}^{\bar{\sigma},\bar{\sigma}^\prime}
+\[\langle\psi_{\gamma,\delta}^{\bar{\sigma},\bar{\sigma}^\prime}
 |\hat{H}|
-\psi_{\alpha,\beta}^{\sigma,\sigma^\prime}\rangle
-\end{equation}\]</div>
+\psi_{\alpha,\beta}^{\sigma,\sigma^\prime}\rangle\]</div>
 </div></blockquote>
 <p>the combination of which defines the energetic cost of pairwise
 electron-electron interactions between states <span class="math notranslate nohighlight">\(\alpha,\sigma\)</span>
@@ -262,12 +252,10 @@ the Coulomb interaction is real, and due to the spin symmetry properties
 of the process <span class="math notranslate nohighlight">\(U\)</span> always obeys</p>
 <blockquote>
 <div><div class="math notranslate nohighlight">
-\[\begin{equation}
-U_{\alpha\sigma,\beta\sigma^\prime,\gamma\sigma^\prime,\delta\sigma} =
+\[U_{\alpha\sigma,\beta\sigma^\prime,\gamma\sigma^\prime,\delta\sigma} =
 U_{\beta\sigma,\alpha\sigma^\prime,\delta\sigma^\prime,\gamma\sigma} =
 U_{\delta\sigma,\gamma\sigma^\prime,\beta\sigma^\prime,\alpha\sigma} =
-U_{\gamma\sigma,\delta\sigma^\prime,\alpha\sigma^\prime,\beta\sigma}.
-\end{equation}\]</div>
+U_{\gamma\sigma,\delta\sigma^\prime,\alpha\sigma^\prime,\beta\sigma}.\]</div>
 </div></blockquote>
 <section id="intra-orbital">
 <h3>1. Intra orbital<a class="headerlink" href="#intra-orbital" title="Link to this heading"></a></h3>
@@ -279,10 +267,8 @@ over all opposite spin pairs. Due to rotational symmetry, all these
 elements are the same and equal to</p>
 <blockquote>
 <div><div class="math notranslate nohighlight">
-\[\begin{split}\begin{eqnarray}
-U_0 &amp;=&amp; \frac{A}{2} + 2B + \frac{3C}{2}\\
-    &amp;=&amp; \frac{F_0}{2} + 2F_2 + 18F_4
-\end{eqnarray}\end{split}\]</div>
+\[\begin{split}U_0 &amp;= \frac{A}{2} + 2B + \frac{3C}{2}\\
+    &amp;= \frac{F_0}{2} + 2F_2 + 18F_4\end{split}\]</div>
 </div></blockquote>
 <p>Let’s print these to demonstrate where these live in the array</p>
 <div class="highlight-Python notranslate"><div class="highlight"><pre><span class="k">for</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="int"><span class="n">i</span></a> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span><span class="p">:</span><span class="w">
@@ -374,12 +360,10 @@ x^2-y^2          xy              0.175
 orbitals like</p>
 <blockquote>
 <div><div class="math notranslate nohighlight">
-\[\begin{split}\begin{equation}
-U_{\alpha\sigma, \gamma\sigma', \beta\sigma', \gamma\sigma} \\
+\[\begin{split}U_{\alpha\sigma, \gamma\sigma', \beta\sigma', \gamma\sigma} \\
 U_{\alpha\sigma, \gamma\sigma', \gamma\sigma', \beta\sigma} \\
 (1-\delta_{\sigma\sigma'})
-U_{\alpha\sigma, \beta\sigma', \gamma\sigma', \gamma\sigma}
-\end{equation}\end{split}\]</div>
+U_{\alpha\sigma, \beta\sigma', \gamma\sigma', \gamma\sigma}\end{split}\]</div>
 </div></blockquote>
 <p>for <span class="math notranslate nohighlight">\(\alpha=3z^2-r^2, \beta=x^2-y^2, \gamma=xz/yz\)</span>.
 These are needed to maintain the rotational symmetry of the interations.
@@ -654,7 +638,7 @@ terms are included or not.</p>
 Transition-Metal Ions in Crystals. Academic Press, New York and London.</p>
 </aside>
 </aside>
-<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.144 seconds)</p>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.196 seconds)</p>
 <div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-example-09-coulomb-py">
 <div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
 <p><a class="reference download internal" download="" href="../_downloads/7e525b7048c2af11c7e1a7d745475124/example_09_Coulomb.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">example_09_Coulomb.ipynb</span></code></a></p>

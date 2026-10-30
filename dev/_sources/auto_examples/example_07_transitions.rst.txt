@@ -120,7 +120,7 @@ eigenvectors.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 69-96
+.. GENERATED FROM PYTHON SOURCE LINES 69-92
 
 Transition operators and scattering matrix
 ------------------------------------------------------------------------------
@@ -139,18 +139,14 @@ specifies the transition amplitude for each incoming and outgoing x-ray
 polarization. Correspondingly, we have
 
      .. math::
-       \begin{equation}
-       \mathcal{F}=\sum_n\langle f|D|n\rangle\langle n|D^{\dagger}|g\rangle
-       \end{equation}.
+       \mathcal{F}=\sum_n\langle f|D|n\rangle\langle n|D^{\dagger}|g\rangle.
 
 In matrix form this is
 
      .. math::
-       \begin{equation}
-       \mathcal{F}(m,n)=\{f^{\dagger} \cdot D(m)\} \cdot \{D^{\dagger}(n) \cdot g\}
-       \end{equation}.
+       \mathcal{F}(m,n)=\{f^{\dagger} \cdot D(m)\} \cdot \{D^{\dagger}(n) \cdot g\}.
 
-.. GENERATED FROM PYTHON SOURCE LINES 96-107
+.. GENERATED FROM PYTHON SOURCE LINES 92-103
 
 .. code-block:: Python
 
@@ -172,13 +168,13 @@ In matrix form this is
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-111
+.. GENERATED FROM PYTHON SOURCE LINES 104-107
 
 Using this function, we can obtain non-spin-flip (NSF) and spin-flip (SF)
 scattering matrices by choosing whether we return to the ground state or
 whether we access the excited state with the spin flipped.
 
-.. GENERATED FROM PYTHON SOURCE LINES 111-114
+.. GENERATED FROM PYTHON SOURCE LINES 107-110
 
 .. code-block:: Python
 
@@ -192,7 +188,7 @@ whether we access the excited state with the spin flipped.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 115-123
+.. GENERATED FROM PYTHON SOURCE LINES 111-119
 
 Angular dependence
 ------------------------------------------------------------------------------
@@ -203,7 +199,7 @@ polarizations. It is then convenient to use function
 :func:`~edrixs.photon_transition.dipole_polvec_rixs`
 to obtain the incoming and outgoing polarization vectors.
 
-.. GENERATED FROM PYTHON SOURCE LINES 123-138
+.. GENERATED FROM PYTHON SOURCE LINES 119-134
 
 .. code-block:: Python
 
@@ -229,7 +225,7 @@ to obtain the incoming and outgoing polarization vectors.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 139-144
+.. GENERATED FROM PYTHON SOURCE LINES 135-140
 
 Plot
 ------------------------------------------------------------------------------
@@ -237,7 +233,7 @@ We now run through a few configurations specified in terms of incoming
 polarization angle :math:`\alpha` (defined in radians w.r.t. the scattering
 plane), :math:`F`, plotting label, and plotting color.
 
-.. GENERATED FROM PYTHON SOURCE LINES 144-160
+.. GENERATED FROM PYTHON SOURCE LINES 140-156
 
 .. code-block:: Python
 
@@ -269,14 +265,14 @@ plane), :math:`F`, plotting label, and plotting color.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 161-165
+.. GENERATED FROM PYTHON SOURCE LINES 157-161
 
 Run through orbitals
 ------------------------------------------------------------------------------
 For completeness, let's look at transitions from :math:`x^2-y^2` to all other
 orbitals.
 
-.. GENERATED FROM PYTHON SOURCE LINES 165-192
+.. GENERATED FROM PYTHON SOURCE LINES 161-188
 
 .. code-block:: Python
 
@@ -319,7 +315,7 @@ orbitals.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 193-199
+.. GENERATED FROM PYTHON SOURCE LINES 189-195
 
 .. rubric:: Footnotes
 
@@ -331,7 +327,7 @@ orbitals.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.297 seconds)
+   **Total running time of the script:** (0 minutes 0.418 seconds)
 
 
 .. _sphx_glr_download_auto_examples_example_07_transitions.py:

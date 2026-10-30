@@ -6,10 +6,8 @@ This exercise will demonstrate how to handle hopping and multi-site problems wit
 edrixs using the example of a Hubbard dimer. We want to solve the equation
 
   .. math::
-    \\begin{equation}
     \\hat{H} = \\sum_{i,j}  \\sum_{\\sigma} t_{i,j} \\hat{f}^{\\dagger}_{i,\\sigma} \\hat{f}_{j, \\sigma}
     + U \\sum_{i} \\hat{n}_{i,\\uparrow}\\hat{n}_{i,\\downarrow},
-    \\end{equation}
 
 which involves two sites labeled with indices :math:`i` or :math:`j` with two
 electrons of spin :math:`\\sigma\\in{\\uparrow,\\downarrow}`. :math:`t_{i,j}`
@@ -22,11 +20,9 @@ where :math:`\\alpha,\\beta,\\delta,\\gamma` are the indices of the single
 particle basis.
 
   .. math::
-    \\begin{equation}
     \\hat{H} = \\sum_{\\alpha,\\beta} t_{\\alpha,\\beta} \\hat{f}^{\\dagger}_{\\alpha} \\hat{f}_{\\beta}
     + \\sum_{\\alpha,\\beta,\\gamma,\\delta} U_{\\alpha,\\beta,\\gamma,\\delta}
     \\hat{f}^{\\dagger}_{\\alpha}\\hat{f}^{\\dagger}_{\\beta}\\hat{f}_{\\gamma}\\hat{f}_{\\delta}.
-    \\end{equation}
 
 """
 

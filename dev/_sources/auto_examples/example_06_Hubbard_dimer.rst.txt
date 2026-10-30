@@ -24,10 +24,8 @@ This exercise will demonstrate how to handle hopping and multi-site problems wit
 edrixs using the example of a Hubbard dimer. We want to solve the equation
 
   .. math::
-    \begin{equation}
     \hat{H} = \sum_{i,j}  \sum_{\sigma} t_{i,j} \hat{f}^{\dagger}_{i,\sigma} \hat{f}_{j, \sigma}
     + U \sum_{i} \hat{n}_{i,\uparrow}\hat{n}_{i,\downarrow},
-    \end{equation}
 
 which involves two sites labeled with indices :math:`i` or :math:`j` with two
 electrons of spin :math:`\sigma\in{\uparrow,\downarrow}`. :math:`t_{i,j}`
@@ -40,13 +38,11 @@ where :math:`\alpha,\beta,\delta,\gamma` are the indices of the single
 particle basis.
 
   .. math::
-    \begin{equation}
     \hat{H} = \sum_{\alpha,\beta} t_{\alpha,\beta} \hat{f}^{\dagger}_{\alpha} \hat{f}_{\beta}
     + \sum_{\alpha,\beta,\gamma,\delta} U_{\alpha,\beta,\gamma,\delta}
     \hat{f}^{\dagger}_{\alpha}\hat{f}^{\dagger}_{\beta}\hat{f}_{\gamma}\hat{f}_{\delta}.
-    \end{equation}
 
-.. GENERATED FROM PYTHON SOURCE LINES 34-39
+.. GENERATED FROM PYTHON SOURCE LINES 30-35
 
 Initialize matrices
 ------------------------------------------------------------------------------
@@ -54,7 +50,7 @@ We start by noting that each of the two sites is like an :math:`l=0`
 :math:`s`-orbital with two spin-orbitals each. We will include
 two electron occupation and build the Fock basis.
 
-.. GENERATED FROM PYTHON SOURCE LINES 39-51
+.. GENERATED FROM PYTHON SOURCE LINES 35-47
 
 .. code-block:: Python
 
@@ -77,7 +73,7 @@ two electron occupation and build the Fock basis.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 52-71
+.. GENERATED FROM PYTHON SOURCE LINES 48-67
 
 Create function to populate and diagonalize matrices
 ------------------------------------------------------------------------------
@@ -99,7 +95,7 @@ the same spin. :func:`~edrixs.solvers.build_op` transforms the one-body matrix
 Hamiltonian in our Fock basis and :func:`~edrixs.solvers.ed` diagonalizes it.
 This problem is tiny, so we use the :code:`'dense'` backend.
 
-.. GENERATED FROM PYTHON SOURCE LINES 71-86
+.. GENERATED FROM PYTHON SOURCE LINES 67-82
 
 .. code-block:: Python
 
@@ -125,13 +121,13 @@ This problem is tiny, so we use the :code:`'dense'` backend.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 87-90
+.. GENERATED FROM PYTHON SOURCE LINES 83-86
 
 The large :math:`U` limit
 ------------------------------------------------------------------------------
 Let us see what happens with :math:`U \gg t`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 90-94
+.. GENERATED FROM PYTHON SOURCE LINES 86-90
 
 .. code-block:: Python
 
@@ -153,13 +149,13 @@ Let us see what happens with :math:`U \gg t`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 95-98
+.. GENERATED FROM PYTHON SOURCE LINES 91-94
 
 To analyze what is going on we can determine the spin expectation values
 of the cluster. Building the operators follows the same form as the
 Hamiltonian and the previous example.
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-107
+.. GENERATED FROM PYTHON SOURCE LINES 94-103
 
 .. code-block:: Python
 
@@ -179,13 +175,13 @@ Hamiltonian and the previous example.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-111
+.. GENERATED FROM PYTHON SOURCE LINES 104-107
 
 This time let us include a tiny magnetic field along the :math:`z`-axis, so
 that we have a well-defined measurement axis and print out the expectation
 values.
 
-.. GENERATED FROM PYTHON SOURCE LINES 111-123
+.. GENERATED FROM PYTHON SOURCE LINES 107-119
 
 .. code-block:: Python
 
@@ -220,20 +216,20 @@ values.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 124-128
+.. GENERATED FROM PYTHON SOURCE LINES 120-124
 
 For :math:`U \gg t` the two states with double occupancy acquire an energy of
 approximately :math:`U`. The low energy states are a :math:`S=0` singlet and
 an :math:`S=1` triplet, which are split by :math:`4t^2/U`, the
 magnetic exchange energy.
 
-.. GENERATED FROM PYTHON SOURCE LINES 130-133
+.. GENERATED FROM PYTHON SOURCE LINES 126-129
 
 :math:`U` dependence
 ------------------------------------------------------------------------------
 Let us plot the changes in  energy with :math:`U`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 133-144
+.. GENERATED FROM PYTHON SOURCE LINES 129-140
 
 .. code-block:: Python
 
@@ -260,12 +256,12 @@ Let us plot the changes in  energy with :math:`U`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 145-147
+.. GENERATED FROM PYTHON SOURCE LINES 141-143
 
 To help interpret this, we can represent the eigenvectors in terms of a sum
 of the single particle states.
 
-.. GENERATED FROM PYTHON SOURCE LINES 147-167
+.. GENERATED FROM PYTHON SOURCE LINES 143-163
 
 .. code-block:: Python
 
@@ -319,7 +315,7 @@ of the single particle states.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 168-173
+.. GENERATED FROM PYTHON SOURCE LINES 164-169
 
 For :math:`U \gg t` the ground state maximizes its magnetic exchange
 energy saving. In the :math:`U \ll t` condition the ground state maximizes
@@ -327,7 +323,7 @@ its kinetic energy saving. Since both states share the same parity, the
 cross-over between them is smooth. This type of physics is at play in current
 research on quantum materials [1]_ [2]_.
 
-.. GENERATED FROM PYTHON SOURCE LINES 175-179
+.. GENERATED FROM PYTHON SOURCE LINES 171-175
 
 .. rubric:: Footnotes
 
@@ -337,7 +333,7 @@ research on quantum materials [1]_ [2]_.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.064 seconds)
+   **Total running time of the script:** (0 minutes 0.089 seconds)
 
 
 .. _sphx_glr_download_auto_examples_example_06_Hubbard_dimer.py:

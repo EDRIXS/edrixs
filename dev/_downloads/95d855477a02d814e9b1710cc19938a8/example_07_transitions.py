@@ -83,16 +83,12 @@ excitedstate_vector = get_eigenvector(orbital_index, 1)
 # polarization. Correspondingly, we have
 #
 #      .. math::
-#        \begin{equation}
-#        \mathcal{F}=\sum_n\langle f|D|n\rangle\langle n|D^{\dagger}|g\rangle
-#        \end{equation}.
+#        \mathcal{F}=\sum_n\langle f|D|n\rangle\langle n|D^{\dagger}|g\rangle.
 #
 # In matrix form this is
 #
 #      .. math::
-#        \begin{equation}
-#        \mathcal{F}(m,n)=\{f^{\dagger} \cdot D(m)\} \cdot \{D^{\dagger}(n) \cdot g\}
-#        \end{equation}.
+#        \mathcal{F}(m,n)=\{f^{\dagger} \cdot D(m)\} \cdot \{D^{\dagger}(n) \cdot g\}.
 
 D_Tmat = edrixs.get_trans_oper('dp32')
 

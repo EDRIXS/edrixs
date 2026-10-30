@@ -15,13 +15,11 @@ that one might not anticipate. Our example is based on a :math:`d` atomic shell.
 # The Coulomb interaction between two particles can be written as
 #
 #   .. math::
-#     \begin{equation}
 #     \hat{H} = \frac{1}{2}
 #     \int d\mathbf{r} \int d\mathbf{r}^\prime
 #     \Sigma_{\sigma, \sigma^\prime}
 #     |\hat{\psi}^\sigma(\mathbf{r})|^2 \frac{e^2}{R}
 #     |\hat{\psi}^{\sigma^\prime}(\mathbf{r^\prime})|^2,
-#     \end{equation}
 #
 # where :math:`\hat{\psi}^\sigma(\mathbf{r})` is the electron wavefunction, with
 # spin :math:`\sigma`, and :math:`R=|r-r^\prime|` is the electron separation.
@@ -32,13 +30,11 @@ that one might not anticipate. Our example is based on a :math:`d` atomic shell.
 # a tensor :math:`U`
 #
 #   .. math::
-#     \begin{equation}
 #     \hat{H} = \sum_{\alpha,\beta,\delta,\gamma,\sigma,\sigma^\prime}
 #     U_{\alpha\sigma,\beta\sigma^\prime,\delta\sigma^\prime,\gamma\sigma}
 #     \hat{f}^{\dagger}_{\alpha\sigma}
 #     \hat{f}^{\dagger}_{\beta\sigma^\prime}
 #     \hat{f}_{\gamma\sigma^\prime}\hat{f}_{\delta\sigma},
-#     \end{equation}
 #
 # where :math:`\alpha`, :math:`\beta`, :math:`\gamma`, :math:`\delta` are
 # orbital indices and :math:`\hat{f}^{\dagger}`
@@ -76,20 +72,16 @@ umat_chb = edrixs.get_umat_slater('d', F0, F2, F4)
 # The first are the Racah parameters, which are
 #
 #   .. math::
-#     \begin{eqnarray}
-#     A &=& F^0 - \frac{49}{441} F^4 \\
-#     B &=& \frac{1}{49}F^2 - \frac{5}{441}F^4 \\
-#     C &=& \frac{35}{441}F^4.
-#     \end{eqnarray}
+#     A &= F^0 - \frac{49}{441} F^4 \\
+#     B &= \frac{1}{49}F^2 - \frac{5}{441}F^4 \\
+#     C &= \frac{35}{441}F^4.
 #
 # or an alternative form for the Slater integrals
 #
 #   .. math::
-#     \begin{eqnarray}
-#     F_0 &=& F^0  \\
-#     F_2 &=& \frac{1}{49}F^2 \\
-#     F_4 &=& \frac{1}{441}F^4,
-#     \end{eqnarray}
+#     F_0 &= F^0  \\
+#     F_2 &= \frac{1}{49}F^2 \\
+#     F_4 &= \frac{1}{441}F^4,
 #
 # which involves different normalization parameters.
 # EDRIXS converts between the Slater integrals and Racah parameters in both
@@ -120,11 +112,9 @@ orbitals = ['3z^2-r^2', 'xz', 'yz', 'x^2-y^2', 'xy']
 # elements
 #
 #   .. math::
-#     \begin{equation}
 #     \langle\psi_{\gamma,\delta}^{\bar{\sigma},\bar{\sigma}^\prime}
 #     |\hat{H}|
 #     \psi_{\alpha,\beta}^{\sigma,\sigma^\prime}\rangle
-#     \end{equation}
 #
 # the combination of which defines the energetic cost of pairwise
 # electron-electron interactions between states :math:`\alpha,\sigma`
@@ -143,12 +133,10 @@ orbitals = ['3z^2-r^2', 'xz', 'yz', 'x^2-y^2', 'xy']
 # of the process :math:`U` always obeys
 #
 #   .. math::
-#     \begin{equation}
 #     U_{\alpha\sigma,\beta\sigma^\prime,\gamma\sigma^\prime,\delta\sigma} =
 #     U_{\beta\sigma,\alpha\sigma^\prime,\delta\sigma^\prime,\gamma\sigma} =
 #     U_{\delta\sigma,\gamma\sigma^\prime,\beta\sigma^\prime,\alpha\sigma} =
 #     U_{\gamma\sigma,\delta\sigma^\prime,\alpha\sigma^\prime,\beta\sigma}.
-#     \end{equation}
 #
 #
 # 1. Intra orbital
@@ -161,10 +149,8 @@ orbitals = ['3z^2-r^2', 'xz', 'yz', 'x^2-y^2', 'xy']
 # elements are the same and equal to
 #
 #   .. math::
-#     \begin{eqnarray}
-#     U_0 &=& \frac{A}{2} + 2B + \frac{3C}{2}\\
-#         &=& \frac{F_0}{2} + 2F_2 + 18F_4
-#     \end{eqnarray}
+#     U_0 &= \frac{A}{2} + 2B + \frac{3C}{2}\\
+#         &= \frac{F_0}{2} + 2F_2 + 18F_4
 #
 # Let's print these to demonstrate where these live in the array
 for i in range(0, 5):
@@ -213,12 +199,10 @@ for i, j in itertools.combinations(range(5), 2):
 # orbitals like
 #
 #   .. math::
-#     \begin{equation}
 #     U_{\alpha\sigma, \gamma\sigma', \beta\sigma', \gamma\sigma} \\
 #     U_{\alpha\sigma, \gamma\sigma', \gamma\sigma', \beta\sigma} \\
 #     (1-\delta_{\sigma\sigma'})
 #     U_{\alpha\sigma, \beta\sigma', \gamma\sigma', \gamma\sigma}
-#     \end{equation}
 #
 # for :math:`\alpha=3z^2-r^2, \beta=x^2-y^2, \gamma=xz/yz`.
 # These are needed to maintain the rotational symmetry of the interations.

@@ -26,20 +26,18 @@ to clarify the form of the matrices, how they are parametrized,
 and how the breaking of spherical symmetry can switch on additional elements
 that one might not anticipate. Our example is based on a :math:`d` atomic shell.
 
-.. GENERATED FROM PYTHON SOURCE LINES 13-54
+.. GENERATED FROM PYTHON SOURCE LINES 13-50
 
 Create matrix
 ------------------------------------------------------------------------------
 The Coulomb interaction between two particles can be written as
 
   .. math::
-    \begin{equation}
     \hat{H} = \frac{1}{2}
     \int d\mathbf{r} \int d\mathbf{r}^\prime
     \Sigma_{\sigma, \sigma^\prime}
     |\hat{\psi}^\sigma(\mathbf{r})|^2 \frac{e^2}{R}
     |\hat{\psi}^{\sigma^\prime}(\mathbf{r^\prime})|^2,
-    \end{equation}
 
 where :math:`\hat{\psi}^\sigma(\mathbf{r})` is the electron wavefunction, with
 spin :math:`\sigma`, and :math:`R=|r-r^\prime|` is the electron separation.
@@ -50,13 +48,11 @@ particle exchange statistics and write the equation in terms of
 a tensor :math:`U`
 
   .. math::
-    \begin{equation}
     \hat{H} = \sum_{\alpha,\beta,\delta,\gamma,\sigma,\sigma^\prime}
     U_{\alpha\sigma,\beta\sigma^\prime,\delta\sigma^\prime,\gamma\sigma}
     \hat{f}^{\dagger}_{\alpha\sigma}
     \hat{f}^{\dagger}_{\beta\sigma^\prime}
     \hat{f}_{\gamma\sigma^\prime}\hat{f}_{\delta\sigma},
-    \end{equation}
 
 where :math:`\alpha`, :math:`\beta`, :math:`\gamma`, :math:`\delta` are
 orbital indices and :math:`\hat{f}^{\dagger}`
@@ -70,7 +66,7 @@ For a :math:`d`-electron system, we have :math:`10` distinct spin-orbitals
 :math:`10\times10\times10\times10` in total size.
 In EDRIXS the matrix can be created as follows:
 
-.. GENERATED FROM PYTHON SOURCE LINES 54-61
+.. GENERATED FROM PYTHON SOURCE LINES 50-57
 
 .. code-block:: Python
 
@@ -88,12 +84,12 @@ In EDRIXS the matrix can be created as follows:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 62-64
+.. GENERATED FROM PYTHON SOURCE LINES 58-60
 
 We stored this under variable :code:`umat_chb` where "chb" stands for
 complex harmonic basis, which is the default basis in EDRIXS.
 
-.. GENERATED FROM PYTHON SOURCE LINES 66-98
+.. GENERATED FROM PYTHON SOURCE LINES 62-90
 
 Parameterizing interactions
 ------------------------------------------------------------------------------
@@ -108,27 +104,23 @@ constructs the required matrix via Gaunt coefficients from
 The first are the Racah parameters, which are
 
   .. math::
-    \begin{eqnarray}
-    A &=& F^0 - \frac{49}{441} F^4 \\
-    B &=& \frac{1}{49}F^2 - \frac{5}{441}F^4 \\
-    C &=& \frac{35}{441}F^4.
-    \end{eqnarray}
+    A &= F^0 - \frac{49}{441} F^4 \\
+    B &= \frac{1}{49}F^2 - \frac{5}{441}F^4 \\
+    C &= \frac{35}{441}F^4.
 
 or an alternative form for the Slater integrals
 
   .. math::
-    \begin{eqnarray}
-    F_0 &=& F^0  \\
-    F_2 &=& \frac{1}{49}F^2 \\
-    F_4 &=& \frac{1}{441}F^4,
-    \end{eqnarray}
+    F_0 &= F^0  \\
+    F_2 &= \frac{1}{49}F^2 \\
+    F_4 &= \frac{1}{441}F^4,
 
 which involves different normalization parameters.
 EDRIXS converts between the Slater integrals and Racah parameters in both
 directions with :func:`~edrixs.utils.F0F2F4_to_ABC` and
 :func:`~edrixs.utils.ABC_to_F0F2F4`:
 
-.. GENERATED FROM PYTHON SOURCE LINES 98-105
+.. GENERATED FROM PYTHON SOURCE LINES 90-97
 
 .. code-block:: Python
 
@@ -146,7 +138,7 @@ directions with :func:`~edrixs.utils.F0F2F4_to_ABC` and
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 106-113
+.. GENERATED FROM PYTHON SOURCE LINES 98-105
 
 Basis transform
 ------------------------------------------------------------------------------
@@ -156,7 +148,7 @@ transformation, which imposes the following orbital order
 :math:`\uparrow, \downarrow` spin pairs. Let's perform this transformation and
 store a list of these orbitals.
 
-.. GENERATED FROM PYTHON SOURCE LINES 113-116
+.. GENERATED FROM PYTHON SOURCE LINES 105-108
 
 .. code-block:: Python
 
@@ -170,7 +162,7 @@ store a list of these orbitals.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 117-170
+.. GENERATED FROM PYTHON SOURCE LINES 109-156
 
 Interactions
 ------------------------------------------------------------------------------
@@ -178,11 +170,9 @@ Tensor :math:`U` is a  series of matrix
 elements
 
   .. math::
-    \begin{equation}
     \langle\psi_{\gamma,\delta}^{\bar{\sigma},\bar{\sigma}^\prime}
     |\hat{H}|
     \psi_{\alpha,\beta}^{\sigma,\sigma^\prime}\rangle
-    \end{equation}
 
 the combination of which defines the energetic cost of pairwise
 electron-electron interactions between states :math:`\alpha,\sigma`
@@ -201,12 +191,10 @@ the Coulomb interaction is real, and due to the spin symmetry properties
 of the process :math:`U` always obeys
 
   .. math::
-    \begin{equation}
     U_{\alpha\sigma,\beta\sigma^\prime,\gamma\sigma^\prime,\delta\sigma} =
     U_{\beta\sigma,\alpha\sigma^\prime,\delta\sigma^\prime,\gamma\sigma} =
     U_{\delta\sigma,\gamma\sigma^\prime,\beta\sigma^\prime,\alpha\sigma} =
     U_{\gamma\sigma,\delta\sigma^\prime,\alpha\sigma^\prime,\beta\sigma}.
-    \end{equation}
 
 
 1. Intra orbital
@@ -219,14 +207,12 @@ over all opposite spin pairs. Due to rotational symmetry, all these
 elements are the same and equal to
 
   .. math::
-    \begin{eqnarray}
-    U_0 &=& \frac{A}{2} + 2B + \frac{3C}{2}\\
-        &=& \frac{F_0}{2} + 2F_2 + 18F_4
-    \end{eqnarray}
+    U_0 &= \frac{A}{2} + 2B + \frac{3C}{2}\\
+        &= \frac{F_0}{2} + 2F_2 + 18F_4
 
 Let's print these to demonstrate where these live in the array
 
-.. GENERATED FROM PYTHON SOURCE LINES 170-174
+.. GENERATED FROM PYTHON SOURCE LINES 156-160
 
 .. code-block:: Python
 
@@ -251,7 +237,7 @@ Let's print these to demonstrate where these live in the array
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 175-182
+.. GENERATED FROM PYTHON SOURCE LINES 161-168
 
 2. Inter orbital Coulomb interactions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -261,7 +247,7 @@ Expressions for these parameters are provided in column :math:`U` in
 :ref:`table_2_orbital`. We can print the values from :code:`umat`
 like this:
 
-.. GENERATED FROM PYTHON SOURCE LINES 182-186
+.. GENERATED FROM PYTHON SOURCE LINES 168-172
 
 .. code-block:: Python
 
@@ -291,7 +277,7 @@ like this:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 187-193
+.. GENERATED FROM PYTHON SOURCE LINES 173-179
 
 3. Inter-orbital exchange interactions
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -300,7 +286,7 @@ Exchange terms exist with the form
 Expressions for these parameters are provided in column :math:`J` of
 :ref:`table_2_orbital`. These come from terms like this in the matrix:
 
-.. GENERATED FROM PYTHON SOURCE LINES 193-197
+.. GENERATED FROM PYTHON SOURCE LINES 179-183
 
 .. code-block:: Python
 
@@ -330,7 +316,7 @@ Expressions for these parameters are provided in column :math:`J` of
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 198-205
+.. GENERATED FROM PYTHON SOURCE LINES 184-191
 
 4. Pair hopping term
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -340,7 +326,7 @@ and depend on exchange interactions column :math:`J` from
 :ref:`table_2_orbital`
 and here in the matrix.
 
-.. GENERATED FROM PYTHON SOURCE LINES 205-209
+.. GENERATED FROM PYTHON SOURCE LINES 191-195
 
 .. code-block:: Python
 
@@ -370,7 +356,7 @@ and here in the matrix.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 210-227
+.. GENERATED FROM PYTHON SOURCE LINES 196-211
 
 5. Three orbital
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -378,19 +364,17 @@ Another set of terms that one might not immediately anticipate involve three
 orbitals like
 
   .. math::
-    \begin{equation}
     U_{\alpha\sigma, \gamma\sigma', \beta\sigma', \gamma\sigma} \\
     U_{\alpha\sigma, \gamma\sigma', \gamma\sigma', \beta\sigma} \\
     (1-\delta_{\sigma\sigma'})
     U_{\alpha\sigma, \beta\sigma', \gamma\sigma', \gamma\sigma}
-    \end{equation}
 
 for :math:`\alpha=3z^2-r^2, \beta=x^2-y^2, \gamma=xz/yz`.
 These are needed to maintain the rotational symmetry of the interations.
 See :ref:`table_3_orbital` for the expressions. We can print some of
 these via:
 
-.. GENERATED FROM PYTHON SOURCE LINES 227-239
+.. GENERATED FROM PYTHON SOURCE LINES 211-223
 
 .. code-block:: Python
 
@@ -424,7 +408,7 @@ these via:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 240-245
+.. GENERATED FROM PYTHON SOURCE LINES 224-229
 
 6. Four orbital
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -432,7 +416,7 @@ Further multi-orbital terms include
 :math:`U_{\alpha\sigma,\beta\sigma^\prime,\gamma\sigma^\prime,\delta\sigma}`.
 We can find these here in the matrix:
 
-.. GENERATED FROM PYTHON SOURCE LINES 245-261
+.. GENERATED FROM PYTHON SOURCE LINES 229-245
 
 .. code-block:: Python
 
@@ -474,7 +458,7 @@ We can find these here in the matrix:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 262-268
+.. GENERATED FROM PYTHON SOURCE LINES 246-252
 
 Effects of multi-orbital terms
 ------------------------------------------------------------------------------
@@ -483,7 +467,7 @@ spectra with and without multi-orbital terms switched on for systems with and
 without a cubic crystal field. We will use a :math:`d`-shell with two
 electrons.
 
-.. GENERATED FROM PYTHON SOURCE LINES 268-302
+.. GENERATED FROM PYTHON SOURCE LINES 252-286
 
 .. code-block:: Python
 
@@ -533,7 +517,7 @@ electrons.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 303-392
+.. GENERATED FROM PYTHON SOURCE LINES 287-376
 
 On the left of the plot Coulomb interactions in spherical symmetry cause
 substantial mixing between :math:`t_{2g}` and :math:`e_{g}` orbitals in the
@@ -628,7 +612,7 @@ terms are included or not.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.144 seconds)
+   **Total running time of the script:** (0 minutes 0.196 seconds)
 
 
 .. _sphx_glr_download_auto_examples_example_09_Coulomb.py:

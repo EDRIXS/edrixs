@@ -121,7 +121,7 @@ Below are some examples illustrating the concepts behind and usage of EDRIXS.
 
 .. raw:: html
 
-    <div class="sphx-glr-thumbcontainer" tooltip="  .. math::     \begin{equation}     \hat{H} = \sum_{i,j}  \sum_{\sigma} t_{i,j} \hat{f}^{\dagger}_{i,\sigma} \hat{f}_{j, \sigma}     + U \sum_{i} \hat{n}_{i,\uparrow}\hat{n}_{i,\downarrow},     \end{equation}">
+    <div class="sphx-glr-thumbcontainer" tooltip="  .. math::     \hat{H} = \sum_{i,j}  \sum_{\sigma} t_{i,j} \hat{f}^{\dagger}_{i,\sigma} \hat{f}_{j, \sigma}     + U \sum_{i} \hat{n}_{i,\uparrow}\hat{n}_{i,\downarrow},">
 
 .. only:: html
 
