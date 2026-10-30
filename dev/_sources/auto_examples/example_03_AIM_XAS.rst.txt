@@ -410,22 +410,27 @@ be supplied through :func:`~edrixs.models.model_siam`.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 203-211
+.. GENERATED FROM PYTHON SOURCE LINES 203-216
 
 Diagonalization
 ------------------------------------------------------------------------------
-:func:`~edrixs.solvers.get_ops` converts these backend-independent
-ingredients into many-body initial/final and intermediate Hamiltonians, plus
-the dipole operators that map the initial Fock space to the intermediate one.
-Here we
-select the SciPy backend, which represents the Hamiltonians as sparse matrices
-and extracts the lowest eigenpairs on a single process.
+:func:`~edrixs.solvers.get_ops` converts these backend-independent ingredients into
+many-body initial/final and intermediate Hamiltonians, plus the dipole
+operators that map the initial Fock space to the intermediate one. Here we
+select the PETSc backend, which stores the Hamiltonians as distributed
+sparse matrices and uses SLEPc to extract the lowest eigenpairs. This scales
+to the larger Hilbert spaces typical of Anderson impurity models and runs in
+parallel if the script is launched with::
 
-.. GENERATED FROM PYTHON SOURCE LINES 211-217
+       mpirun -n <number of processors> python example_03_AIM_XAS.py
+
+Running it as a plain :code:`python` script also works, it is just slower.
+
+.. GENERATED FROM PYTHON SOURCE LINES 216-222
 
 .. code-block:: Python
 
-    backend = 'scipy'
+    backend = 'petsc'
     hmat_i, hmat_n, trans_ops = edrixs.get_ops(
         emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
         backend=backend,
@@ -438,17 +443,17 @@ and extracts the lowest eigenpairs on a single process.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 218-221
+.. GENERATED FROM PYTHON SOURCE LINES 223-226
 
 :func:`~edrixs.solvers.ed` obtains the retained low-energy eigenpairs of the
 Hamiltonian without a core hole. Here :code:`num_evals=3` states are
 thermally populated at the temperature of interest.
 
-.. GENERATED FROM PYTHON SOURCE LINES 221-223
+.. GENERATED FROM PYTHON SOURCE LINES 226-228
 
 .. code-block:: Python
 
-    eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=3, backend=backend)
+    eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=3)
 
 
 
@@ -457,7 +462,7 @@ thermally populated at the temperature of interest.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 224-232
+.. GENERATED FROM PYTHON SOURCE LINES 229-237
 
 Compute XAS
 ------------------------------------------------------------------------------
@@ -468,14 +473,14 @@ factors at :code:`temperature`. Because our model includes hybridization,
 the spectrum captures charge-transfer processes in which electrons move
 between the O bath and the Ni impurity.
 
-.. GENERATED FROM PYTHON SOURCE LINES 232-238
+.. GENERATED FROM PYTHON SOURCE LINES 237-243
 
 .. code-block:: Python
 
     xas = edrixs.xas(
         eval_i, evec_i, hmat_n, trans_ops, ominc_xas,
         gamma_c=gamma_c, thin=thin, phi=phi, pol_type=poltype_xas,
-        temperature=temperature, backend=backend,
+        temperature=temperature,
     )
 
 
@@ -485,12 +490,12 @@ between the O bath and the Ni impurity.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 239-241
+.. GENERATED FROM PYTHON SOURCE LINES 244-246
 
 Let's plot the data and save it just in case. The returned array has shape
 :code:`(len(ominc_xas), len(poltype_xas))`.
 
-.. GENERATED FROM PYTHON SOURCE LINES 241-252
+.. GENERATED FROM PYTHON SOURCE LINES 246-257
 
 .. code-block:: Python
 
@@ -517,7 +522,7 @@ Let's plot the data and save it just in case. The returned array has shape
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 253-261
+.. GENERATED FROM PYTHON SOURCE LINES 258-266
 
 .. rubric:: Footnotes
 
@@ -531,7 +536,7 @@ Let's plot the data and save it just in case. The returned array has shape
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.166 seconds)
+   **Total running time of the script:** (0 minutes 1.551 seconds)
 
 
 .. _sphx_glr_download_auto_examples_example_03_AIM_XAS.py:

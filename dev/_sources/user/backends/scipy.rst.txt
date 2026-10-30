@@ -11,8 +11,15 @@ About this backend
 
 The ``scipy`` backend builds operators as SciPy
 `CSR matrices <https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html>`__.
-The solver stages also accept a NumPy array, a SciPy sparse matrix, or a
-matrix-free
+``build_op`` and ``get_ops`` return labeled factories that construct these
+matrices when called. Pass the factories to public ``ed``, ``xas``, and ``rixs``;
+the primary Hamiltonian's ``.backend`` label selects SciPy. The backend calls
+each supplied factory at calculation start, including repeated arguments.
+See :ref:`lazy-operators`.
+
+The backend-specific ``ed_scipy``, ``xas_scipy``, and ``rixs_scipy`` functions
+also require factories. These can return NumPy arrays, SciPy sparse matrices,
+or a matrix-free
 `LinearOperator <https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html>`__.
 ED uses SciPy's
 `LOBPCG eigensolver <https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.lobpcg.html>`__;
@@ -54,3 +61,7 @@ eigensolver tolerance accepted by ``ed``.
 ========
 
 .. backend-options:: scipy rixs
+
+``linsys_tol`` sets GMRES's relative tolerance, passed as ``rtol`` (or ``tol``
+in older SciPy). With the ``rtol`` API, EDRIXS sets the absolute tolerance
+``atol`` to zero.

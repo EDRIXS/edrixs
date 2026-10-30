@@ -43,6 +43,8 @@ and activate the build environment::
     mamba create --name edrixs_env -c conda-forge --strict-channel-priority \
         python=3.14 "numpy>=2" scipy sympy matplotlib mpi4py \
         "arpack=*=mpi_openmpi*" openmpi gfortran \
+        "petsc=*=complex_*" petsc4py \
+        "slepc=*=complex_*" slepc4py \
         "libblas=*=*openblas" cmake ninja numba pip setuptools wheel \
         sphinx ipython numpydoc pillow sphinx-copybutton sphinx-gallery \
         sphinx_rtd_theme pytest
@@ -76,6 +78,10 @@ requirements. The supported versions and required components are:
      ``mpif90`` and ``mpicc`` wrappers are used in the recommended environment
    * mpi4py 4 or newer, built with the same MPI implementation used to build
      edrixs
+   * PETSc and SLEPc built for double-precision complex scalars
+     (``complex128``), together with petsc4py and slepc4py. The
+     ``*=complex_*`` package specifications select these complex conda-forge
+     builds.
    * BLAS and LAPACK; OpenBLAS 0.3 is used in the recommended environment
    * `ARPACK-NG <https://github.com/opencollab/arpack-ng/>`_ 3.9 or newer,
      built with MPI support

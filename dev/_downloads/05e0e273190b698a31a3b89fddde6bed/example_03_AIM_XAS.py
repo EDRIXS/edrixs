@@ -202,13 +202,18 @@ emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat, shift = out
 ################################################################################
 # Diagonalization
 # ------------------------------------------------------------------------------
-# :func:`~edrixs.solvers.get_ops` converts these backend-independent
-# ingredients into many-body initial/final and intermediate Hamiltonians, plus
-# the dipole operators that map the initial Fock space to the intermediate one.
-# Here we
-# select the SciPy backend, which represents the Hamiltonians as sparse matrices
-# and extracts the lowest eigenpairs on a single process.
-backend = 'scipy'
+# :func:`~edrixs.solvers.get_ops` converts these backend-independent ingredients into
+# many-body initial/final and intermediate Hamiltonians, plus the dipole
+# operators that map the initial Fock space to the intermediate one. Here we
+# select the PETSc backend, which stores the Hamiltonians as distributed
+# sparse matrices and uses SLEPc to extract the lowest eigenpairs. This scales
+# to the larger Hilbert spaces typical of Anderson impurity models and runs in
+# parallel if the script is launched with::
+#
+#        mpirun -n <number of processors> python example_03_AIM_XAS.py
+#
+# Running it as a plain :code:`python` script also works, it is just slower.
+backend = 'petsc'
 hmat_i, hmat_n, trans_ops = edrixs.get_ops(
     emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
     backend=backend,
@@ -218,7 +223,7 @@ hmat_i, hmat_n, trans_ops = edrixs.get_ops(
 # :func:`~edrixs.solvers.ed` obtains the retained low-energy eigenpairs of the
 # Hamiltonian without a core hole. Here :code:`num_evals=3` states are
 # thermally populated at the temperature of interest.
-eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=3, backend=backend)
+eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=3)
 
 ################################################################################
 # Compute XAS
@@ -232,7 +237,7 @@ eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=3, backend=backend)
 xas = edrixs.xas(
     eval_i, evec_i, hmat_n, trans_ops, ominc_xas,
     gamma_c=gamma_c, thin=thin, phi=phi, pol_type=poltype_xas,
-    temperature=temperature, backend=backend,
+    temperature=temperature,
 )
 
 ################################################################################

@@ -115,7 +115,7 @@ This problem is tiny, so we use the :code:`'dense'` backend.
             emat = emat + extra_emat
 
         H = edrixs.build_op(emat, umat, basis, backend='dense')
-        e, v = edrixs.ed(H, num_evals=len(basis), backend='dense')
+        e, v = edrixs.ed(H, num_evals=len(basis))
         return e, v
 
 
@@ -167,7 +167,7 @@ Hamiltonian and the previous example.
     spin_mom = np.zeros((3, norb, norb), dtype=np.complex128)
     spin_mom[:, :2, :2] = spin_mom[:, 2:, 2:] = spin_mom_one_site
 
-    opS = [edrixs.build_op(component, None, basis, backend='dense')
+    opS = [edrixs.build_op(component, None, basis, backend='dense')()
            for component in spin_mom]
     opS_squared = (np.dot(opS[0], opS[0]) + np.dot(opS[1], opS[1])
                    + np.dot(opS[2], opS[2]))
@@ -337,7 +337,7 @@ research on quantum materials [1]_ [2]_.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.048 seconds)
+   **Total running time of the script:** (0 minutes 0.086 seconds)
 
 
 .. _sphx_glr_download_auto_examples_example_06_Hubbard_dimer.py:

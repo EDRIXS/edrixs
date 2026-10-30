@@ -9,6 +9,9 @@ This example uses :func:`~edrixs.models.model_siam_2d1p` to calculate Ni
 contains a correlated Ni :math:`3d` shell and one bath site representing ten
 symmetry-adapted O :math:`2p` ligand spin-orbitals. Hybridization allows the
 calculation to include ligand-to-metal charge-transfer configurations.
+The distributed PETSc/SLEPc backend is used for the many-body operators and
+solvers. The example runs on one process during the documentation build, or it
+can be run in parallel with ``mpirun``.
 
 The nominal impurity occupancy is ``nd=8``. The wrapper fixes one full
 bath, so the initial valence sector contains 18 electrons; the intermediate

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>edrixs.models &mdash; EDRIXS 0.post1+gf1f06c7 documentation</title>
+  <title>edrixs.models &mdash; EDRIXS 0.post1+g846835b documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -19,7 +19,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=62ebc182"></script>
+      <script src="../../_static/documentation_options.js?v=226246b0"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -176,7 +176,7 @@
 <span class="sd">        ``c_norb * shell_level[1]`` (zero if unspecified), excluding Coulomb</span>
 <span class="sd">        contributions.</span>
 <span class="sd">        Pass the first seven outputs to :func:`~edrixs.solvers.get_ops` and</span>
-<span class="sd">        ``shift`` to dense or SciPy :func:`~edrixs.solvers.ed`.</span>
+<span class="sd">        ``shift`` to dense, SciPy, or PETSc :func:`~edrixs.solvers.ed`.</span>
 <span class="sd">        The returned integrals retain the full, unshifted energies.</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
@@ -443,8 +443,8 @@
 <span class="sd">    shift : float</span>
 <span class="sd">        Filled core shell-level energy, ``c_norb * shell_level[2]`` (zero if</span>
 <span class="sd">        unspecified), excluding Coulomb contributions. Pass the first seven</span>
-<span class="sd">        outputs to :func:`~edrixs.solvers.get_ops` and ``shift`` to dense or</span>
-<span class="sd">        SciPy :func:`~edrixs.solvers.ed`. Integrals remain unshifted.</span>
+<span class="sd">        outputs to :func:`~edrixs.solvers.get_ops` and ``shift`` to dense, SciPy, or</span>
+<span class="sd">        PETSc :func:`~edrixs.solvers.ed`. Integrals remain unshifted.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -676,7 +676,8 @@
 <span class="sd">    is the setup analogue of :func:`~edrixs.solvers.ed_siam_fort` at fixed</span>
 <span class="sd">    ``v_noccu``; it does not search over occupancies, build many-body</span>
 <span class="sd">    Hamiltonians, or diagonalize them. Pass the returned tuple to</span>
-<span class="sd">    :func:`~edrixs.solvers.get_ops` to construct the many-body operators.</span>
+<span class="sd">    :func:`~edrixs.solvers.get_ops` to construct the many-body operators</span>
+<span class="sd">    with the SciPy, dense, or PETSc backend.</span>
 
 <span class="sd">    All energies, Slater integrals, hybridizations, spin-orbit coupling</span>
 <span class="sd">    constants, and magnetic-field components are in eV. Let ``v_norb`` and</span>
@@ -817,7 +818,7 @@
 <span class="sd">    shift : float</span>
 <span class="sd">        Filled core shell-level energy, ``c_norb * c_level``, excluding</span>
 <span class="sd">        Coulomb contributions. Pass the first seven outputs to</span>
-<span class="sd">        :func:`~edrixs.solvers.get_ops` and ``shift`` to dense or SciPy</span>
+<span class="sd">        :func:`~edrixs.solvers.get_ops` and ``shift`` to dense, SciPy, or PETSc</span>
 <span class="sd">        :func:`~edrixs.solvers.ed`. Integrals remain unshifted.</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
@@ -1053,8 +1054,8 @@
 <span class="sd">    -------</span>
 <span class="sd">    emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat, shift</span>
 <span class="sd">        The eight model_siam outputs. Pass the first seven to</span>
-<span class="sd">        :func:`~edrixs.solvers.get_ops` and the final ``shift`` to dense or</span>
-<span class="sd">        SciPy :func:`~edrixs.solvers.ed`. Here ``shift = 6 * (-om_shift - 5*E_p)``;</span>
+<span class="sd">        :func:`~edrixs.solvers.get_ops` and the final ``shift`` to dense, SciPy, or</span>
+<span class="sd">        PETSc :func:`~edrixs.solvers.ed`. Here ``shift = 6 * (-om_shift - 5*E_p)``;</span>
 <span class="sd">        it excludes Coulomb contributions and does not alter the integrals. One-body</span>
 <span class="sd">        matrices both have shape (26, 26) and use complex spherical</span>
 <span class="sd">        harmonics. Basis metadata fixes initial valence occupancy to nd+10,</span>

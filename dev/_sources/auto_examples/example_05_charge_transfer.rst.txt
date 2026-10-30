@@ -52,7 +52,7 @@ The first step repeats what was done in
 :ref:`sphx_glr_auto_examples_example_04_GS_analysis.py` but removes
 the hybridization between the impurity and bath states.
 
-.. GENERATED FROM PYTHON SOURCE LINES 24-36
+.. GENERATED FROM PYTHON SOURCE LINES 24-40
 
 .. code-block:: Python
 
@@ -61,36 +61,31 @@ the hybridization between the impurity and bath states.
     emat_i[:norb_d, norb_d:(norb_d + nbath*norb_d)] = 0
     emat_i[norb_d:(norb_d + nbath*norb_d), :norb_d] = 0
 
-    backend = 'scipy'
+    backend = 'petsc'
     hmat_i = edrixs.build_op(emat_i, umat_i, basis_i, backend=backend)
-    eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=len(basis_i), backend=backend)
+    eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=len(basis_i))
     eval_i = eval_i - eval_i.min()
 
-    nd_expect = np.sum(evec_i.conj() * (O @ evec_i), axis=0).real
+    work = O.createVecLeft()
+    nd_expect = np.empty(len(evec_i))
+    for k, psi in enumerate(evec_i):
+        O.mult(psi, work)
+        nd_expect[k] = work.dot(psi).real
 
 
 
 
 
-.. rst-class:: sphx-glr-script-out
-
- .. code-block:: none
-
-    /home/runner/micromamba/envs/build-env/lib/python3.12/site-packages/edrixs/scipy_backend/scipy_backend.py:98: UserWarning: The problem size 190 minus the constraints size 0 is too small relative to the block size 190. Using a dense eigensolver instead of LOBPCG iterations.No output of the history of the iterations.
-      eigenvalues, eigenvectors = lobpcg(
-    /home/runner/micromamba/envs/build-env/lib/python3.12/site-packages/edrixs/scipy_backend/scipy_backend.py:98: UserWarning: The problem size 190 minus the constraints size 0 is too small relative to the block size 190. Using a dense eigensolver instead of LOBPCG iterations.No output of the history of the iterations.
-      eigenvalues, eigenvectors = lobpcg(
 
 
 
-
-.. GENERATED FROM PYTHON SOURCE LINES 48-51
+.. GENERATED FROM PYTHON SOURCE LINES 52-55
 
 Energy to lowest energy ligand orbital
 ------------------------------------------------------------------------------
 Let's plot the :math:`d`-electron count of each eigenstate against its energy.
 
-.. GENERATED FROM PYTHON SOURCE LINES 51-60
+.. GENERATED FROM PYTHON SOURCE LINES 55-64
 
 .. code-block:: Python
 
@@ -115,14 +110,14 @@ Let's plot the :math:`d`-electron count of each eigenstate against its energy.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 61-65
+.. GENERATED FROM PYTHON SOURCE LINES 65-69
 
 With the hybridization turned off, the impurity and bath states no longer mix,
 so every eigenstate has an (almost) integer :math:`d` count. The charge
 transfer energy is the energy to go from the :math:`d^8` ground state to the
 lowest :math:`d^9\underline{L}` state:
 
-.. GENERATED FROM PYTHON SOURCE LINES 65-72
+.. GENERATED FROM PYTHON SOURCE LINES 69-76
 
 .. code-block:: Python
 
@@ -146,7 +141,7 @@ lowest :math:`d^9\underline{L}` state:
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 73-82
+.. GENERATED FROM PYTHON SOURCE LINES 77-86
 
 Diagonalizing by blocks
 ------------------------------------------------------------------------------
@@ -158,7 +153,7 @@ relevant sub-blocks of :code:`emat_i` and :code:`umat_i` together with a
 :class:`~edrixs.fock_basis.FockBasisSpec` fixing that block's occupancy. The
 blocks are small, so we use the dense backend.
 
-.. GENERATED FROM PYTHON SOURCE LINES 82-107
+.. GENERATED FROM PYTHON SOURCE LINES 86-111
 
 .. code-block:: Python
 
@@ -174,11 +169,11 @@ blocks are small, so we use the dense backend.
     for n_ligand_holes in [0, 1]:
         basis_d = FockBasisSpec.from_args(norb_d, nd + n_ligand_holes, norb_c, norb_c)
         Hd = edrixs.build_op(emat_d, umat_d, basis_d, backend='dense')
-        e_d = edrixs.ed(Hd, shift=shift, num_evals=1, backend='dense')[0][0]
+        e_d = edrixs.ed(Hd, shift=shift, num_evals=1)[0][0]
 
         basis_L = FockBasisSpec.from_args(norb_d, norb_d - n_ligand_holes)
         HL = edrixs.build_op(emat_i[L_block, L_block], None, basis_L, backend='dense')
-        e_L = edrixs.ed(HL, num_evals=1, backend='dense')[0][0]
+        e_L = edrixs.ed(HL, num_evals=1)[0][0]
 
         energies.append(e_d + e_L)
 
@@ -200,7 +195,7 @@ blocks are small, so we use the dense backend.
 
 
 
-.. GENERATED FROM PYTHON SOURCE LINES 108-112
+.. GENERATED FROM PYTHON SOURCE LINES 112-116
 
 .. rubric:: Footnotes
 
@@ -210,7 +205,7 @@ blocks are small, so we use the dense backend.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.098 seconds)
+   **Total running time of the script:** (0 minutes 0.190 seconds)
 
 
 .. _sphx_glr_download_auto_examples_example_05_charge_transfer.py:

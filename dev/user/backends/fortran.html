@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fortran keywords &mdash; EDRIXS 0.post1+g3cb59a0 documentation</title>
+  <title>Fortran keywords &mdash; EDRIXS 0.post1+g846835b documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=fd7cd5d2"></script>
+      <script src="../../_static/documentation_options.js?v=226246b0"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -67,6 +67,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../introduction.html">Introduction to EDRIXS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../conventions.html">Conventions</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../backend.html">Backend</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../backend.html#operator-factories-and-solver-dispatch">Operator factories and solver dispatch</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../backend.html#numerical-precision">Numerical precision</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="../backend.html#backend-keyword-reference">Backend keyword reference</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="scipy.html">SciPy keywords</a></li>
@@ -162,6 +163,10 @@ functions retain their existing explicit parameters and behavior.</p>
 current working directory, call <a class="reference internal" href="../../reference/solvers.html#edrixs.solvers.get_ops_disk" title="edrixs.solvers.get_ops_disk"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops_disk()</span></code></a>.  It
 returns <code class="docutils literal notranslate"><span class="pre">hmat_i</span></code>, <code class="docutils literal notranslate"><span class="pre">hmat_n</span></code>, and <code class="docutils literal notranslate"><span class="pre">trans_ops</span></code> handles without rewriting
 the problem files.</p>
+<p>Both <code class="docutils literal notranslate"><span class="pre">get_ops(...,</span> <span class="pre">backend='fortran')</span></code> and <code class="docutils literal notranslate"><span class="pre">get_ops_disk()</span></code> return disk
+handles with <code class="docutils literal notranslate"><span class="pre">.backend</span> <span class="pre">==</span> <span class="pre">'fortran'</span></code>. Pass them directly to public <code class="docutils literal notranslate"><span class="pre">ed</span></code>,
+<code class="docutils literal notranslate"><span class="pre">xas</span></code>, and <code class="docutils literal notranslate"><span class="pre">rixs</span></code>. The handles are callable and return themselves; the
+Fortran backends call them while native Fortran manages matrix construction.</p>
 </section>
 <section id="ed">
 <h2><code class="docutils literal notranslate"><span class="pre">ed</span></code><a class="headerlink" href="#ed" title="Link to this heading"></a></h2>

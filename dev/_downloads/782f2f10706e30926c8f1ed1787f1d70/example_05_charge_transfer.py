@@ -37,12 +37,16 @@ plt.close('all')
 emat_i[:norb_d, norb_d:(norb_d + nbath*norb_d)] = 0
 emat_i[norb_d:(norb_d + nbath*norb_d), :norb_d] = 0
 
-backend = 'scipy'
+backend = 'petsc'
 hmat_i = edrixs.build_op(emat_i, umat_i, basis_i, backend=backend)
-eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=len(basis_i), backend=backend)
+eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=len(basis_i))
 eval_i = eval_i - eval_i.min()
 
-nd_expect = np.sum(evec_i.conj() * (O @ evec_i), axis=0).real
+work = O.createVecLeft()
+nd_expect = np.empty(len(evec_i))
+for k, psi in enumerate(evec_i):
+    O.mult(psi, work)
+    nd_expect[k] = work.dot(psi).real
 
 ################################################################################
 # Energy to lowest energy ligand orbital
@@ -91,11 +95,11 @@ energies = []
 for n_ligand_holes in [0, 1]:
     basis_d = FockBasisSpec.from_args(norb_d, nd + n_ligand_holes, norb_c, norb_c)
     Hd = edrixs.build_op(emat_d, umat_d, basis_d, backend='dense')
-    e_d = edrixs.ed(Hd, shift=shift, num_evals=1, backend='dense')[0][0]
+    e_d = edrixs.ed(Hd, shift=shift, num_evals=1)[0][0]
 
     basis_L = FockBasisSpec.from_args(norb_d, norb_d - n_ligand_holes)
     HL = edrixs.build_op(emat_i[L_block, L_block], None, basis_L, backend='dense')
-    e_L = edrixs.ed(HL, num_evals=1, backend='dense')[0][0]
+    e_L = edrixs.ed(HL, num_evals=1)[0][0]
 
     energies.append(e_d + e_L)
 

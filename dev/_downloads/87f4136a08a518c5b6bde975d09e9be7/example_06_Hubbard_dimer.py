@@ -80,7 +80,7 @@ def diagonalize(U, t, extra_emat=None):
         emat = emat + extra_emat
 
     H = edrixs.build_op(emat, umat, basis, backend='dense')
-    e, v = edrixs.ed(H, num_evals=len(basis), backend='dense')
+    e, v = edrixs.ed(H, num_evals=len(basis))
     return e, v
 
 ################################################################################
@@ -99,7 +99,7 @@ spin_mom_one_site = edrixs.get_spin_momentum(ll)
 spin_mom = np.zeros((3, norb, norb), dtype=np.complex128)
 spin_mom[:, :2, :2] = spin_mom[:, 2:, 2:] = spin_mom_one_site
 
-opS = [edrixs.build_op(component, None, basis, backend='dense')
+opS = [edrixs.build_op(component, None, basis, backend='dense')()
        for component in spin_mom]
 opS_squared = (np.dot(opS[0], opS[0]) + np.dot(opS[1], opS[1])
                + np.dot(opS[2], opS[2]))

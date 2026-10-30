@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dense keywords &mdash; EDRIXS 0.post1+g3cb59a0 documentation</title>
+  <title>Dense keywords &mdash; EDRIXS 0.post1+g846835b documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=fd7cd5d2"></script>
+      <script src="../../_static/documentation_options.js?v=226246b0"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -67,6 +67,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../introduction.html">Introduction to EDRIXS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../conventions.html">Conventions</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../backend.html">Backend</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../backend.html#operator-factories-and-solver-dispatch">Operator factories and solver dispatch</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../backend.html#numerical-precision">Numerical precision</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="../backend.html#backend-keyword-reference">Backend keyword reference</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="scipy.html">SciPy keywords</a></li>
@@ -117,9 +118,13 @@
 <p><a class="reference internal" href="../backend.html"><span class="doc">Back to the backend overview</span></a></p>
 <section id="about-this-backend">
 <h2>About this backend<a class="headerlink" href="#about-this-backend" title="Link to this heading"></a></h2>
-<p>The <code class="docutils literal notranslate"><span class="pre">dense</span></code> backend constructs NumPy
+<p>The <code class="docutils literal notranslate"><span class="pre">dense</span></code> backend uses NumPy
 <a class="reference external" href="https://numpy.org/doc/stable/reference/arrays.ndarray.html">ndarray objects</a>.
-It uses SciPy’s
+<code class="docutils literal notranslate"><span class="pre">build_op</span></code> and <code class="docutils literal notranslate"><span class="pre">get_ops</span></code> return labeled factories; the matrices are built
+when a factory is called explicitly or by the dense backend at the start of
+each calculation. Each argument is called independently, including repeated
+references. Backend-specific solvers also require factories.</p>
+<p>It uses SciPy’s
 <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.eigh.html">dense Hermitian eigensolver</a>
 for ED.  XAS explicitly sums over all intermediate eigenstates, while RIXS
 explicitly sums over all intermediate and final eigenstates.  These are the

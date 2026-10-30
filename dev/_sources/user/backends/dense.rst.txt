@@ -9,8 +9,13 @@ Dense keywords
 About this backend
 ==================
 
-The ``dense`` backend constructs NumPy
+The ``dense`` backend uses NumPy
 `ndarray objects <https://numpy.org/doc/stable/reference/arrays.ndarray.html>`__.
+``build_op`` and ``get_ops`` return labeled factories; the matrices are built
+when a factory is called explicitly or by the dense backend at the start of
+each calculation. Each argument is called independently, including repeated
+references. Backend-specific solvers also require factories.
+
 It uses SciPy's
 `dense Hermitian eigensolver <https://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.eigh.html>`__
 for ED.  XAS explicitly sums over all intermediate eigenstates, while RIXS

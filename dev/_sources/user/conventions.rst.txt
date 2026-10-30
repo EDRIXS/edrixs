@@ -48,7 +48,7 @@ the construction of transition operators.
 Numerical diagonalization can lose precision when the diagonal entries have a
 large common energy offset.
 For this reason, model constructors also return an energy offset, ``shift``.
-Passing it to :func:`~edrixs.solvers.ed` with the dense or SciPy backend subtracts
+Passing it to :func:`~edrixs.solvers.ed` with the dense, SciPy, or PETSc backend subtracts
 the offset from the Hamiltonian diagonal before diagonalization and restores
 it to the returned eigenvalues. This preserves the physics while reducing
 numerical errors caused by subtracting large, nearly equal numbers.
@@ -136,10 +136,12 @@ Spectral conventions
   ``loc_axis`` (model) or ``scatter_axis`` (solver) to change this.
 * **Polarization** is given as a list of channels. For XAS, each entry is
   ``(kind, angle)`` with ``kind`` one of ``'linear'``, ``'left'``, ``'right'``
-  or ``'isotropic'`` (the last for powders). For RIXS, each entry is a 4-tuple
-  ``(in_kind, in_angle, out_kind, out_angle)``; sum the two outgoing channels
-  when the experiment does not resolve emitted polarization.
-* **Broadening** is a Lorentzian half width at half maximum. ``gamma_c`` is the
+  or ``'isotropic'`` (the last for powders).  For RIXS each entry is a 4-tuple
+  ``(in_kind, in_angle, out_kind, out_angle)``, where each kind is ``'linear'``,
+  ``'left'``, or ``'right'``; sum the two outgoing channels when the experiment
+  does not resolve emitted polarization.  ``'isotropic'`` is not supported for
+  RIXS and is rejected with a warning.
+* **Broadening** is a Lorentzian half width at half maximum.  ``gamma_c`` is the
   inverse core-hole lifetime (it dominates XAS and the incident-energy axis of
   RIXS); ``gamma_f`` is the final-state or resolution width on the RIXS
   energy-loss axis. ``gamma_c`` may be a scalar or an array with the same

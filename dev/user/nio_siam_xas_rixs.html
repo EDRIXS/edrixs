@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NiO Anderson impurity model XAS and RIXS &mdash; EDRIXS 0.post1+g3cb59a0 documentation</title>
+  <title>NiO Anderson impurity model XAS and RIXS &mdash; EDRIXS 0.post1+g846835b documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=fd7cd5d2"></script>
+      <script src="../_static/documentation_options.js?v=226246b0"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -117,7 +117,10 @@
 <span class="math notranslate nohighlight">\(L_{2,3}\)</span>-edge XAS and RIXS for a NiO Anderson impurity model. The model
 contains a correlated Ni <span class="math notranslate nohighlight">\(3d\)</span> shell and one bath site representing ten
 symmetry-adapted O <span class="math notranslate nohighlight">\(2p\)</span> ligand spin-orbitals. Hybridization allows the
-calculation to include ligand-to-metal charge-transfer configurations.</p>
+calculation to include ligand-to-metal charge-transfer configurations.
+The distributed PETSc/SLEPc backend is used for the many-body operators and
+solvers. The example runs on one process during the documentation build, or it
+can be run in parallel with <code class="docutils literal notranslate"><span class="pre">mpirun</span></code>.</p>
 <p>The nominal impurity occupancy is <code class="docutils literal notranslate"><span class="pre">nd=8</span></code>. The wrapper fixes one full
 bath, so the initial valence sector contains 18 electrons; the intermediate
 sector contains 19 valence electrons and five core electrons. The bath has
@@ -217,7 +220,7 @@ polarization, and lifetime broadening are supplied to the spectrum routines.</p>
 <span class="n">eval_i</span><span class="p">,</span> <span class="n">evec_i</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">ed</span><span class="p">(</span>
     <span class="n">hmat_i</span><span class="p">,</span> <span class="n">shift</span><span class="o">=</span><span class="n">shift</span><span class="p">,</span>
     <span class="n">num_evals</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-    <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
+
 <span class="p">)</span>
 
 <span class="c1"># Isotropic XAS</span>
@@ -233,7 +236,7 @@ polarization, and lifetime broadening are supplied to the spectrum routines.</p>
     <span class="n">phi</span><span class="o">=</span><span class="n">phi</span><span class="p">,</span>
     <span class="n">pol_type</span><span class="o">=</span><span class="p">[(</span><span class="s1">'isotropic'</span><span class="p">,</span> <span class="mi">0</span><span class="p">)],</span>
     <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-    <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
+
 <span class="p">)[:,</span> <span class="mi">0</span><span class="p">]</span>
 <span class="n">xas</span> <span class="o">/=</span> <span class="n">xas</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
 
@@ -255,7 +258,7 @@ polarization, and lifetime broadening are supplied to the spectrum routines.</p>
         <span class="p">(</span><span class="s1">'linear'</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'linear'</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span>
     <span class="p">],</span>
     <span class="n">temperature</span><span class="o">=</span><span class="n">temperature</span><span class="p">,</span>
-    <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
+
 <span class="p">)</span>
 <span class="n">rixs_spectrum</span> <span class="o">=</span> <span class="n">rixs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">rixs_spectrum</span> <span class="o">/=</span> <span class="n">rixs_spectrum</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>SciPy keywords &mdash; EDRIXS 0.post1+g3cb59a0 documentation</title>
+  <title>SciPy keywords &mdash; EDRIXS 0.post1+g846835b documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=fd7cd5d2"></script>
+      <script src="../../_static/documentation_options.js?v=226246b0"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -67,6 +67,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../introduction.html">Introduction to EDRIXS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../conventions.html">Conventions</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../backend.html">Backend</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../backend.html#operator-factories-and-solver-dispatch">Operator factories and solver dispatch</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../backend.html#numerical-precision">Numerical precision</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="../backend.html#backend-keyword-reference">Backend keyword reference</a><ul class="current">
 <li class="toctree-l4 current"><a class="current reference internal" href="#">SciPy keywords</a></li>
@@ -119,8 +120,14 @@
 <h2>About this backend<a class="headerlink" href="#about-this-backend" title="Link to this heading"></a></h2>
 <p>The <code class="docutils literal notranslate"><span class="pre">scipy</span></code> backend builds operators as SciPy
 <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.csr_matrix.html">CSR matrices</a>.
-The solver stages also accept a NumPy array, a SciPy sparse matrix, or a
-matrix-free
+<code class="docutils literal notranslate"><span class="pre">build_op</span></code> and <code class="docutils literal notranslate"><span class="pre">get_ops</span></code> return labeled factories that construct these
+matrices when called. Pass the factories to public <code class="docutils literal notranslate"><span class="pre">ed</span></code>, <code class="docutils literal notranslate"><span class="pre">xas</span></code>, and <code class="docutils literal notranslate"><span class="pre">rixs</span></code>;
+the primary Hamiltonian’s <code class="docutils literal notranslate"><span class="pre">.backend</span></code> label selects SciPy. The backend calls
+each supplied factory at calculation start, including repeated arguments.
+See <a class="reference internal" href="../backend.html#lazy-operators"><span class="std std-ref">Operator factories and solver dispatch</span></a>.</p>
+<p>The backend-specific <code class="docutils literal notranslate"><span class="pre">ed_scipy</span></code>, <code class="docutils literal notranslate"><span class="pre">xas_scipy</span></code>, and <code class="docutils literal notranslate"><span class="pre">rixs_scipy</span></code> functions
+also require factories. These can return NumPy arrays, SciPy sparse matrices,
+or a matrix-free
 <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.LinearOperator.html">LinearOperator</a>.
 ED uses SciPy’s
 <a class="reference external" href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.sparse.linalg.lobpcg.html">LOBPCG eigensolver</a>;
@@ -227,7 +234,7 @@ eigensolver tolerance accepted by <code class="docutils literal notranslate"><sp
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">linsys_tol</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">1e-09</span></code></p></td>
-<td><p>GMRES convergence tolerance.</p></td>
+<td><p>GMRES relative convergence tolerance (rtol; tol in older SciPy).</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">linsys_maxiter</span></code></p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">50000</span></code></p></td>
@@ -239,6 +246,9 @@ eigensolver tolerance accepted by <code class="docutils literal notranslate"><sp
 </tr>
 </tbody>
 </table>
+<p><code class="docutils literal notranslate"><span class="pre">linsys_tol</span></code> sets GMRES’s relative tolerance, passed as <code class="docutils literal notranslate"><span class="pre">rtol</span></code> (or <code class="docutils literal notranslate"><span class="pre">tol</span></code>
+in older SciPy). With the <code class="docutils literal notranslate"><span class="pre">rtol</span></code> API, EDRIXS sets the absolute tolerance
+<code class="docutils literal notranslate"><span class="pre">atol</span></code> to zero.</p>
 </section>
 </section>
 

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Introduction to EDRIXS &mdash; EDRIXS 0.post1+g3cb59a0 documentation</title>
+  <title>Introduction to EDRIXS &mdash; EDRIXS 0.post1+g846835b documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=fd7cd5d2"></script>
+      <script src="../_static/documentation_options.js?v=226246b0"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -198,25 +198,31 @@ Slater integrals <span class="math notranslate nohighlight">\(F^k\)</span>, with
 <span id="id1"></span><h2>Many-body operators<a class="headerlink" href="#many-body-operators" title="Link to this heading"></a></h2>
 <p>The second stage picks the many-body Fock basis <span class="math notranslate nohighlight">\(\lvert \Phi \rangle\)</span>
 defined above and evaluates the Hamiltonian in it.</p>
-<p><a class="reference internal" href="../reference/solvers.html#edrixs.solvers.build_op" title="edrixs.solvers.build_op"><code class="xref py py-func docutils literal notranslate"><span class="pre">build_op()</span></code></a> builds one many-body operator:</p>
+<p><a class="reference internal" href="../reference/solvers.html#edrixs.solvers.build_op" title="edrixs.solvers.build_op"><code class="xref py py-func docutils literal notranslate"><span class="pre">build_op()</span></code></a> prepares one many-body operator:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">emat</span></code>, <code class="docutils literal notranslate"><span class="pre">umat</span></code> – the one- and two-body coefficients from the first
 stage.  Pass <code class="docutils literal notranslate"><span class="pre">None</span></code> for whichever of the two is absent.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">basis</span></code> – a Fock-basis specification, or a realized basis.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">backend</span></code> – the representation the operator is returned in.</p></li>
 </ul>
-<p>It returns the matrix <span class="math notranslate nohighlight">\(\langle \Phi_l \rvert \hat{H} \lvert \Phi_r
-\rangle\)</span> of the one- and two-body terms above.</p>
+<p>It returns a zero-argument callable with a <code class="docutils literal notranslate"><span class="pre">.backend</span></code> label. Calling it builds
+the matrix <span class="math notranslate nohighlight">\(\langle \Phi_l \rvert \hat{H} \lvert \Phi_r
+\rangle\)</span> of the one- and two-body terms above. Each call builds a fresh matrix.</p>
 <p><a class="reference internal" href="../reference/solvers.html#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops()</span></code></a> is the spectroscopy-oriented wrapper, which
-builds everything an XAS or RIXS calculation needs in one call:</p>
+prepares everything an XAS or RIXS calculation needs in one call:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">emat_i</span></code>, <code class="docutils literal notranslate"><span class="pre">umat_i</span></code>, <code class="docutils literal notranslate"><span class="pre">basis_i</span></code> and their <code class="docutils literal notranslate"><span class="pre">_n</span></code> counterparts – the two
 Fock spaces, without and with a core hole.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">trans_mat</span></code> – the Cartesian photon transition matrices from the model.</p></li>
 </ul>
 <p>It returns <code class="docutils literal notranslate"><span class="pre">hmat_i</span></code>, <code class="docutils literal notranslate"><span class="pre">hmat_n</span></code> and the many-body transition operators
-<code class="docutils literal notranslate"><span class="pre">trans_ops</span></code>.  Because XAS and RIXS connect states with no core hole to states
-with exactly one core hole, keeping the two Hamiltonians separate avoids the
+<code class="docutils literal notranslate"><span class="pre">trans_ops</span></code> as labeled factories for numerical backends, or disk handles for
+Fortran. Pass these directly to <code class="docutils literal notranslate"><span class="pre">ed</span></code>, <code class="docutils literal notranslate"><span class="pre">xas</span></code>, and <code class="docutils literal notranslate"><span class="pre">rixs</span></code>; the solvers read
+their <code class="docutils literal notranslate"><span class="pre">.backend</span></code> labels and pass the factories to the backend for matrix
+construction. These solver functions
+do not accept a <code class="docutils literal notranslate"><span class="pre">backend</span></code> keyword. Because XAS and RIXS connect states with
+no core hole to states with exactly one core hole, keeping the two Hamiltonians
+separate avoids the
 need to generate a Hamiltonian that spans both spaces and makes
 the calculation more efficient.</p>
 <p>The Fock-basis encoding and the valence-before-core orbital ordering that both
@@ -231,10 +237,10 @@ functions assume are set out in <a class="reference internal" href="conventions.
 <li><p><code class="docutils literal notranslate"><span class="pre">eval_i</span></code> is a 1D real array ordered by increasing energy.</p></li>
 <li><p>For the <code class="docutils literal notranslate"><span class="pre">dense</span></code> and <code class="docutils literal notranslate"><span class="pre">scipy</span></code> backends <code class="docutils literal notranslate"><span class="pre">evec_i</span></code> is a 2D complex array; the
 eigenvector belonging to <code class="docutils literal notranslate"><span class="pre">eval_i[k]</span></code> is the column <code class="docutils literal notranslate"><span class="pre">evec_i[:,</span> <span class="pre">k]</span></code>.</p></li>
-<li><p>The <code class="docutils literal notranslate"><span class="pre">petsc</span></code> backend is currently an interface stub.  Requesting it raises
-<code class="docutils literal notranslate"><span class="pre">NotImplementedError</span></code> rather than returning eigenvectors.</p></li>
+<li><p>For the <code class="docutils literal notranslate"><span class="pre">petsc</span></code> backend <code class="docutils literal notranslate"><span class="pre">evec_i</span></code> is a list of distributed PETSc vectors,
+one for each value in <code class="docutils literal notranslate"><span class="pre">eval_i</span></code>.</p></li>
 </ul>
-<p>Dense and SciPy ED accept <code class="docutils literal notranslate"><span class="pre">shift=shift</span></code>, where <code class="docutils literal notranslate"><span class="pre">shift</span></code> is the eighth
+<p>Dense, SciPy, and PETSc ED accept <code class="docutils literal notranslate"><span class="pre">shift=shift</span></code>, where <code class="docutils literal notranslate"><span class="pre">shift</span></code> is the eighth
 output of a model constructor. They diagonalize <span class="math notranslate nohighlight">\(H - \mathrm{shift} I\)</span>
 and restore the offset in <code class="docutils literal notranslate"><span class="pre">eval_i</span></code>. The Hamiltonian supplied by the caller
 remains unchanged, so XAS and RIXS continue using the same energy reference.

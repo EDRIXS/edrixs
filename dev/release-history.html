@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Release History &mdash; EDRIXS 0.post1+g3cb59a0 documentation</title>
+  <title>Release History &mdash; EDRIXS 0.post1+g846835b documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=fd7cd5d2"></script>
+      <script src="_static/documentation_options.js?v=226246b0"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/clipboard.min.js?v=a7894cd8"></script>
@@ -116,6 +116,14 @@
 <section id="new-calculation-interface">
 <h3>New calculation interface<a class="headerlink" href="#new-calculation-interface" title="Link to this heading"></a></h3>
 <ul class="simple">
+<li><p>Return labeled matrix factories from <code class="docutils literal notranslate"><span class="pre">build_op</span></code> and numerical <code class="docutils literal notranslate"><span class="pre">get_ops</span></code>.
+Call a factory explicitly for matrix arithmetic. <code class="docutils literal notranslate"><span class="pre">ed</span></code>, <code class="docutils literal notranslate"><span class="pre">xas</span></code>, and <code class="docutils literal notranslate"><span class="pre">rixs</span></code>
+now dispatch using <code class="docutils literal notranslate"><span class="pre">.backend</span></code> labels and no longer accept <code class="docutils literal notranslate"><span class="pre">backend=</span></code>.</p></li>
+<li><p>Construct matrices inside the numerical backends. Dense and SciPy eagerly
+materialize inputs at calculation start, as does PETSc ED. PETSc XAS and
+RIXS accept <code class="docutils literal notranslate"><span class="pre">matrix_lifetime</span></code> with
+<code class="docutils literal notranslate"><span class="pre">'retain'</span></code> (default) and <code class="docutils literal notranslate"><span class="pre">'recompute'</span></code> policies for reusing matrices or
+releasing and rebuilding them between operations.</p></li>
 <li><p>Introduce a staged workflow that separates physical model construction,
 many-body operator construction, diagonalization, and spectral calculations:
 <code class="docutils literal notranslate"><span class="pre">model_*</span></code> → <code class="docutils literal notranslate"><span class="pre">get_ops</span></code> → <code class="docutils literal notranslate"><span class="pre">ed</span></code> → <code class="docutils literal notranslate"><span class="pre">xas</span></code> / <code class="docutils literal notranslate"><span class="pre">rixs</span></code>.</p></li>
@@ -125,7 +133,7 @@ charge-transfer parameterization for a d impurity, bath, and p core.</p></li>
 <li><p>Make SciPy the default backend, with sparse operator construction and Krylov
 methods for ED, XAS, and RIXS. Dense calculations and native Fortran/MPI
 solvers are also available through the staged interface.</p></li>
-<li><p>A PETSc-based backend is under development</p></li>
+<li><p>Provide a PETSc backend with distributed operator construction and solvers.</p></li>
 <li><p>Add compact Fock-basis specifications with interchangeable combinadic and
 explicit basis construction. Operator construction uses Numba by default;
 <code class="docutils literal notranslate"><span class="pre">use_numba=False</span></code> selects Python construction.</p></li>
@@ -136,7 +144,7 @@ documented defaults, and value constraints.</p></li>
 <section id="numerical-methods-and-utilities">
 <h3>Numerical methods and utilities<a class="headerlink" href="#numerical-methods-and-utilities" title="Link to this heading"></a></h3>
 <ul class="simple">
-<li><p>Support an energy-reference shift for SciPy and dense diagonalization while
+<li><p>Support an energy-reference shift for SciPy, dense, and PETSc diagonalization while
 returning eigenvalues in the original reference. Models return the shift
 alongside their operator inputs. The Fortran backend warns and continues
 when a nonzero shift is supplied.</p></li>
@@ -150,6 +158,11 @@ backend consistency, and XAS/RIXS spectra.</p></li>
 <section id="compatibility-and-migration">
 <h3>Compatibility and migration<a class="headerlink" href="#compatibility-and-migration" title="Link to this heading"></a></h3>
 <ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">build_op</span></code> and numerical <code class="docutils literal notranslate"><span class="pre">get_ops</span></code> now return factories rather than
+matrices. Call a factory to obtain a matrix for arithmetic. Public <code class="docutils literal notranslate"><span class="pre">ed</span></code>,
+<code class="docutils literal notranslate"><span class="pre">xas</span></code>, and <code class="docutils literal notranslate"><span class="pre">rixs</span></code> require labeled factories or Fortran disk handles and
+reject the removed <code class="docutils literal notranslate"><span class="pre">backend</span></code> keyword. Backend-specific staged solvers also
+require factories. See <a class="reference internal" href="user/backend.html#lazy-operators"><span class="std std-ref">Operator factories and solver dispatch</span></a>.</p></li>
 <li><p>Deprecate the legacy model-specific Python and Fortran solver wrappers in
 favor of the staged interface. Existing wrappers emit deprecation warnings.</p></li>
 <li><p>Reject isotropic RIXS polarization; specify incoming and outgoing

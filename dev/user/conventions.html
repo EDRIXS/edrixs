@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Conventions &mdash; EDRIXS 0.post1+g3cb59a0 documentation</title>
+  <title>Conventions &mdash; EDRIXS 0.post1+g846835b documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=fd7cd5d2"></script>
+      <script src="../_static/documentation_options.js?v=226246b0"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -153,7 +153,7 @@ the construction of transition operators.</p>
 <p>Numerical diagonalization can lose precision when the diagonal entries have a
 large common energy offset.
 For this reason, model constructors also return an energy offset, <code class="docutils literal notranslate"><span class="pre">shift</span></code>.
-Passing it to <a class="reference internal" href="../reference/solvers.html#edrixs.solvers.ed" title="edrixs.solvers.ed"><code class="xref py py-func docutils literal notranslate"><span class="pre">ed()</span></code></a> with the dense or SciPy backend subtracts
+Passing it to <a class="reference internal" href="../reference/solvers.html#edrixs.solvers.ed" title="edrixs.solvers.ed"><code class="xref py py-func docutils literal notranslate"><span class="pre">ed()</span></code></a> with the dense, SciPy, or PETSc backend subtracts
 the offset from the Hamiltonian diagonal before diagonalization and restores
 it to the returned eigenvalues. This preserves the physics while reducing
 numerical errors caused by subtracting large, nearly equal numbers.</p>
@@ -237,10 +237,12 @@ crystal-field <span class="math notranslate nohighlight">\(x, y, z\)</span> axes
 <code class="docutils literal notranslate"><span class="pre">loc_axis</span></code> (model) or <code class="docutils literal notranslate"><span class="pre">scatter_axis</span></code> (solver) to change this.</p></li>
 <li><p><strong>Polarization</strong> is given as a list of channels. For XAS, each entry is
 <code class="docutils literal notranslate"><span class="pre">(kind,</span> <span class="pre">angle)</span></code> with <code class="docutils literal notranslate"><span class="pre">kind</span></code> one of <code class="docutils literal notranslate"><span class="pre">'linear'</span></code>, <code class="docutils literal notranslate"><span class="pre">'left'</span></code>, <code class="docutils literal notranslate"><span class="pre">'right'</span></code>
-or <code class="docutils literal notranslate"><span class="pre">'isotropic'</span></code> (the last for powders). For RIXS, each entry is a 4-tuple
-<code class="docutils literal notranslate"><span class="pre">(in_kind,</span> <span class="pre">in_angle,</span> <span class="pre">out_kind,</span> <span class="pre">out_angle)</span></code>; sum the two outgoing channels
-when the experiment does not resolve emitted polarization.</p></li>
-<li><p><strong>Broadening</strong> is a Lorentzian half width at half maximum. <code class="docutils literal notranslate"><span class="pre">gamma_c</span></code> is the
+or <code class="docutils literal notranslate"><span class="pre">'isotropic'</span></code> (the last for powders).  For RIXS each entry is a 4-tuple
+<code class="docutils literal notranslate"><span class="pre">(in_kind,</span> <span class="pre">in_angle,</span> <span class="pre">out_kind,</span> <span class="pre">out_angle)</span></code>, where each kind is <code class="docutils literal notranslate"><span class="pre">'linear'</span></code>,
+<code class="docutils literal notranslate"><span class="pre">'left'</span></code>, or <code class="docutils literal notranslate"><span class="pre">'right'</span></code>; sum the two outgoing channels when the experiment
+does not resolve emitted polarization.  <code class="docutils literal notranslate"><span class="pre">'isotropic'</span></code> is not supported for
+RIXS and is rejected with a warning.</p></li>
+<li><p><strong>Broadening</strong> is a Lorentzian half width at half maximum.  <code class="docutils literal notranslate"><span class="pre">gamma_c</span></code> is the
 inverse core-hole lifetime (it dominates XAS and the incident-energy axis of
 RIXS); <code class="docutils literal notranslate"><span class="pre">gamma_f</span></code> is the final-state or resolution width on the RIXS
 energy-loss axis. <code class="docutils literal notranslate"><span class="pre">gamma_c</span></code> may be a scalar or an array with the same

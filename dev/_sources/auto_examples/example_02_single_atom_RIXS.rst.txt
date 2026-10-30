@@ -164,7 +164,7 @@ so we do not need to pass an additional :code:`v_cfmat` matrix.
     )
 
 
-    eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=2, backend=backend)
+    eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=2)
 
 
 
@@ -215,7 +215,7 @@ The spectral broadening is dominated by the inverse core-hole lifetime
     xas = edrixs.xas(
         eval_i, evec_i, hmat_n, trans_ops, ominc,
         gamma_c=gamma_c, thin=thin, phi=phi, pol_type=pol_type,
-        temperature=temperature, backend=backend,
+        temperature=temperature,
     )
 
 
@@ -257,7 +257,7 @@ add both outgoing polarization channels, which is what we do here.
         gamma_c=gamma_c, gamma_f=gamma_f,
         thin=thin, thout=thout, phi=phi,
         pol_type=pol_type_rixs,
-        temperature=temperature, backend=backend,
+        temperature=temperature,
     )
 
 
@@ -359,19 +359,19 @@ is the amount the crystal field moves the :math:`t_{2g}` subshell.
         emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
         backend=backend,
     )
-    eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=2, backend=backend)
+    eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=2)
 
     xas_full_d_shell = edrixs.xas(
         eval_i, evec_i, hmat_n, trans_ops, ominc,
         gamma_c=gamma_c, thin=thin, phi=phi, pol_type=pol_type,
-        temperature=temperature, backend=backend,
+        temperature=temperature,
     )
 
     rixs_full_d_shell = edrixs.rixs(
         eval_i, evec_i, hmat_i, hmat_n, trans_ops, np.array([11215]), eloss,
         gamma_c=gamma_c, gamma_f=gamma_f,
         thin=thin, thout=thout, phi=phi, pol_type=pol_type_rixs,
-        temperature=temperature, backend=backend,
+        temperature=temperature,
     )
 
     fig, axs = plt.subplots(1, 2, figsize=(10, 4))
@@ -415,7 +415,7 @@ of Sr\ :sub:`2`\ YIrO\ :sub:`6`\  is dependent on the model.
 
 .. rst-class:: sphx-glr-timing
 
-   **Total running time of the script:** (0 minutes 0.621 seconds)
+   **Total running time of the script:** (0 minutes 1.247 seconds)
 
 
 .. _sphx_glr_download_auto_examples_example_02_single_atom_RIXS.py:

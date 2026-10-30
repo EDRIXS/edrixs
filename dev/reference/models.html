@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>models &mdash; EDRIXS 0.post1+g3cb59a0 documentation</title>
+  <title>models &mdash; EDRIXS 0.post1+g846835b documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=fd7cd5d2"></script>
+      <script src="../_static/documentation_options.js?v=226246b0"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -117,17 +117,14 @@
              
   <section id="models">
 <h1>models<a class="headerlink" href="#models" title="Link to this heading"></a></h1>
-<p>Model constructors return eight values: seven orbital-space problem inputs
-and a scalar <code class="docutils literal notranslate"><span class="pre">shift</span></code> equal to the filled core’s shell-level energy. Coulomb
-contributions are excluded from this shift, and the integrals remain unshifted.
-Use it explicitly for dense or SciPy diagonalization:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span><span class="n">problem</span><span class="p">,</span> <span class="n">shift</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">model_1v1c</span><span class="p">((</span><span class="s1">'p'</span><span class="p">,</span> <span class="s1">'s'</span><span class="p">),</span> <span class="n">shell_level</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">100</span><span class="p">))</span>
-<span class="n">hmat_i</span><span class="p">,</span> <span class="n">hmat_n</span><span class="p">,</span> <span class="n">trans_ops</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_ops</span><span class="p">(</span><span class="o">*</span><span class="n">problem</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'scipy'</span><span class="p">)</span>
-<span class="n">eval_i</span><span class="p">,</span> <span class="n">evec_i</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">ed</span><span class="p">(</span><span class="n">hmat_i</span><span class="p">,</span> <span class="n">shift</span><span class="o">=</span><span class="n">shift</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>The returned eigenvalues retain their absolute energy reference. Fortran
-callers pass only <code class="docutils literal notranslate"><span class="pre">problem</span></code> to <code class="docutils literal notranslate"><span class="pre">get_ops</span></code> and omit <code class="docutils literal notranslate"><span class="pre">shift</span></code> from <code class="docutils literal notranslate"><span class="pre">ed</span></code>.</p>
+<p>Model constructors define the physical problem without building many-body
+operators or running solvers. They return eight values: seven inputs describing
+the Hamiltonians, Fock bases, and transition operators, plus a scalar <code class="docutils literal notranslate"><span class="pre">shift</span></code>
+equal to the filled core’s shell-level energy.</p>
+<p>Pass the first seven outputs to <code class="docutils literal notranslate"><span class="pre">get_ops</span></code>. For dense, SciPy, or PETSc
+diagonalization, optionally pass <code class="docutils literal notranslate"><span class="pre">shift</span></code> to <code class="docutils literal notranslate"><span class="pre">ed</span></code> to reduce numerical errors.
+The returned eigenvalues retain their original energy reference, so the shift
+does not change the physics. Fortran ED ignores a nonzero shift with a warning.</p>
 <p id="module-edrixs.models">Backend-independent physical model construction for EDRIXS.</p>
 <p>The model functions in this module describe orbital-space Hamiltonians,
 interactions, Fock-basis specifications, and photon-transition matrices without
@@ -171,7 +168,7 @@ Coulomb tensors have shape (ntot,) * 4, and trans_mat has shape
 <code class="docutils literal notranslate"><span class="pre">c_norb</span> <span class="pre">*</span> <span class="pre">shell_level[1]</span></code> (zero if unspecified), excluding Coulomb
 contributions.
 Pass the first seven outputs to <a class="reference internal" href="solvers.html#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops()</span></code></a> and
-<code class="docutils literal notranslate"><span class="pre">shift</span></code> to dense or SciPy <a class="reference internal" href="solvers.html#edrixs.solvers.ed" title="edrixs.solvers.ed"><code class="xref py py-func docutils literal notranslate"><span class="pre">ed()</span></code></a>.
+<code class="docutils literal notranslate"><span class="pre">shift</span></code> to dense, SciPy, or PETSc <a class="reference internal" href="solvers.html#edrixs.solvers.ed" title="edrixs.solvers.ed"><code class="xref py py-func docutils literal notranslate"><span class="pre">ed()</span></code></a>.
 The returned integrals retain the full, unshifted energies.</p>
 </dd>
 </dl>
@@ -277,8 +274,8 @@ valence electron and one core hole.</p>
 </dd>
 <dt><strong>shift</strong><span class="classifier">float</span></dt><dd><p>Filled core shell-level energy, <code class="docutils literal notranslate"><span class="pre">c_norb</span> <span class="pre">*</span> <span class="pre">shell_level[2]</span></code> (zero if
 unspecified), excluding Coulomb contributions. Pass the first seven
-outputs to <a class="reference internal" href="solvers.html#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops()</span></code></a> and <code class="docutils literal notranslate"><span class="pre">shift</span></code> to dense or
-SciPy <a class="reference internal" href="solvers.html#edrixs.solvers.ed" title="edrixs.solvers.ed"><code class="xref py py-func docutils literal notranslate"><span class="pre">ed()</span></code></a>. Integrals remain unshifted.</p>
+outputs to <a class="reference internal" href="solvers.html#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops()</span></code></a> and <code class="docutils literal notranslate"><span class="pre">shift</span></code> to dense, SciPy, or
+PETSc <a class="reference internal" href="solvers.html#edrixs.solvers.ed" title="edrixs.solvers.ed"><code class="xref py py-func docutils literal notranslate"><span class="pre">ed()</span></code></a>. Integrals remain unshifted.</p>
 </dd>
 </dl>
 </dd>
@@ -316,7 +313,8 @@ Fock-basis specifications, and core-to-impurity transition matrices. This
 is the setup analogue of <a class="reference internal" href="solvers.html#edrixs.solvers.ed_siam_fort" title="edrixs.solvers.ed_siam_fort"><code class="xref py py-func docutils literal notranslate"><span class="pre">ed_siam_fort()</span></code></a> at fixed
 <code class="docutils literal notranslate"><span class="pre">v_noccu</span></code>; it does not search over occupancies, build many-body
 Hamiltonians, or diagonalize them. Pass the returned tuple to
-<a class="reference internal" href="solvers.html#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops()</span></code></a> to construct the many-body operators.</p>
+<a class="reference internal" href="solvers.html#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops()</span></code></a> to construct the many-body operators
+with the SciPy, dense, or PETSc backend.</p>
 <p>All energies, Slater integrals, hybridizations, spin-orbit coupling
 constants, and magnetic-field components are in eV. Let <code class="docutils literal notranslate"><span class="pre">v_norb</span></code> and
 <code class="docutils literal notranslate"><span class="pre">c_norb</span></code> be the numbers of impurity and core spin-orbitals, respectively,
@@ -456,7 +454,7 @@ for quadrupole transitions; components are in the global frame.</p>
 </dd>
 <dt><strong>shift</strong><span class="classifier">float</span></dt><dd><p>Filled core shell-level energy, <code class="docutils literal notranslate"><span class="pre">c_norb</span> <span class="pre">*</span> <span class="pre">c_level</span></code>, excluding
 Coulomb contributions. Pass the first seven outputs to
-<a class="reference internal" href="solvers.html#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops()</span></code></a> and <code class="docutils literal notranslate"><span class="pre">shift</span></code> to dense or SciPy
+<a class="reference internal" href="solvers.html#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops()</span></code></a> and <code class="docutils literal notranslate"><span class="pre">shift</span></code> to dense, SciPy, or PETSc
 <a class="reference internal" href="solvers.html#edrixs.solvers.ed" title="edrixs.solvers.ed"><code class="xref py py-func docutils literal notranslate"><span class="pre">ed()</span></code></a>. Integrals remain unshifted.</p>
 </dd>
 </dl>
@@ -514,8 +512,8 @@ The magnetic field acts on the impurity only.</p>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><dl class="simple">
 <dt>emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat, shift</dt><dd><p>The eight model_siam outputs. Pass the first seven to
-<a class="reference internal" href="solvers.html#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops()</span></code></a> and the final <code class="docutils literal notranslate"><span class="pre">shift</span></code> to dense or
-SciPy <a class="reference internal" href="solvers.html#edrixs.solvers.ed" title="edrixs.solvers.ed"><code class="xref py py-func docutils literal notranslate"><span class="pre">ed()</span></code></a>. Here <code class="docutils literal notranslate"><span class="pre">shift</span> <span class="pre">=</span> <span class="pre">6</span> <span class="pre">*</span> <span class="pre">(-om_shift</span> <span class="pre">-</span> <span class="pre">5*E_p)</span></code>;
+<a class="reference internal" href="solvers.html#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops()</span></code></a> and the final <code class="docutils literal notranslate"><span class="pre">shift</span></code> to dense, SciPy, or
+PETSc <a class="reference internal" href="solvers.html#edrixs.solvers.ed" title="edrixs.solvers.ed"><code class="xref py py-func docutils literal notranslate"><span class="pre">ed()</span></code></a>. Here <code class="docutils literal notranslate"><span class="pre">shift</span> <span class="pre">=</span> <span class="pre">6</span> <span class="pre">*</span> <span class="pre">(-om_shift</span> <span class="pre">-</span> <span class="pre">5*E_p)</span></code>;
 it excludes Coulomb contributions and does not alter the integrals. One-body
 matrices both have shape (26, 26) and use complex spherical
 harmonics. Basis metadata fixes initial valence occupancy to nd+10,

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Backend &mdash; EDRIXS 0.post1+g3cb59a0 documentation</title>
+  <title>Backend &mdash; EDRIXS 0.post1+g846835b documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=fd7cd5d2"></script>
+      <script src="../_static/documentation_options.js?v=226246b0"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -67,6 +67,7 @@
 <li class="toctree-l2"><a class="reference internal" href="introduction.html">Introduction to EDRIXS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conventions.html">Conventions</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Backend</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#operator-factories-and-solver-dispatch">Operator factories and solver dispatch</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#numerical-precision">Numerical precision</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#backend-keyword-reference">Backend keyword reference</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="backends/scipy.html">SciPy keywords</a></li>
@@ -115,23 +116,45 @@
 <span id="id1"></span><h1>Backend<a class="headerlink" href="#backend" title="Link to this heading"></a></h1>
 <p>The <a class="reference internal" href="introduction.html#introduction"><span class="std std-ref">Introduction to EDRIXS</span></a> describes the four stages of a calculation.  Stages two
 to four – building operators, diagonalizing, and assembling spectra –
-delegate their numerical work to a backend selected with <code class="docutils literal notranslate"><span class="pre">backend</span></code>:</p>
+delegate their numerical work to a backend selected with <code class="docutils literal notranslate"><span class="pre">backend</span></code> when
+calling <code class="docutils literal notranslate"><span class="pre">build_op</span></code> or <code class="docutils literal notranslate"><span class="pre">get_ops</span></code>:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">'dense'</span></code> returns full NumPy matrices and uses exact dense
+<li><p><code class="docutils literal notranslate"><span class="pre">'dense'</span></code> builds full NumPy matrices and uses exact dense
 diagonalization and explicit eigenstate sums.  It is intended for small
 problems, reference calculations, and pedagogy.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">'scipy'</span></code> returns SciPy sparse matrices and uses LOBPCG, Lanczos, and GMRES.
+<li><p><code class="docutils literal notranslate"><span class="pre">'scipy'</span></code> builds SciPy CSR matrices and uses LOBPCG, Lanczos, and GMRES.
 It is the default backend.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">'fortran'</span></code> uses the native MPI solvers and communicates through files in
 the current working directory.  We provide the function
 <a class="reference internal" href="../reference/solvers.html#edrixs.solvers.get_ops_disk" title="edrixs.solvers.get_ops_disk"><code class="xref py py-func docutils literal notranslate"><span class="pre">edrixs.get_ops_disk</span></code></a> to load the setup
 from disk if desired.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">'petsc'</span></code> reserves the PETSc backend contract but is not yet implemented.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'petsc'</span></code> uses distributed PETSc matrices, SLEPc eigensolvers, and PETSc
+Krylov solvers.  It is intended for larger Hilbert spaces and MPI runs.</p></li>
 </ul>
-<p>Use the same backend when constructing operators, diagonalizing the Hamiltonian,
-and calculating spectra.
-Backend-specific numerical controls belong in a <code class="docutils literal notranslate"><span class="pre">backend_kws</span></code> mapping.  The
+<p>Backend-specific numerical controls belong in a <code class="docutils literal notranslate"><span class="pre">backend_kws</span></code> mapping. The
 mapping is specific to both the backend <em>and the operation</em>.</p>
+<section id="operator-factories-and-solver-dispatch">
+<span id="lazy-operators"></span><h2>Operator factories and solver dispatch<a class="headerlink" href="#operator-factories-and-solver-dispatch" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">build_op</span></code> returns a callable that constructs the matrix when called. This
+lets callers defer matrix allocation and recreate matrices when needed. Its
+<code class="docutils literal notranslate"><span class="pre">.backend</span></code> attribute identifies the numerical backend and the matrix
+representation it will produce.</p>
+<p>Numerical <code class="docutils literal notranslate"><span class="pre">get_ops</span></code> returns these callables for both Hamiltonians
+and every transition component. Public <code class="docutils literal notranslate"><span class="pre">ed</span></code> and <code class="docutils literal notranslate"><span class="pre">rixs</span></code> dispatch using
+<code class="docutils literal notranslate"><span class="pre">hmat_i.backend</span></code>; <code class="docutils literal notranslate"><span class="pre">xas</span></code> uses <code class="docutils literal notranslate"><span class="pre">hmat_n.backend</span></code>. They pass the factories
+unchanged to the selected backend and assume all operators are suitable for it.
+Dense, SciPy, and PETSc ED call every supplied factory at calculation
+start. Repeated arguments may be instantiated independently. PETSc XAS and RIXS
+accept <code class="docutils literal notranslate"><span class="pre">matrix_lifetime</span></code> in <code class="docutils literal notranslate"><span class="pre">backend_kws</span></code>; see <a class="reference internal" href="backends/petsc.html"><span class="doc">PETSc keywords</span></a>.
+All staged solver entry points, including backend-specific functions, require
+factories or callable Fortran disk handles.</p>
+<p>For matrix arithmetic or direct access to matrix methods, call the factory
+explicitly:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">number_op</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">build_op</span><span class="p">(</span><span class="n">number_coefficients</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">basis</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'dense'</span><span class="p">)</span>
+<span class="n">number_matrix</span> <span class="o">=</span> <span class="n">number_op</span><span class="p">()</span>
+</pre></div>
+</div>
+</section>
 <section id="numerical-precision">
 <h2>Numerical precision<a class="headerlink" href="#numerical-precision" title="Link to this heading"></a></h2>
 <p>XAS and RIXS thermally average over the retained initial eigenstates.  Request
@@ -152,7 +175,7 @@ options documented below.</p>
 <li><p><a class="reference internal" href="backends/scipy.html"><span class="doc">SciPy keywords</span></a></p></li>
 <li><p><a class="reference internal" href="backends/dense.html"><span class="doc">Dense keywords</span></a></p></li>
 <li><p><a class="reference internal" href="backends/fortran.html"><span class="doc">Fortran keywords</span></a></p></li>
-<li><p><a class="reference internal" href="backends/petsc.html"><span class="doc">PETSc status and keywords</span></a></p></li>
+<li><p><a class="reference internal" href="backends/petsc.html"><span class="doc">PETSc keywords</span></a></p></li>
 </ul>
 <p>These references apply to the staged <code class="docutils literal notranslate"><span class="pre">get_ops</span></code> / <code class="docutils literal notranslate"><span class="pre">ed</span></code> / <code class="docutils literal notranslate"><span class="pre">xas</span></code> / <code class="docutils literal notranslate"><span class="pre">rixs</span></code>
 interface.  The legacy <code class="docutils literal notranslate"><span class="pre">ed_*_fort</span></code>, <code class="docutils literal notranslate"><span class="pre">xas_*_fort</span></code>, and <code class="docutils literal notranslate"><span class="pre">rixs_*_fort</span></code>

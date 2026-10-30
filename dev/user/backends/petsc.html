@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PETSc keywords &mdash; EDRIXS 0.post1+g3cb59a0 documentation</title>
+  <title>PETSc keywords &mdash; EDRIXS 0.post1+g846835b documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=fd7cd5d2"></script>
+      <script src="../../_static/documentation_options.js?v=226246b0"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -67,6 +67,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../introduction.html">Introduction to EDRIXS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../conventions.html">Conventions</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../backend.html">Backend</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../backend.html#operator-factories-and-solver-dispatch">Operator factories and solver dispatch</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../backend.html#numerical-precision">Numerical precision</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="../backend.html#backend-keyword-reference">Backend keyword reference</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="scipy.html">SciPy keywords</a></li>
@@ -128,10 +129,215 @@ through the
 <a class="reference external" href="https://slepc.upv.es/release/documentation/manual/eps.html">SLEPc eigenvalue guide</a>
 and the
 <a class="reference external" href="https://slepc.upv.es/release/slepc4py/reference/slepc4py.SLEPc.EPS.html">slepc4py EPS API</a>.</p>
-<p>The EDRIXS PETSc backend is currently an unimplemented contract.  It recognizes
-PETSc <code class="docutils literal notranslate"><span class="pre">Mat</span></code> and <code class="docutils literal notranslate"><span class="pre">Vec</span></code> objects, but its operations raise
-<code class="docutils literal notranslate"><span class="pre">NotImplementedError</span></code> and accept no backend-specific options.  The keyword
-contract will be documented here when those operations are implemented.</p>
+<p>EDRIXS constructs distributed PETSc <code class="docutils literal notranslate"><span class="pre">Mat</span></code> objects, obtains low-energy
+eigenpairs with SLEPc’s Krylov–Schur method, and evaluates XAS and RIXS with
+distributed Lanczos and KSP solves.  Importing EDRIXS does not import PETSc;
+<code class="docutils literal notranslate"><span class="pre">petsc4py</span></code> and <code class="docutils literal notranslate"><span class="pre">slepc4py</span></code> are loaded only when this backend is used.</p>
+<p><code class="docutils literal notranslate"><span class="pre">build_op</span></code> and <code class="docutils literal notranslate"><span class="pre">get_ops</span></code> return factories labeled with
+<code class="docutils literal notranslate"><span class="pre">.backend</span> <span class="pre">==</span> <span class="pre">'petsc'</span></code>. Calling a factory assembles its distributed matrix;
+public <code class="docutils literal notranslate"><span class="pre">ed</span></code>, <code class="docutils literal notranslate"><span class="pre">xas</span></code>, and <code class="docutils literal notranslate"><span class="pre">rixs</span></code> read the labels and pass the factories to
+the PETSc backend. All MPI ranks in the matrix communicator must participate
+in construction and solver calls. See <a class="reference internal" href="../backend.html#lazy-operators"><span class="std std-ref">Operator factories and solver dispatch</span></a>.</p>
+<p>Options are specific to the stage where they are supplied.</p>
+</section>
+<section id="matrix-lifetime">
+<h2>Matrix lifetime<a class="headerlink" href="#matrix-lifetime" title="Link to this heading"></a></h2>
+<p>PETSc <code class="docutils literal notranslate"><span class="pre">xas</span></code> and <code class="docutils literal notranslate"><span class="pre">rixs</span></code> accept <code class="docutils literal notranslate"><span class="pre">matrix_lifetime</span></code> in <code class="docutils literal notranslate"><span class="pre">backend_kws</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">'retain'</span></code> (default) builds each required factory on first use, keeps its
+matrix for reuse during the calculation, and destroys it before returning.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">'recompute'</span></code> builds a matrix for each operation and destroys it immediately
+afterward, rebuilding it for later uses. This reduces peak memory usage at the
+cost of more CPU time. This can be useful for the largest jobs.</p></li>
+</ul>
+</section>
+<section id="build-op-and-get-ops">
+<h2><code class="docutils literal notranslate"><span class="pre">build_op</span></code> and <code class="docutils literal notranslate"><span class="pre">get_ops</span></code><a class="headerlink" href="#build-op-and-get-ops" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">comm</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">PETSc.COMM_WORLD</span></code></p></td>
+<td><p>PETSc or mpi4py communicator used to distribute the operator.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">assembly_method</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">'row'</span></code></p></td>
+<td><p>Assembly method: ‘row’ inserts bounded chunks by row; ‘coo’ uses bulk COO assembly with full local coordinate and value buffers.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">tol_e</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1e-10</span></code></p></td>
+<td><p>Discard one-body coefficients whose magnitude does not exceed this threshold.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">tol_u</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1e-10</span></code></p></td>
+<td><p>Discard two-body coefficients whose magnitude does not exceed this threshold.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">nnz_guess_per_row</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
+<td><p>Nonzeros per row reserved separately for local and remote column blocks under MPI; estimated automatically when omitted. Used only by row assembly.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">mat_type</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
+<td><p>PETSc matrix type selected after assembly, for example ‘aijcusparse’.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">assembly_chunk_cols</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">4096</span></code></p></td>
+<td><p>Number of owned basis columns generated per kernel call. COO still collects all local entries before bulk insertion.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Two matrix construction options are available. <code class="docutils literal notranslate"><span class="pre">assembly_method='row'</span></code> is
+the default and inserts entries by row in bounded chunks.
+<code class="docutils literal notranslate"><span class="pre">assembly_method='coo'</span></code> counts contributions in a first pass, then generates
+them again into exact-sized coordinate and value arrays for bulk PETSc COO
+assembly. PETSc combines duplicate coordinates and communicates remote entries.
+Both options produce AIJ (CSR) matrices before optional <code class="docutils literal notranslate"><span class="pre">mat_type</span></code> conversion;
+COO describes the assembly interface, rather than the final storage format.
+Both options support the same solver lifetime policies.
+COO avoids the Python row-insertion loop but requires full local entry buffers
+and PETSc’s COO mappings, so compare assembly time and peak memory for your
+problem. <code class="docutils literal notranslate"><span class="pre">assembly_chunk_cols</span></code> bounds individual kernel calls for both
+methods; COO still collects all local contributions before insertion.</p>
+<p><code class="docutils literal notranslate"><span class="pre">nnz_guess_per_row</span></code> controls PETSc matrix preallocation.  Leaving it unset
+uses an estimate from the retained one- and two-body coefficients. With multiple
+MPI ranks, the hint is applied separately to the local-column and remote-column
+blocks of each rank’s matrix rows. With one rank it applies to the sequential
+matrix. Larger hints reserve more memory but can avoid reallocations during
+row assembly; they do not change the matrix values. COO computes its pattern
+directly and ignores this hint. A
+<code class="docutils literal notranslate"><span class="pre">mat_type</span></code> such as <code class="docutils literal notranslate"><span class="pre">'aijcusparse'</span></code> can select an accelerated matrix format;
+see PETSc’s <a class="reference external" href="https://petsc.org/release/manual/mat/#basic-matrix-operations">matrix type overview</a>.</p>
+</section>
+<section id="ed">
+<h2><code class="docutils literal notranslate"><span class="pre">ed</span></code><a class="headerlink" href="#ed" title="Link to this heading"></a></h2>
+<p>Pass the final model output as <code class="docutils literal notranslate"><span class="pre">ed(hmat_i,</span> <span class="pre">shift=shift)</span></code> to subtract the
+filled-core shell energy from the factory-created distributed Hamiltonian before
+diagonalization. Returned eigenvalues retain the original energy reference.
+With a nonzero <code class="docutils literal notranslate"><span class="pre">shift</span></code>, <code class="docutils literal notranslate"><span class="pre">eigval_tol</span></code> is an absolute residual tolerance for
+the shifted problem, avoiding division by a near-zero centered eigenvalue.
+With <code class="docutils literal notranslate"><span class="pre">shift=0</span></code>, it is a relative residual tolerance, scaled by the eigenvalue
+magnitude.</p>
+<p>ED calls its factory once and destroys the matrix before returning.
+<code class="docutils literal notranslate"><span class="pre">matrix_lifetime</span></code> is not accepted for ED.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">eigval_tol</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1e-08</span></code></p></td>
+<td><p>SLEPc residual tolerance: relative when shift is zero, absolute otherwise.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">maxiter</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1000</span></code></p></td>
+<td><p>Maximum SLEPc eigensolver iterations.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">ncv</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
+<td><p>SLEPc Krylov subspace size.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">verbose</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">False</span></code></p></td>
+<td><p>Print SLEPc convergence diagnostics on rank zero.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The eigensolver uses SLEPc <code class="docutils literal notranslate"><span class="pre">EPS</span></code> with a Hermitian problem type and requests
+the smallest-real eigenpairs.  <code class="docutils literal notranslate"><span class="pre">ncv</span></code> sets the Krylov subspace size described
+by <a class="reference external" href="https://slepc.upv.es/release/slepc4py/reference/slepc4py.SLEPc.EPS.html#slepc4py.SLEPc.EPS.setDimensions">EPS.setDimensions</a>.</p>
+</section>
+<section id="xas">
+<h2><code class="docutils literal notranslate"><span class="pre">xas</span></code><a class="headerlink" href="#xas" title="Link to this heading"></a></h2>
+<p>XAS accepts <code class="docutils literal notranslate"><span class="pre">matrix_lifetime</span></code> in <code class="docutils literal notranslate"><span class="pre">backend_kws</span></code>. The default <code class="docutils literal notranslate"><span class="pre">'retain'</span></code>
+builds required transition components and the intermediate Hamiltonian on first
+use and keeps them until calculation exit. With <code class="docutils literal notranslate"><span class="pre">'recompute'</span></code>, each transition
+component is destroyed after its application, and the intermediate Hamiltonian
+is rebuilt and destroyed for each nonzero seed’s Lanczos calculation. At most
+one factory-created matrix is alive at a time in this mode. Components with
+zero polarization coefficients and Hamiltonians for zero seeds are skipped.
+Both policies destroy factory-created matrices before returning, including on
+failure; initial-state eigenvectors remain owned by the caller.</p>
+<p>XAS and RIXS center factory-created distributed matrices using the lowest retained initial
+energy and the first incident energy, which should lie near resonance. RIXS
+also centers the final Hamiltonian. Spectra are evaluated on these relative
+energies before restoring the original reference in returned pole dictionaries.
+Factory-created Hamiltonians are shifted in place.</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">matrix_lifetime</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">'retain'</span></code></p></td>
+<td><p>Matrix lifetime: ‘retain’ builds on first use and reuses until return; ‘recompute’ rebuilds for each solver phase or transition application.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">nkryl</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">200</span></code></p></td>
+<td><p>Maximum intermediate-state Lanczos dimension.</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="rixs">
+<h2><code class="docutils literal notranslate"><span class="pre">rixs</span></code><a class="headerlink" href="#rixs" title="Link to this heading"></a></h2>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Option</p></th>
+<th class="head"><p>Default</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">matrix_lifetime</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">'retain'</span></code></p></td>
+<td><p>Matrix lifetime: ‘retain’ builds on first use and reuses until return; ‘recompute’ rebuilds for each solver phase or transition application.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">nkryl</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">200</span></code></p></td>
+<td><p>Maximum final-state Lanczos dimension.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">linsys_tol</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1e-10</span></code></p></td>
+<td><p>PETSc KSP absolute tolerance (atol); shifted_pminres defaults to rtol=0.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">linsys_maxiter</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">1000</span></code></p></td>
+<td><p>Maximum PETSc KSP iterations.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">pminres_library</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p></td>
+<td><p>Optional native library path for shifted_pminres.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">ksp_type</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">'shifted_pminres'</span></code></p></td>
+<td><p>Shifted PMINRES (PCNONE, rtol=0), or a PETSc KSP solver type.</p></td>
+</tr>
+</tbody>
+</table>
+<p>The default solver is <code class="docutils literal notranslate"><span class="pre">shifted_pminres</span></code>. <code class="docutils literal notranslate"><span class="pre">linsys_tol</span></code> sets KSP’s absolute
+tolerance, <code class="docutils literal notranslate"><span class="pre">atol</span></code>, and the default relative tolerance is zero. Other KSP
+types retain PETSc’s default relative tolerance unless overridden through
+its options database.</p>
+<p>EDRIXS calls KSP’s <code class="docutils literal notranslate"><span class="pre">setFromOptions()</span></code> after applying <code class="docutils literal notranslate"><span class="pre">backend_kws</span></code>.
+Corresponding PETSc options-database entries, such as <code class="docutils literal notranslate"><span class="pre">ksp_atol</span></code>, <code class="docutils literal notranslate"><span class="pre">ksp_rtol</span></code>,
+<code class="docutils literal notranslate"><span class="pre">ksp_max_it</span></code>, and <code class="docutils literal notranslate"><span class="pre">ksp_type</span></code>, take precedence over these settings.</p>
+<p><code class="docutils literal notranslate"><span class="pre">ksp_type</span></code> accepts a PETSc KSP type such as <code class="docutils literal notranslate"><span class="pre">'gmres'</span></code>; the available
+algorithms and their tradeoffs are listed in the <a class="reference external" href="https://petsc.org/release/manual/ksp/#tab-kspdefaults">KSP solver table</a>.</p>
+<p>To select GMRES instead of the default shifted PMINRES, pass:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">backend_kws</span><span class="o">=</span><span class="p">{</span><span class="s1">'ksp_type'</span><span class="p">:</span> <span class="s1">'gmres'</span><span class="p">,</span> <span class="s1">'linsys_tol'</span><span class="p">:</span> <span class="mf">1e-10</span><span class="p">}</span>
+</pre></div>
+</div>
 </section>
 </section>
 

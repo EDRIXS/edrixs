@@ -70,11 +70,9 @@ umat_chb = edrixs.get_umat_slater('d', F0, F2, F4)
 # Harmonics as well as Clebsch-Gordon coefficients, Gaunt coefficients,
 # and Wigner 3J symbols. Textbooks such as [1]_ can be used for further
 # reference. If you are interested in the details of how
-# EDRIXS does this (and you probably aren't) function
-# :func:`~edrixs.coulomb_utensor.umat_slater`,
+# EDRIXS does this (and you probably aren't) function :func:`.umat_slater`,
 # constructs the required matrix via Gaunt coefficients from
-# :func:`~edrixs.coulomb_utensor.get_gaunt`. Two alternative parameterizations
-# are common.
+# :func:`.get_gaunt`. Two alternative parameterizations are common.
 # The first are the Racah parameters, which are
 #
 #   .. math::
@@ -273,7 +271,7 @@ def diagonalize(ten_dq, umat):
     emat = edrixs.cb_op(edrixs.cf_cubic_d(ten_dq),
                         edrixs.tmat_c2r('d', ispin=True))
     H = edrixs.build_op(emat, umat, basis, backend='dense')
-    e = edrixs.ed(H, num_evals=len(basis), backend='dense')[0]
+    e = edrixs.ed(H, num_evals=len(basis))[0]
     return e - e.min()
 
 basis = edrixs.get_fock_basis_int(10, 2)

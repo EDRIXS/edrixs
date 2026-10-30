@@ -65,5 +65,5 @@
 
   <!-- backend bracket spanning the numerical stages -->
   <path class="bracket" d="M 60 132 L 52 132 L 52 414 L 60 414"/>
-  <text class="blabel" transform="rotate(-90 34 273)" x="34" y="273" text-anchor="middle">backend:  dense &#183; scipy &#183; fortran &#183; etc.</text>
+  <text class="blabel" transform="rotate(-90 34 273)" x="34" y="273" text-anchor="middle">backend:  dense &#183; scipy &#183; petsc &#183; etc.</text>
 </svg>

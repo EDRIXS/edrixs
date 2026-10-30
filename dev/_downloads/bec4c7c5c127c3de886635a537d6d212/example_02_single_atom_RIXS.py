@@ -103,7 +103,7 @@ hmat_i, hmat_n, trans_ops = edrixs.get_ops(
 )
 
 
-eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=2, backend=backend)
+eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=2)
 
 ################################################################################
 # Compute XAS
@@ -141,7 +141,7 @@ gamma_c = info['gamma_c'][0]
 xas = edrixs.xas(
     eval_i, evec_i, hmat_n, trans_ops, ominc,
     gamma_c=gamma_c, thin=thin, phi=phi, pol_type=pol_type,
-    temperature=temperature, backend=backend,
+    temperature=temperature,
 )
 
 ################################################################################
@@ -170,7 +170,7 @@ rixs = edrixs.rixs(
     gamma_c=gamma_c, gamma_f=gamma_f,
     thin=thin, thout=thout, phi=phi,
     pol_type=pol_type_rixs,
-    temperature=temperature, backend=backend,
+    temperature=temperature,
 )
 
 ################################################################################
@@ -240,19 +240,19 @@ hmat_i, hmat_n, trans_ops = edrixs.get_ops(
     emat_i, umat_i, basis_i, emat_n, umat_n, basis_n, trans_mat,
     backend=backend,
 )
-eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=2, backend=backend)
+eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=2)
 
 xas_full_d_shell = edrixs.xas(
     eval_i, evec_i, hmat_n, trans_ops, ominc,
     gamma_c=gamma_c, thin=thin, phi=phi, pol_type=pol_type,
-    temperature=temperature, backend=backend,
+    temperature=temperature,
 )
 
 rixs_full_d_shell = edrixs.rixs(
     eval_i, evec_i, hmat_i, hmat_n, trans_ops, np.array([11215]), eloss,
     gamma_c=gamma_c, gamma_f=gamma_f,
     thin=thin, thout=thout, phi=phi, pol_type=pol_type_rixs,
-    temperature=temperature, backend=backend,
+    temperature=temperature,
 )
 
 fig, axs = plt.subplots(1, 2, figsize=(10, 4))

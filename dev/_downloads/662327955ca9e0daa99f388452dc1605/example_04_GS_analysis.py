@@ -17,6 +17,7 @@ representation.
 
 import numpy as np
 import matplotlib.pyplot as plt
+from mpi4py import MPI
 import edrixs
 # sphinx_gallery_start_ignore
 # Importing the script re-executes example 3. Silence its prints and discard any
@@ -28,8 +29,8 @@ with contextlib.redirect_stdout(io.StringIO()):
 plt.close('all')
 # sphinx_gallery_end_ignore
 
-backend = 'scipy'
-eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=len(basis_i), backend=backend)
+backend = 'petsc'
+eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=len(basis_i))
 eval_i = eval_i - eval_i.min()
 
 ################################################################################
@@ -44,37 +45,53 @@ eval_i = eval_i - eval_i.min()
 single_particle_Nd = np.zeros_like(emat_i)
 single_particle_Nd[:norb_d, :norb_d] = np.eye(norb_d)
 
-O = edrixs.build_op(single_particle_Nd, None, basis_i, backend=backend)
+O = edrixs.build_op(single_particle_Nd, None, basis_i, backend=backend)()
+comm = O.getComm().tompi4py()
 
-nd_expect = np.sum(evec_i.conj() * (O @ evec_i), axis=0).real
+work = O.createVecLeft()
+nd_expect = np.empty(len(evec_i))
+for k, psi in enumerate(evec_i):
+    O.mult(psi, work)
+    nd_expect[k] = work.dot(psi).real
 
-fig, ax = plt.subplots()
-
-ax.set_xlabel('Energy (eV)')
-ax.set_ylabel('$d$ electron count')
-ax.plot(eval_i, nd_expect)
+if comm.rank == 0:
+    fig, ax = plt.subplots()
+    ax.set_xlabel('Energy (eV)')
+    ax.set_ylabel('$d$ electron count')
+    ax.plot(eval_i, nd_expect)
 
 ################################################################################
 # Configuration weights alpha, beta, gamma
 # ------------------------------------------------------------------------------
 # Every Fock state has a definite :math:`d` occupation, so :math:`O` is diagonal
-# in the Fock basis. :code:`O.diagonal()` therefore gives the :math:`d`-electron
+# in the Fock basis. :code:`O.getDiagonal()` therefore gives the :math:`d`-electron
 # count of each Fock-basis component, in the same order as the amplitudes of the
 # eigenvectors returned by :func:`~edrixs.solvers.ed`.
-nd_per_component = np.rint(O.diagonal().real).astype(int)
+nd_per_component = np.rint(O.getDiagonal().getArray().real).astype(int)
 
-amp2 = np.abs(evec_i)**2
-alphas = amp2[nd_per_component == 8].sum(axis=0)
-betas = amp2[nd_per_component == 9].sum(axis=0)
-gammas = amp2[nd_per_component == 10].sum(axis=0)
+alphas = np.empty(len(evec_i))
+betas = np.empty(len(evec_i))
+gammas = np.empty(len(evec_i))
+for k, psi in enumerate(evec_i):
+    amp2 = np.abs(psi.getArray())**2
+    alphas[k] = amp2[nd_per_component == 8].sum()
+    betas[k] = amp2[nd_per_component == 9].sum()
+    gammas[k] = amp2[nd_per_component == 10].sum()
 
-print("Ground state\nalpha={:.3f}\tbeta={:.3f}\tgamma={:.3f}".format(
-    alphas[0], betas[0], gammas[0]))
+# getArray() exposes only this rank's components. Sum the local weights
+# across all ranks before displaying the complete configuration weights.
+weights = np.array([alphas, betas, gammas])
+comm.Allreduce(MPI.IN_PLACE, weights, op=MPI.SUM)
+alphas, betas, gammas = weights
 
-fig, ax = plt.subplots()
-ax.plot(eval_i, alphas, label=r'$\alpha$ $d^8L^{10}$')
-ax.plot(eval_i, betas, label=r'$\beta$ $d^9L^{9}$')
-ax.plot(eval_i, gammas, label=r'$\gamma$ $d^{10}L^{8}$')
-ax.set_xlabel('Energy (eV)')
-ax.set_ylabel('Population')
-ax.legend()
+if comm.rank == 0:
+    print("Ground state\nalpha={:.3f}\tbeta={:.3f}\tgamma={:.3f}".format(
+        alphas[0], betas[0], gammas[0]))
+
+    fig, ax = plt.subplots()
+    ax.plot(eval_i, alphas, label=r'$\alpha$ $d^8L^{10}$')
+    ax.plot(eval_i, betas, label=r'$\beta$ $d^9L^{9}$')
+    ax.plot(eval_i, gammas, label=r'$\gamma$ $d^{10}L^{8}$')
+    ax.set_xlabel('Energy (eV)')
+    ax.set_ylabel('Population')
+    ax.legend()

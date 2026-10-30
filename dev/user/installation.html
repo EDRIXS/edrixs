@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; EDRIXS 0.post1+g3cb59a0 documentation</title>
+  <title>Installation &mdash; EDRIXS 0.post1+g846835b documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=fd7cd5d2"></script>
+      <script src="../_static/documentation_options.js?v=226246b0"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -138,6 +138,8 @@ and activate the build environment:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mamba</span> <span class="n">create</span> <span class="o">--</span><span class="n">name</span> <span class="n">edrixs_env</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="o">--</span><span class="n">strict</span><span class="o">-</span><span class="n">channel</span><span class="o">-</span><span class="n">priority</span> \
     <span class="n">python</span><span class="o">=</span><span class="mf">3.14</span> <span class="s2">"numpy&gt;=2"</span> <span class="n">scipy</span> <span class="n">sympy</span> <span class="n">matplotlib</span> <span class="n">mpi4py</span> \
     <span class="s2">"arpack=*=mpi_openmpi*"</span> <span class="n">openmpi</span> <span class="n">gfortran</span> \
+    <span class="s2">"petsc=*=complex_*"</span> <span class="n">petsc4py</span> \
+    <span class="s2">"slepc=*=complex_*"</span> <span class="n">slepc4py</span> \
     <span class="s2">"libblas=*=*openblas"</span> <span class="n">cmake</span> <span class="n">ninja</span> <span class="n">numba</span> <span class="n">pip</span> <span class="n">setuptools</span> <span class="n">wheel</span> \
     <span class="n">sphinx</span> <span class="n">ipython</span> <span class="n">numpydoc</span> <span class="n">pillow</span> <span class="n">sphinx</span><span class="o">-</span><span class="n">copybutton</span> <span class="n">sphinx</span><span class="o">-</span><span class="n">gallery</span> \
     <span class="n">sphinx_rtd_theme</span> <span class="n">pytest</span>
@@ -173,6 +175,10 @@ sphinx-rtd-theme for building the documentation</p></li>
 <code class="docutils literal notranslate"><span class="pre">mpif90</span></code> and <code class="docutils literal notranslate"><span class="pre">mpicc</span></code> wrappers are used in the recommended environment</p></li>
 <li><p>mpi4py 4 or newer, built with the same MPI implementation used to build
 edrixs</p></li>
+<li><p>PETSc and SLEPc built for double-precision complex scalars
+(<code class="docutils literal notranslate"><span class="pre">complex128</span></code>), together with petsc4py and slepc4py. The
+<code class="docutils literal notranslate"><span class="pre">*=complex_*</span></code> package specifications select these complex conda-forge
+builds.</p></li>
 <li><p>BLAS and LAPACK; OpenBLAS 0.3 is used in the recommended environment</p></li>
 <li><p><a class="reference external" href="https://github.com/opencollab/arpack-ng/">ARPACK-NG</a> 3.9 or newer,
 built with MPI support</p></li>

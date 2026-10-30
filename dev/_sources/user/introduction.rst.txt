@@ -108,26 +108,32 @@ Many-body operators
 The second stage picks the many-body Fock basis :math:`\lvert \Phi \rangle`
 defined above and evaluates the Hamiltonian in it.
 
-:func:`~edrixs.solvers.build_op` builds one many-body operator:
+:func:`~edrixs.solvers.build_op` prepares one many-body operator:
 
 * ``emat``, ``umat`` -- the one- and two-body coefficients from the first
   stage.  Pass ``None`` for whichever of the two is absent.
 * ``basis`` -- a Fock-basis specification, or a realized basis.
 * ``backend`` -- the representation the operator is returned in.
 
-It returns the matrix :math:`\langle \Phi_l \rvert \hat{H} \lvert \Phi_r
-\rangle` of the one- and two-body terms above.
+It returns a zero-argument callable with a ``.backend`` label. Calling it builds
+the matrix :math:`\langle \Phi_l \rvert \hat{H} \lvert \Phi_r
+\rangle` of the one- and two-body terms above. Each call builds a fresh matrix.
 
 :func:`~edrixs.solvers.get_ops` is the spectroscopy-oriented wrapper, which
-builds everything an XAS or RIXS calculation needs in one call:
+prepares everything an XAS or RIXS calculation needs in one call:
 
 * ``emat_i``, ``umat_i``, ``basis_i`` and their ``_n`` counterparts -- the two
   Fock spaces, without and with a core hole.
 * ``trans_mat`` -- the Cartesian photon transition matrices from the model.
 
 It returns ``hmat_i``, ``hmat_n`` and the many-body transition operators
-``trans_ops``.  Because XAS and RIXS connect states with no core hole to states
-with exactly one core hole, keeping the two Hamiltonians separate avoids the
+``trans_ops`` as labeled factories for numerical backends, or disk handles for
+Fortran. Pass these directly to ``ed``, ``xas``, and ``rixs``; the solvers read
+their ``.backend`` labels and pass the factories to the backend for matrix
+construction. These solver functions
+do not accept a ``backend`` keyword. Because XAS and RIXS connect states with
+no core hole to states with exactly one core hole, keeping the two Hamiltonians
+separate avoids the
 need to generate a Hamiltonian that spans both spaces and makes
 the calculation more efficient.
 
@@ -147,10 +153,10 @@ The third stage finds the low-energy eigenstates of the many-body Hamiltonian.
 * ``eval_i`` is a 1D real array ordered by increasing energy.
 * For the ``dense`` and ``scipy`` backends ``evec_i`` is a 2D complex array; the
   eigenvector belonging to ``eval_i[k]`` is the column ``evec_i[:, k]``.
-* The ``petsc`` backend is currently an interface stub.  Requesting it raises
-  ``NotImplementedError`` rather than returning eigenvectors.
+* For the ``petsc`` backend ``evec_i`` is a list of distributed PETSc vectors,
+  one for each value in ``eval_i``.
 
-Dense and SciPy ED accept ``shift=shift``, where ``shift`` is the eighth
+Dense, SciPy, and PETSc ED accept ``shift=shift``, where ``shift`` is the eighth
 output of a model constructor. They diagonalize :math:`H - \mathrm{shift} I`
 and restore the offset in ``eval_i``. The Hamiltonian supplied by the caller
 remains unchanged, so XAS and RIXS continue using the same energy reference.

@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NiO crystal-field \(L_{2,3}\) XAS &amp; RIXS &mdash; EDRIXS 0.post1+g3cb59a0 documentation</title>
+  <title>NiO crystal-field \(L_{2,3}\) XAS &amp; RIXS &mdash; EDRIXS 0.post1+g846835b documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=fd7cd5d2"></script>
+      <script src="../_static/documentation_options.js?v=226246b0"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -165,7 +165,7 @@ over two orthogonal outgoing linear polarizations.</p>
 <span class="n">eval_i</span><span class="p">,</span> <span class="n">evec_i</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">ed</span><span class="p">(</span>
     <span class="n">hmat_i</span><span class="p">,</span> <span class="n">shift</span><span class="o">=</span><span class="n">shift</span><span class="p">,</span>
     <span class="n">num_evals</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
-    <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
+
 <span class="p">)</span>
 
 <span class="c1"># Calculate XAS spectrum.</span>
@@ -175,7 +175,7 @@ over two orthogonal outgoing linear polarizations.</p>
     <span class="n">eval_i</span><span class="p">,</span> <span class="n">evec_i</span><span class="p">,</span> <span class="n">hmat_n</span><span class="p">,</span> <span class="n">trans_ops</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span>
     <span class="n">gamma_c</span><span class="o">=</span><span class="n">gamma_c</span><span class="p">,</span>
     <span class="n">pol_type</span><span class="o">=</span><span class="p">[(</span><span class="s1">'linear'</span><span class="p">,</span> <span class="mi">0</span><span class="p">)],</span>
-    <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
+
 <span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">xas</span> <span class="o">/=</span> <span class="n">xas</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
 
@@ -193,7 +193,7 @@ over two orthogonal outgoing linear polarizations.</p>
         <span class="p">(</span><span class="s1">'linear'</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'linear'</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
         <span class="p">(</span><span class="s1">'linear'</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="s1">'linear'</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span>
     <span class="p">],</span>
-    <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">,</span>
+
 <span class="p">)</span>
 <span class="n">rixs_spectrum</span> <span class="o">=</span> <span class="n">rixs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
 <span class="n">rixs_spectrum</span> <span class="o">/=</span> <span class="n">rixs_spectrum</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>

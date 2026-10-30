@@ -32,7 +32,7 @@ cfmat = edrixs.angular_momentum.cf_cubic_d(ten_dq)
 # Let us diagonalize this matrix as a check and print out the energies
 # and their degeneracies.
 
-evals_i, evecs_i = edrixs.ed(cfmat, num_evals=10)
+evals_i, evecs_i = np.linalg.eigh(cfmat)
 evals_i = evals_i.round(decimals=6)
 unique_e = np.unique(evals_i)
 degeneracies = [sum(evalue == evals_i) for evalue in unique_e]
@@ -112,7 +112,7 @@ def diagonalize(scaleU=1):
     cfmat = edrixs.angular_momentum.cf_tetragonal_d(ten_dq=ten_dq, d1=d1, d3=d3)
     umat_i = edrixs.get_umat_slater('d', *slater_i)
     hmat_i = edrixs.build_op(cfmat, umat_i, basis_i, backend='dense')
-    evals_i, evecs_i = edrixs.ed(hmat_i, num_evals=len(basis_i), backend='dense')
+    evals_i, evecs_i = edrixs.ed(hmat_i, num_evals=len(basis_i))
     evals_i = evals_i - np.min(evals_i)  # define ground state as zero energy
     return evals_i, evecs_i, basis_i
 
@@ -161,7 +161,7 @@ nd_complex_harmoic_basis = edrixs.cb_op(nd_real_harmoic_basis,
 
 def transform_occupancy_operators(evecs_i):
     op = [edrixs.cb_op(
-            edrixs.build_op(nd_vec, None, basis_i, backend='dense'),
+            edrixs.build_op(nd_vec, None, basis_i, backend='dense')(),
             evecs_i)
         for nd_vec in nd_complex_harmoic_basis]
     return op

@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>edrixs.solvers &mdash; EDRIXS 0.post1+gf1f06c7 documentation</title>
+  <title>edrixs.solvers &mdash; EDRIXS 0.post1+g846835b documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -19,7 +19,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=62ebc182"></script>
+      <script src="../../_static/documentation_options.js?v=226246b0"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -95,6 +95,7 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -128,7 +129,6 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">.fortran_backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">fortran_backend</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">._solvers_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">_ed_1or2_valence_1core</span><span class="p">,</span>
-    <span class="n">_infer_backend</span><span class="p">,</span>
     <span class="n">_rixs_1or2_valence_1core</span><span class="p">,</span>
     <span class="n">_xas_1or2_valence_1core</span><span class="p">,</span>
 <span class="p">)</span>
@@ -157,7 +157,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">build_op</span><span class="p">(</span><span class="n">emat</span><span class="p">,</span> <span class="n">umat</span><span class="p">,</span> <span class="n">lb</span><span class="p">,</span> <span class="n">rb</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'scipy'</span><span class="p">,</span>
              <span class="n">basis_method</span><span class="o">=</span><span class="s1">'combinadic'</span><span class="p">,</span> <span class="n">use_numba</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">backend_kws</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
-<span class="sd">    Build a many-body operator with the selected backend.</span>
+<span class="sd">    Prepare a labeled callable that builds a many-body operator.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -188,8 +188,11 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    operator</span>
-<span class="sd">        Many-body operator in the representation owned by ``backend``.</span>
+<span class="sd">    functools.partial</span>
+<span class="sd">        Zero-argument matrix factory with a ``backend`` attribute. Each call</span>
+<span class="sd">        builds a fresh matrix. Coefficient arrays are retained by reference;</span>
+<span class="sd">        later edits affect subsequent builds. Matrix construction and its</span>
+<span class="sd">        backend-specific validation run when the factory is called.</span>
 <span class="sd">    """</span>
     <span class="k">match</span> <span class="n">backend</span><span class="p">:</span>
         <span class="k">case</span> <span class="s1">'scipy'</span><span class="p">:</span>
@@ -213,14 +216,17 @@
     <span class="k">if</span> <span class="n">rb</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">rb</span> <span class="o">=</span> <span class="n">build_fock_basis</span><span class="p">(</span><span class="n">rb</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">basis_method</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">build_op_backend</span><span class="p">(</span>
+    <span class="n">factory</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+        <span class="n">build_op_backend</span><span class="p">,</span>
         <span class="n">emat</span><span class="p">,</span>
         <span class="n">umat</span><span class="p">,</span>
         <span class="n">lb</span><span class="p">,</span>
         <span class="n">rb</span><span class="p">,</span>
         <span class="n">use_numba</span><span class="o">=</span><span class="n">use_numba</span><span class="p">,</span>
         <span class="n">backend_kws</span><span class="o">=</span><span class="n">backend_kws</span><span class="p">,</span>
-    <span class="p">)</span></div>
+    <span class="p">)</span>
+    <span class="n">factory</span><span class="o">.</span><span class="n">backend</span> <span class="o">=</span> <span class="n">backend</span>
+    <span class="k">return</span> <span class="n">factory</span></div>
 
 
 
@@ -260,7 +266,8 @@
 <span class="sd">    -------</span>
 <span class="sd">    hmat_i, hmat_n, trans_ops</span>
 <span class="sd">        Initial/final Hamiltonian, intermediate Hamiltonian, and transition</span>
-<span class="sd">        operators for the selected backend.</span>
+<span class="sd">        labeled factories for the selected numerical backend, or disk handles</span>
+<span class="sd">        for Fortran. Call a numerical factory to obtain its matrix.</span>
 <span class="sd">    """</span>
     <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="s1">'fortran'</span><span class="p">:</span>
         <span class="n">trans_mat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">trans_mat</span><span class="p">)</span>
@@ -323,26 +330,25 @@
 
 <div class="viewcode-block" id="ed">
 <a class="viewcode-back" href="../../reference/solvers.html#edrixs.solvers.ed">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">ed</span><span class="p">(</span><span class="n">hmat_i</span><span class="p">,</span> <span class="n">num_evals</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">shift</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">backend_kws</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">ed</span><span class="p">(</span><span class="n">hmat_i</span><span class="p">,</span> <span class="n">num_evals</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">shift</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">backend_kws</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Compute low-energy initial states through a numerical backend.</span>
 
+<span class="sd">    Read ``hmat_i.backend`` and pass the factory to that backend.</span>
+<span class="sd">    Fortran disk handles are passed directly to the Fortran backend.</span>
+
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    hmat_i : backend-owned operator</span>
+<span class="sd">    hmat_i : labeled operator factory or Fortran disk handle</span>
 <span class="sd">        Initial/final Hamiltonian.</span>
 <span class="sd">    num_evals : int, optional</span>
 <span class="sd">        Number of lowest eigenpairs to return.</span>
 <span class="sd">    shift : float, optional</span>
 <span class="sd">        Real energy offset, normally the final output of a model</span>
-<span class="sd">        constructor. Dense and SciPy ED diagonalize ``hmat_i - shift * I``</span>
+<span class="sd">        constructor. Dense, SciPy, and PETSc ED diagonalize ``hmat_i - shift * I``</span>
 <span class="sd">        and add the offset back to the returned eigenvalues. The supplied</span>
-<span class="sd">        Hamiltonian is not modified. Default zero; PETSc requires zero.</span>
-<span class="sd">        Fortran ED warns and ignores nonzero shifts, continuing with the</span>
-<span class="sd">        original Hamiltonian.</span>
-<span class="sd">    backend : str or None, optional</span>
-<span class="sd">        Backend name. This must be compatible with the backend choice</span>
-<span class="sd">        for ``hmat_i``. When omitted, infer it from ``hmat_i``.</span>
+<span class="sd">        Hamiltonian is not modified. Default zero; Fortran ED warns</span>
+<span class="sd">        and ignores nonzero shifts, continuing with the original Hamiltonian.</span>
 <span class="sd">    backend_kws : mapping, optional</span>
 <span class="sd">        Backend-specific eigensolver options. Accepted names, defaults, and</span>
 <span class="sd">        constraints are in the EDRIXS backend keyword reference:</span>
@@ -354,21 +360,12 @@
 <span class="sd">        Lowest retained eigenpairs, with eigenvalues on the original energy</span>
 <span class="sd">        reference even when a nonzero ``shift`` is supplied.</span>
 <span class="sd">    """</span>
-    <span class="n">backend_name</span> <span class="o">=</span> <span class="n">backend</span> <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_infer_backend</span><span class="p">(</span><span class="n">hmat_i</span><span class="p">)</span>
-    <span class="k">match</span> <span class="n">backend_name</span><span class="p">:</span>
-        <span class="k">case</span> <span class="s1">'scipy'</span><span class="p">:</span>
-            <span class="n">ed_backend</span> <span class="o">=</span> <span class="n">scipy_backend</span><span class="o">.</span><span class="n">ed_scipy</span>
-        <span class="k">case</span> <span class="s1">'dense'</span><span class="p">:</span>
-            <span class="n">ed_backend</span> <span class="o">=</span> <span class="n">dense_backend</span><span class="o">.</span><span class="n">ed_dense</span>
-        <span class="k">case</span> <span class="s1">'petsc'</span><span class="p">:</span>
-            <span class="n">ed_backend</span> <span class="o">=</span> <span class="n">petsc_backend</span><span class="o">.</span><span class="n">ed_petsc</span>
-        <span class="k">case</span> <span class="s1">'fortran'</span><span class="p">:</span>
-            <span class="n">ed_backend</span> <span class="o">=</span> <span class="n">fortran_backend</span><span class="o">.</span><span class="n">ed_fortran</span>
-        <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">"Unknown backend </span><span class="si">{!r}</span><span class="s2">; expected 'scipy', 'dense', 'petsc', or "</span>
-                <span class="s2">"'fortran'"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">backend_name</span><span class="p">)</span>
-            <span class="p">)</span>
+    <span class="n">ed_backend</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">'scipy'</span><span class="p">:</span> <span class="n">scipy_backend</span><span class="o">.</span><span class="n">ed_scipy</span><span class="p">,</span>
+        <span class="s1">'dense'</span><span class="p">:</span> <span class="n">dense_backend</span><span class="o">.</span><span class="n">ed_dense</span><span class="p">,</span>
+        <span class="s1">'petsc'</span><span class="p">:</span> <span class="n">petsc_backend</span><span class="o">.</span><span class="n">ed_petsc</span><span class="p">,</span>
+        <span class="s1">'fortran'</span><span class="p">:</span> <span class="n">fortran_backend</span><span class="o">.</span><span class="n">ed_fortran</span><span class="p">,</span>
+    <span class="p">}[</span><span class="n">hmat_i</span><span class="o">.</span><span class="n">backend</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">ed_backend</span><span class="p">(</span>
         <span class="n">hmat_i</span><span class="p">,</span>
@@ -384,14 +381,14 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">xas</span><span class="p">(</span><span class="n">eval_i</span><span class="p">,</span> <span class="n">evec_i</span><span class="p">,</span> <span class="n">hmat_n</span><span class="p">,</span> <span class="n">trans_op</span><span class="p">,</span> <span class="n">ominc</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span>
         <span class="n">gamma_c</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">thin</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">pol_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">temperature</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">scatter_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">backend</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">backend_kws</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">backend_kws</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Calculate X-ray absorption spectra through a numerical backend.</span>
 
 <span class="sd">    Backend-neutral physical arguments are passed directly. Numerical</span>
-<span class="sd">    controls such as the SciPy Lanczos dimension belong in ``backend_kws``.</span>
-<span class="sd">    When ``backend`` is omitted, it is inferred from ``hmat_n`` and the</span>
-<span class="sd">    transition operators.</span>
+<span class="sd">    controls belong in ``backend_kws``.</span>
+<span class="sd">    The backend is read from ``hmat_n.backend``. The backend controls matrix</span>
+<span class="sd">    construction and lifetime.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -403,10 +400,10 @@
 <span class="sd">        :func:`~edrixs.solvers.ed`.  For the ``'dense'`` and ``'scipy'``</span>
 <span class="sd">        backends this is a two-dimensional array whose column ``i`` belongs to</span>
 <span class="sd">        ``eval_i[i]``.</span>
-<span class="sd">    hmat_n : backend-owned operator</span>
+<span class="sd">    hmat_n : labeled operator factory or Fortran disk handle</span>
 <span class="sd">        Intermediate-state Hamiltonian, normally returned by</span>
 <span class="sd">        :func:`~edrixs.solvers.get_ops`.</span>
-<span class="sd">    trans_op : sequence of backend-owned operators</span>
+<span class="sd">    trans_op : sequence of labeled operator factories or Fortran disk handles</span>
 <span class="sd">        Transition operators from the initial to the intermediate Hilbert</span>
 <span class="sd">        space.  There must be three components for a dipole transition or five</span>
 <span class="sd">        for a quadrupole transition.</span>
@@ -430,10 +427,6 @@
 <span class="sd">    scatter_axis : array-like of float, shape (3, 3), or None, optional</span>
 <span class="sd">        Cartesian axes defining the scattering frame.  The identity matrix is</span>
 <span class="sd">        used by default.</span>
-<span class="sd">    backend : {'dense', 'scipy', 'fortran', 'petsc'} or None, optional</span>
-<span class="sd">        Numerical backend.  This must be compatible with operators passed to</span>
-<span class="sd">        the function. If omitted, infer it from ``hmat_n`` and</span>
-<span class="sd">        ``trans_op``.  The PETSc backend is currently an unimplemented stub.</span>
 <span class="sd">    backend_kws : mapping or None, optional</span>
 <span class="sd">        Backend-specific solver settings. Accepted names, defaults, and</span>
 <span class="sd">        constraints are in the EDRIXS backend keyword reference:</span>
@@ -462,26 +455,15 @@
 <span class="sd">    &gt;&gt;&gt; ominc = np.linspace(-5.0, 5.0, 201)</span>
 <span class="sd">    &gt;&gt;&gt; spectrum = edrixs.xas(  # doctest: +SKIP</span>
 <span class="sd">    ...     eval_i, evec_i, hmat_n, trans_ops, ominc,</span>
-<span class="sd">    ...     pol_type=[('isotropic', 0.0)], backend='scipy'</span>
+<span class="sd">    ...     pol_type=[('isotropic', 0.0)]</span>
 <span class="sd">    ... )</span>
 <span class="sd">    """</span>
-    <span class="n">backend_name</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">backend</span> <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">_infer_backend</span><span class="p">(</span><span class="n">hmat_n</span><span class="p">,</span> <span class="o">*</span><span class="n">trans_op</span><span class="p">)</span>
-    <span class="p">)</span>
-    <span class="k">match</span> <span class="n">backend_name</span><span class="p">:</span>
-        <span class="k">case</span> <span class="s1">'scipy'</span><span class="p">:</span>
-            <span class="n">xas_backend</span> <span class="o">=</span> <span class="n">scipy_backend</span><span class="o">.</span><span class="n">xas_scipy</span>
-        <span class="k">case</span> <span class="s1">'dense'</span><span class="p">:</span>
-            <span class="n">xas_backend</span> <span class="o">=</span> <span class="n">dense_backend</span><span class="o">.</span><span class="n">xas_dense</span>
-        <span class="k">case</span> <span class="s1">'petsc'</span><span class="p">:</span>
-            <span class="n">xas_backend</span> <span class="o">=</span> <span class="n">petsc_backend</span><span class="o">.</span><span class="n">xas_petsc</span>
-        <span class="k">case</span> <span class="s1">'fortran'</span><span class="p">:</span>
-            <span class="n">xas_backend</span> <span class="o">=</span> <span class="n">fortran_backend</span><span class="o">.</span><span class="n">xas_fortran</span>
-        <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">"Unknown backend </span><span class="si">{!r}</span><span class="s2">; expected 'scipy', 'dense', 'petsc', or "</span>
-                <span class="s2">"'fortran'"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">backend_name</span><span class="p">)</span>
-            <span class="p">)</span>
+    <span class="n">xas_backend</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">'scipy'</span><span class="p">:</span> <span class="n">scipy_backend</span><span class="o">.</span><span class="n">xas_scipy</span><span class="p">,</span>
+        <span class="s1">'dense'</span><span class="p">:</span> <span class="n">dense_backend</span><span class="o">.</span><span class="n">xas_dense</span><span class="p">,</span>
+        <span class="s1">'petsc'</span><span class="p">:</span> <span class="n">petsc_backend</span><span class="o">.</span><span class="n">xas_petsc</span><span class="p">,</span>
+        <span class="s1">'fortran'</span><span class="p">:</span> <span class="n">fortran_backend</span><span class="o">.</span><span class="n">xas_fortran</span><span class="p">,</span>
+    <span class="p">}[</span><span class="n">hmat_n</span><span class="o">.</span><span class="n">backend</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">xas_backend</span><span class="p">(</span>
         <span class="n">eval_i</span><span class="p">,</span> <span class="n">evec_i</span><span class="p">,</span> <span class="n">hmat_n</span><span class="p">,</span> <span class="n">trans_op</span><span class="p">,</span> <span class="n">ominc</span><span class="p">,</span>
@@ -501,14 +483,14 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">rixs</span><span class="p">(</span><span class="n">eval_i</span><span class="p">,</span> <span class="n">evec_i</span><span class="p">,</span> <span class="n">hmat_i</span><span class="p">,</span> <span class="n">hmat_n</span><span class="p">,</span> <span class="n">trans_op</span><span class="p">,</span> <span class="n">ominc</span><span class="p">,</span> <span class="n">eloss</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span>
          <span class="n">gamma_c</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">gamma_f</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">thin</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">thout</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
          <span class="n">pol_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">scatter_axis</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-         <span class="n">skip_gs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_poles</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">backend_kws</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+         <span class="n">skip_gs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">return_poles</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">backend_kws</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Calculate resonant inelastic X-ray scattering spectra through a backend.</span>
 
 <span class="sd">    Backend-neutral physical arguments are passed directly. Numerical</span>
-<span class="sd">    controls such as SciPy Lanczos and GMRES settings belong in</span>
-<span class="sd">    ``backend_kws``. When ``backend`` is omitted, it is inferred from the</span>
-<span class="sd">    Hamiltonians and transition operators.</span>
+<span class="sd">    controls belong in</span>
+<span class="sd">    ``backend_kws``. The backend is read from ``hmat_i.backend`` and controls</span>
+<span class="sd">    matrix construction and lifetime.</span>
 
 <span class="sd">    If ``skip_gs`` is true, transitions into the retained initial-state</span>
 <span class="sd">    subspace are omitted from the final-state spectrum, matching the legacy</span>
@@ -524,12 +506,12 @@
 <span class="sd">        :func:`~edrixs.solvers.ed`.  For the ``'dense'`` and ``'scipy'``</span>
 <span class="sd">        backends this is a two-dimensional array whose column ``i`` belongs to</span>
 <span class="sd">        ``eval_i[i]``.</span>
-<span class="sd">    hmat_i : backend-owned operator</span>
+<span class="sd">    hmat_i : labeled operator factory or Fortran disk handle</span>
 <span class="sd">        Initial- and final-state Hamiltonian.</span>
-<span class="sd">    hmat_n : backend-owned operator</span>
+<span class="sd">    hmat_n : labeled operator factory or Fortran disk handle</span>
 <span class="sd">        Intermediate-state Hamiltonian.  Both Hamiltonians are normally</span>
 <span class="sd">        returned by :func:`~edrixs.solvers.get_ops`.</span>
-<span class="sd">    trans_op : sequence of backend-owned operators</span>
+<span class="sd">    trans_op : sequence of labeled operator factories or Fortran disk handles</span>
 <span class="sd">        Transition operators from the initial/final Hilbert space to the</span>
 <span class="sd">        intermediate Hilbert space.  There must be three components for a</span>
 <span class="sd">        dipole transition or five for a quadrupole transition.</span>
@@ -566,10 +548,6 @@
 <span class="sd">    return_poles : bool, optional</span>
 <span class="sd">        If True, also return the continued-fraction pole data.  Default is</span>
 <span class="sd">        False.</span>
-<span class="sd">    backend : {'dense', 'scipy', 'fortran', 'petsc'} or None, optional</span>
-<span class="sd">        Numerical backend. This must be compatible with operators passed to</span>
-<span class="sd">        the function. If omitted, infer it from the Hamiltonians and</span>
-<span class="sd">        ``trans_op``.  The PETSc backend is currently an unimplemented stub.</span>
 <span class="sd">    backend_kws : mapping or None, optional</span>
 <span class="sd">        Backend-specific solver settings. Accepted names, defaults, and</span>
 <span class="sd">        constraints are in the EDRIXS backend keyword reference:</span>
@@ -604,28 +582,15 @@
 <span class="sd">    &gt;&gt;&gt; eloss = np.linspace(0.0, 5.0, 501)</span>
 <span class="sd">    &gt;&gt;&gt; spectrum = edrixs.rixs(  # doctest: +SKIP</span>
 <span class="sd">    ...     eval_i, evec_i, hmat_i, hmat_n, trans_ops, ominc, eloss,</span>
-<span class="sd">    ...     pol_type=[('linear', 0.0, 'linear', 0.0)], backend='scipy'</span>
+<span class="sd">    ...     pol_type=[('linear', 0.0, 'linear', 0.0)]</span>
 <span class="sd">    ... )</span>
 <span class="sd">    """</span>
-    <span class="n">backend_name</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">backend</span>
-        <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="k">else</span> <span class="n">_infer_backend</span><span class="p">(</span><span class="n">hmat_i</span><span class="p">,</span> <span class="n">hmat_n</span><span class="p">,</span> <span class="o">*</span><span class="n">trans_op</span><span class="p">)</span>
-    <span class="p">)</span>
-    <span class="k">match</span> <span class="n">backend_name</span><span class="p">:</span>
-        <span class="k">case</span> <span class="s1">'scipy'</span><span class="p">:</span>
-            <span class="n">rixs_backend</span> <span class="o">=</span> <span class="n">scipy_backend</span><span class="o">.</span><span class="n">rixs_scipy</span>
-        <span class="k">case</span> <span class="s1">'dense'</span><span class="p">:</span>
-            <span class="n">rixs_backend</span> <span class="o">=</span> <span class="n">dense_backend</span><span class="o">.</span><span class="n">rixs_dense</span>
-        <span class="k">case</span> <span class="s1">'petsc'</span><span class="p">:</span>
-            <span class="n">rixs_backend</span> <span class="o">=</span> <span class="n">petsc_backend</span><span class="o">.</span><span class="n">rixs_petsc</span>
-        <span class="k">case</span> <span class="s1">'fortran'</span><span class="p">:</span>
-            <span class="n">rixs_backend</span> <span class="o">=</span> <span class="n">fortran_backend</span><span class="o">.</span><span class="n">rixs_fortran</span>
-        <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">"Unknown backend </span><span class="si">{!r}</span><span class="s2">; expected 'scipy', 'dense', 'petsc', or "</span>
-                <span class="s2">"'fortran'"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">backend_name</span><span class="p">)</span>
-            <span class="p">)</span>
+    <span class="n">rixs_backend</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">'scipy'</span><span class="p">:</span> <span class="n">scipy_backend</span><span class="o">.</span><span class="n">rixs_scipy</span><span class="p">,</span>
+        <span class="s1">'dense'</span><span class="p">:</span> <span class="n">dense_backend</span><span class="o">.</span><span class="n">rixs_dense</span><span class="p">,</span>
+        <span class="s1">'petsc'</span><span class="p">:</span> <span class="n">petsc_backend</span><span class="o">.</span><span class="n">rixs_petsc</span><span class="p">,</span>
+        <span class="s1">'fortran'</span><span class="p">:</span> <span class="n">fortran_backend</span><span class="o">.</span><span class="n">rixs_fortran</span><span class="p">,</span>
+    <span class="p">}[</span><span class="n">hmat_i</span><span class="o">.</span><span class="n">backend</span><span class="p">]</span>
 
     <span class="k">return</span> <span class="n">rixs_backend</span><span class="p">(</span>
         <span class="n">eval_i</span><span class="p">,</span> <span class="n">evec_i</span><span class="p">,</span> <span class="n">hmat_i</span><span class="p">,</span> <span class="n">hmat_n</span><span class="p">,</span> <span class="n">trans_op</span><span class="p">,</span> <span class="n">ominc</span><span class="p">,</span> <span class="n">eloss</span><span class="p">,</span>
