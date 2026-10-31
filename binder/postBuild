@@ -1,12 +1,13 @@
 #!/bin/bash
 
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
 # run matplotlib once to generate the font cache
 python -c "import matplotlib as mpl; mpl.use('Agg'); import pylab as plt; fig, ax = plt.subplots(); fig.savefig('test.png')"
 
 test -e test.png && rm test.png
 
-git clone https://github.com/NSLS-II/edrixs.git
-cp -r edrixs/examples .
+# Use the examples from the checkout being launched by Binder.
 cp examples/sphinx/example_*.py .
-sphx_glr_python_to_jupyter.py example_*.py
-rm -r edrixs
+sphinx_gallery_py2jupyter example_*.py
