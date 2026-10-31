@@ -56,25 +56,49 @@ RUN curl --fail --show-error --location --retry 3 \
   rm -rf /tmp/arpack-ng.tar.gz "/tmp/arpack-ng-${ARPACK_VERSION}" \
       /tmp/arpack-ng-build
 
-FROM dep_builder AS app_builder
+FROM dep_builder AS solver_builder
 
 ENV PETSC_CONFIGURE_OPTIONS="--with-scalar-type=complex --with-precision=double"
 
-COPY --chown=docker docker/requirements.txt /tmp/edrixs-docker-requirements.txt
+COPY --chown=docker docker/solver-requirements.txt /tmp/edrixs-requirements/solver-requirements.txt
 RUN python -m pip install --no-cache-dir --upgrade \
-      pip==26.2.1 setuptools==84.0.0 wheel==0.48.0 && \
+      pip==26.2.1 setuptools==84.1.0 wheel==0.48.0 && \
   python -m pip install --no-cache-dir \
-      --requirement /tmp/edrixs-docker-requirements.txt && \
-  python -m pip install --no-cache-dir petsc petsc4py && \
-  python -m pip install --no-cache-dir slepc slepc4py numba
+      --build-constraint /tmp/edrixs-requirements/solver-requirements.txt \
+      --requirement /tmp/edrixs-requirements/solver-requirements.txt
 
-COPY --chown=docker . edrixs
+# Resolve Versioneer against the complete checkout before selecting build inputs.
+# A partial checkout with .git would incorrectly mark release builds as dirty.
+FROM dep_builder AS source
+WORKDIR /tmp/edrixs-source
+COPY --chown=docker . .
+RUN python -c "import versioneer; versioneer.write_to_version_file('edrixs/_version.py', versioneer.get_versions())"
+
+FROM solver_builder AS app_builder
+
+COPY --chown=docker docker/requirements.txt /tmp/edrixs-requirements/requirements.txt
+RUN python -m pip install --no-cache-dir \
+      --requirement /tmp/edrixs-requirements/requirements.txt
+
+COPY --from=source --chown=docker /tmp/edrixs-source/edrixs/ edrixs/edrixs/
+COPY --from=source --chown=docker /tmp/edrixs-source/src/ edrixs/src/
+COPY --from=source --chown=docker /tmp/edrixs-source/cmake/ edrixs/cmake/
+COPY --from=source --chown=docker \
+    /tmp/edrixs-source/setup.py /tmp/edrixs-source/setup.cfg \
+    /tmp/edrixs-source/pyproject.toml /tmp/edrixs-source/versioneer.py \
+    /tmp/edrixs-source/CMakeLists.txt /tmp/edrixs-source/MANIFEST.in \
+    /tmp/edrixs-source/README.rst /tmp/edrixs-source/requirements.txt \
+    /tmp/edrixs-source/AUTHORS.rst /tmp/edrixs-source/CONTRIBUTING.rst \
+    /tmp/edrixs-source/LICENSE edrixs/
 
 RUN export VERBOSE=1 FFLAGS="-Wall -Wunused -Wextra -Wno-maybe-uninitialized -Ofast -faggressive-loop-optimizations -fno-tree-pre" && \
   python -m pip install --no-build-isolation --no-deps --verbose ./edrixs
 
 FROM app_builder AS developer
+# The developer target still includes the full checkout and local tooling.
+COPY --chown=docker . edrixs
 RUN python -m pip install --no-cache-dir \
+    --constraint /tmp/edrixs-requirements/solver-requirements.txt \
     --requirement edrixs/requirements-dev.txt
 
 FROM base AS app
@@ -85,4 +109,4 @@ ENV LD_LIBRARY_PATH="/opt/edrixs/lib" \
     OMPI_MCA_btl_vader_single_copy_mechanism="none"
 
 COPY --from=app_builder /opt /opt
-COPY --from=app_builder --chown=docker /home/docker/edrixs/examples examples
+COPY --chown=docker examples/ examples/

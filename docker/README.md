@@ -52,3 +52,18 @@ docker run --rm -it -p 8888:8888 \
 The image is published from the corresponding GitHub release by GitHub
 Actions. Images produced by the current release workflow include build
 provenance and a software bill of materials.
+
+## Build dependencies and caching
+
+`solver-requirements.txt` pins NumPy, MPI bindings, PETSc, SLEPc, and their
+Python bindings in a separate build stage. `requirements.txt` includes that
+file and pins the general Python environment. Updating a general dependency
+reuses the compiled solver stage when its cached layers are available.
+Update the solver pins together when changing NumPy or PETSc/SLEPc, and check
+both the Python imports and two-rank MPI smoke tests.
+
+The EDRIXS build copies package sources and packaging inputs, including the
+README used for package metadata. Examples are copied into the final image
+after installation. Versioneer resolves the version against the complete
+checkout first, so release tags and development revisions remain accurate.
+A new Git revision can still require rebuilding EDRIXS to record that version.

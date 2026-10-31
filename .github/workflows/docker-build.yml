@@ -72,19 +72,23 @@ jobs:
 
           import numpy
           from edrixs import fedrixs
+          from petsc4py import PETSc
+          from slepc4py import SLEPc
 
           actual = version("edrixs")
           expected = os.environ.get("RELEASE_TAG", "").removeprefix("v")
           assert actual != "0+unknown"
           assert not expected or actual == expected, (actual, expected)
           assert int(numpy.__version__.split(".")[0]) >= 2
+          assert numpy.issubdtype(PETSc.ScalarType, numpy.complexfloating)
           print(actual, fedrixs.__file__)
+          print("PETSc", PETSc.Sys.getVersion(), "SLEPc", SLEPc.Sys.getVersion())
           PY
 
       - name: Test two-rank MPI execution
         run: |
           docker run --rm edrixs:test mpirun -np 2 python -c \
-            "from mpi4py import MPI; from edrixs import fedrixs; print(MPI.COMM_WORLD.rank)"
+            "from mpi4py import MPI; from edrixs import fedrixs; from petsc4py import PETSc; from slepc4py import SLEPc; assert PETSc.COMM_WORLD.getSize() == MPI.COMM_WORLD.size == 2; print(MPI.COMM_WORLD.rank)"
 
   publish:
     name: Publish release image

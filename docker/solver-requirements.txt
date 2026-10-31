@@ -1,0 +1,8 @@
+# Python 3.12 solver stack, built separately from the general Python packages.
+# Keep NumPy and MPI bindings here so later installs preserve their versions.
+numpy==2.5.2
+mpi4py==4.1.2
+petsc==3.26.0
+petsc4py==3.26.0
+slepc==3.26.0
+slepc4py==3.26.0
