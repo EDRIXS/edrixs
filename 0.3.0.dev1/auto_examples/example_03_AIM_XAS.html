@@ -1,0 +1,427 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Anderson impurity model for NiO XAS &mdash; EDRIXS 0.3.0.dev1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery.css?v=c83e6b79" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="../_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/version-switcher.css?v=23edc989" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=cbbe7d37"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/sg-tags.js?v=d80f6fa4"></script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+      <script src="../_static/version-switcher.js?v=7c26ac8e"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Ground state analysis for NiO" href="example_04_GS_analysis.html" />
+    <link rel="prev" title="RIXS calculations for an atomic model" href="example_02_single_atom_RIXS.html" />
+   
+  <meta name="edrixs-doc-version" content="0.3.0.dev1">
+  <meta name="edrixs-doc-site-root" content="/edrixs/">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            EDRIXS
+              <img src="../_static/EDRIXS_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user/index.html">EDRIXS User Guide</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Pedagogical examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="example_00_ed_calculator.html">Exact diagonalization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_01_crystal_field.html">Crystal fields</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_02_single_atom_RIXS.html">RIXS calculations for an atomic model</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Anderson impurity model for NiO XAS</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#number-of-electrons">Number of electrons</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#coulomb-interactions">Coulomb interactions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#charge-transfer-energy">Charge-transfer energy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#orbital-energies-and-hybridization">Orbital energies and hybridization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#spin-orbit-coupling">Spin-orbit coupling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#build-the-model">Build the model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#diagonalization">Diagonalization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compute-xas">Compute XAS</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="example_04_GS_analysis.html">Ground state analysis for NiO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_05_charge_transfer.html">Charge-transfer energy for NiO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_06_Hubbard_dimer.html">Hubbard Dimer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_07_transitions.html">X-ray transitions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_08_Hunds_interactions.html">Hund’s Interactions in charge transfer insulators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_09_Coulomb.html">Coulomb interactions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="example_10_geometry.html">Geometry</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/index.html">EDRIXS Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../release-history.html">Release History</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">EDRIXS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Pedagogical examples</a></li>
+      <li class="breadcrumb-item active">Anderson impurity model for NiO XAS</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/auto_examples/example_03_AIM_XAS.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <div class="sphx-glr-download-link-note admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference internal" href="#sphx-glr-download-auto-examples-example-03-aim-xas-py"><span class="std std-ref">Go to the end</span></a>
+to download the full example code.</p>
+</div>
+<section class="sphx-glr-example-title" id="anderson-impurity-model-for-nio-xas">
+<span id="sphx-glr-auto-examples-example-03-aim-xas-py"></span><h1>Anderson impurity model for NiO XAS<a class="headerlink" href="#anderson-impurity-model-for-nio-xas" title="Link to this heading"></a></h1>
+<p>Here we calculate the <span class="math notranslate nohighlight">\(L\)</span>-edge XAS spectrum of an Anderson impurity model,
+which is sometimes also called a charge-transfer multiplet model. This model
+considers a set of correlated orbitals, often called the impurity or metal
+states, that hybridize with a set of uncorrelated orbitals, often called the
+ligands or bath states. Everyone’s favorite test case for x-ray spectroscopic
+calculations of the Anderson impurity model is NiO and we won’t risk being
+original! This means that our correlated states will
+be the Ni <span class="math notranslate nohighlight">\(3d\)</span> orbitals and the uncorrelated states come from O
+<span class="math notranslate nohighlight">\(2p\)</span> orbitals. The fact that we include these interactions means that our
+spectrum can include processes where electrons transition from the bath to the
+impurity, as such the Anderson Impurity Model is often more accurate than atomic
+models, especially if the material has strong covalency.</p>
+<p>When defining the bath states, it is useful to use the so-called
+symmetry adapted linear combinations of orbitals as the basis. These states
+take into account the symmetry relationships between the different bath atom
+orbitals and the fact that there are bath orbital combinations that do not
+interact with the impurity by symmetry. By doing this the problem can be
+represented with fewer orbitals, which makes the calculation far more efficient.
+The standard EDRIXS solver that we will use assumes that the bath states are
+represented by an integer number of bath sites set by <code class="code docutils literal notranslate"><span class="pre">nbath</span></code>, each of
+which hosts the same number of spin-orbitals as the impurity e.g. 10 for a
+<span class="math notranslate nohighlight">\(d\)</span>-electron material.</p>
+<p>NiO has a rocksalt structure in which all Ni atoms are surrounded by six O
+atoms. This NiO cluster used to simulate the
+crystal would then contain 10 Ni <span class="math notranslate nohighlight">\(3d\)</span> spin-orbitals and <span class="math notranslate nohighlight">\(6\)</span>
+spin-orbitals per O <span class="math notranslate nohighlight">\(\times 6\)</span> O atoms <span class="math notranslate nohighlight">\(=36\)</span> oxygen
+spin-orbitals. As explained by, for example, Maurits Haverkort
+et al. in <a class="footnote-reference brackets" href="#id7" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a> symmetry allows us to represent the bath with 10 symmetry
+adapted linear combinations of the different O <span class="math notranslate nohighlight">\(p_x, p_y, p_z\)</span> states.
+The crystal field and hopping parameters for
+such a calculation can be obtained by post-processing DFT calculations. We will
+use values for NiO from <a class="footnote-reference brackets" href="#id7" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. If you use values from a paper the relevant
+references should, of course, be cited.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="kn">import</span><span class="w"> </span><span class="nn">edrixs</span><span class="w">
+</span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span><span class="w">
+</span><span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span><span class="nn">.</span><span class="nn">pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span><span class="w">
+</span></pre></div></div>
+<section id="number-of-electrons">
+<h2>Number of electrons<a class="headerlink" href="#number-of-electrons" title="Link to this heading"></a></h2>
+<p>We use a nominal Ni d8 impurity and a full bath of ten spin-orbitals.
+The bath orbitals are ligand combinations with d-like symmetry, not a second
+correlated atomic d shell. <a class="reference internal" href="../reference/models.html#edrixs.models.model_siam_2d1p" title="edrixs.models.model_siam_2d1p"><code class="xref py py-func docutils literal notranslate"><span class="pre">model_siam_2d1p()</span></code></a> fixes one
+such bath and a p core. It infers 18 initial valence electrons from nd=8.
+Hybridization redistributes these electrons while conserving their total.
+All model energies and hoppings below are in eV.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="int"><span class="n">nd</span></a> <span class="o">=</span> <span class="mi">8</span><span class="w">
+</span><span class="c1"># Fixed model dimensions, also used by the following analysis examples.</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="int"><span class="n">norb_d</span></a> <span class="o">=</span> <span class="mi">10</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="int"><span class="n">nbath</span></a> <span class="o">=</span> <span class="mi">1</span><span class="w">
+</span></pre></div></div>
+</section>
+<section id="coulomb-interactions">
+<h2>Coulomb interactions<a class="headerlink" href="#coulomb-interactions" title="Link to this heading"></a></h2>
+<p>The atomic Coulomb interactions are usually initialized based on Hartree-Fock
+calculations from, for example,
+<a class="reference external" href="https://www.tcd.ie/physics/research/groups/xray-spectroscopy/CowanCode.php">Cowan’s code</a>.
+edrixs has a database of these.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="dict"><span class="n">info</span></a>  <span class="o">=</span> <a class="sphx-glr-backref-module-edrixs sphx-glr-backref-type-py-function reference internal" href="../reference/utils.html#edrixs.utils.get_atom_data" title="edrixs.get_atom_data"><span class="n">edrixs</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_atom_data</span></a><span class="p">(</span><span class="s1">'</span><span class="s1">Ni</span><span class="s1">'</span><span class="p">,</span> <span class="s1">'</span><span class="s1">3d</span><span class="s1">'</span><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="int"><span class="n">nd</span></a><span class="p">,</span> <span class="n">edge</span><span class="o">=</span><span class="s1">'</span><span class="s1">L3</span><span class="s1">'</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<p>The atomic values are typically scaled to account for screening in the solid.
+Here we use 80% scaling. Let’s write these out in full, so that nothing is
+hidden. Values for <span class="math notranslate nohighlight">\(U_{dd}\)</span> and <span class="math notranslate nohighlight">\(U_{dp}\)</span> are those of Ref. <a class="footnote-reference brackets" href="#id7" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>
+obtained by comparing theory and experiment <a class="footnote-reference brackets" href="#id8" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a> <a class="footnote-reference brackets" href="#id9" id="id5" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">scale_dd</span></a> <span class="o">=</span> <span class="mf">0.8</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">F2_dd</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="dict"><span class="n">info</span></a><span class="p">[</span><span class="s1">'</span><span class="s1">slater_i</span><span class="s1">'</span><span class="p">]</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">scale_dd</span></a><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">F4_dd</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="dict"><span class="n">info</span></a><span class="p">[</span><span class="s1">'</span><span class="s1">slater_i</span><span class="s1">'</span><span class="p">]</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">scale_dd</span></a><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">U_dd</span></a> <span class="o">=</span> <span class="mf">7.3</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">F0_dd</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">U_dd</span></a> <span class="o">+</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_F0</span><span class="p">(</span><span class="s1">'</span><span class="s1">d</span><span class="s1">'</span><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">F2_dd</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">F4_dd</span></a><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">scale_dp</span></a> <span class="o">=</span> <span class="mf">0.8</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">F2_dp</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="dict"><span class="n">info</span></a><span class="p">[</span><span class="s1">'</span><span class="s1">slater_n</span><span class="s1">'</span><span class="p">]</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">scale_dp</span></a><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">G1_dp</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="dict"><span class="n">info</span></a><span class="p">[</span><span class="s1">'</span><span class="s1">slater_n</span><span class="s1">'</span><span class="p">]</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">scale_dp</span></a><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">G3_dp</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="dict"><span class="n">info</span></a><span class="p">[</span><span class="s1">'</span><span class="s1">slater_n</span><span class="s1">'</span><span class="p">]</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">scale_dp</span></a><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">U_dp</span></a> <span class="o">=</span> <span class="mf">8.5</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">F0_dp</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">U_dp</span></a> <span class="o">+</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_F0</span><span class="p">(</span><span class="s1">'</span><span class="s1">dp</span><span class="s1">'</span><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">G1_dp</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">G3_dp</span></a><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="tuple"><span class="n">slater</span></a> <span class="o">=</span> <span class="p">(</span><span class="p">[</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">F0_dd</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">F2_dd</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">F4_dd</span></a><span class="p">]</span><span class="p">,</span>  <span class="c1"># initial</span><span class="w">
+</span>          <span class="p">[</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">F0_dd</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">F2_dd</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">F4_dd</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">F0_dp</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">F2_dp</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">G1_dp</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">G3_dp</span></a><span class="p">]</span><span class="p">)</span>  <span class="c1"># with core hole</span><span class="w">
+</span></pre></div></div>
+</section>
+<section id="charge-transfer-energy">
+<h2>Charge-transfer energy<a class="headerlink" href="#charge-transfer-energy" title="Link to this heading"></a></h2>
+<p>Delta is the energy cost of transferring an electron from the ligand bath
+to the impurity: <span class="math notranslate nohighlight">\(\Delta = E(d^{n_d+1}\underline{L}) - E(d^{n_d})\)</span>.
+This definition uses configuration-average energies without crystal field,
+hybridization, or multipolar Coulomb interactions. It is not the bare
+one-electron separation between the impurity and bath centers.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">Delta</span></a> <span class="o">=</span> <span class="mf">4.7</span><span class="w">
+</span></pre></div></div>
+</section>
+<section id="orbital-energies-and-hybridization">
+<h2>Orbital energies and hybridization<a class="headerlink" href="#orbital-energies-and-hybridization" title="Link to this heading"></a></h2>
+<p>Supply five real-harmonic orbital energies in the order
+(dz2, dzx, dzy, dx2-y2, dxy). Each value applies to both spins.
+The wrapper subtracts the mean of each set before adding its CT-derived
+center. Thus Delta controls the shell alignment independently of any common
+offset in these input energies. For cubic symmetry the two eg orbitals lie
+at +0.6*10Dq and the three t2g orbitals at -0.4*10Dq.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">ten_dq</span></a> <span class="o">=</span> <span class="mf">0.56</span><span class="w">
+</span><a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">impurity_levels</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">ten_dq</span></a> <span class="o">*</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.4</span><span class="p">]</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">ten_dq_bath</span></a> <span class="o">=</span> <span class="mf">1.44</span><span class="w">
+</span><a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">bath_levels</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">ten_dq_bath</span></a> <span class="o">*</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.4</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.4</span><span class="p">]</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<p>Each hopping connects matching impurity and bath orbitals, with the same
+amplitude for both spins and both states. We use the eg and t2g values
+from Ref. <a class="footnote-reference brackets" href="#id7" id="id6" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. The wrapper handles spin duplication and basis conversion.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">Veg</span></a> <span class="o">=</span> <span class="mf">2.06</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">Vt2g</span></a> <span class="o">=</span> <span class="mf">1.21</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="list"><span class="n">hyb</span></a> <span class="o">=</span> <span class="p">[</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">Veg</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">Vt2g</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">Vt2g</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">Veg</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">Vt2g</span></a><span class="p">]</span><span class="w">
+</span></pre></div></div>
+</section>
+<section id="spin-orbit-coupling">
+<h2>Spin-orbit coupling<a class="headerlink" href="#spin-orbit-coupling" title="Link to this heading"></a></h2>
+<p>v_soc contains the initial and intermediate impurity SOC constants. We keep
+the same impurity SOC in both states to preserve this example’s original
+parameterization. To use the separate atomic core-hole value instead, pass
+v_soc=(zeta_d_i, zeta_d_n). The p-core SOC is supplied separately as c_soc.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">zeta_d_i</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="dict"><span class="n">info</span></a><span class="p">[</span><span class="s1">'</span><span class="s1">v_soc_i</span><span class="s1">'</span><span class="p">]</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">zeta_d_n</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="dict"><span class="n">info</span></a><span class="p">[</span><span class="s1">'</span><span class="s1">v_soc_n</span><span class="s1">'</span><span class="p">]</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="tuple"><span class="n">v_soc</span></a> <span class="o">=</span> <span class="p">(</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">zeta_d_i</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">zeta_d_i</span></a><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">c_soc</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#dict" title="dict"><span class="n">info</span></a><span class="p">[</span><span class="s1">'</span><span class="s1">c_soc</span><span class="s1">'</span><span class="p">]</span><span class="w">
+</span></pre></div></div>
+<p>We now need to define the parameters describing the XAS. X-ray polarization
+can be linear, circular or isotropic (appropriate for a powder).</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="list"><span class="n">poltype_xas</span></a> <span class="o">=</span> <span class="p">[</span><span class="p">(</span><span class="s1">'</span><span class="s1">isotropic</span><span class="s1">'</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="p">]</span><span class="w">
+</span></pre></div></div>
+<p>edrixs uses the temperature in Kelvin to work out the population of the low-lying
+states via a Boltzmann distribution.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="int"><span class="n">temperature</span></a> <span class="o">=</span> <span class="mi">300</span><span class="w">
+</span></pre></div></div>
+<p>The x-ray beam is specified by the incident angle and azimuthal angle in radians</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">thin</span></a> <span class="o">=</span> <span class="mi">0</span> <span class="o">/</span> <span class="mf">180.0</span> <span class="o">*</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">np</span><span class="o">.</span><span class="n">pi</span></a><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">phi</span></a> <span class="o">=</span> <span class="mf">0.0</span><span class="w">
+</span></pre></div></div>
+<p>these are with respect to the crystal field <span class="math notranslate nohighlight">\(z\)</span> and <span class="math notranslate nohighlight">\(x\)</span> axes
+written above. (That is, unless you specify the <code class="code docutils literal notranslate"><span class="pre">loc_axis</span></code> parameter
+described in the <code class="code docutils literal notranslate"><span class="pre">edrixs.model_siam_2d1p</span></code> function documentation.)</p>
+<p>om_shift aligns the calculated XAS with the experimental Ni L edge. The
+wrapper combines this shift with its CT-derived core energy E_p through
+c_level = -om_shift - 5*E_p. Increasing om_shift raises the transition
+energies by the same amount. We center the photon-energy grid on this value.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">om_shift</span></a> <span class="o">=</span> <span class="mf">857.6</span><span class="w">
+</span><a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">ominc_xas</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">om_shift</span></a> <span class="o">+</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.linspace.html#numpy.linspace" title="numpy.linspace"><span class="n">np</span><span class="o">.</span><span class="n">linspace</span></a><span class="p">(</span><span class="o">-</span><span class="mi">15</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">1000</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<p>The core-hole lifetime broadening is a half-width at half-maximum.
+You can either pass a constant value or an array the same size as
+<code class="code docutils literal notranslate"><span class="pre">ominc_xas</span></code> with varying values to simulate, for example, different state
+lifetimes for higher energy states.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">gamma_c</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.full.html#numpy.full" title="numpy.full"><span class="n">np</span><span class="o">.</span><span class="n">full</span></a><span class="p">(</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="tuple"><span class="n">ominc_xas</span><span class="o">.</span><span class="n">shape</span></a><span class="p">,</span> <span class="mf">0.48</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<p>Magnetic field is a three-component vector in eV specified with respect to the
+same local axis as the x-ray beam. <code class="code docutils literal notranslate"><span class="pre">on_which</span> <span class="pre">=</span> <span class="pre">'both'</span></code> applies the
+operator to the total spin plus orbital angular momentum, as is appropriate
+for a physical external magnetic field. Passing <code class="code docutils literal notranslate"><span class="pre">on_which</span> <span class="pre">=</span> <span class="pre">'spin'</span></code>
+instead applies it to spin only, which is a convenient way to impose a
+magnetic order direction on the sample. The Bohr magneton
+<span class="math notranslate nohighlight">\(\mu_B = 5.7883818012\times 10^{-5}\)</span> eV/T is useful for converting
+a physical field strength. Here we mimic magnetic order with an exchange
+energy of <span class="math notranslate nohighlight">\(6 \times 0.027\)</span> eV directed along <span class="math notranslate nohighlight">\([112]\)</span>.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">exchange</span></a> <span class="o">=</span> <span class="mi">6</span> <span class="o">*</span> <span class="mf">0.027</span><span class="w">
+</span><a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">ext_B</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">exchange</span></a> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ufunc.html#numpy.ufunc" title="numpy.ufunc"><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span></a><span class="p">(</span><span class="mi">6</span><span class="p">)</span><span class="p">)</span> <span class="o">*</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html#numpy.array" title="numpy.array"><span class="n">np</span><span class="o">.</span><span class="n">array</span></a><span class="p">(</span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">2.0</span><span class="p">]</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="n">on_which</span></a> <span class="o">=</span> <span class="s1">'</span><span class="s1">spin</span><span class="s1">'</span><span class="w">
+</span></pre></div></div>
+</section>
+<section id="build-the-model">
+<h2>Build the model<a class="headerlink" href="#build-the-model" title="Link to this heading"></a></h2>
+<p><a class="reference internal" href="../reference/models.html#edrixs.models.model_siam_2d1p" title="edrixs.models.model_siam_2d1p"><code class="xref py py-func docutils literal notranslate"><span class="pre">model_siam_2d1p()</span></code></a> constructs the orbital-space model
+from the parameters above. It builds the one-body matrices, Coulomb tensors,
+and Fock-basis metadata; diagonalization remains a separate step. The returned
+i quantities describe initial/final states without a core hole, while the n
+quantities describe the intermediate state with a core hole. Both one-body
+matrices have shape (26, 26), and both Coulomb tensors include core orbitals.
+The initial basis is ((20, 18), (6, 6)); the occupancy nd+10 counts only
+impurity and bath electrons. Initial core interactions are active when supplied.
+trans_mat holds
+the Cartesian dipole matrices. General bath or hopping matrices can instead
+be supplied through <a class="reference internal" href="../reference/models.html#edrixs.models.model_siam" title="edrixs.models.model_siam"><code class="xref py py-func docutils literal notranslate"><span class="pre">model_siam()</span></code></a>.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="tuple"><span class="n">out</span></a> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">model_siam_2d1p</span><span class="p">(</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="tuple"><span class="n">slater</span></a><span class="o">=</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="tuple"><span class="n">slater</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="int"><span class="n">nd</span></a><span class="o">=</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="int"><span class="n">nd</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">Delta</span></a><span class="o">=</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">Delta</span></a><span class="p">,</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">impurity_levels</span></a><span class="o">=</span><a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">impurity_levels</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">bath_levels</span></a><span class="o">=</span><a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">bath_levels</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="list"><span class="n">hyb</span></a><span class="o">=</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="list"><span class="n">hyb</span></a><span class="p">,</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="tuple"><span class="n">v_soc</span></a><span class="o">=</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="tuple"><span class="n">v_soc</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">c_soc</span></a><span class="o">=</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">c_soc</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">om_shift</span></a><span class="o">=</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">om_shift</span></a><span class="p">,</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">ext_B</span></a><span class="o">=</span><a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">ext_B</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="n">on_which</span></a><span class="o">=</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="n">on_which</span></a><span class="p">,</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span><a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">emat_i</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">umat_i</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-edrixs sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../reference/fock_basis.html#edrixs.fock_basis.FockBasisSpec" title="edrixs.FockBasisSpec"><span class="n">basis_i</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">emat_n</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">umat_n</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-edrixs sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../reference/fock_basis.html#edrixs.fock_basis.FockBasisSpec" title="edrixs.FockBasisSpec"><span class="n">basis_n</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">trans_mat</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">shift</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#tuple" title="tuple"><span class="n">out</span></a><span class="w">
+</span></pre></div></div>
+</section>
+<section id="diagonalization">
+<h2>Diagonalization<a class="headerlink" href="#diagonalization" title="Link to this heading"></a></h2>
+<p><a class="reference internal" href="../reference/solvers.html#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops()</span></code></a> converts these backend-independent ingredients into
+many-body initial/final and intermediate Hamiltonians, plus the dipole
+operators that map the initial Fock space to the intermediate one. Here we
+select the PETSc backend, which stores the Hamiltonians as distributed
+sparse matrices and uses SLEPc to extract the lowest eigenpairs. This scales
+to the larger Hilbert spaces typical of Anderson impurity models and runs in
+parallel if the script is launched with:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span class="n">mpirun</span> <span class="o">-</span><span class="n">n</span> <span class="o">&lt;</span><span class="n">number</span> <span class="n">of</span> <span class="n">processors</span><span class="o">&gt;</span> <span class="n">python</span> <span class="n">example_03_AIM_XAS</span><span class="o">.</span><span class="n">py</span><span class="w">
+</span></pre></div></div>
+<p>Running it as a plain <code class="code docutils literal notranslate"><span class="pre">python</span></code> script also works, it is just slower.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="n">backend</span></a> <span class="o">=</span> <span class="s1">'</span><span class="s1">petsc</span><span class="s1">'</span><span class="w">
+</span><a class="sphx-glr-backref-module-functools sphx-glr-backref-type-py-function reference external" href="https://docs.python.org/3/library/functools.html#functools.partial" title="functools.partial"><span class="n">hmat_i</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-functools sphx-glr-backref-type-py-function reference external" href="https://docs.python.org/3/library/functools.html#functools.partial" title="functools.partial"><span class="n">hmat_n</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="list"><span class="n">trans_ops</span></a> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_ops</span><span class="p">(</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">emat_i</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">umat_i</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-edrixs sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../reference/fock_basis.html#edrixs.fock_basis.FockBasisSpec" title="edrixs.FockBasisSpec"><span class="n">basis_i</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">emat_n</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">umat_n</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-edrixs sphx-glr-backref-type-py-class sphx-glr-backref-instance reference internal" href="../reference/fock_basis.html#edrixs.fock_basis.FockBasisSpec" title="edrixs.FockBasisSpec"><span class="n">basis_n</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">trans_mat</span></a><span class="p">,</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="n">backend</span></a><span class="o">=</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="n">backend</span></a><span class="p">,</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<p><a class="reference internal" href="../reference/solvers.html#edrixs.solvers.ed" title="edrixs.solvers.ed"><code class="xref py py-func docutils literal notranslate"><span class="pre">ed()</span></code></a> obtains the retained low-energy eigenpairs of the
+Hamiltonian without a core hole. Here <code class="code docutils literal notranslate"><span class="pre">num_evals=3</span></code> states are
+thermally populated at the temperature of interest.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">eval_i</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="list"><span class="n">evec_i</span></a> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">ed</span><span class="p">(</span><a class="sphx-glr-backref-module-functools sphx-glr-backref-type-py-function reference external" href="https://docs.python.org/3/library/functools.html#functools.partial" title="functools.partial"><span class="n">hmat_i</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">shift</span></a><span class="o">=</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">shift</span></a><span class="p">,</span> <span class="n">num_evals</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+</section>
+<section id="compute-xas">
+<h2>Compute XAS<a class="headerlink" href="#compute-xas" title="Link to this heading"></a></h2>
+<p>The spectrum is built by applying the dipole operators to the thermally
+populated initial states and propagating in the intermediate-state
+Hamiltonian. EDRIXS weights the retained eigenstates by their Boltzmann
+factors at <code class="code docutils literal notranslate"><span class="pre">temperature</span></code>. Because our model includes hybridization,
+the spectrum captures charge-transfer processes in which electrons move
+between the O bath and the Ni impurity.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">xas</span></a> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">xas</span><span class="p">(</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">eval_i</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="list"><span class="n">evec_i</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-functools sphx-glr-backref-type-py-function reference external" href="https://docs.python.org/3/library/functools.html#functools.partial" title="functools.partial"><span class="n">hmat_n</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="list"><span class="n">trans_ops</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">ominc_xas</span></a><span class="p">,</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">gamma_c</span></a><span class="o">=</span><a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">gamma_c</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">thin</span></a><span class="o">=</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">thin</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">phi</span></a><span class="o">=</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#float" title="float"><span class="n">phi</span></a><span class="p">,</span> <span class="n">pol_type</span><span class="o">=</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#list" title="list"><span class="n">poltype_xas</span></a><span class="p">,</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="int"><span class="n">temperature</span></a><span class="o">=</span><a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/functions.html#int" title="int"><span class="n">temperature</span></a><span class="p">,</span><span class="w">
+</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<p>Let’s plot the data and save it just in case. The returned array has shape
+<code class="code docutils literal notranslate"><span class="pre">(len(ominc_xas),</span> <span class="pre">len(poltype_xas))</span></code>.</p>
+<div class="highlight-Python notranslate"><div class="highlight"><pre><span class="k">if</span> <a class="sphx-glr-backref-module-builtins sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://docs.python.org/3/builtins/stdtypes.html#str" title="str"><span class="vm">__name__</span></a> <span class="o">==</span> <span class="s2">&quot;</span><span class="s2">__main__</span><span class="s2">&quot;</span><span class="p">:</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-matplotlib-figure sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.figure.Figure.html#matplotlib.figure.Figure" title="matplotlib.figure.Figure"><span class="n">fig</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="matplotlib.axes.Axes"><span class="n">ax</span></a> <span class="o">=</span> <a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplots.html#matplotlib.pyplot.subplots" title="matplotlib.pyplot.subplots"><span class="n">plt</span><span class="o">.</span><span class="n">subplots</span></a><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.plot.html#matplotlib.axes.Axes.plot" title="matplotlib.axes.Axes.plot"><span class="n">ax</span><span class="o">.</span><span class="n">plot</span></a><span class="p">(</span><a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">ominc_xas</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">xas</span></a><span class="p">[</span><span class="p">:</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="p">)</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_xlabel.html#matplotlib.axes.Axes.set_xlabel" title="matplotlib.axes.Axes.set_xlabel"><span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span></a><span class="p">(</span><span class="s1">'</span><span class="s1">Energy (eV)</span><span class="s1">'</span><span class="p">)</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_ylabel.html#matplotlib.axes.Axes.set_ylabel" title="matplotlib.axes.Axes.set_ylabel"><span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span></a><span class="p">(</span><span class="s1">'</span><span class="s1">XAS intensity</span><span class="s1">'</span><span class="p">)</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-matplotlib-axes sphx-glr-backref-type-py-method reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.set_title.html#matplotlib.axes.Axes.set_title" title="matplotlib.axes.Axes.set_title"><span class="n">ax</span><span class="o">.</span><span class="n">set_title</span></a><span class="p">(</span><span class="s1">'</span><span class="s1">Anderson impurity model for NiO</span><span class="s1">'</span><span class="p">)</span><span class="w">
+</span>    <a class="sphx-glr-backref-module-matplotlib-pyplot sphx-glr-backref-type-py-function reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.show.html#matplotlib.pyplot.show" title="matplotlib.pyplot.show"><span class="n">plt</span><span class="o">.</span><span class="n">show</span></a><span class="p">(</span><span class="p">)</span><span class="w">
+</span><span class="w">
+</span><a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.savetxt.html#numpy.savetxt" title="numpy.savetxt"><span class="n">np</span><span class="o">.</span><span class="n">savetxt</span></a><span class="p">(</span><span class="s1">'</span><span class="s1">xas.dat</span><span class="s1">'</span><span class="p">,</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-function reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.column_stack.html#numpy.column_stack" title="numpy.column_stack"><span class="n">np</span><span class="o">.</span><span class="n">column_stack</span></a><span class="p">(</span><span class="p">(</span><a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">ominc_xas</span></a><span class="p">,</span> <a class="sphx-glr-backref-module-numpy sphx-glr-backref-type-py-class sphx-glr-backref-instance reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="numpy.ndarray"><span class="n">xas</span></a><span class="p">)</span><span class="p">)</span><span class="p">)</span><span class="w">
+</span></pre></div></div>
+<img src="../_images/sphx_glr_example_03_AIM_XAS_001.png" srcset="../_images/sphx_glr_example_03_AIM_XAS_001.png" alt="Anderson impurity model for NiO" class = "sphx-glr-single-img"/><p class="rubric">Footnotes</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id7" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<span class="backrefs">(<a role="doc-backlink" href="#id1">1</a>,<a role="doc-backlink" href="#id2">2</a>,<a role="doc-backlink" href="#id3">3</a>,<a role="doc-backlink" href="#id6">4</a>)</span>
+<p>Maurits Haverkort et al
+<a class="reference external" href="https://doi.org/10.1103/PhysRevB.85.165113">Phys. Rev. B 85, 165113 (2012)</a>.</p>
+</aside>
+<aside class="footnote brackets" id="id8" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">2</a><span class="fn-bracket">]</span></span>
+<p>A. E. Bocquet et al.,
+<a class="reference external" href="https://doi.org/10.1103/PhysRevB.53.1161">Phys. Rev. B 53, 1161 (1996)</a>.</p>
+</aside>
+<aside class="footnote brackets" id="id9" role="doc-footnote">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id5">3</a><span class="fn-bracket">]</span></span>
+<p>Arata Tanaka, and Takeo Jo,
+<a class="reference external" href="https://doi.org/10.1143/JPSJ.63.2788">J. Phys. Soc. Jpn. 63, 2788-2807(1994)</a>.</p>
+</aside>
+</aside>
+<p class="sphx-glr-timing"><strong>Total running time of the script:</strong> (0 minutes 0.297 seconds)</p>
+<div class="sphx-glr-footer sphx-glr-footer-example docutils container" id="sphx-glr-download-auto-examples-example-03-aim-xas-py">
+<div class="sphx-glr-download sphx-glr-download-jupyter docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/fb3c04d30abd45a0ba95741ec9da2ff1/example_03_AIM_XAS.ipynb"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Jupyter</span> <span class="pre">notebook:</span> <span class="pre">example_03_AIM_XAS.ipynb</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-python docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/05e0e273190b698a31a3b89fddde6bed/example_03_AIM_XAS.py"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">Python</span> <span class="pre">source</span> <span class="pre">code:</span> <span class="pre">example_03_AIM_XAS.py</span></code></a></p>
+</div>
+<div class="sphx-glr-download sphx-glr-download-zip docutils container">
+<p><a class="reference download internal" download="" href="../_downloads/fe8e091fdca45baf5c9035ee57db4c25/example_03_AIM_XAS.zip"><code class="xref download docutils literal notranslate"><span class="pre">Download</span> <span class="pre">zipped:</span> <span class="pre">example_03_AIM_XAS.zip</span></code></a></p>
+</div>
+</div>
+<p class="sphx-glr-signature"><a class="reference external" href="https://sphinx-gallery.github.io">Gallery generated by Sphinx-Gallery</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="example_02_single_atom_RIXS.html" class="btn btn-neutral float-left" title="RIXS calculations for an atomic model" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="example_04_GS_analysis.html" class="btn btn-neutral float-right" title="Ground state analysis for NiO" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Brookhaven National Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
