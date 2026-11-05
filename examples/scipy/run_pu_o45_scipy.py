@@ -134,20 +134,19 @@ def run(
     hmat_i, hmat_n, trans_ops = get_ops(*problem, backend="scipy")
     timings["ops_s"] = time.perf_counter() - stage_start
 
-    print(f"Initial-space dimension:      {hmat_i.shape[0]}")
-    print(f"Intermediate-space dimension: {hmat_n.shape[0]}")
+    print(f"Initial-space dimension:      {len(problem[2])}")
+    print(f"Intermediate-space dimension: {len(problem[5])}")
 
     stage_start = time.perf_counter()
     blocksize = neval
     rng = np.random.default_rng(12345)
     initial_guess = (
-        rng.standard_normal((hmat_i.shape[0], blocksize))
-        + 1j * rng.standard_normal((hmat_i.shape[0], blocksize))
+        rng.standard_normal((len(problem[2]), blocksize))
+        + 1j * rng.standard_normal((len(problem[2]), blocksize))
     )
     eval_all, evec_all = solve_ed(
         hmat_i, shift=shift,
         num_evals=neval,
-        backend="scipy",
         backend_kws={
             "blocksize": blocksize,
             "tol": 1.0e-8,
@@ -158,12 +157,10 @@ def run(
     )
     timings["ed_s"] = time.perf_counter() - stage_start
 
-    residuals = np.array([
-        np.linalg.norm(
-            hmat_i @ evec_all[:, state] - eval_all[state] * evec_all[:, state]
-        )
-        for state in range(neval)
-    ])
+    # Build the initial matrix only for the eigenpair residual check.
+    residuals = np.linalg.norm(
+        hmat_i() @ evec_all - evec_all * eval_all, axis=0,
+    )
     print("Computed initial energies:")
     print(eval_all)
     print("Eigenpair residual norms:")
@@ -192,7 +189,6 @@ def run(
             phi=phi,
             pol_type=poltype_xas,
             temperature=temperature,
-            backend="scipy",
             backend_kws={
                 "nkryl": 200,
             },
@@ -223,7 +219,6 @@ def run(
             phi=phi,
             pol_type=poltype_rixs,
             temperature=temperature,
-            backend="scipy",
             backend_kws={
                 "nkryl": 200,
                 "linsys_tol": 1.0e-10,

@@ -137,8 +137,8 @@ def run(output_dir: Path) -> None:
         backend="scipy",
     )
 
-    print(f"Initial-space dimension:     {hmat_i.shape[0]}")
-    print(f"Intermediate-space dimension: {hmat_n.shape[0]}")
+    print(f"Initial-space dimension:     {len(problem[2])}")
+    print(f"Intermediate-space dimension: {len(problem[5])}")
 
     # -------------------------------------------------------------------------
     # 3. Calculate the Fortran eigenvalue count, then retain three states.
@@ -146,14 +146,13 @@ def run(output_dir: Path) -> None:
     blocksize = neval
     rng = np.random.default_rng(12345)
     initial_guess = (
-        rng.standard_normal((hmat_i.shape[0], blocksize))
-        + 1j * rng.standard_normal((hmat_i.shape[0], blocksize))
+        rng.standard_normal((len(problem[2]), blocksize))
+        + 1j * rng.standard_normal((len(problem[2]), blocksize))
     )
 
     eval_all, evec_all = solve_ed(
         hmat_i, shift=shift,
         num_evals=neval,
-        backend="scipy",
         backend_kws={
             "blocksize": blocksize,
             "tol": 1.0e-12,
@@ -163,10 +162,10 @@ def run(output_dir: Path) -> None:
         },
     )
 
-    residuals = np.array([
-        np.linalg.norm(hmat_i @ evec_all[:, index] - eval_all[index] * evec_all[:, index])
-        for index in range(neval)
-    ])
+    # Build the initial matrix only for the eigenpair residual check.
+    residuals = np.linalg.norm(
+        hmat_i() @ evec_all - evec_all * eval_all, axis=0,
+    )
     print("Computed initial energies:", eval_all)
     print("Eigenpair residual norms: ", residuals)
 
@@ -193,7 +192,6 @@ def run(output_dir: Path) -> None:
         phi=phi,
         pol_type=poltype_xas,
         temperature=temperature,
-        backend="scipy",
         backend_kws={
             "nkryl": 100,
         },
@@ -214,12 +212,11 @@ def run(output_dir: Path) -> None:
         phi=phi,
         pol_type=poltype_rixs,
         temperature=temperature,
-        backend="scipy",
         backend_kws={
-            "nkryl": min(100, hmat_i.shape[0]),
+            "nkryl": min(100, len(problem[2])),
             "linsys_tol": 1.0e-11,
             "linsys_maxiter": 2000,
-            "linsys_restart": min(60, hmat_n.shape[0]),
+            "linsys_restart": min(60, len(problem[5])),
         },
     )
 
