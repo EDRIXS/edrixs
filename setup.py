@@ -148,5 +148,5 @@ setup(
         # after the CMake build succeeds.
         CMakeExtension("edrixs.fedrixs")
     ],
-    cmdclass={"build_ext": cmake_build_ext},
+    cmdclass=dict(versioneer.get_cmdclass(), build_ext=cmake_build_ext),
 )
