@@ -1,0 +1,333 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Release History &mdash; EDRIXS 0.3.0.dev2 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/plot_directive.css" />
+      <link rel="stylesheet" type="text/css" href="_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery.css?v=c83e6b79" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery-binder.css?v=f4aeca0c" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery-dataframe.css?v=2082cf3c" />
+      <link rel="stylesheet" type="text/css" href="_static/sg_gallery-rendered-html.css?v=1277b6f3" />
+      <link rel="stylesheet" type="text/css" href="_static/version-switcher.css?v=23edc989" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=fc46f75d"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="_static/copybutton.js?v=f281be69"></script>
+      <script src="_static/sg-tags.js?v=d80f6fa4"></script>
+      <script src="_static/version-switcher.js?v=7c26ac8e"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="wannier_ham" href="reference/wannier_ham.html" />
+   
+  <meta name="edrixs-doc-version" content="0.3.0.dev2">
+  <meta name="edrixs-doc-site-root" content="/edrixs/">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            EDRIXS
+              <img src="_static/EDRIXS_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="user/index.html">EDRIXS User Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="auto_examples/index.html">Pedagogical examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference/index.html">EDRIXS Reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Release History</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#unreleased">Unreleased</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#new-calculation-interface">New calculation interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#numerical-methods-and-utilities">Numerical methods and utilities</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#compatibility-and-migration">Compatibility and migration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#documentation-and-packaging">Documentation and packaging</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-1-3-2026-09-08">v0.1.3 (2026-09-08)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-1-2-2026-05-06">v0.1.2 (2026-05-06)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-1-1-2024-06-05">v0.1.1 (2024-06-05)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-1-0-2023-10-13">v0.1.0 (2023-10-13)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-0-8-2022-10-28">v0.0.8 (2022-10-28)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-0-7-2020-09-07">v0.0.7 (2020-09-07)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-0-6-2020-07-08">v0.0.6 (2020-07-08)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-0-5-2020-06-03">v0.0.5 (2020-06-03)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-0-4-2019-07-01">v0.0.4 (2019-07-01)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-0-3-2019-06-28">v0.0.3 (2019-06-28)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-0-2-2019-06-27">v0.0.2 (2019-06-27)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#v0-0-1-2019-05-15">v0.0.1 (2019-05-15)</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">EDRIXS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Release History</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/release-history.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="release-history">
+<h1>Release History<a class="headerlink" href="#release-history" title="Link to this heading"></a></h1>
+<section id="unreleased">
+<h2>Unreleased<a class="headerlink" href="#unreleased" title="Link to this heading"></a></h2>
+<section id="new-calculation-interface">
+<h3>New calculation interface<a class="headerlink" href="#new-calculation-interface" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Return labeled matrix factories from <code class="docutils literal notranslate"><span class="pre">build_op</span></code> and numerical <code class="docutils literal notranslate"><span class="pre">get_ops</span></code>.
+Call a factory explicitly for matrix arithmetic. <code class="docutils literal notranslate"><span class="pre">ed</span></code>, <code class="docutils literal notranslate"><span class="pre">xas</span></code>, and <code class="docutils literal notranslate"><span class="pre">rixs</span></code>
+now dispatch using <code class="docutils literal notranslate"><span class="pre">.backend</span></code> labels and no longer accept <code class="docutils literal notranslate"><span class="pre">backend=</span></code>.</p></li>
+<li><p>Construct matrices inside the numerical backends. Dense and SciPy eagerly
+materialize inputs at calculation start, as does PETSc ED. PETSc XAS and
+RIXS accept <code class="docutils literal notranslate"><span class="pre">matrix_lifetime</span></code> with
+<code class="docutils literal notranslate"><span class="pre">'retain'</span></code> (default) and <code class="docutils literal notranslate"><span class="pre">'recompute'</span></code> policies for reusing matrices or
+releasing and rebuilding them between operations.</p></li>
+<li><p>Introduce a staged workflow that separates physical model construction,
+many-body operator construction, diagonalization, and spectral calculations:
+<code class="docutils literal notranslate"><span class="pre">model_*</span></code> → <code class="docutils literal notranslate"><span class="pre">get_ops</span></code> → <code class="docutils literal notranslate"><span class="pre">ed</span></code> → <code class="docutils literal notranslate"><span class="pre">xas</span></code> / <code class="docutils literal notranslate"><span class="pre">rixs</span></code>.</p></li>
+<li><p>Add backend-independent <code class="docutils literal notranslate"><span class="pre">model_1v1c</span></code>, <code class="docutils literal notranslate"><span class="pre">model_2v1c</span></code>, <code class="docutils literal notranslate"><span class="pre">model_siam</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">model_siam_2d1p</span></code> constructors, including sparse Coulomb tensors and a
+charge-transfer parameterization for a d impurity, bath, and p core.</p></li>
+<li><p>Make SciPy the default backend, with sparse operator construction and Krylov
+methods for ED, XAS, and RIXS. Dense calculations and native Fortran/MPI
+solvers are also available through the staged interface.</p></li>
+<li><p>Provide a PETSc backend with distributed operator construction and solvers.</p></li>
+<li><p>Add compact Fock-basis specifications with interchangeable combinadic and
+explicit basis construction. Operator construction uses Numba by default;
+<code class="docutils literal notranslate"><span class="pre">use_numba=False</span></code> selects Python construction.</p></li>
+<li><p>Validate <code class="docutils literal notranslate"><span class="pre">backend_kws</span></code> by backend and operation, with typo suggestions,
+documented defaults, and value constraints.</p></li>
+</ul>
+</section>
+<section id="numerical-methods-and-utilities">
+<h3>Numerical methods and utilities<a class="headerlink" href="#numerical-methods-and-utilities" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Support an energy-reference shift for SciPy, dense, and PETSc diagonalization while
+returning eigenvalues in the original reference. Models return the shift
+alongside their operator inputs. The Fortran backend warns and continues
+when a nonzero shift is supplied.</p></li>
+<li><p>Reuse SciPy RIXS intermediate-state solves across outgoing polarization
+channels sharing the same incoming polarization.</p></li>
+<li><p>Add conversions between Racah parameters and d-shell Slater integrals.</p></li>
+<li><p>Expand tests for model construction, basis ordering, fermionic signs,
+backend consistency, and XAS/RIXS spectra.</p></li>
+</ul>
+</section>
+<section id="compatibility-and-migration">
+<h3>Compatibility and migration<a class="headerlink" href="#compatibility-and-migration" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">build_op</span></code> and numerical <code class="docutils literal notranslate"><span class="pre">get_ops</span></code> now return factories rather than
+matrices. Call a factory to obtain a matrix for arithmetic. Public <code class="docutils literal notranslate"><span class="pre">ed</span></code>,
+<code class="docutils literal notranslate"><span class="pre">xas</span></code>, and <code class="docutils literal notranslate"><span class="pre">rixs</span></code> require labeled factories or Fortran disk handles and
+reject the removed <code class="docutils literal notranslate"><span class="pre">backend</span></code> keyword. Backend-specific staged solvers also
+require factories. See <a class="reference internal" href="user/backend.html#lazy-operators"><span class="std std-ref">Operator factories and solver dispatch</span></a>.</p></li>
+<li><p>Deprecate the legacy model-specific Python and Fortran solver wrappers in
+favor of the staged interface. Existing wrappers emit deprecation warnings.</p></li>
+<li><p>Reject isotropic RIXS polarization; specify incoming and outgoing
+polarization channels explicitly. Isotropic XAS remains supported.</p></li>
+</ul>
+</section>
+<section id="documentation-and-packaging">
+<h3>Documentation and packaging<a class="headerlink" href="#documentation-and-packaging" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p>Update the examples for the staged workflow and document the SciPy, dense,
+and Fortran backend options and numerical-precision considerations.</p></li>
+<li><p>Clarify Slater-integral normalization and add versioned documentation and
+stricter documentation validation.</p></li>
+<li><p>Correct the CMake extension name used by packaging, automate Docker Hub
+release publishing, and update installation guidance and dependencies.</p></li>
+</ul>
+<p>This page summarizes the user-visible changes in each tagged release.  See the
+<a class="reference external" href="https://github.com/EDRIXS/edrixs/releases">GitHub releases page</a> for the
+complete release notes and downloadable artifacts.</p>
+</section>
+</section>
+<section id="v0-1-3-2026-09-08">
+<h2>v0.1.3 (2026-09-08)<a class="headerlink" href="#v0-1-3-2026-09-08" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Updated the build system to support installation on Apple silicon.  This
+release does not change the physics functionality.</p></li>
+<li><p>Revised the charge-transfer examples and documentation and made minor
+example-maintenance improvements.</p></li>
+</ul>
+<p><a class="reference external" href="https://github.com/EDRIXS/edrixs/releases/tag/v0.1.3">Release notes</a> |
+<a class="reference external" href="https://github.com/EDRIXS/edrixs/compare/v0.1.2...v0.1.3">Changes since v0.1.2</a></p>
+</section>
+<section id="v0-1-2-2026-05-06">
+<h2>v0.1.2 (2026-05-06)<a class="headerlink" href="#v0-1-2-2026-05-06" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Fixed several small issues in the solvers, examples, and documentation,
+including a missing spinor and outdated <code class="docutils literal notranslate"><span class="pre">pkg_resources</span></code> usage.</p></li>
+<li><p>Improved wheel generation, supported Python versions, development-container
+setup, installation guidance, and documentation publishing.</p></li>
+<li><p>Added and clarified examples for scattering geometry, NiO, and execution-time
+estimates.</p></li>
+</ul>
+<p><a class="reference external" href="https://github.com/EDRIXS/edrixs/releases/tag/v0.1.2">Release notes</a> |
+<a class="reference external" href="https://github.com/EDRIXS/edrixs/compare/v0.1.1...v0.1.2">Changes since v0.1.1</a></p>
+</section>
+<section id="v0-1-1-2024-06-05">
+<h2>v0.1.1 (2024-06-05)<a class="headerlink" href="#v0-1-1-2024-06-05" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Fixed the <code class="docutils literal notranslate"><span class="pre">end_indx</span></code> handling in the Fortran expectation-value driver and
+corrected macOS compilation.</p></li>
+<li><p>Updated Docker packaging, installation documentation, and the publication
+list.</p></li>
+</ul>
+<p><a class="reference external" href="https://github.com/EDRIXS/edrixs/releases/tag/v0.1.1">Release notes</a> |
+<a class="reference external" href="https://github.com/EDRIXS/edrixs/compare/v0.1.0...v0.1.1">Changes since v0.1.0</a></p>
+</section>
+<section id="v0-1-0-2023-10-13">
+<h2>v0.1.0 (2023-10-13)<a class="headerlink" href="#v0-1-0-2023-10-13" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Added a CMake-based build and improved macOS support.</p></li>
+<li><p>Added examples covering Hund’s coupling and charge-transfer excitons, and
+refreshed the existing examples and Binder setup.</p></li>
+<li><p>Expanded the documentation and publication list.</p></li>
+</ul>
+<p><a class="reference external" href="https://github.com/EDRIXS/edrixs/releases/tag/v0.1.0">Release notes</a> |
+<a class="reference external" href="https://github.com/EDRIXS/edrixs/compare/v0.0.8...v0.1.0">Changes since v0.0.8</a></p>
+</section>
+<section id="v0-0-8-2022-10-28">
+<h2>v0.0.8 (2022-10-28)<a class="headerlink" href="#v0-0-8-2022-10-28" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Fixed polarization normalization in the Python XAS solver.</p></li>
+<li><p>Added and revised RIXS, Hubbard-model, crystal-field, and transition examples,
+along with substantial documentation and continuous-integration updates.</p></li>
+</ul>
+<p><a class="reference external" href="https://github.com/EDRIXS/edrixs/releases/tag/v0.0.8">Release notes</a> |
+<a class="reference external" href="https://github.com/EDRIXS/edrixs/compare/v0.0.7...v0.0.8">Changes since v0.0.7</a></p>
+</section>
+<section id="v0-0-7-2020-09-07">
+<h2>v0.0.7 (2020-09-07)<a class="headerlink" href="#v0-0-7-2020-09-07" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Improved the examples, documentation, and installation instructions.</p></li>
+<li><p>Added the missing Cu <code class="docutils literal notranslate"><span class="pre">d10_2p5</span></code> Slater parameters and fixed several small
+issues.</p></li>
+</ul>
+<p><a class="reference external" href="https://github.com/EDRIXS/edrixs/compare/v0.0.6...v0.0.7">Changes since v0.0.6</a></p>
+</section>
+<section id="v0-0-6-2020-07-08">
+<h2>v0.0.6 (2020-07-08)<a class="headerlink" href="#v0-0-6-2020-07-08" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Added three gallery examples, including a charge-transfer calculation.</p></li>
+<li><p>Added utilities that derive impurity and bath energy levels from the
+charge-transfer energy and <code class="docutils literal notranslate"><span class="pre">U</span></code>, and fixed several bugs.</p></li>
+</ul>
+<p><a class="reference external" href="https://github.com/EDRIXS/edrixs/releases/tag/v0.0.6">Release notes</a> |
+<a class="reference external" href="https://github.com/EDRIXS/edrixs/compare/v0.0.5...v0.0.6">Changes since v0.0.5</a></p>
+</section>
+<section id="v0-0-5-2020-06-03">
+<h2>v0.0.5 (2020-06-03)<a class="headerlink" href="#v0-0-5-2020-06-03" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Updated the documentation and examples, including expectation-value and
+Python-tips material.</p></li>
+</ul>
+<p><a class="reference external" href="https://github.com/EDRIXS/edrixs/releases/tag/v0.0.5">Release notes</a> |
+<a class="reference external" href="https://github.com/EDRIXS/edrixs/compare/v0.0.4...v0.0.5">Changes since v0.0.4</a></p>
+</section>
+<section id="v0-0-4-2019-07-01">
+<h2>v0.0.4 (2019-07-01)<a class="headerlink" href="#v0-0-4-2019-07-01" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Corrected the source distribution and extension-linker configuration for
+packaging, including Conda packaging.</p></li>
+</ul>
+<p><a class="reference external" href="https://github.com/EDRIXS/edrixs/compare/v0.0.3...v0.0.4">Changes since v0.0.3</a></p>
+</section>
+<section id="v0-0-3-2019-06-28">
+<h2>v0.0.3 (2019-06-28)<a class="headerlink" href="#v0-0-3-2019-06-28" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Included <code class="docutils literal notranslate"><span class="pre">requirements.txt</span></code> in the source distribution.</p></li>
+</ul>
+<p><a class="reference external" href="https://github.com/EDRIXS/edrixs/compare/v0.0.2...v0.0.3">Changes since v0.0.2</a></p>
+</section>
+<section id="v0-0-2-2019-06-27">
+<h2>v0.0.2 (2019-06-27)<a class="headerlink" href="#v0-0-2-2019-06-27" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Added simpler APIs for angular-momentum and many-body operators.</p></li>
+<li><p>Corrected isotropic XAS calculations and improved Docker/Jupyter support.</p></li>
+</ul>
+<p><a class="reference external" href="https://github.com/EDRIXS/edrixs/compare/v0.0.1...v0.0.2">Changes since v0.0.1</a></p>
+</section>
+<section id="v0-0-1-2019-05-15">
+<h2>v0.0.1 (2019-05-15)<a class="headerlink" href="#v0-0-1-2019-05-15" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Initial tagged release of EDRIXS.</p></li>
+</ul>
+<p><a class="reference external" href="https://github.com/EDRIXS/edrixs/tree/v0.0.1">Source at v0.0.1</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="reference/wannier_ham.html" class="btn btn-neutral float-left" title="wannier_ham" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2019, Brookhaven National Lab.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

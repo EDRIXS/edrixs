@@ -1,0 +1,16 @@
+.edrixs-version-switcher {
+  margin-top: 0.75rem;
+  text-align: left;
+}
+
+.edrixs-version-switcher label {
+  color: #fcfcfc;
+  display: block;
+  font-size: 0.75rem;
+  margin-bottom: 0.2rem;
+}
+
+.edrixs-version-switcher select {
+  color: #343131;
+  width: 100%;
+}
