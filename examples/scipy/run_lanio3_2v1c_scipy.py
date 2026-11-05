@@ -4,10 +4,8 @@
 This example uses the EDRIXS backend-neutral solver interface with the
 SciPy backend.
 
-This is the SciPy/Krylov counterpart of:
-    examples/more/RIXS/LaNiO3_thin/test_2v1c.py
-
-The model retains the original physical parameters and spectral grids, but uses:
+Valence shells: Ni 3d and 4p; core shell: 2p.
+The Ni L2,3-edge transition excites a 2p electron into the 3d shell:
     model_2v1c -> get_ops -> ed -> xas / rixs
 """
 
@@ -32,7 +30,7 @@ from edrixs.solvers import (  # noqa: E402
 
 
 def build_physical_parameters():
-    """Return the Slater integrals and one-body parameters of test_2v1c.py."""
+    """Return the Slater integrals and one-body parameters for Ni 3d+4p / 2p."""
     f2_dd = 12.234 * 0.65
     f4_dd = 7.598 * 0.65
     f0_dd = edrixs.get_F0("d", f2_dd, f4_dd)

@@ -4,9 +4,6 @@
     model_2v1c(...) -> get_ops(..., backend="scipy")
         -> ed(...) -> xas(...) / rixs(...)
 
-This reproduces the physical model and output grids of:
-    examples/more/RIXS/U_L3/run_rixs_fsolver.py
-
 Physical model
 --------------
 - Valence shells: U 5f and 6d
@@ -37,7 +34,7 @@ from edrixs.solvers import (  # noqa: E402
 
 
 def build_physical_parameters() -> dict:
-    """Construct parameters used by the repository U_L3 Fortran example."""
+    """Construct the U 5f2 / 6d atomic parameters for the L3 edge."""
     valence_occupancy = 2
 
     atom = edrixs.get_atom_data(

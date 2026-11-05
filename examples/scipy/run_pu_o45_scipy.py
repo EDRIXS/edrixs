@@ -4,7 +4,7 @@
 This example uses the EDRIXS backend-neutral solver interface with the
 SciPy backend.
 
-Reference: examples/more/RIXS/Pu_O45/run_rixs_fsolver.py
+The 5d -> 5f transition probes the Pu 5f6 configuration.
 Expected dimensions: initial 3,003; intermediate 34,320.
 """
 
@@ -32,7 +32,7 @@ from edrixs.solvers import (  # noqa: E402
 
 
 def build_physical_parameters() -> dict:
-    """Build the exact parameters from Pu_O45/run_rixs_fsolver.py."""
+    """Build the Pu 5f6 atomic parameters for the O4,5 edge."""
     occupancy = 6
     atom = edrixs.get_atom_data(
         "Pu", v_name="5f", v_noccu=occupancy, edge="O45"
@@ -49,9 +49,9 @@ def build_physical_parameters() -> dict:
         "f", slater_i[1], slater_i[2], slater_i[3]
     )
 
-    # Preserve the reference example exactly. It supplies eight indices but
-    # seven factors, and edrixs.rescale uses zip(), so index 9 (G5_fd) remains
-    # unscaled while indices 5, 6, 7, and 8 are scaled by 0.6.
+    # Scale F2/F4/F6_ff by 0.77 and F2/F4_fd and G1/G3_fd by 0.6.
+    # G5_fd remains unscaled: rescale pairs indices and factors with zip(),
+    # and the final index has no corresponding factor.
     slater_n = edrixs.rescale(
         slater_n_atomic,
         (
