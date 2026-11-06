@@ -4,7 +4,7 @@
 This example uses the EDRIXS backend-neutral solver interface with the
 SciPy backend.
 
-Reference: examples/more/RIXS/Pu_O45/run_rixs_fsolver.py
+The 5d -> 5f transition probes the Pu 5f6 configuration.
 Expected dimensions: initial 3,003; intermediate 34,320.
 """
 
@@ -32,7 +32,7 @@ from edrixs.solvers import (  # noqa: E402
 
 
 def build_physical_parameters() -> dict:
-    """Build the exact parameters from Pu_O45/run_rixs_fsolver.py."""
+    """Build the Pu 5f6 atomic parameters for the O4,5 edge."""
     occupancy = 6
     atom = edrixs.get_atom_data(
         "Pu", v_name="5f", v_noccu=occupancy, edge="O45"
@@ -49,9 +49,9 @@ def build_physical_parameters() -> dict:
         "f", slater_i[1], slater_i[2], slater_i[3]
     )
 
-    # Preserve the reference example exactly. It supplies eight indices but
-    # seven factors, and edrixs.rescale uses zip(), so index 9 (G5_fd) remains
-    # unscaled while indices 5, 6, 7, and 8 are scaled by 0.6.
+    # Scale F2/F4/F6_ff by 0.77 and F2/F4_fd and G1/G3_fd by 0.6.
+    # G5_fd remains unscaled: rescale pairs indices and factors with zip(),
+    # and the final index has no corresponding factor.
     slater_n = edrixs.rescale(
         slater_n_atomic,
         (
@@ -134,20 +134,19 @@ def run(
     hmat_i, hmat_n, trans_ops = get_ops(*problem, backend="scipy")
     timings["ops_s"] = time.perf_counter() - stage_start
 
-    print(f"Initial-space dimension:      {hmat_i.shape[0]}")
-    print(f"Intermediate-space dimension: {hmat_n.shape[0]}")
+    print(f"Initial-space dimension:      {len(problem[2])}")
+    print(f"Intermediate-space dimension: {len(problem[5])}")
 
     stage_start = time.perf_counter()
     blocksize = neval
     rng = np.random.default_rng(12345)
     initial_guess = (
-        rng.standard_normal((hmat_i.shape[0], blocksize))
-        + 1j * rng.standard_normal((hmat_i.shape[0], blocksize))
+        rng.standard_normal((len(problem[2]), blocksize))
+        + 1j * rng.standard_normal((len(problem[2]), blocksize))
     )
     eval_all, evec_all = solve_ed(
         hmat_i, shift=shift,
         num_evals=neval,
-        backend="scipy",
         backend_kws={
             "blocksize": blocksize,
             "tol": 1.0e-8,
@@ -158,12 +157,10 @@ def run(
     )
     timings["ed_s"] = time.perf_counter() - stage_start
 
-    residuals = np.array([
-        np.linalg.norm(
-            hmat_i @ evec_all[:, state] - eval_all[state] * evec_all[:, state]
-        )
-        for state in range(neval)
-    ])
+    # Build the initial matrix only for the eigenpair residual check.
+    residuals = np.linalg.norm(
+        hmat_i() @ evec_all - evec_all * eval_all, axis=0,
+    )
     print("Computed initial energies:")
     print(eval_all)
     print("Eigenpair residual norms:")
@@ -192,7 +189,6 @@ def run(
             phi=phi,
             pol_type=poltype_xas,
             temperature=temperature,
-            backend="scipy",
             backend_kws={
                 "nkryl": 200,
             },
@@ -223,7 +219,6 @@ def run(
             phi=phi,
             pol_type=poltype_rixs,
             temperature=temperature,
-            backend="scipy",
             backend_kws={
                 "nkryl": 200,
                 "linsys_tol": 1.0e-10,

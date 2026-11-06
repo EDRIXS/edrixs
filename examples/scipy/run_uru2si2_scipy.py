@@ -7,8 +7,7 @@ SciPy backend:
     model_1v1c(...) -> get_ops(..., backend="scipy")
         -> ed(...) -> xas(...) / rixs(...)
 
-This reproduces the physical model and output grids of:
-    examples/more/RIXS/URu2Si2/run_rixs_fsolver.py
+The U 5f2 model uses parameters from Phys. Rev. Lett. 114, 236401 (2015).
 """
 
 from __future__ import annotations
@@ -33,14 +32,14 @@ from edrixs.solvers import (  # noqa: E402
 
 
 def build_physical_parameters() -> dict:
-    """Return the parameters from the repository URu2Si2 Fortran example."""
+    """Return the U 5f2 atomic parameters for URu2Si2."""
     # 5f-5f Coulomb interactions, scaled to 77%.
     f2_ff = 9.711 * 0.77
     f4_ff = 6.364 * 0.77
     f6_ff = 4.677 * 0.77
 
     # The average 5f Coulomb interaction is set to zero in the fixed-occupancy
-    # atomic calculation, exactly as in the reference example.
+    # atomic calculation.
     uf_average = 0.0
     f0_ff = uf_average + edrixs.get_F0("f", f2_ff, f4_ff, f6_ff)
 
@@ -81,10 +80,7 @@ def build_physical_parameters() -> dict:
 
 
 def build_gamma_c(ominc: np.ndarray) -> np.ndarray:
-    """
-    Reproduce the incident-energy-dependent core-hole broadening in the
-    reference Fortran example.
-    """
+    """Build the core-hole half-width increasing between 101.5 and 104 eV."""
     gamma_c = np.zeros(len(ominc), dtype=float)
     begin = 101.5
     end = 104.0
@@ -93,7 +89,7 @@ def build_gamma_c(ominc: np.ndarray) -> np.ndarray:
     if inside == 0:
         raise RuntimeError(
             "The incident-energy grid contains no points between "
-            f"{begin} and {end} eV, so the reference broadening cannot be built."
+            f"{begin} and {end} eV, so the core-hole broadening cannot be built."
         )
 
     step = (6.5 - 1.05) / (2.0 * inside)
@@ -130,8 +126,7 @@ def run(output_dir: Path) -> None:
     thout = np.deg2rad(60.0)
     phi = 0.0
 
-    # The Fortran example uses the same 10-point incident-energy grid for
-    # both XAS and RIXS.
+    # Use the same 10-point incident-energy grid for XAS and RIXS.
     ominc = np.linspace(core_offset - 5.0, core_offset + 20.0, 10)
     eloss = np.linspace(-0.2, 2.5, 1000)
 
@@ -169,8 +164,8 @@ def run(output_dir: Path) -> None:
         backend="scipy",
     )
 
-    print(f"Initial-space dimension:      {hmat_i.shape[0]}")
-    print(f"Intermediate-space dimension: {hmat_n.shape[0]}")
+    print(f"Initial-space dimension:      {len(problem[2])}")
+    print(f"Intermediate-space dimension: {len(problem[5])}")
 
     # -------------------------------------------------------------------------
     # 3. Compute 30 eigenpairs, then retain nine states for spectra.
@@ -178,14 +173,13 @@ def run(output_dir: Path) -> None:
     blocksize = neval
     rng = np.random.default_rng(12345)
     initial_guess = (
-        rng.standard_normal((hmat_i.shape[0], blocksize))
-        + 1j * rng.standard_normal((hmat_i.shape[0], blocksize))
+        rng.standard_normal((len(problem[2]), blocksize))
+        + 1j * rng.standard_normal((len(problem[2]), blocksize))
     )
 
     eval_all, evec_all = solve_ed(
         hmat_i, shift=shift,
         num_evals=neval,
-        backend="scipy",
         backend_kws={
             "blocksize": blocksize,
             "tol": 1.0e-12,
@@ -195,13 +189,10 @@ def run(output_dir: Path) -> None:
         },
     )
 
-    residuals = np.array([
-        np.linalg.norm(
-            hmat_i @ evec_all[:, state]
-            - eval_all[state] * evec_all[:, state]
-        )
-        for state in range(neval)
-    ])
+    # Build the initial matrix only for the eigenpair residual check.
+    residuals = np.linalg.norm(
+        hmat_i() @ evec_all - evec_all * eval_all, axis=0,
+    )
 
     print("Computed initial energies:")
     print(eval_all)
@@ -241,7 +232,6 @@ def run(output_dir: Path) -> None:
         phi=phi,
         pol_type=poltype_xas,
         temperature=temperature,
-        backend="scipy",
         backend_kws={
             "nkryl": 100,
         },
@@ -271,7 +261,6 @@ def run(output_dir: Path) -> None:
         phi=phi,
         pol_type=poltype_rixs,
         temperature=temperature,
-        backend="scipy",
         backend_kws={
             "nkryl": 100,
             "linsys_tol": 1.0e-10,

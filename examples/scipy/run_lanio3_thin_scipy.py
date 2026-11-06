@@ -7,8 +7,7 @@ SciPy backend:
     model_1v1c(...) -> get_ops(..., backend="scipy")
         -> ed(...) -> xas(...) / rixs(...)
 
-This reproduces the physical model and output grids of:
-    examples/more/RIXS/LaNiO3_thin/run_rixs_fsolver.py
+The Ni 3d8 model includes a tetragonal crystal field and 2p core SOC.
 """
 
 from __future__ import annotations
@@ -34,7 +33,7 @@ from edrixs.solvers import (  # noqa: E402
 
 
 def build_physical_parameters():
-    """Return the parameters used by the repository LaNiO3_thin example."""
+    """Return the atomic parameters and tetragonal crystal field for LaNiO3."""
     atom = edrixs.get_atom_data(
         "Ni",
         v_name="3d",
@@ -97,7 +96,7 @@ def run(output_dir: Path) -> None:
     ominc_rixs = np.linspace(core_offset - 5.9, core_offset - 0.9, 10)
     eloss = np.linspace(-0.5, 5.0, 1000)
 
-    # L3-edge settings from the repository example.
+    # L3-edge lifetime broadenings.
     gamma_c = atom["gamma_c"][1]
     gamma_f = 0.1
 
@@ -137,23 +136,22 @@ def run(output_dir: Path) -> None:
         backend="scipy",
     )
 
-    print(f"Initial-space dimension:     {hmat_i.shape[0]}")
-    print(f"Intermediate-space dimension: {hmat_n.shape[0]}")
+    print(f"Initial-space dimension:     {len(problem[2])}")
+    print(f"Intermediate-space dimension: {len(problem[5])}")
 
     # -------------------------------------------------------------------------
-    # 3. Calculate the Fortran eigenvalue count, then retain three states.
+    # 3. Calculate ten eigenpairs, then retain three states for spectra.
     # -------------------------------------------------------------------------
     blocksize = neval
     rng = np.random.default_rng(12345)
     initial_guess = (
-        rng.standard_normal((hmat_i.shape[0], blocksize))
-        + 1j * rng.standard_normal((hmat_i.shape[0], blocksize))
+        rng.standard_normal((len(problem[2]), blocksize))
+        + 1j * rng.standard_normal((len(problem[2]), blocksize))
     )
 
     eval_all, evec_all = solve_ed(
         hmat_i, shift=shift,
         num_evals=neval,
-        backend="scipy",
         backend_kws={
             "blocksize": blocksize,
             "tol": 1.0e-12,
@@ -163,10 +161,10 @@ def run(output_dir: Path) -> None:
         },
     )
 
-    residuals = np.array([
-        np.linalg.norm(hmat_i @ evec_all[:, index] - eval_all[index] * evec_all[:, index])
-        for index in range(neval)
-    ])
+    # Build the initial matrix only for the eigenpair residual check.
+    residuals = np.linalg.norm(
+        hmat_i() @ evec_all - evec_all * eval_all, axis=0,
+    )
     print("Computed initial energies:", eval_all)
     print("Eigenpair residual norms: ", residuals)
 
@@ -179,8 +177,8 @@ def run(output_dir: Path) -> None:
     eval_i = eval_all[:num_gs]
     evec_i = evec_all[:, :num_gs]
 
-    # The original Fortran input requests nkryl=100. The effective Krylov
-    # dimensions cannot exceed the Hilbert-space dimensions (60 for XAS and
+    # Use up to 100 Krylov vectors. The effective Krylov dimensions cannot
+    # exceed the Hilbert-space dimensions (60 for XAS and
     # 45 for the final-state RIXS Lanczos chain).
     xas = solve_xas(
         eval_i,
@@ -193,7 +191,6 @@ def run(output_dir: Path) -> None:
         phi=phi,
         pol_type=poltype_xas,
         temperature=temperature,
-        backend="scipy",
         backend_kws={
             "nkryl": 100,
         },
@@ -214,16 +211,15 @@ def run(output_dir: Path) -> None:
         phi=phi,
         pol_type=poltype_rixs,
         temperature=temperature,
-        backend="scipy",
         backend_kws={
-            "nkryl": min(100, hmat_i.shape[0]),
+            "nkryl": min(100, len(problem[2])),
             "linsys_tol": 1.0e-11,
             "linsys_maxiter": 2000,
-            "linsys_restart": min(60, hmat_n.shape[0]),
+            "linsys_restart": min(60, len(problem[5])),
         },
     )
 
-    # Match the files produced by the repository Fortran example.
+    # Write XAS and RIXS spectra as text tables.
     np.savetxt(
         output_dir / "xas.dat",
         np.column_stack((ominc_xas, xas)),

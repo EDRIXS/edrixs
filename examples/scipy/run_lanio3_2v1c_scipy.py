@@ -4,10 +4,8 @@
 This example uses the EDRIXS backend-neutral solver interface with the
 SciPy backend.
 
-This is the SciPy/Krylov counterpart of:
-    examples/more/RIXS/LaNiO3_thin/test_2v1c.py
-
-The model retains the original physical parameters and spectral grids, but uses:
+Valence shells: Ni 3d and 4p; core shell: 2p.
+The Ni L2,3-edge transition excites a 2p electron into the 3d shell:
     model_2v1c -> get_ops -> ed -> xas / rixs
 """
 
@@ -32,7 +30,7 @@ from edrixs.solvers import (  # noqa: E402
 
 
 def build_physical_parameters():
-    """Return the Slater integrals and one-body parameters of test_2v1c.py."""
+    """Return the Slater integrals and one-body parameters for Ni 3d+4p / 2p."""
     f2_dd = 12.234 * 0.65
     f4_dd = 7.598 * 0.65
     f0_dd = edrixs.get_F0("d", f2_dd, f4_dd)
@@ -152,20 +150,19 @@ def run(
     hmat_i, hmat_n, trans_ops = get_ops(*problem, backend="scipy")
     timings["ops_s"] = time.perf_counter() - stage_start
 
-    print("Initial-space dimension:     ", hmat_i.shape[0])
-    print("Intermediate-space dimension:", hmat_n.shape[0])
+    print("Initial-space dimension:     ", len(problem[2]))
+    print("Intermediate-space dimension:", len(problem[5]))
 
     stage_start = time.perf_counter()
     blocksize = 30
     rng = np.random.default_rng(12345)
     initial_guess = (
-        rng.standard_normal((hmat_i.shape[0], blocksize))
-        + 1j * rng.standard_normal((hmat_i.shape[0], blocksize))
+        rng.standard_normal((len(problem[2]), blocksize))
+        + 1j * rng.standard_normal((len(problem[2]), blocksize))
     )
     eval_all, evec_all = solve_ed(
         hmat_i, shift=shift,
         num_evals=neval,
-        backend="scipy",
         backend_kws={
             "blocksize": blocksize,
             "tol": 1.0e-10,
@@ -176,10 +173,10 @@ def run(
     )
     timings["ed_s"] = time.perf_counter() - stage_start
 
-    residuals = np.asarray([
-        np.linalg.norm(hmat_i @ evec_all[:, i] - eval_all[i] * evec_all[:, i])
-        for i in range(neval)
-    ])
+    # Build the initial matrix only for the eigenpair residual check.
+    residuals = np.linalg.norm(
+        hmat_i() @ evec_all - evec_all * eval_all, axis=0,
+    )
 
     print("Computed initial energies:")
     print(eval_all)
@@ -210,7 +207,6 @@ def run(
             phi=phi,
             pol_type=poltype_xas,
             temperature=temperature,
-            backend="scipy",
             backend_kws={
                 "nkryl": 100,
             },
@@ -242,7 +238,6 @@ def run(
             phi=phi,
             pol_type=poltype_rixs,
             temperature=temperature,
-            backend="scipy",
             backend_kws={
                 "nkryl": 100,
                 "linsys_tol": 1.0e-10,
