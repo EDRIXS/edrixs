@@ -6,6 +6,9 @@
 EDRIXS Documentation
 ====================
 
+New to EDRIXS? :ref:`start-here` points to installation instructions, complete
+calculations, and explanations of the underlying physics.
+
 .. toctree::
    :maxdepth: 2
 

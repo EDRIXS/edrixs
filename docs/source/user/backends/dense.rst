@@ -1,8 +1,8 @@
 .. _dense-backend-options:
 
-**************
-Dense keywords
-**************
+**********************
+Dense backend settings
+**********************
 
 :doc:`Back to the backend overview <../backend>`
 

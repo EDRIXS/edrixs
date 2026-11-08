@@ -35,12 +35,12 @@ The sections below follow the figure box by box.  The :ref:`backend` that
 carries out the linear algebra for the last three stages is described on its
 own page.  The units, naming, orbital orderings, single-particle bases,
 Fock-basis encoding and spectral conventions are collected separately on the
-:ref:`conventions` page, and the :ref:`pedagogical examples <examples>` work
+:ref:`conventions` page, and the :doc:`/auto_examples/index` work
 through the same material in more physical detail.
 
 If you prefer to begin with a complete calculation, skip ahead to either the
-:ref:`NiO crystal-field example <nio-l23-xas>` or the
-:ref:`NiO Anderson impurity example <nio-siam-xas-rixs>` and return to this
+:ref:`nio-l23-xas` or
+:ref:`nio-siam-xas-rixs` and return to this
 overview as needed.
 
 .. _physical-model:
@@ -58,12 +58,37 @@ There are four ``edrixs.models`` constructors:
   Anderson impurity model with one :math:`d` impurity shell, one bath shell,
   and one :math:`p` core shell (for L-edge spectroscopy).
 
-Each returns a description of the problem, building no operators itself:
+These are conveniences for common spectroscopy models. You can also supply
+your own ``emat``, ``umat``, and Fock basis to :func:`~edrixs.solvers.build_op`,
+for example to study a Hamiltonian without core electrons or calculate
+observables without computing spectra. See the
+:ref:`sphx_glr_auto_examples_example_00_ed_calculator.py` example.
+
+Each constructor returns eight values describing the model, without building
+many-body operators:
 
 * the one-body matrices ``emat_i`` / ``emat_n``,
 * the Coulomb tensors ``umat_i`` / ``umat_n``,
-* compact Fock-basis specifications ``basis_i`` / ``basis_n``, and
-* the Cartesian photon transition matrices ``trans_mat``.
+* compact Fock-basis specifications ``basis_i`` / ``basis_n``,
+* the photon transition matrices ``trans_mat``, and
+* the filled-core energy offset ``shift`` used to improve ED precision.
+
+The examples collect the first seven values in a Python list called
+``problem``::
+
+    *problem, shift = edrixs.model_1v1c(('d', 'p'), v_noccu=8)
+    hmat_i, hmat_n, trans_ops = edrixs.get_ops(*problem, backend='scipy')
+    eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=3)
+
+Here ``problem`` is an ordinary list of model inputs; ``*problem`` unpacks it
+into the seven arguments of ``get_ops``. It contains no many-body matrices or
+eigenstates.
+
+In the NiO example, ``edge_shift`` sets the photon-energy reference through
+``shell_level=(0.0, -edge_shift)``. Lowering the core level by this amount
+raises the absorption energies by the same amount. This empirical alignment
+parameter differs from the numerical ``shift`` returned by the constructor;
+see :ref:`conventions`.
 
 The ``_i`` suffix marks the initial and final states, which have no core hole,
 and ``_n`` the intermediate state, which has one.
@@ -126,11 +151,11 @@ prepares everything an XAS or RIXS calculation needs in one call:
   Fock spaces, without and with a core hole.
 * ``trans_mat`` -- the Cartesian photon transition matrices from the model.
 
-It returns ``hmat_i``, ``hmat_n`` and the many-body transition operators
-``trans_ops`` as labeled factories for numerical backends, or disk handles for
-Fortran. Pass these directly to ``ed``, ``xas``, and ``rixs``; the solvers read
-their ``.backend`` labels and pass the factories to the backend for matrix
-construction. These solver functions
+It returns ``hmat_i``, ``hmat_n`` and ``trans_ops`` as instructions for building
+the many-body matrices when a solver needs them. These callable objects are
+also called *operator factories*. Fortran uses handles to input files instead.
+Pass the returned objects directly to ``ed``, ``xas``, and ``rixs``; their
+``.backend`` labels select the backend automatically. These solver functions
 do not accept a ``backend`` keyword. Because XAS and RIXS connect states with
 no core hole to states with exactly one core hole, keeping the two Hamiltonians
 separate avoids the
@@ -191,11 +216,9 @@ resolution width ``gamma_f``, and 4-tuple
 different emitted polarizations and sum them, since this is what happens for
 RIXS with no scattered-polarization analysis.
 
-See :ref:`sphx_glr_auto_examples_example_02_single_atom_RIXS.py` for a fully
-worked calculation of the
-:func:`~edrixs.models.model_1v1c` model including plotting the
-incident-energy / energy-loss map. Other models have more parameters
-to pay attention to but are, in most ways, not fundamentally more complicated.
+See :ref:`nio-l23-xas` to continue the ionic Ni calculation through RIXS at
+the XAS maximum, or :ref:`nio-siam-xas-rixs` for a NiO incident-energy /
+energy-loss map including ligand hybridization.
 
 Where to go next
 ================

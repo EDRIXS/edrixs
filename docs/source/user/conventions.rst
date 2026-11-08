@@ -48,6 +48,10 @@ the construction of transition operators.
 Numerical diagonalization can lose precision when the diagonal entries have a
 large common energy offset.
 For this reason, model constructors also return an energy offset, ``shift``.
+It is the number of core spin-orbitals multiplied by their common shell-level
+energy, excluding Coulomb and spin-orbit contributions. For example,
+``model_1v1c(('d', 'p'), shell_level=(0.0, -857.6))`` returns
+``shift = 6 * (-857.6)`` eV. It is zero when the core shell level is zero.
 Passing it to :func:`~edrixs.solvers.ed` with the dense, SciPy, or PETSc backend subtracts
 the offset from the Hamiltonian diagonal before diagonalization and restores
 it to the returned eigenvalues. This preserves the physics while reducing
@@ -78,10 +82,20 @@ Unless specified otherwise, EDRIXS uses these orderings.
 
 The **default single-particle basis used to define the Fock basis** is:
 
-* complex spherical harmonics for ``p``, ``d``, ``t2g``, and ``f`` (``p`` and
-  ``t2g`` share the same complex-harmonic basis);
+* complex spherical harmonics for ``p``, ``d``, and ``f``, and an effective
+  :math:`l=1` complex basis for ``t2g``;
 * the :math:`\lvert j, j_z \rangle` basis for ``p12``, ``p32``, ``d32``,
   ``d52``, ``f52``, and ``f72``.
+
+The three ``t2g`` orbitals are represented using an effective :math:`l=1`
+space, like a ``p`` shell. In EDRIXS's transformation convention,
+``(d_xz, d_yz, d_xy)`` correspond to ``(p_y, p_x, p_z)``. Thus the ``p`` and
+``t2g`` change-of-basis matrices differ by the order of their first two real
+orbitals. The ``t2g`` orbitals remain a subset of the physical :math:`d` shell:
+the projected orbital angular momentum has the opposite sign to an ordinary
+:math:`l=1` shell, as accounted for by EDRIXS's ``t2g`` spin-orbit and
+orbital-field terms. Use ``tmat_c2r('t2g')`` for this effective three-orbital
+space and ``tmat_c2r('d')`` for the full five-orbital shell.
 
 Helper functions that return matrices or tensors -- ``get_umat_slater``,
 ``get_trans_oper``, ``cf_cubic_d``, ``cf_tetragonal_d``, and
@@ -107,25 +121,50 @@ Helper functions that return matrices or tensors -- ``get_umat_slater``,
 Fock basis
 ==========
 
-* **Valence orbitals come first.** When a problem has both valence and core
-  electrons, all valence spin-orbitals are indexed before all core
-  spin-orbitals.
-* **Encoding.** A Fock state is a string of 1s (occupied) and 0s (empty) over
-  the single-particle spin-orbitals, stored as an integer for efficiency.
-  Orbital zero occupies the least significant bit:
-  orbital ``i`` has mask ``1 << i``. Occupation lists remain in increasing
-  orbital order; ordinary binary integer displays place orbital zero at the
-  right. Basis row ordering is unchanged.
-* **Specification.** A basis is described compactly by
-  :class:`~edrixs.fock_basis.FockBasisSpec`, built from ``(norb, nocc)`` pairs
-  -- one per shell, each with fixed occupancy. For a single shell,
-  :func:`~edrixs.fock_basis.get_fock_basis_int` returns a realized
-  integer-encoded basis directly. :func:`~edrixs.solvers.build_op` and
-  :func:`~edrixs.solvers.get_ops` accept either the specification or a realized
-  basis.
+A Fock state specifies which single-particle spin-orbitals contain electrons.
+Each orbital is either occupied (1) or empty (0). EDRIXS stores this string as
+an integer, with orbital indices running **from right to left** in its binary
+representation: orbital 0 is the rightmost, least significant bit.
+
+For example, two electrons in orbitals 0 and 2 of a four-orbital space give
+binary ``0101``, or integer ``5 = 2**0 + 2**2``. If written as an occupation
+list indexed by orbital, the same state is ``[1, 0, 1, 0]``: such a list starts
+with orbital 0 on the left. The integer labels a configuration; its position
+in the basis determines the corresponding matrix row or column.
+
+When a model contains core orbitals, all valence spin-orbitals precede them
+in orbital index. The initial basis includes a filled core, and the
+intermediate basis includes one core hole.
+
+:class:`~edrixs.fock_basis.FockBasisSpec` describes the allowed configurations
+without listing them. Supply ``(norb, nocc)`` pairs to ``from_args``, one per
+group with a fixed electron count. ``norb`` counts spin-orbitals, and ``nocc``
+counts electrons. For ionic Ni :math:`3d^8` with a :math:`2p` core::
+
+    basis_i = edrixs.FockBasisSpec.from_args(10, 8, 6, 6)  # 3d^8 2p^6
+    basis_n = edrixs.FockBasisSpec.from_args(10, 9, 6, 5)  # 3d^9 2p^5
+
+There is one pair per fixed-occupancy group, which need not be a physical
+shell. ``model_2v1c`` combines both valence shells into one group so electrons
+can move between them; it uses two pairs (combined valence, core), rather than
+three independently fixed shell occupations. Anderson impurity models likewise
+group impurity and bath orbitals together.
+
+For a single group, :func:`~edrixs.fock_basis.get_fock_basis_int` returns the
+integer-encoded basis directly. :func:`~edrixs.solvers.build_op` and
+:func:`~edrixs.solvers.get_ops` accept either a specification or a realized basis.
 
 Spectral conventions
 ====================
+
+.. figure:: /_static/geometry.png
+   :width: 90%
+   :align: center
+   :alt: Incident and outgoing beams, polarizations, and angles at the sample.
+
+   Scattering geometry. ``thin`` and ``thout`` are
+   :math:`\theta_{in}` and :math:`\theta_{out}`; ``phi`` is :math:`\phi`.
+   Linear polarization angles correspond to :math:`\alpha` and :math:`\beta`.
 
 * **Geometry** follows Figure 1 of Y. Wang *et al.*,
   `Comput. Phys. Commun. 243, 151 (2019)
@@ -152,3 +191,17 @@ Spectral conventions
   thermally populated states.
 * Returned array shapes: ``xas`` has shape ``(len(ominc), len(pol_type))``;
   ``rixs`` has shape ``(len(ominc), len(eloss), len(pol_type))``.
+
+The widths enter directly as :math:`\gamma`, without a factor of one half.
+For example, an XAS line at excitation energy :math:`\Delta E` has the form
+
+.. math::
+
+   L(\omega-\Delta E;\gamma_c)
+   = \frac{1}{\pi}\frac{\gamma_c}
+     {(\omega-\Delta E)^2+\gamma_c^2}.
+
+Its full width at half maximum is :math:`2\gamma_c`. The RIXS intermediate
+resolvent contains :math:`\omega_{in}+E_i-H_n+i\gamma_c`, and its energy-loss
+lines use the same Lorentzian with :math:`\gamma_f` (full width
+:math:`2\gamma_f`).

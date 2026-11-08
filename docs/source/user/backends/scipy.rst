@@ -1,8 +1,8 @@
 .. _scipy-backend-options:
 
-**************
-SciPy keywords
-**************
+**********************
+SciPy backend settings
+**********************
 
 :doc:`Back to the backend overview <../backend>`
 
