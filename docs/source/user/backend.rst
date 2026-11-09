@@ -26,23 +26,30 @@ mapping is specific to both the backend *and the operation*.
 
 .. _lazy-operators:
 
-Operator factories and solver dispatch
-======================================
+Preparing and using operators
+=============================
 
-``build_op`` returns a callable that constructs the matrix when called. This
-lets callers defer matrix allocation and recreate matrices when needed. Its
-``.backend`` attribute identifies the numerical backend and the matrix
-representation it will produce.
+Choose the backend when preparing operators, then pass the returned objects
+directly to the solvers::
 
-Numerical ``get_ops`` returns these callables for both Hamiltonians
-and every transition component. Public ``ed`` and ``rixs`` dispatch using
-``hmat_i.backend``; ``xas`` uses ``hmat_n.backend``. They pass the factories
-unchanged to the selected backend and assume all operators are suitable for it.
-Dense, SciPy, and PETSc ED call every supplied factory at calculation
-start. Repeated arguments may be instantiated independently. PETSc XAS and RIXS
-accept ``matrix_lifetime`` in ``backend_kws``; see :doc:`backends/petsc`.
-All staged solver entry points, including backend-specific functions, require
-factories or callable Fortran disk handles.
+    hmat_i, hmat_n, trans_ops = edrixs.get_ops(*problem, backend='scipy')
+    eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=3)
+
+Here ``problem`` and ``shift`` come from a model constructor as shown in
+:ref:`physical-model`. You do not repeat the backend choice in ``ed``, ``xas``,
+or ``rixs``. The operators carry that choice in their ``.backend`` labels;
+prepare all operators for a calculation with the same backend.
+
+For dense, SciPy, and PETSc calculations, these objects are instructions for
+building a matrix, rather than matrices already occupying memory. In Python
+they are callables (functions you can call with no arguments), also called
+*operator factories*. The solvers call them when needed, and each call builds
+a fresh matrix. This lets the backend release large matrices and reconstruct
+them later. PETSc offers a memory-versus-computation choice through
+``matrix_lifetime``; see :doc:`backends/petsc`.
+
+Fortran instead uses handles to solver input files. Pass those handles to the
+same solver functions; see :doc:`backends/fortran` for its file-based workflow.
 
 For matrix arithmetic or direct access to matrix methods, call the factory
 explicitly::
@@ -67,15 +74,15 @@ options documented below.
 
 .. _backend-options:
 
-Backend keyword reference
-=========================
+Backend settings reference
+==========================
 
-Choose the backend whose keywords you need:
+Choose the backend whose solver and matrix settings you need:
 
-* :doc:`SciPy keywords <backends/scipy>`
-* :doc:`Dense keywords <backends/dense>`
-* :doc:`Fortran keywords <backends/fortran>`
-* :doc:`PETSc keywords <backends/petsc>`
+* :doc:`backends/scipy`
+* :doc:`backends/dense`
+* :doc:`backends/fortran`
+* :doc:`backends/petsc`
 
 These references apply to the staged ``get_ops`` / ``ed`` / ``xas`` / ``rixs``
 interface.  The legacy ``ed_*_fort``, ``xas_*_fort``, and ``rixs_*_fort``

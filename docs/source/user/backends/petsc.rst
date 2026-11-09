@@ -1,8 +1,8 @@
 .. _petsc-backend-options:
 
-**************
-PETSc keywords
-**************
+**********************
+PETSc backend settings
+**********************
 
 :doc:`Back to the backend overview <../backend>`
 

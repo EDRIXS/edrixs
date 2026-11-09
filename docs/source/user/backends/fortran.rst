@@ -1,8 +1,8 @@
 .. _fortran-backend-options:
 
-****************
-Fortran keywords
-****************
+************************
+Fortran backend settings
+************************
 
 :doc:`Back to the backend overview <../backend>`
 

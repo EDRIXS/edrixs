@@ -1,3 +1,5 @@
+.. _installation:
+
 ************
 Installation
 ************
@@ -15,7 +17,7 @@ A prebuilt conda package is available for Linux and macOS. First install `Minifo
 then create a separate environment for edrixs::
 
     mamba create --name edrixs_env -c conda-forge --strict-channel-priority \
-        edrixs matplotlib
+        edrixs matplotlib ipykernel
     conda activate edrixs_env
 
 edrixs will also run on `Google Colaboratory
@@ -33,7 +35,7 @@ default. Install Conda and then edrixs from within a notebook cell::
 Build the current source with Mamba on Linux or macOS
 =====================================================
 
-This is the recommended way to build the current source on
+If you need access to the bleeding-edge version, this is the recommended way to build the current source on
 Linux and macOS. See the :ref:`macOS compiler note <macos-sdk-note>` if the
 standard build fails on a recent macOS release.
 
@@ -47,7 +49,7 @@ and activate the build environment::
         "slepc=*=complex_*" slepc4py \
         "libblas=*=*openblas" cmake ninja numba pip setuptools wheel \
         sphinx ipython numpydoc pillow sphinx-copybutton sphinx-gallery \
-        sphinx_rtd_theme pytest
+        sphinx_rtd_theme pytest ipykernel
     conda activate edrixs_env
 
 Clone and install edrixs from the repository root::
@@ -59,6 +61,18 @@ Clone and install edrixs from the repository root::
 The ``--no-build-isolation`` option makes the extension use NumPy and the
 compiler toolchain from the activated environment. The ``--no-deps`` option
 prevents pip from replacing the compatible conda packages installed above.
+
+Using the environment in Jupyter
+================================
+
+The environments above include ``ipykernel``. To make the activated environment
+available to an existing Jupyter installation, register it once::
+
+    python -m ipykernel install --user --name edrixs_env --display-name "EDRIXS"
+
+Select the **EDRIXS** kernel when opening a notebook. Python scripts can also
+run directly from the activated environment; Jupyter is optional. Colab
+provides its own notebook kernel.
 
 Requirements
 ============
