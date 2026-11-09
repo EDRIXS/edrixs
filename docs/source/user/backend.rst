@@ -65,27 +65,6 @@ enough eigenpairs from ``ed`` to keep every thermally populated state in the
 ground-state manifold, including complete degenerate or nearly degenerate
 multiplets; otherwise the Boltzmann average is incomplete.
 
-For example, after setting up the NiO model and an incident-energy grid
-``ominc``, compare XAS at the same temperature while retaining more initial
-states::
-
-    spectra = []
-    for count in (3, 6, 12):
-        eval_i, evec_i = edrixs.ed(hmat_i, shift=shift, num_evals=count)
-        spectra.append(edrixs.xas(
-            eval_i, evec_i, hmat_n, trans_ops, ominc,
-            gamma_c=0.65, temperature=300,
-            pol_type=[('linear', 0)],
-        ))
-
-Compare the spectra on the same intensity scale. If the spectrum changes,
-retain more states, staying within the basis dimension, and repeat. Choose
-counts that include whole multiplets rather than cutting through a degenerate
-group. At 300 K, :math:`k_B T \simeq 0.026` eV; levels within a few times
-this energy of the ground state may contribute. Recheck convergence when
-increasing temperature. The same initial-state convergence check applies to
-RIXS.
-
 EDRIXS uses established numerical linear-algebra packages, but floating-point
 and iterative solvers are not exact.  If numerical accuracy is a concern,
 repeat the calculation with varied solver settings and check that the result
