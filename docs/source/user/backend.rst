@@ -27,7 +27,7 @@ mapping is specific to both the backend *and the operation*.
 .. _lazy-operators:
 
 Preparing and using operators
-============================
+=============================
 
 Choose the backend when preparing operators, then pass the returned objects
 directly to the solvers::
