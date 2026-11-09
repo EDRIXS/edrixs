@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PETSc keywords &mdash; EDRIXS 0+untagged.1.g5436d68 documentation</title>
+  <title>PETSc backend settings &mdash; EDRIXS 0+untagged.1.g31baa43 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=78c07697"></script>
+      <script src="../../_static/documentation_options.js?v=04eac77b"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -31,7 +31,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Examples" href="../examples.html" />
-    <link rel="prev" title="Fortran keywords" href="fortran.html" />
+    <link rel="prev" title="Fortran backend settings" href="fortran.html" />
    
   <meta name="edrixs-doc-version" content="dev">
   <meta name="edrixs-doc-site-root" content="/edrixs/">
@@ -60,20 +60,20 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">EDRIXS User Guide</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../whatisedrixs.html">What is EDRIXS?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../whatisedrixs.html">Start here</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usedocker.html">EDRIXS and docker</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../devcontainer.html">Dev Container</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../introduction.html">Introduction to EDRIXS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../conventions.html">Conventions</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../backend.html">Backend</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../backend.html#operator-factories-and-solver-dispatch">Operator factories and solver dispatch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../backend.html#preparing-and-using-operators">Preparing and using operators</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../backend.html#numerical-precision">Numerical precision</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../backend.html#backend-keyword-reference">Backend keyword reference</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="scipy.html">SciPy keywords</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dense.html">Dense keywords</a></li>
-<li class="toctree-l4"><a class="reference internal" href="fortran.html">Fortran keywords</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">PETSc keywords</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../backend.html#backend-settings-reference">Backend settings reference</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="scipy.html">SciPy backend settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dense.html">Dense backend settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="fortran.html">Fortran backend settings</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">PETSc backend settings</a></li>
 </ul>
 </li>
 </ul>
@@ -103,7 +103,7 @@
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">EDRIXS User Guide</a></li>
           <li class="breadcrumb-item"><a href="../backend.html">Backend</a></li>
-      <li class="breadcrumb-item active">PETSc keywords</li>
+      <li class="breadcrumb-item active">PETSc backend settings</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../_sources/user/backends/petsc.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -113,8 +113,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="petsc-keywords">
-<span id="petsc-backend-options"></span><h1>PETSc keywords<a class="headerlink" href="#petsc-keywords" title="Link to this heading"></a></h1>
+  <section id="petsc-backend-settings">
+<span id="petsc-backend-options"></span><h1>PETSc backend settings<a class="headerlink" href="#petsc-backend-settings" title="Link to this heading"></a></h1>
 <p><a class="reference internal" href="../backend.html"><span class="doc">Back to the backend overview</span></a></p>
 <section id="about-this-backend">
 <h2>About this backend<a class="headerlink" href="#about-this-backend" title="Link to this heading"></a></h2>
@@ -137,7 +137,7 @@ distributed Lanczos and KSP solves.  Importing EDRIXS does not import PETSc;
 <code class="docutils literal notranslate"><span class="pre">.backend</span> <span class="pre">==</span> <span class="pre">'petsc'</span></code>. Calling a factory assembles its distributed matrix;
 public <code class="docutils literal notranslate"><span class="pre">ed</span></code>, <code class="docutils literal notranslate"><span class="pre">xas</span></code>, and <code class="docutils literal notranslate"><span class="pre">rixs</span></code> read the labels and pass the factories to
 the PETSc backend. All MPI ranks in the matrix communicator must participate
-in construction and solver calls. See <a class="reference internal" href="../backend.html#lazy-operators"><span class="std std-ref">Operator factories and solver dispatch</span></a>.</p>
+in construction and solver calls. See <a class="reference internal" href="../backend.html#lazy-operators"><span class="std std-ref">Preparing and using operators</span></a>.</p>
 <p>Options are specific to the stage where they are supplied.</p>
 </section>
 <section id="matrix-lifetime">
@@ -345,7 +345,7 @@ algorithms and their tradeoffs are listed in the <a class="reference external" h
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="fortran.html" class="btn btn-neutral float-left" title="Fortran keywords" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="fortran.html" class="btn btn-neutral float-left" title="Fortran backend settings" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="../examples.html" class="btn btn-neutral float-right" title="Examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

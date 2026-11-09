@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Installation &mdash; EDRIXS 0+untagged.1.g5436d68 documentation</title>
+  <title>Installation &mdash; EDRIXS 0+untagged.1.g31baa43 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=78c07697"></script>
+      <script src="../_static/documentation_options.js?v=04eac77b"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -31,7 +31,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="EDRIXS and docker" href="usedocker.html" />
-    <link rel="prev" title="What is EDRIXS?" href="whatisedrixs.html" />
+    <link rel="prev" title="Start here" href="whatisedrixs.html" />
    
   <meta name="edrixs-doc-version" content="dev">
   <meta name="edrixs-doc-site-root" content="/edrixs/">
@@ -60,10 +60,11 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">EDRIXS User Guide</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="whatisedrixs.html">What is EDRIXS?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whatisedrixs.html">Start here</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Installation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#install-the-released-package-with-mamba-on-linux-and-macos">Install the released package with Mamba on Linux and macOS</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#build-the-current-source-with-mamba-on-linux-or-macos">Build the current source with Mamba on Linux or macOS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-the-environment-in-jupyter">Using the environment in Jupyter</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#requirements">Requirements</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#install-with-docker-on-windows">Install with Docker on Windows</a></li>
 </ul>
@@ -108,14 +109,14 @@
            <div itemprop="articleBody">
              
   <section id="installation">
-<h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
+<span id="id1"></span><h1>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h1>
 <p>For Linux and macOS, we recommend installation via Mamba. Windows users should use the <a class="reference internal" href="usedocker.html#edrixsanddocker"><span class="std std-ref">Docker instructions</span></a>.</p>
 <section id="install-the-released-package-with-mamba-on-linux-and-macos">
 <span id="anacondainstall"></span><h2>Install the released package with Mamba on Linux and macOS<a class="headerlink" href="#install-the-released-package-with-mamba-on-linux-and-macos" title="Link to this heading"></a></h2>
 <p>A prebuilt conda package is available for Linux and macOS. First install <a class="reference external" href="https://github.com/conda-forge/miniforge">Miniforge</a>, which provides Conda and Mamba,
 then create a separate environment for edrixs:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mamba</span> <span class="n">create</span> <span class="o">--</span><span class="n">name</span> <span class="n">edrixs_env</span> <span class="o">-</span><span class="n">c</span> <span class="n">conda</span><span class="o">-</span><span class="n">forge</span> <span class="o">--</span><span class="n">strict</span><span class="o">-</span><span class="n">channel</span><span class="o">-</span><span class="n">priority</span> \
-    <span class="n">edrixs</span> <span class="n">matplotlib</span>
+    <span class="n">edrixs</span> <span class="n">matplotlib</span> <span class="n">ipykernel</span>
 <span class="n">conda</span> <span class="n">activate</span> <span class="n">edrixs_env</span>
 </pre></div>
 </div>
@@ -130,7 +131,7 @@ condacolab.install()
 </section>
 <section id="build-the-current-source-with-mamba-on-linux-or-macos">
 <span id="sourceinstall"></span><span id="macosinstall"></span><h2>Build the current source with Mamba on Linux or macOS<a class="headerlink" href="#build-the-current-source-with-mamba-on-linux-or-macos" title="Link to this heading"></a></h2>
-<p>This is the recommended way to build the current source on
+<p>If you need access to the bleeding-edge version, this is the recommended way to build the current source on
 Linux and macOS. See the <a class="reference internal" href="#macos-sdk-note"><span class="std std-ref">macOS compiler note</span></a> if the
 standard build fails on a recent macOS release.</p>
 <p>Install <a class="reference external" href="https://github.com/conda-forge/miniforge">Miniforge</a>, then create
@@ -142,7 +143,7 @@ and activate the build environment:</p>
     <span class="s2">"slepc=*=complex_*"</span> <span class="n">slepc4py</span> \
     <span class="s2">"libblas=*=*openblas"</span> <span class="n">cmake</span> <span class="n">ninja</span> <span class="n">numba</span> <span class="n">pip</span> <span class="n">setuptools</span> <span class="n">wheel</span> \
     <span class="n">sphinx</span> <span class="n">ipython</span> <span class="n">numpydoc</span> <span class="n">pillow</span> <span class="n">sphinx</span><span class="o">-</span><span class="n">copybutton</span> <span class="n">sphinx</span><span class="o">-</span><span class="n">gallery</span> \
-    <span class="n">sphinx_rtd_theme</span> <span class="n">pytest</span>
+    <span class="n">sphinx_rtd_theme</span> <span class="n">pytest</span> <span class="n">ipykernel</span>
 <span class="n">conda</span> <span class="n">activate</span> <span class="n">edrixs_env</span>
 </pre></div>
 </div>
@@ -155,6 +156,17 @@ and activate the build environment:</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">--no-build-isolation</span></code> option makes the extension use NumPy and the
 compiler toolchain from the activated environment. The <code class="docutils literal notranslate"><span class="pre">--no-deps</span></code> option
 prevents pip from replacing the compatible conda packages installed above.</p>
+</section>
+<section id="using-the-environment-in-jupyter">
+<h2>Using the environment in Jupyter<a class="headerlink" href="#using-the-environment-in-jupyter" title="Link to this heading"></a></h2>
+<p>The environments above include <code class="docutils literal notranslate"><span class="pre">ipykernel</span></code>. To make the activated environment
+available to an existing Jupyter installation, register it once:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">ipykernel</span> <span class="n">install</span> <span class="o">--</span><span class="n">user</span> <span class="o">--</span><span class="n">name</span> <span class="n">edrixs_env</span> <span class="o">--</span><span class="n">display</span><span class="o">-</span><span class="n">name</span> <span class="s2">"EDRIXS"</span>
+</pre></div>
+</div>
+<p>Select the <strong>EDRIXS</strong> kernel when opening a notebook. Python scripts can also
+run directly from the activated environment; Jupyter is optional. Colab
+provides its own notebook kernel.</p>
 </section>
 <section id="requirements">
 <h2>Requirements<a class="headerlink" href="#requirements" title="Link to this heading"></a></h2>
@@ -221,7 +233,7 @@ generated CMake cache with <code class="docutils literal notranslate"><span clas
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="whatisedrixs.html" class="btn btn-neutral float-left" title="What is EDRIXS?" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="whatisedrixs.html" class="btn btn-neutral float-left" title="Start here" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="usedocker.html" class="btn btn-neutral float-right" title="EDRIXS and docker" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

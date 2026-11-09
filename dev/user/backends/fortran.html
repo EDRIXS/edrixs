@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fortran keywords &mdash; EDRIXS 0+untagged.1.g5436d68 documentation</title>
+  <title>Fortran backend settings &mdash; EDRIXS 0+untagged.1.g31baa43 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=78c07697"></script>
+      <script src="../../_static/documentation_options.js?v=04eac77b"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -30,8 +30,8 @@
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="PETSc keywords" href="petsc.html" />
-    <link rel="prev" title="Dense keywords" href="dense.html" />
+    <link rel="next" title="PETSc backend settings" href="petsc.html" />
+    <link rel="prev" title="Dense backend settings" href="dense.html" />
    
   <meta name="edrixs-doc-version" content="dev">
   <meta name="edrixs-doc-site-root" content="/edrixs/">
@@ -60,20 +60,20 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../index.html">EDRIXS User Guide</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="../whatisedrixs.html">What is EDRIXS?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../whatisedrixs.html">Start here</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../installation.html">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../usedocker.html">EDRIXS and docker</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../devcontainer.html">Dev Container</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../introduction.html">Introduction to EDRIXS</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../conventions.html">Conventions</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="../backend.html">Backend</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="../backend.html#operator-factories-and-solver-dispatch">Operator factories and solver dispatch</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../backend.html#preparing-and-using-operators">Preparing and using operators</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../backend.html#numerical-precision">Numerical precision</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="../backend.html#backend-keyword-reference">Backend keyword reference</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="scipy.html">SciPy keywords</a></li>
-<li class="toctree-l4"><a class="reference internal" href="dense.html">Dense keywords</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">Fortran keywords</a></li>
-<li class="toctree-l4"><a class="reference internal" href="petsc.html">PETSc keywords</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="../backend.html#backend-settings-reference">Backend settings reference</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="scipy.html">SciPy backend settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="dense.html">Dense backend settings</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Fortran backend settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="petsc.html">PETSc backend settings</a></li>
 </ul>
 </li>
 </ul>
@@ -103,7 +103,7 @@
       <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="../index.html">EDRIXS User Guide</a></li>
           <li class="breadcrumb-item"><a href="../backend.html">Backend</a></li>
-      <li class="breadcrumb-item active">Fortran keywords</li>
+      <li class="breadcrumb-item active">Fortran backend settings</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../../_sources/user/backends/fortran.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -113,8 +113,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="fortran-keywords">
-<span id="fortran-backend-options"></span><h1>Fortran keywords<a class="headerlink" href="#fortran-keywords" title="Link to this heading"></a></h1>
+  <section id="fortran-backend-settings">
+<span id="fortran-backend-options"></span><h1>Fortran backend settings<a class="headerlink" href="#fortran-backend-settings" title="Link to this heading"></a></h1>
 <p><a class="reference internal" href="../backend.html"><span class="doc">Back to the backend overview</span></a></p>
 <section id="about-this-backend">
 <h2>About this backend<a class="headerlink" href="#about-this-backend" title="Link to this heading"></a></h2>
@@ -280,8 +280,8 @@ must be at least the later <code class="docutils literal notranslate"><span clas
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="dense.html" class="btn btn-neutral float-left" title="Dense keywords" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="petsc.html" class="btn btn-neutral float-right" title="PETSc keywords" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="dense.html" class="btn btn-neutral float-left" title="Dense backend settings" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="petsc.html" class="btn btn-neutral float-right" title="PETSc backend settings" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

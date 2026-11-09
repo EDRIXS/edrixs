@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Conventions &mdash; EDRIXS 0+untagged.1.g5436d68 documentation</title>
+  <title>Conventions &mdash; EDRIXS 0+untagged.1.g31baa43 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=78c07697"></script>
+      <script src="../_static/documentation_options.js?v=04eac77b"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -61,7 +61,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">EDRIXS User Guide</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="whatisedrixs.html">What is EDRIXS?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whatisedrixs.html">Start here</a></li>
 <li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="usedocker.html">EDRIXS and docker</a></li>
 <li class="toctree-l2"><a class="reference internal" href="devcontainer.html">Dev Container</a></li>
@@ -153,6 +153,10 @@ the construction of transition operators.</p>
 <p>Numerical diagonalization can lose precision when the diagonal entries have a
 large common energy offset.
 For this reason, model constructors also return an energy offset, <code class="docutils literal notranslate"><span class="pre">shift</span></code>.
+It is the number of core spin-orbitals multiplied by their common shell-level
+energy, excluding Coulomb and spin-orbit contributions. For example,
+<code class="docutils literal notranslate"><span class="pre">model_1v1c(('d',</span> <span class="pre">'p'),</span> <span class="pre">shell_level=(0.0,</span> <span class="pre">-857.6))</span></code> returns
+<code class="docutils literal notranslate"><span class="pre">shift</span> <span class="pre">=</span> <span class="pre">6</span> <span class="pre">*</span> <span class="pre">(-857.6)</span></code> eV. It is zero when the core shell level is zero.
 Passing it to <a class="reference internal" href="../reference/solvers.html#edrixs.solvers.ed" title="edrixs.solvers.ed"><code class="xref py py-func docutils literal notranslate"><span class="pre">ed()</span></code></a> with the dense, SciPy, or PETSc backend subtracts
 the offset from the Hamiltonian diagonal before diagonalization and restores
 it to the returned eigenvalues. This preserves the physics while reducing
@@ -182,11 +186,20 @@ f_{x(x^2-3y^2)}, f_{y(3x^2-y^2)}\)</span></p></li>
 </ul>
 <p>The <strong>default single-particle basis used to define the Fock basis</strong> is:</p>
 <ul class="simple">
-<li><p>complex spherical harmonics for <code class="docutils literal notranslate"><span class="pre">p</span></code>, <code class="docutils literal notranslate"><span class="pre">d</span></code>, <code class="docutils literal notranslate"><span class="pre">t2g</span></code>, and <code class="docutils literal notranslate"><span class="pre">f</span></code> (<code class="docutils literal notranslate"><span class="pre">p</span></code> and
-<code class="docutils literal notranslate"><span class="pre">t2g</span></code> share the same complex-harmonic basis);</p></li>
+<li><p>complex spherical harmonics for <code class="docutils literal notranslate"><span class="pre">p</span></code>, <code class="docutils literal notranslate"><span class="pre">d</span></code>, and <code class="docutils literal notranslate"><span class="pre">f</span></code>, and an effective
+<span class="math notranslate nohighlight">\(l=1\)</span> complex basis for <code class="docutils literal notranslate"><span class="pre">t2g</span></code>;</p></li>
 <li><p>the <span class="math notranslate nohighlight">\(\lvert j, j_z \rangle\)</span> basis for <code class="docutils literal notranslate"><span class="pre">p12</span></code>, <code class="docutils literal notranslate"><span class="pre">p32</span></code>, <code class="docutils literal notranslate"><span class="pre">d32</span></code>,
 <code class="docutils literal notranslate"><span class="pre">d52</span></code>, <code class="docutils literal notranslate"><span class="pre">f52</span></code>, and <code class="docutils literal notranslate"><span class="pre">f72</span></code>.</p></li>
 </ul>
+<p>The three <code class="docutils literal notranslate"><span class="pre">t2g</span></code> orbitals are represented using an effective <span class="math notranslate nohighlight">\(l=1\)</span>
+space, like a <code class="docutils literal notranslate"><span class="pre">p</span></code> shell. In EDRIXS’s transformation convention,
+<code class="docutils literal notranslate"><span class="pre">(d_xz,</span> <span class="pre">d_yz,</span> <span class="pre">d_xy)</span></code> correspond to <code class="docutils literal notranslate"><span class="pre">(p_y,</span> <span class="pre">p_x,</span> <span class="pre">p_z)</span></code>. Thus the <code class="docutils literal notranslate"><span class="pre">p</span></code> and
+<code class="docutils literal notranslate"><span class="pre">t2g</span></code> change-of-basis matrices differ by the order of their first two real
+orbitals. The <code class="docutils literal notranslate"><span class="pre">t2g</span></code> orbitals remain a subset of the physical <span class="math notranslate nohighlight">\(d\)</span> shell:
+the projected orbital angular momentum has the opposite sign to an ordinary
+<span class="math notranslate nohighlight">\(l=1\)</span> shell, as accounted for by EDRIXS’s <code class="docutils literal notranslate"><span class="pre">t2g</span></code> spin-orbit and
+orbital-field terms. Use <code class="docutils literal notranslate"><span class="pre">tmat_c2r('t2g')</span></code> for this effective three-orbital
+space and <code class="docutils literal notranslate"><span class="pre">tmat_c2r('d')</span></code> for the full five-orbital shell.</p>
 <p>Helper functions that return matrices or tensors – <code class="docutils literal notranslate"><span class="pre">get_umat_slater</span></code>,
 <code class="docutils literal notranslate"><span class="pre">get_trans_oper</span></code>, <code class="docutils literal notranslate"><span class="pre">cf_cubic_d</span></code>, <code class="docutils literal notranslate"><span class="pre">cf_tetragonal_d</span></code>, and
 <code class="docutils literal notranslate"><span class="pre">cf_trigonal_t2g</span></code>, for example – return them <strong>in this default basis</strong>.</p>
@@ -207,27 +220,46 @@ real harmonics, or <code class="docutils literal notranslate"><span class="pre">
 </section>
 <section id="fock-basis">
 <h2>Fock basis<a class="headerlink" href="#fock-basis" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p><strong>Valence orbitals come first.</strong> When a problem has both valence and core
-electrons, all valence spin-orbitals are indexed before all core
-spin-orbitals.</p></li>
-<li><p><strong>Encoding.</strong> A Fock state is a string of 1s (occupied) and 0s (empty) over
-the single-particle spin-orbitals, stored as an integer for efficiency.
-Orbital zero occupies the least significant bit:
-orbital <code class="docutils literal notranslate"><span class="pre">i</span></code> has mask <code class="docutils literal notranslate"><span class="pre">1</span> <span class="pre">&lt;&lt;</span> <span class="pre">i</span></code>. Occupation lists remain in increasing
-orbital order; ordinary binary integer displays place orbital zero at the
-right. Basis row ordering is unchanged.</p></li>
-<li><p><strong>Specification.</strong> A basis is described compactly by
-<a class="reference internal" href="../reference/fock_basis.html#edrixs.fock_basis.FockBasisSpec" title="edrixs.fock_basis.FockBasisSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">FockBasisSpec</span></code></a>, built from <code class="docutils literal notranslate"><span class="pre">(norb,</span> <span class="pre">nocc)</span></code> pairs
-– one per shell, each with fixed occupancy. For a single shell,
-<a class="reference internal" href="../reference/fock_basis.html#edrixs.fock_basis.get_fock_basis_int" title="edrixs.fock_basis.get_fock_basis_int"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_fock_basis_int()</span></code></a> returns a realized
+<p>A Fock state specifies which single-particle spin-orbitals contain electrons.
+Each orbital is either occupied (1) or empty (0). EDRIXS stores this string as
+an integer, with orbital indices running <strong>from right to left</strong> in its binary
+representation: orbital 0 is the rightmost, least significant bit.</p>
+<p>For example, two electrons in orbitals 0 and 2 of a four-orbital space give
+binary <code class="docutils literal notranslate"><span class="pre">0101</span></code>, or integer <code class="docutils literal notranslate"><span class="pre">5</span> <span class="pre">=</span> <span class="pre">2**0</span> <span class="pre">+</span> <span class="pre">2**2</span></code>. If written as an occupation
+list indexed by orbital, the same state is <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">0,</span> <span class="pre">1,</span> <span class="pre">0]</span></code>: such a list starts
+with orbital 0 on the left. The integer labels a configuration; its position
+in the basis determines the corresponding matrix row or column.</p>
+<p>When a model contains core orbitals, all valence spin-orbitals precede them
+in orbital index. The initial basis includes a filled core, and the
+intermediate basis includes one core hole.</p>
+<p><a class="reference internal" href="../reference/fock_basis.html#edrixs.fock_basis.FockBasisSpec" title="edrixs.fock_basis.FockBasisSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">FockBasisSpec</span></code></a> describes the allowed configurations
+without listing them. Supply <code class="docutils literal notranslate"><span class="pre">(norb,</span> <span class="pre">nocc)</span></code> pairs to <code class="docutils literal notranslate"><span class="pre">from_args</span></code>, one per
+group with a fixed electron count. <code class="docutils literal notranslate"><span class="pre">norb</span></code> counts spin-orbitals, and <code class="docutils literal notranslate"><span class="pre">nocc</span></code>
+counts electrons. For ionic Ni <span class="math notranslate nohighlight">\(3d^8\)</span> with a <span class="math notranslate nohighlight">\(2p\)</span> core:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">basis_i</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">FockBasisSpec</span><span class="o">.</span><span class="n">from_args</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>  <span class="c1"># 3d^8 2p^6</span>
+<span class="n">basis_n</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">FockBasisSpec</span><span class="o">.</span><span class="n">from_args</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>  <span class="c1"># 3d^9 2p^5</span>
+</pre></div>
+</div>
+<p>There is one pair per fixed-occupancy group, which need not be a physical
+shell. <code class="docutils literal notranslate"><span class="pre">model_2v1c</span></code> combines both valence shells into one group so electrons
+can move between them; it uses two pairs (combined valence, core), rather than
+three independently fixed shell occupations. Anderson impurity models likewise
+group impurity and bath orbitals together.</p>
+<p>For a single group, <a class="reference internal" href="../reference/fock_basis.html#edrixs.fock_basis.get_fock_basis_int" title="edrixs.fock_basis.get_fock_basis_int"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_fock_basis_int()</span></code></a> returns the
 integer-encoded basis directly. <a class="reference internal" href="../reference/solvers.html#edrixs.solvers.build_op" title="edrixs.solvers.build_op"><code class="xref py py-func docutils literal notranslate"><span class="pre">build_op()</span></code></a> and
-<a class="reference internal" href="../reference/solvers.html#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops()</span></code></a> accept either the specification or a realized
-basis.</p></li>
-</ul>
+<a class="reference internal" href="../reference/solvers.html#edrixs.solvers.get_ops" title="edrixs.solvers.get_ops"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_ops()</span></code></a> accept either a specification or a realized basis.</p>
 </section>
 <section id="spectral-conventions">
 <h2>Spectral conventions<a class="headerlink" href="#spectral-conventions" title="Link to this heading"></a></h2>
+<figure class="align-center" id="id2">
+<a class="reference internal image-reference" href="../_images/geometry.png"><img alt="Incident and outgoing beams, polarizations, and angles at the sample." src="../_images/geometry.png" style="width: 90%;" />
+</a>
+<figcaption>
+<p><span class="caption-text">Scattering geometry. <code class="docutils literal notranslate"><span class="pre">thin</span></code> and <code class="docutils literal notranslate"><span class="pre">thout</span></code> are
+<span class="math notranslate nohighlight">\(\theta_{in}\)</span> and <span class="math notranslate nohighlight">\(\theta_{out}\)</span>; <code class="docutils literal notranslate"><span class="pre">phi</span></code> is <span class="math notranslate nohighlight">\(\phi\)</span>.
+Linear polarization angles correspond to <span class="math notranslate nohighlight">\(\alpha\)</span> and <span class="math notranslate nohighlight">\(\beta\)</span>.</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
+</figcaption>
+</figure>
 <ul class="simple">
 <li><p><strong>Geometry</strong> follows Figure 1 of Y. Wang <em>et al.</em>,
 <a class="reference external" href="https://doi.org/10.1016/j.cpc.2019.04.018">Comput. Phys. Commun. 243, 151 (2019)</a>. The incident and scattered
@@ -254,6 +286,16 @@ thermally populated states.</p></li>
 <li><p>Returned array shapes: <code class="docutils literal notranslate"><span class="pre">xas</span></code> has shape <code class="docutils literal notranslate"><span class="pre">(len(ominc),</span> <span class="pre">len(pol_type))</span></code>;
 <code class="docutils literal notranslate"><span class="pre">rixs</span></code> has shape <code class="docutils literal notranslate"><span class="pre">(len(ominc),</span> <span class="pre">len(eloss),</span> <span class="pre">len(pol_type))</span></code>.</p></li>
 </ul>
+<p>The widths enter directly as <span class="math notranslate nohighlight">\(\gamma\)</span>, without a factor of one half.
+For example, an XAS line at excitation energy <span class="math notranslate nohighlight">\(\Delta E\)</span> has the form</p>
+<div class="math notranslate nohighlight">
+\[L(\omega-\Delta E;\gamma_c)
+= \frac{1}{\pi}\frac{\gamma_c}
+  {(\omega-\Delta E)^2+\gamma_c^2}.\]</div>
+<p>Its full width at half maximum is <span class="math notranslate nohighlight">\(2\gamma_c\)</span>. The RIXS intermediate
+resolvent contains <span class="math notranslate nohighlight">\(\omega_{in}+E_i-H_n+i\gamma_c\)</span>, and its energy-loss
+lines use the same Lorentzian with <span class="math notranslate nohighlight">\(\gamma_f\)</span> (full width
+<span class="math notranslate nohighlight">\(2\gamma_f\)</span>).</p>
 </section>
 </section>
 

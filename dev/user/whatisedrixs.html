@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>What is EDRIXS? &mdash; EDRIXS 0+untagged.1.g5436d68 documentation</title>
+  <title>Start here &mdash; EDRIXS 0+untagged.1.g31baa43 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=78c07697"></script>
+      <script src="../_static/documentation_options.js?v=04eac77b"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -60,7 +60,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">EDRIXS User Guide</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">What is EDRIXS?</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Start here</a></li>
 <li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="usedocker.html">EDRIXS and docker</a></li>
 <li class="toctree-l2"><a class="reference internal" href="devcontainer.html">Dev Container</a></li>
@@ -91,7 +91,7 @@
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
           <li class="breadcrumb-item"><a href="index.html">EDRIXS User Guide</a></li>
-      <li class="breadcrumb-item active">What is EDRIXS?</li>
+      <li class="breadcrumb-item active">Start here</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/user/whatisedrixs.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -101,13 +101,38 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="what-is-edrixs">
-<h1>What is EDRIXS?<a class="headerlink" href="#what-is-edrixs" title="Link to this heading"></a></h1>
-<p>EDRIXS is an open source toolkit for simulating XAS and RIXS spectra based on exact diagonalization of model Hamiltonians.
-It was started as part of the <a class="reference external" href="https://www.bnl.gov/comscope/">COMSCOPE project</a> in the
-Center for Computational Material Spectroscopy and Design, Brookhaven National Laboratory and is now maintained and
-developed in collaboration between the <a class="reference external" href="https://www.bnl.gov/cmpmsd/">Condensed Matter Physics and Materials Science Division</a>
-and the <a class="reference external" href="https://www.bnl.gov/nsls2/">National Syncrotron Light Source II</a>.</p>
+  <section id="start-here">
+<span id="id1"></span><h1>Start here<a class="headerlink" href="#start-here" title="Link to this heading"></a></h1>
+<p>EDRIXS is an open source toolkit that uses exact diagonalization of model Hamiltonians to calculate X-ray
+absorption (XAS) and resonant inelastic X-ray scattering (RIXS), as well as
+energy levels, eigenstates, and observables of correlated-electron models.</p>
+<p>It began as part of the <a class="reference external" href="https://www.bnl.gov/comscope/">COMSCOPE project</a>
+in the Center for Computational Material Spectroscopy and Design at Brookhaven
+National Laboratory. It is maintained and developed in collaboration between
+the <a class="reference external" href="https://www.bnl.gov/cmpmsd/">Condensed Matter Physics and Materials Science Division</a> and the <a class="reference external" href="https://www.bnl.gov/nsls2/">National Synchrotron Light Source II</a>.</p>
+<p>Choose a starting point for what you want to do:</p>
+<ul class="simple">
+<li><p><strong>Install EDRIXS:</strong> <a class="reference internal" href="installation.html"><span class="doc">Installation</span></a> covers released packages, source
+builds, and Colab, and links to the Docker and development-container guides.
+Use documentation for the version you install; the development documentation
+can describe interfaces that are absent from a released package.</p></li>
+<li><p><strong>Run a complete XAS or RIXS calculation:</strong> start with
+<a class="reference internal" href="nio_l23_xas.html#nio-l23-xas"><span class="std std-ref">NiO crystal-field L_{2,3} XAS &amp; RIXS</span></a> for an ionic Ni model, then
+<a class="reference internal" href="nio_siam_xas_rixs.html#nio-siam-xas-rixs"><span class="std std-ref">NiO Anderson impurity model XAS and RIXS</span></a> to include ligand hybridization and charge transfer.
+Both pages include executable Python code and the resulting spectra.</p></li>
+<li><p><strong>Understand the calculation workflow:</strong> <a class="reference internal" href="introduction.html#introduction"><span class="std std-ref">Introduction to EDRIXS</span></a> explains how
+model parameters become Hamiltonians, eigenstates, and spectra.</p></li>
+<li><p><strong>Learn the physics or build a custom Hamiltonian:</strong> the
+<a class="reference internal" href="../auto_examples/index.html"><span class="doc">Pedagogical examples</span></a> work through diagonalization, crystal fields,
+Coulomb interactions, and spectroscopy. They also illustrate calculations
+without core orbitals or photon transitions.</p></li>
+<li><p><strong>Check units, basis order, or spectral widths:</strong> see <a class="reference internal" href="conventions.html#conventions"><span class="std std-ref">Conventions</span></a>.</p></li>
+<li><p><strong>Choose a solver or improve convergence:</strong> see <a class="reference internal" href="backend.html#backend"><span class="std std-ref">Backend</span></a> and the
+backend settings linked there.</p></li>
+<li><p><strong>Look up a function:</strong> see <a class="reference internal" href="../reference/index.html#reference"><span class="std std-ref">EDRIXS Reference</span></a>.</p></li>
+</ul>
+<p>The scripts can run in a terminal or a notebook. You do not need to read every
+pedagogical example before running the NiO calculations.</p>
 </section>
 
 

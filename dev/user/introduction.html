@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Introduction to EDRIXS &mdash; EDRIXS 0+untagged.1.g5436d68 documentation</title>
+  <title>Introduction to EDRIXS &mdash; EDRIXS 0+untagged.1.g31baa43 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/plot_directive.css" />
@@ -20,7 +20,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=78c07697"></script>
+      <script src="../_static/documentation_options.js?v=04eac77b"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
@@ -61,7 +61,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">EDRIXS User Guide</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="whatisedrixs.html">What is EDRIXS?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="whatisedrixs.html">Start here</a></li>
 <li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="usedocker.html">EDRIXS and docker</a></li>
 <li class="toctree-l2"><a class="reference internal" href="devcontainer.html">Dev Container</a></li>
@@ -141,11 +141,11 @@ to the next are shown in gray to the right of the arrows.</span><a class="header
 carries out the linear algebra for the last three stages is described on its
 own page.  The units, naming, orbital orderings, single-particle bases,
 Fock-basis encoding and spectral conventions are collected separately on the
-<a class="reference internal" href="conventions.html#conventions"><span class="std std-ref">Conventions</span></a> page, and the <a class="reference internal" href="examples.html#examples"><span class="std std-ref">pedagogical examples</span></a> work
+<a class="reference internal" href="conventions.html#conventions"><span class="std std-ref">Conventions</span></a> page, and the <a class="reference internal" href="../auto_examples/index.html"><span class="doc">Pedagogical examples</span></a> work
 through the same material in more physical detail.</p>
 <p>If you prefer to begin with a complete calculation, skip ahead to either the
-<a class="reference internal" href="nio_l23_xas.html#nio-l23-xas"><span class="std std-ref">NiO crystal-field example</span></a> or the
-<a class="reference internal" href="nio_siam_xas_rixs.html#nio-siam-xas-rixs"><span class="std std-ref">NiO Anderson impurity example</span></a> and return to this
+<a class="reference internal" href="nio_l23_xas.html#nio-l23-xas"><span class="std std-ref">NiO crystal-field L_{2,3} XAS &amp; RIXS</span></a> or
+<a class="reference internal" href="nio_siam_xas_rixs.html#nio-siam-xas-rixs"><span class="std std-ref">NiO Anderson impurity model XAS and RIXS</span></a> and return to this
 overview as needed.</p>
 <section id="the-physical-model">
 <span id="physical-model"></span><h2>The physical model<a class="headerlink" href="#the-physical-model" title="Link to this heading"></a></h2>
@@ -159,13 +159,35 @@ overview as needed.</p>
 Anderson impurity model with one <span class="math notranslate nohighlight">\(d\)</span> impurity shell, one bath shell,
 and one <span class="math notranslate nohighlight">\(p\)</span> core shell (for L-edge spectroscopy).</p></li>
 </ul>
-<p>Each returns a description of the problem, building no operators itself:</p>
+<p>These are conveniences for common spectroscopy models. You can also supply
+your own <code class="docutils literal notranslate"><span class="pre">emat</span></code>, <code class="docutils literal notranslate"><span class="pre">umat</span></code>, and Fock basis to <a class="reference internal" href="../reference/solvers.html#edrixs.solvers.build_op" title="edrixs.solvers.build_op"><code class="xref py py-func docutils literal notranslate"><span class="pre">build_op()</span></code></a>,
+for example to study a Hamiltonian without core electrons or calculate
+observables without computing spectra. See the
+<a class="reference internal" href="../auto_examples/example_00_ed_calculator.html#sphx-glr-auto-examples-example-00-ed-calculator-py"><span class="std std-ref">Exact diagonalization</span></a> example.</p>
+<p>Each constructor returns eight values describing the model, without building
+many-body operators:</p>
 <ul class="simple">
 <li><p>the one-body matrices <code class="docutils literal notranslate"><span class="pre">emat_i</span></code> / <code class="docutils literal notranslate"><span class="pre">emat_n</span></code>,</p></li>
 <li><p>the Coulomb tensors <code class="docutils literal notranslate"><span class="pre">umat_i</span></code> / <code class="docutils literal notranslate"><span class="pre">umat_n</span></code>,</p></li>
-<li><p>compact Fock-basis specifications <code class="docutils literal notranslate"><span class="pre">basis_i</span></code> / <code class="docutils literal notranslate"><span class="pre">basis_n</span></code>, and</p></li>
-<li><p>the Cartesian photon transition matrices <code class="docutils literal notranslate"><span class="pre">trans_mat</span></code>.</p></li>
+<li><p>compact Fock-basis specifications <code class="docutils literal notranslate"><span class="pre">basis_i</span></code> / <code class="docutils literal notranslate"><span class="pre">basis_n</span></code>,</p></li>
+<li><p>the photon transition matrices <code class="docutils literal notranslate"><span class="pre">trans_mat</span></code>, and</p></li>
+<li><p>the filled-core energy offset <code class="docutils literal notranslate"><span class="pre">shift</span></code> used to improve ED precision.</p></li>
 </ul>
+<p>The examples collect the first seven values in a Python list called
+<code class="docutils literal notranslate"><span class="pre">problem</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">*</span><span class="n">problem</span><span class="p">,</span> <span class="n">shift</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">model_1v1c</span><span class="p">((</span><span class="s1">'d'</span><span class="p">,</span> <span class="s1">'p'</span><span class="p">),</span> <span class="n">v_noccu</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">hmat_i</span><span class="p">,</span> <span class="n">hmat_n</span><span class="p">,</span> <span class="n">trans_ops</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">get_ops</span><span class="p">(</span><span class="o">*</span><span class="n">problem</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">'scipy'</span><span class="p">)</span>
+<span class="n">eval_i</span><span class="p">,</span> <span class="n">evec_i</span> <span class="o">=</span> <span class="n">edrixs</span><span class="o">.</span><span class="n">ed</span><span class="p">(</span><span class="n">hmat_i</span><span class="p">,</span> <span class="n">shift</span><span class="o">=</span><span class="n">shift</span><span class="p">,</span> <span class="n">num_evals</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Here <code class="docutils literal notranslate"><span class="pre">problem</span></code> is an ordinary list of model inputs; <code class="docutils literal notranslate"><span class="pre">*problem</span></code> unpacks it
+into the seven arguments of <code class="docutils literal notranslate"><span class="pre">get_ops</span></code>. It contains no many-body matrices or
+eigenstates.</p>
+<p>In the NiO example, <code class="docutils literal notranslate"><span class="pre">edge_shift</span></code> sets the photon-energy reference through
+<code class="docutils literal notranslate"><span class="pre">shell_level=(0.0,</span> <span class="pre">-edge_shift)</span></code>. Lowering the core level by this amount
+raises the absorption energies by the same amount. This empirical alignment
+parameter differs from the numerical <code class="docutils literal notranslate"><span class="pre">shift</span></code> returned by the constructor;
+see <a class="reference internal" href="conventions.html#conventions"><span class="std std-ref">Conventions</span></a>.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">_i</span></code> suffix marks the initial and final states, which have no core hole,
 and <code class="docutils literal notranslate"><span class="pre">_n</span></code> the intermediate state, which has one.</p>
 <p><code class="docutils literal notranslate"><span class="pre">emat</span></code> and <code class="docutils literal notranslate"><span class="pre">umat</span></code> are the coefficients of a second-quantized Hamiltonian</p>
@@ -215,11 +237,11 @@ prepares everything an XAS or RIXS calculation needs in one call:</p>
 Fock spaces, without and with a core hole.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">trans_mat</span></code> – the Cartesian photon transition matrices from the model.</p></li>
 </ul>
-<p>It returns <code class="docutils literal notranslate"><span class="pre">hmat_i</span></code>, <code class="docutils literal notranslate"><span class="pre">hmat_n</span></code> and the many-body transition operators
-<code class="docutils literal notranslate"><span class="pre">trans_ops</span></code> as labeled factories for numerical backends, or disk handles for
-Fortran. Pass these directly to <code class="docutils literal notranslate"><span class="pre">ed</span></code>, <code class="docutils literal notranslate"><span class="pre">xas</span></code>, and <code class="docutils literal notranslate"><span class="pre">rixs</span></code>; the solvers read
-their <code class="docutils literal notranslate"><span class="pre">.backend</span></code> labels and pass the factories to the backend for matrix
-construction. These solver functions
+<p>It returns <code class="docutils literal notranslate"><span class="pre">hmat_i</span></code>, <code class="docutils literal notranslate"><span class="pre">hmat_n</span></code> and <code class="docutils literal notranslate"><span class="pre">trans_ops</span></code> as instructions for building
+the many-body matrices when a solver needs them. These callable objects are
+also called <em>operator factories</em>. Fortran uses handles to input files instead.
+Pass the returned objects directly to <code class="docutils literal notranslate"><span class="pre">ed</span></code>, <code class="docutils literal notranslate"><span class="pre">xas</span></code>, and <code class="docutils literal notranslate"><span class="pre">rixs</span></code>; their
+<code class="docutils literal notranslate"><span class="pre">.backend</span></code> labels select the backend automatically. These solver functions
 do not accept a <code class="docutils literal notranslate"><span class="pre">backend</span></code> keyword. Because XAS and RIXS connect states with
 no core hole to states with exactly one core hole, keeping the two Hamiltonians
 separate avoids the
@@ -269,11 +291,9 @@ resolution width <code class="docutils literal notranslate"><span class="pre">ga
 <code class="docutils literal notranslate"><span class="pre">(len(ominc),</span> <span class="pre">len(eloss),</span> <span class="pre">len(pol_type))</span></code>.  It is very common to compute two
 different emitted polarizations and sum them, since this is what happens for
 RIXS with no scattered-polarization analysis.</p>
-<p>See <a class="reference internal" href="../auto_examples/example_02_single_atom_RIXS.html#sphx-glr-auto-examples-example-02-single-atom-rixs-py"><span class="std std-ref">RIXS calculations for an atomic model</span></a> for a fully
-worked calculation of the
-<a class="reference internal" href="../reference/models.html#edrixs.models.model_1v1c" title="edrixs.models.model_1v1c"><code class="xref py py-func docutils literal notranslate"><span class="pre">model_1v1c()</span></code></a> model including plotting the
-incident-energy / energy-loss map. Other models have more parameters
-to pay attention to but are, in most ways, not fundamentally more complicated.</p>
+<p>See <a class="reference internal" href="nio_l23_xas.html#nio-l23-xas"><span class="std std-ref">NiO crystal-field L_{2,3} XAS &amp; RIXS</span></a> to continue the ionic Ni calculation through RIXS at
+the XAS maximum, or <a class="reference internal" href="nio_siam_xas_rixs.html#nio-siam-xas-rixs"><span class="std std-ref">NiO Anderson impurity model XAS and RIXS</span></a> for a NiO incident-energy /
+energy-loss map including ligand hybridization.</p>
 </section>
 <section id="where-to-go-next">
 <h2>Where to go next<a class="headerlink" href="#where-to-go-next" title="Link to this heading"></a></h2>
