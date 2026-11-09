@@ -6,11 +6,6 @@ Installation
 For Linux and macOS, we recommend installation via Mamba. Windows users should use the :ref:`Docker instructions
 <edrixsanddocker>`.
 
-Choose a released package for routine use, or build the current source to use
-the development interface documented here. For a ready-made notebook
-environment, see :ref:`edrixsanddocker`; for an editor with EDRIXS already
-configured, see :ref:`devcontainer`.
-
 
 .. _AnacondaInstall:
 
@@ -40,7 +35,7 @@ default. Install Conda and then edrixs from within a notebook cell::
 Build the current source with Mamba on Linux or macOS
 =====================================================
 
-This is the recommended way to build the current source on
+If you need access to the bleeding-edge version, this is the recommended way to build the current source on
 Linux and macOS. See the :ref:`macOS compiler note <macos-sdk-note>` if the
 standard build fails on a recent macOS release.
 
