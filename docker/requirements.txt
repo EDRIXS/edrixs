@@ -103,7 +103,7 @@ scipy==1.18.1
 setuptools==84.1.0
 six==1.17.0
 snowballstemmer==3.1.1
-soupsieve==2.9.2
+soupsieve==4.0
 sphinxcontrib-applehelp==2.0.0
 sphinxcontrib-devhelp==2.0.0
 sphinxcontrib-htmlhelp==2.1.0
